@@ -97,12 +97,19 @@ export class DdataTextareaComponent implements OnInit, AfterViewInit {
   @Input() autoFocus = false;
   @Input() wrapperClass = 'd-flex flex-wrap';
   @Input() rows = '5';
+  @Input() enableCharacterCounter = false;
+  @Input() enableWordCounter = false;
+  @Input() maxLength = 255;
+  @Input() maxWords = 7;
+  @Input() wordCounterWarningMessage = '';
 
   @Output() changed: EventEmitter<any> = new EventEmitter();
 
   @ViewChild('inputBox') inputBox: ElementRef;
 
   random: string = this.helperService.randChars();
+
+  displayWordCounterWarning = false;
 
   constructor() { }
 
@@ -121,6 +128,10 @@ export class DdataTextareaComponent implements OnInit, AfterViewInit {
     if (isValid) {
       this.changed.emit(this._model);
     }
+  }
+
+  setWordCounterWarning(value: boolean): void {
+    this.displayWordCounterWarning = value;
   }
 
 }
