@@ -13,10 +13,10 @@ export class CharacterCounterComponent {
 
   @Input() set currentLength(value: string | null | undefined) {
     if (!value) {
-      return;
+      this._currentLength = '';
+    } else {
+      this._currentLength = value;
     }
-
-    this._currentLength = value;
   }
 
   _currentLength = '';
