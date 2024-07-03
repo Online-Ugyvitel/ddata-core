@@ -109,11 +109,6 @@ export class DdataMultipleSelectComponent implements OnInit {
     this.selectModel.emit(event);
   }
 
-  // deleteFromMultipleSelectedList(item: any): void {
-  //   this.model[this.field].splice(this.model[this.field].indexOf(item), 1);
-  //   this._dialogSettings.listOptions.selectedElements.splice(this.model[this.field].indexOf(item), 1);
-  // }
-
   deleteFromMultipleSelectedList(item: any): void {
     const index = this.model[this.field].indexOf(item);
     if (index !== -1) {
