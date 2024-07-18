@@ -1,0 +1,6 @@
+<div class="input-group-append" title="Kulcsszavak száma">
+  <!-- eslint-disable-next-line @angular-eslint/template/no-call-expression -->
+  <span class="input-group-text" [class.bg-warning]="wordsNumber() > maxLength">
+    {{ wordsNumber() }} / {{ maxLength }}
+  </span>
+</div>
