@@ -24,7 +24,7 @@ export class DdataInputComponent implements OnInit, AfterViewInit {
   _isRequired = false;
   _model: BaseModelInterface<any> & FieldsInterface<any> = new BaseModel();
 
-  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any>) {
+  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any> | null) {
     // prevent undefined
     if (!value) {
       console.error('The input-box component get undefined model');

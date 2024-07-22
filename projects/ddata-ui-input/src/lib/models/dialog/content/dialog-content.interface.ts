@@ -20,8 +20,8 @@ export interface DialogContentInterface extends OptionsInterface {
 }
 
 export interface DialogContentWithOptionsInterface {
-  createEditComponent: Type<any>;
+  createEditComponent?: Type<any>;
   createEditOptions?: OptionsInterface;
-  listComponent: Type<any>;
+  listComponent?: Type<any>;
   listOptions?: OptionsInterface;
 }

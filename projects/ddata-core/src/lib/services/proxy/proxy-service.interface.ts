@@ -5,7 +5,7 @@ import { FileUploadProcessInterface } from '../../models/file/file-upload-proces
 import { DataServiceAbstractInterface } from '../data/data-service-abstract.interface';
 
 export interface ProxyServiceInterface<T extends BaseModelInterface<T>> extends DataServiceAbstractInterface<T> {
-  getOne(id: number): Observable<T | Observable<T>>;
+  getOne(id: number): Observable<T>;
   getAll(pageNumber?: number): Observable<PaginateInterface>;
   getAllSortedBy(fieldName?: string): Observable<T[]>;
   getAllSortedByDesc(fieldName: string): Observable<T[]>;
@@ -21,9 +21,9 @@ export interface ProxyServiceInterface<T extends BaseModelInterface<T>> extends 
 
   postUri(data: any, uri: string): Observable<any>;
 
-  save(model: T): Observable<number | Observable<number>>;
+  save(model: T): Observable<number>;
 
-  delete(model: T, paginate: PaginateInterface): Observable<PaginateInterface | Observable<PaginateInterface>>;
+  delete(model: T, paginate: PaginateInterface): Observable<PaginateInterface>;
   deleteMultiple(models: T[], paginate: PaginateInterface): Observable<PaginateInterface | Observable<PaginateInterface>>;
 
   watch(): Observable<boolean>;

@@ -19,7 +19,11 @@ export class DdataInputColorComponent implements OnInit {
   _isRequired = false;
   _model: BaseModelInterface<any> & FieldsInterface<any> = new BaseModel();
 
-  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any>) {
+  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any> | null) {
+    if (!value) {
+      value = new BaseModel();
+    }
+
     this._model = value;
 
     if (!!this._model && !!this._model.fields[this._field]) {

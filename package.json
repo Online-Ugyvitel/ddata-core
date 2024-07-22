@@ -39,7 +39,7 @@
     "@fortawesome/angular-fontawesome": "^0.12.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
-    "@ng-bootstrap/ng-bootstrap": "^13.1.1",
+    "@ng-bootstrap/ng-bootstrap": "^14.2.0",
     "moment": "^2.29.4",
     "ngx-color-picker": "^10.1.0",
     "ngx-daterangepicker-material": "^5.0.1",

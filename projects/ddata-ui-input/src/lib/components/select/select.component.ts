@@ -19,6 +19,7 @@ export class DdataSelectComponent implements OnInit {
   _prepend = '';
   _append = '';
   _isRequired = false;
+  _items = [];
   _model: BaseModelInterface<any> & FieldsInterface<any> = new BaseModel();
   _selectedModelName = '';
   _mode = 'simple';
@@ -57,7 +58,7 @@ export class DdataSelectComponent implements OnInit {
     this._mode = value ?? 'simple';
   }
 
-  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any>) {
+  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any> | null) {
     if (!value) {
       return;
     }
@@ -109,6 +110,14 @@ export class DdataSelectComponent implements OnInit {
     this._field = value;
   }
 
+  @Input() set items(value: any[] | null) {
+    if (!value) {
+      return;
+    }
+
+    this._items = value;
+  }
+
   @Input() wrapperClass = 'd-flex flex-wrap';
   @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
   @Input() inputBlockClass = 'col-12 d-flex px-0';
@@ -117,7 +126,6 @@ export class DdataSelectComponent implements OnInit {
   @Input() disabledAppearance = false;
   @Input() disabled = false;
   @Input() addEmptyOption = true;
-  @Input() items: any[] = [];
   @Input() dialogSettings: DialogContentWithOptionsInterface;
   @Input() text = 'name';
   @Input() valueField = 'id';

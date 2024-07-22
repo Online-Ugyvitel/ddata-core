@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./loading-overlay.component.css']
 })
 export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
-  subscription: Subscription;
+  subscriptions: Subscription = new Subscription();
   // tslint:disable-next-line: variable-name
   _spinner = true;
   @Input() loadingInProgress = false;
@@ -25,13 +25,15 @@ export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
   constructor() { }
 
   ngOnInit(): void {
-    this.subscription = this.spinnerService.watch().subscribe((isLoading: boolean) => {
-      this.loadingInProgress = isLoading;
-    });
+    this.subscriptions.add(
+      this.spinnerService.watch().subscribe((isLoading: boolean) => {
+        this.loadingInProgress = isLoading;
+      })
+    );
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 
 }

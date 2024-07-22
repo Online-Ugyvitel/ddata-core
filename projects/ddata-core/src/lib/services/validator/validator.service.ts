@@ -83,7 +83,9 @@ export class ValidatorService {
     // TODO megcsinálni, hogy kitalálja a függvény a szabályt a típus alapján. Pl. BankAccountNumber - bankaacount
 
     ruleList.forEach((rule: string)  => {
-      switch (rule) {
+      const [ruleType, ruleValue] = rule.split(':');
+
+      switch (ruleType) {
         case 'string':
           results.push(this.isString(data));
           break;
@@ -168,9 +170,12 @@ export class ValidatorService {
         case 'swift_code':
           results.push(this.isSwiftCode(data));
           break;
-
-        // TODO min:N
-        // TODO max:N
+        case 'min':
+          results.push(this.min(data, Number(ruleValue)));
+          break;
+        case 'max':
+          results.push(this.max(data, Number(ruleValue)));
+          break;
 
         default:
           results.push(false);
@@ -185,19 +190,41 @@ export class ValidatorService {
     return value;
   }
 
-  // TODO: befejezni
   min(data: any, minimum: number): boolean {
-    if (data.length >= minimum) {
-      return true;
+    // number
+    if (typeof data === 'number') {
+      return data >= minimum;
     }
+
+    // array length
+    if (data instanceof Array) {
+      return data.length >= minimum;
+    }
+
+    // string length
+    if (typeof data === 'string') {
+      return data.length >= minimum;
+    }
+
     return false;
   }
 
-  // TODO: befejezni
   max(data: any, maximum: number): boolean {
-    if (data.length <= maximum) {
-      return true;
+    // number
+    if (typeof data === 'number') {
+      return data <= maximum;
     }
+
+    // array length
+    if (data instanceof Array) {
+      return data.length <= maximum;
+    }
+
+    // string length
+    if (typeof data === 'string') {
+      return data.length <= maximum;
+    }
+
     return false;
   }
 

@@ -129,7 +129,7 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     }));
   }
 
-  save(model: T): Observable<number | Observable<number>> {
+  save(model: T): Observable<number> {
     if (!model) {
       return of(0);
     }

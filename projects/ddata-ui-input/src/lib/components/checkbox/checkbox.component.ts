@@ -15,7 +15,7 @@ export class DdataInputCheckboxComponent implements OnInit {
   _label = '';
 
   @Input() disabled = false;
-  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any>) {
+  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any> | null) {
     if (!value) {
       value = new BaseModel();
     }
