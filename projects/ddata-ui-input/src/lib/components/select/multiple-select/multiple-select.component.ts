@@ -112,13 +112,15 @@ export class DdataMultipleSelectComponent implements OnInit {
   deleteFromMultipleSelectedList(item: any): void {
     const index = this.model[this.field].indexOf(item);
     if (index !== -1) {
-      this.model[this.field].splice(index, 1);
+        this.model[this.field].splice(index, 1);
     }
+
     const dialogIndex = this._dialogSettings.listOptions.selectedElements.indexOf(item);
+
     if (dialogIndex !== -1) {
-      this._dialogSettings.listOptions.selectedElements.splice(dialogIndex, 1);
+        this._dialogSettings.listOptions.selectedElements.splice(dialogIndex, 1);
     }
-  }
+}
 
   getObjectFieldName(): string {
     return this.field.split('_id')[0];
