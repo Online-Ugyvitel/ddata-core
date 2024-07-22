@@ -99,12 +99,21 @@ export class DdataInputComponent implements OnInit, AfterViewInit {
   @Input() wrapperClass = 'd-flex flex-wrap';
   @Input() showLabel = true;
   @Input() autoFocus = false;
+  @Input() enableCharacterCounter = false;
+  @Input() enableWordCounter = false;
+  @Input() maxLength = 255;
+  @Input() maxWords = 7;
+  @Input() wordCounterWarningMessage = '';
 
   @Output() changed: EventEmitter<any> = new EventEmitter();
+
+  @Output() readonly maxLengthReached: EventEmitter<boolean> = new EventEmitter();
 
   @ViewChild('inputBox') inputBox: ElementRef;
 
   random: string = this.helperService.randChars();
+
+  displayWordCounterWarning = false;
 
   constructor() { }
 
@@ -125,4 +134,7 @@ export class DdataInputComponent implements OnInit, AfterViewInit {
     }
   }
 
+  setWordCounterWarning(value: boolean): void {
+    this.displayWordCounterWarning = value;
+  }
 }
