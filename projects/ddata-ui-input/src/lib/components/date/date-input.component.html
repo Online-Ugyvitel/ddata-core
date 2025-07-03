@@ -35,8 +35,7 @@
     </ng-container>
 
     <label [class]="buttonClass" *ngIf="!disabled && showIcon" [for]="_field + '_' + random">
-      <!-- TODO: Fix FontAwesome 2.x integration -->
-      <span>📅</span>
+      <fa-icon [icon]="icon.calendar"></fa-icon>
     </label>
 
     <div class="input-group-append" *ngIf="_append != ''">

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DdataUiCommonModule } from 'ddata-ui-common';
 import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
@@ -37,6 +38,7 @@ import { DdataInputTimeComponent } from './components/time/time-input.component'
     ColorPickerComponent,
     ColorPickerDirective,
     CommonModule,
+    FontAwesomeModule,
     FormsModule,
     NgxMaterialTimepickerModule,
     DdataUiCommonModule,

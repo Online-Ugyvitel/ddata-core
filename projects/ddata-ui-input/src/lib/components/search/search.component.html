@@ -6,8 +6,7 @@
 
     <div class="input-group-append">
       <button type="submit" class="btn btn-secondary border-0" (click)="search()">
-        <!-- TODO: Fix FontAwesome 2.x integration -->
-        <span>🔍</span>
+        <fa-icon [icon]="icon.search" [fixedWidth]="true"></fa-icon>
       </button>
     </div>
 
@@ -19,8 +18,7 @@
       <div class="row">
         <!-- icon -->
         <div class="col-1 px-0 text-center text-muted">
-          <!-- TODO: Fix FontAwesome 2.x integration -->
-          <span>📄</span>
+          <fa-icon [icon]="model.icon" [fixedWidth]="true"></fa-icon>
         </div>
         <div class="col-10">
           <!-- name -->

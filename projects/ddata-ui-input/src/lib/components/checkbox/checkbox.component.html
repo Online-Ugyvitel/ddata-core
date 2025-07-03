@@ -15,8 +15,7 @@
     [name]="_field + iterable"
     [title]="_label"
     >
-    <!-- TODO: Fix FontAwesome 2.x integration -->
-    <span>{{ model[_field] ? '☑' : '☐' }}</span>
+    <fa-icon [icon]="getIcon()"></fa-icon>
   </button>
 
   <label *ngIf="showLabel && showLabelAfter"
