@@ -1,6 +1,6 @@
 // tslint:disable: variable-name
 import 'zone.js/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injector } from '@angular/core';
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
@@ -10,6 +10,7 @@ import { BaseModel, BaseModelWithoutTypeDefinitionInterface } from '../../models
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { Paginate } from '../../models/paginate/paginate.model';
 import { RemoteDataService } from './remote-data.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 interface DummyDataInterface extends BaseModelWithoutTypeDefinitionInterface {
   id: ID;
@@ -64,16 +65,14 @@ xdescribe('RemoteDataService', () => {
   // set TestBed before each tests
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        // angular testing module that provides mocking for http connections
-        HttpClientTestingModule,
-      ],
-      // add declaration of services or components and use inject to get to them in tests
-      providers: [
+    imports: [],
+    providers: [
         Injector,
         { provide: RemoteDataService, useValue: new DummyData() },
-      ]
-    });
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
   }));
 
   beforeEach(() => {
