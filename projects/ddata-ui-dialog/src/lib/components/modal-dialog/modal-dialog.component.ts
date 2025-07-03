@@ -9,9 +9,10 @@ import { DialogContentItem } from '../../models/dialog/content/dialog-content-it
 import { DialogContentInterface } from '../../models/dialog/content/dialog-content.interface';
 
 @Component({
-  selector: 'dd-modal-dialog',
-  templateUrl: './modal-dialog.component.html',
-  styleUrls: ['./modal-dialog.component.scss']
+    selector: 'dd-modal-dialog',
+    templateUrl: './modal-dialog.component.html',
+    styleUrls: ['./modal-dialog.component.scss'],
+    standalone: false
 })
 export class DdataUiModalDialogComponent implements OnInit {
   isModalVisible = false;

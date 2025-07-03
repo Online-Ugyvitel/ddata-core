@@ -7,9 +7,10 @@ import { InputHelperServiceInterface } from '../../services/input/helper/input-h
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 @Component({
-  selector: 'dd-input-date',
-  templateUrl: './date-input.component.html',
-  styleUrls: ['./date-input.component.scss']
+    selector: 'dd-input-date',
+    templateUrl: './date-input.component.html',
+    styleUrls: ['./date-input.component.scss'],
+    standalone: false
 })
 export class DdataInputDateComponent implements OnInit {
   helperService: InputHelperServiceInterface = DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);

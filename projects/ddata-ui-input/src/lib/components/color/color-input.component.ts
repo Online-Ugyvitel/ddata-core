@@ -3,9 +3,10 @@ import { BaseModel, BaseModelInterface, DdataCoreModule, FieldsInterface, Valida
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 @Component({
-  selector: 'dd-input-color',
-  templateUrl: './color-input.component.html',
-  styleUrls: ['./color-input.component.scss']
+    selector: 'dd-input-color',
+    templateUrl: './color-input.component.html',
+    styleUrls: ['./color-input.component.scss'],
+    standalone: false
 })
 export class DdataInputColorComponent implements OnInit {
 

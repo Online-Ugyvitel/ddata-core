@@ -1,6 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'clearModel' })
+@Pipe({
+    name: 'clearModel',
+    standalone: false
+})
 export class ClearModelPipe implements PipeTransform {
   removeProperties(model: any): any {
     delete model.api_endpoint;

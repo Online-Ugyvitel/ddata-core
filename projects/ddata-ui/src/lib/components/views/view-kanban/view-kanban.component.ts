@@ -9,9 +9,10 @@ import { ViewKanbanInterface } from 'src/app/models/view/kanban/view-kanban.inte
 import { ViewKanban } from 'src/app/models/view/kanban/view-kanban.model';
 
 @Component({
-  selector: 'app-view-kanban',
-  templateUrl: './view-kanban.component.html',
-  styleUrls: ['./view-kanban.component.scss']
+    selector: 'app-view-kanban',
+    templateUrl: './view-kanban.component.html',
+    styleUrls: ['./view-kanban.component.scss'],
+    standalone: false
 })
 export class ViewKanbanComponent implements AfterViewInit {
   @Input() set data(data: BehaviorSubject<CasefileInterface[]>) {

@@ -5,9 +5,10 @@ import { BaseModel, BaseModelInterface } from 'src/app/models/base-model/base-mo
 import { Global } from 'src/app/models/global.model';
 
 @Component({
-  selector: 'app-list-buttons',
-  templateUrl: './list-buttons.component.html',
-  styleUrls: ['./list-buttons.component.scss']
+    selector: 'app-list-buttons',
+    templateUrl: './list-buttons.component.html',
+    styleUrls: ['./list-buttons.component.scss'],
+    standalone: false
 })
 export class ListButtonsComponent implements OnInit {
   /**

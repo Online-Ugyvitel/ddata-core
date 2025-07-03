@@ -3,9 +3,10 @@ import { TabService } from 'src/app/services/tab/tab.service';
 import { TabsetComponent } from 'ngx-bootstrap/tabs';
 
 @Component({
-  selector: 'app-tab-button',
-  templateUrl: './tab-button.component.html',
-  styleUrls: ['./tab-button.component.scss']
+    selector: 'app-tab-button',
+    templateUrl: './tab-button.component.html',
+    styleUrls: ['./tab-button.component.scss'],
+    standalone: false
 })
 export class TabButtonComponent implements OnInit {
   @Input() service: TabService;

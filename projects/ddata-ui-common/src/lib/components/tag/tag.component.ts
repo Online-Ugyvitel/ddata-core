@@ -6,9 +6,10 @@ interface TagInterface {
 }
 
 @Component({
-  selector: 'dd-tag',
-  templateUrl: './tag.component.html',
-  styleUrls: ['./tag.component.scss']
+    selector: 'dd-tag',
+    templateUrl: './tag.component.html',
+    styleUrls: ['./tag.component.scss'],
+    standalone: false
 })
 export class DdataUiTagComponent implements OnInit {
   // tslint:disable-next-line: variable-name

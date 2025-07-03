@@ -14,9 +14,10 @@ interface HasFileModel {
 }
 
 @Component({
-  selector: 'dd-file-list',
-  templateUrl: './file-list.component.html',
-  styleUrls: ['./file-list.component.css']
+    selector: 'dd-file-list',
+    templateUrl: './file-list.component.html',
+    styleUrls: ['./file-list.component.css'],
+    standalone: false
 })
 export class DdataUiFileListComponent implements OnInit {
   @Inject('config') private config: ModuleConfiguration = {lang: 'en'};

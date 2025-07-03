@@ -6,9 +6,10 @@ import { InputHelperService } from '../../services/input/helper/input-helper.ser
 import { SelectType } from './select.type';
 
 @Component({
-  selector: 'dd-select',
-  templateUrl: './select.component.html',
-  styleUrls: ['./select.component.scss']
+    selector: 'dd-select',
+    templateUrl: './select.component.html',
+    styleUrls: ['./select.component.scss'],
+    standalone: false
 })
 export class DdataSelectComponent implements OnInit {
   private helperService: InputHelperServiceInterface =

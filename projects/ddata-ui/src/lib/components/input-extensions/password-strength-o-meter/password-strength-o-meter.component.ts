@@ -1,9 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-password-strength-o-meter',
-  templateUrl: './password-strength-o-meter.component.html',
-  styleUrls: ['./password-strength-o-meter.component.css']
+    selector: 'app-password-strength-o-meter',
+    templateUrl: './password-strength-o-meter.component.html',
+    styleUrls: ['./password-strength-o-meter.component.css'],
+    standalone: false
 })
 export class PasswordStrengthOMeterComponent implements OnInit {
   // _level = 0;

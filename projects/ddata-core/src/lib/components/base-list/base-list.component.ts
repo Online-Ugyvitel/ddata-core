@@ -11,7 +11,8 @@ import { BaseListComponentInterface } from './base-list-component.interface';
 
 // @dynamic
 @Component({
-  template: '',
+    template: '',
+    standalone: false
 })
 export abstract class BaseListComponent<T extends BaseModelInterface<T>>
   implements OnInit, BaseListComponentInterface<T> {

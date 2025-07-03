@@ -7,7 +7,8 @@ import { SelectableListComponentInterface } from './selectable-list.component.in
 
 // @dynamic
 @Component({
-  template: '',
+    template: '',
+    standalone: false
 })
 export abstract class SelectableListComponent<T extends BaseModelInterface<T> & SelectableInterface>
   extends BaseListComponent<T>

@@ -9,9 +9,10 @@ import { DialogContentWithOptionsInterface } from '../../../../models/dialog/con
 import { SelectType } from '../../select.type';
 
 @Component({
-  selector: 'multiple-select-dialog',
-  templateUrl: './multiple-select-dialog.component.html',
-  styleUrls: ['./multiple-select-dialog.component.scss']
+    selector: 'multiple-select-dialog',
+    templateUrl: './multiple-select-dialog.component.html',
+    styleUrls: ['./multiple-select-dialog.component.scss'],
+    standalone: false
 })
 export class DdataMultipleSelectDialogComponent implements OnInit {
   private componentRendererService: ComponentRendererService;

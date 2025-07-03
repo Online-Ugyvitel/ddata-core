@@ -4,10 +4,11 @@ import { DdataCoreModule, SpinnerService, SpinnerServiceInterface } from 'ddata-
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'dd-loading-overlay',
-  templateUrl: './loading-overlay.component.html',
-  styleUrls: ['./loading-overlay.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'dd-loading-overlay',
+    templateUrl: './loading-overlay.component.html',
+    styleUrls: ['./loading-overlay.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
   subscriptions: Subscription = new Subscription();

@@ -4,9 +4,10 @@ import { faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { BaseModel, BaseModelInterface, FieldsInterface } from 'ddata-core';
 
 @Component({
-  selector: 'dd-input-checkbox',
-  templateUrl: './checkbox.component.html',
-  styleUrls: ['./checkbox.component.css']
+    selector: 'dd-input-checkbox',
+    templateUrl: './checkbox.component.html',
+    styleUrls: ['./checkbox.component.css'],
+    standalone: false
 })
 export class DdataInputCheckboxComponent implements OnInit {
   // tslint:disable: variable-name

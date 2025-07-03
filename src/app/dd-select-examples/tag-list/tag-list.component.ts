@@ -5,8 +5,9 @@ import { DdSelectExampleService } from '../dd-select-example.service';
 import { Tag } from '../tag.model';
 
 @Component({
-  selector: 'app-tag-list',
-  templateUrl: './tag-list.component.html',
+    selector: 'app-tag-list',
+    templateUrl: './tag-list.component.html',
+    standalone: false
 })
 export class TagListComponent extends SelectableListComponent<TagInterface> implements OnInit {
   constructor(private readonly service: DdSelectExampleService) {

@@ -9,9 +9,10 @@ interface HasFieldContainerInterface {
 }
 
 @Component({
-  selector: 'app-show-search-parameters',
-  templateUrl: './show-search-parameters.component.html',
-  styleUrls: ['./show-search-parameters.component.scss']
+    selector: 'app-show-search-parameters',
+    templateUrl: './show-search-parameters.component.html',
+    styleUrls: ['./show-search-parameters.component.scss'],
+    standalone: false
 })
 export class ShowSearchParametersComponent implements OnInit {
   @Input() langs: LangInterface[] = [];

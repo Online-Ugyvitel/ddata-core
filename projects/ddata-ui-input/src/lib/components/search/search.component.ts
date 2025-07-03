@@ -13,9 +13,10 @@ import { SearchResultInterface } from '../../models/search/result/search-result.
 import { SearchInterface } from '../../models/search/search.interface';
 
 @Component({
-  selector: 'dd-search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+    selector: 'dd-search',
+    templateUrl: './search.component.html',
+    styleUrls: ['./search.component.scss'],
+    standalone: false
 })
 export class DdataInputSearchComponent implements OnDestroy {
   @Input() model: SearchInterface = new BaseSearch().init();
