@@ -1,6 +1,5 @@
 import { Injector, ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { ModuleConfiguration } from './models/module-configuration/module-configuration.interface';
 
@@ -25,7 +24,6 @@ import { DdataUiUserThumbnailComponent } from './components/user-profile-thumbna
   ],
   imports: [
     CommonModule,
-    FontAwesomeModule,
   ],
   exports: [
     DdataUiNoDataComponent,

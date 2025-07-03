@@ -1,5 +1,6 @@
 <div class="overlay" [class.active]="loadingInProgress$ | async">
     <div class="spinner-container" *ngIf="spinner$ | async">
-      <fa-icon [icon]="icon.spinner" [spin]="true" size="3x"></fa-icon>
+      <!-- TODO: Fix FontAwesome 2.x integration -->
+      <div class="loading-spinner">Loading...</div>
     </div>
 </div>

@@ -3,7 +3,8 @@
     <p *ngIf="sentence.length === 0">{{ article }} {{ _text }} {{ i18n.no_data.label }}.</p>
     <p *ngIf="sentence.length > 0">{{ sentence }}</p>
     <p class="py-3 inactive">
-      <fa-icon [icon]="randomIcon" size="3x"></fa-icon>
+      <!-- TODO: Fix FontAwesome 2.x integration -->
+      <span style="font-size: 3rem;">📄</span>
     </p>
   </div>
 </div>

@@ -1,9 +1,11 @@
 <span [class]="_class">
-  <fa-icon *ngIf="showIcon" [icon]="icon.tag"></fa-icon>
+  <!-- TODO: Fix FontAwesome 2.x integration -->
+  <span *ngIf="showIcon">🏷️</span>
 
   <span> {{ tag.name }} </span>
 
   <button class="btn btn-xs btn-light" type="button" (click)="deleteTag()">
-    <fa-icon [icon]="icon.times"></fa-icon>
+    <!-- TODO: Fix FontAwesome 2.x integration -->
+    <span>✖</span>
   </button>
 </span>
