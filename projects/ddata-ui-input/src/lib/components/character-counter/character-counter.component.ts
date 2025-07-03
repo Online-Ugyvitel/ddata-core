@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'character-counter',
   templateUrl: './character-counter.component.html',
-  styleUrls: ['./character-counter.component.css'],
+  styleUrls: ['./character-counter.component.scss'],
   // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
   changeDetection: ChangeDetectionStrategy.Default
 })

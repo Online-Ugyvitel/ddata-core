@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 @Component({
   selector: 'app-word-counter',
   templateUrl: './word-counter.component.html',
-  styleUrls: ['./word-counter.component.css'],
+  styleUrls: ['./word-counter.component.scss'],
   // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
   changeDetection: ChangeDetectionStrategy.Default
 })

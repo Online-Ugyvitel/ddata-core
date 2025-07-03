@@ -1,0 +1,81 @@
+<div [class]="wrapperClass">
+  <!-- label -->
+  <label
+    [class]="labelClass"
+    [for]="id"
+    *ngIf="showLabel"
+  >
+    {{ labelText }}:
+    <span *ngIf="isRequired"> *</span>
+  </label>
+
+  <!-- combobox container -->
+  <div
+    [class]="inputBlockClass"
+    [ngClass]="showLabel ? inputBlockExtraClass : ''"
+  >
+    <!-- prepend -->
+    <div class="input-group-prepend" *ngIf="!!prepend">
+      <div class="input-group-text">{{ prepend }}</div>
+    </div>
+
+    <!-- combobox input -->
+    <div class="autocomplete-combobox">
+      <input
+        #inputBox
+        type="text"
+        class="form-control"
+        [id]="id"
+        [value]="inputValue"
+        [class.invalid]="model.validationErrors.includes(field)"
+        [class.disable-appearance]="disabledAppearance"
+        [disabled]="disabled"
+        [placeholder]="unselectedText"
+        role="combobox"
+        [attr.aria-expanded]="isOpen"
+        [attr.aria-controls]="listboxId"
+        [attr.aria-activedescendant]="getActiveDescendant()"
+        aria-autocomplete="list"
+        [attr.aria-required]="isRequired"
+        (focus)="onInputFocus()"
+        (input)="onInput($event)"
+        (keydown)="onKeydown($event)"
+      >
+
+      <!-- dropdown listbox -->
+      <div
+        *ngIf="isOpen"
+        class="autocomplete-dropdown"
+        [id]="listboxId"
+        role="listbox"
+        [attr.aria-label]="labelText + ' options'"
+      >
+        <div
+          *ngIf="filteredItems.length === 0"
+          class="autocomplete-option no-results"
+          role="option"
+        >
+          Nincs találat
+        </div>
+        
+        <div
+          *ngFor="let item of filteredItems; let i = index"
+          class="autocomplete-option"
+          [class.selected]="selectedIndex === i"
+          [id]="getOptionId(i)"
+          role="option"
+          [attr.aria-selected]="selectedIndex === i"
+          (click)="selectItem(item, i)"
+          (mouseenter)="selectedIndex = i"
+        >
+          {{ item[text] }}
+        </div>
+      </div>
+    </div>
+
+    <!-- append -->
+    <div class="input-group-append" *ngIf="!!append">
+      <div class="input-group-text">{{ append }}</div>
+    </div>
+  </div>
+</div>
