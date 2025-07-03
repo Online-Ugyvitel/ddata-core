@@ -135,7 +135,7 @@ export class DdataAutocompleteSelectComponent implements OnInit {
     }
 
     const searchText = this.inputValue.toLowerCase();
-    this.filteredItems = this.items.filter(item => 
+    this.filteredItems = this.items.filter(item =>
       item[this.text].toLowerCase().includes(searchText)
     );
   }
@@ -156,7 +156,7 @@ export class DdataAutocompleteSelectComponent implements OnInit {
       this.openDropdown();
       return;
     }
-    
+
     if (this.selectedIndex < this.filteredItems.length - 1) {
       this.selectedIndex++;
     }
@@ -172,13 +172,13 @@ export class DdataAutocompleteSelectComponent implements OnInit {
     this.selectedModel = item;
     this.model[this.field] = item[this.valueField];
     this.inputValue = item[this.text];
-    
+
     if (typeof index === 'number') {
       this.selectedIndex = index;
     }
-    
+
     this.closeDropdown();
-    
+
     this.selected.emit(this.model[this.field]);
     this.selectModel.emit(this.selectedModel);
   }
