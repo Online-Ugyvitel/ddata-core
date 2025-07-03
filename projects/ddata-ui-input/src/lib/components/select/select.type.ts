@@ -1,1 +1,1 @@
-export type SelectType = 'simple' | 'single' | 'multiple';
+export type SelectType = 'simple' | 'single' | 'multiple' | 'autocomplete';
