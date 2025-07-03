@@ -6,9 +6,10 @@ import { InputHelperServiceInterface } from '../../services/input/helper/input-h
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 @Component({
-  selector: 'dd-input',
-  templateUrl: './input.component.html',
-  styleUrls: ['./input.component.scss']
+    selector: 'dd-input',
+    templateUrl: './input.component.html',
+    styleUrls: ['./input.component.scss'],
+    standalone: false
 })
 export class DdataInputComponent implements OnInit, AfterViewInit {
   helperService: InputHelperServiceInterface = DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);

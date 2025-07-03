@@ -5,8 +5,9 @@ import { Country } from '../country.model';
 import { DdSelectExampleService } from '../dd-select-example.service';
 
 @Component({
-  selector: 'app-country-list',
-  templateUrl: './country-list.component.html',
+    selector: 'app-country-list',
+    templateUrl: './country-list.component.html',
+    standalone: false
 })
 export class CountryListComponent extends SelectableListComponent<CountryInterface> implements OnInit {
   models: CountryInterface[] = [];

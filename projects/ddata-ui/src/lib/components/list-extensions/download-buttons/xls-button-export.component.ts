@@ -2,9 +2,10 @@ import { Component, Input } from '@angular/core';
 import { BaseModel } from './../../../models/base-model/base-model.model';
 
 @Component({
-  selector: 'app-xls-button-export',
-  templateUrl: './xls-button-export.component.html',
-  styleUrls: ['./xls-button-export.component.scss']
+    selector: 'app-xls-button-export',
+    templateUrl: './xls-button-export.component.html',
+    styleUrls: ['./xls-button-export.component.scss'],
+    standalone: false
 })
 export class XlsButtonExportComponent {
   @Input() model: BaseModel = new BaseModel();

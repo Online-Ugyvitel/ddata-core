@@ -4,9 +4,10 @@ import { InputHelperServiceInterface } from '../../services/input/helper/input-h
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 @Component({
-  selector: 'dd-textarea',
-  templateUrl: './textarea.component.html',
-  styleUrls: ['./textarea.component.scss']
+    selector: 'dd-textarea',
+    templateUrl: './textarea.component.html',
+    styleUrls: ['./textarea.component.scss'],
+    standalone: false
 })
 export class DdataTextareaComponent implements OnInit, AfterViewInit {
   helperService: InputHelperServiceInterface = DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);

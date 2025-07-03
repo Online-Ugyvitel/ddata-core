@@ -4,9 +4,10 @@ import { noDataText } from '../../i18n/no-data.lang';
 import { faCat, faCrow, faDog, faDove, faDragon, faFrog, faHippo, faHorse, faKiwiBird, faFish, faOtter, faPaw } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: 'dd-no-data',
-  templateUrl: './no-data.component.html',
-  styleUrls: ['./no-data.component.scss']
+    selector: 'dd-no-data',
+    templateUrl: './no-data.component.html',
+    styleUrls: ['./no-data.component.scss'],
+    standalone: false
 })
 export class DdataUiNoDataComponent implements OnInit {
   @Inject('config') private config: ModuleConfiguration = {lang: 'en'};

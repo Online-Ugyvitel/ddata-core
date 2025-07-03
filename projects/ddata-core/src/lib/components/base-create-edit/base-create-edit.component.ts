@@ -28,7 +28,8 @@ import { BaseCreateEditComponentInterface } from './base-create-edit-component.i
  */
 // @dynamic
 @Component({
-  template: '',
+    template: '',
+    standalone: false
 })
 export abstract class BaseCreateEditComponent<T extends BaseModelInterface<T>>
   implements OnInit, BaseCreateEditComponentInterface<T> {

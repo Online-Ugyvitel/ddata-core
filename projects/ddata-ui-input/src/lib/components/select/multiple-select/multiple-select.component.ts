@@ -6,9 +6,10 @@ import { InputHelperService } from '../../../services/input/helper/input-helper.
 import { SelectType } from '../select.type';
 
 @Component({
-  selector: 'multiple-select',
-  templateUrl: './multiple-select.component.html',
-  styleUrls: ['./multiple-select.component.scss']
+    selector: 'multiple-select',
+    templateUrl: './multiple-select.component.html',
+    styleUrls: ['./multiple-select.component.scss'],
+    standalone: false
 })
 export class DdataMultipleSelectComponent implements OnInit {
   private helperService: InputHelperServiceInterface =

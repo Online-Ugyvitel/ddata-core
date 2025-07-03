@@ -4,9 +4,10 @@ import { DialogType } from '../../models/dialog/dialog.interface';
 
 declare var $: any;
 @Component({
-  selector: 'dd-confirm-dialog',
-  templateUrl: './confirm-dialog.component.html',
-  styleUrls: ['./confirm-dialog.component.scss']
+    selector: 'dd-confirm-dialog',
+    templateUrl: './confirm-dialog.component.html',
+    styleUrls: ['./confirm-dialog.component.scss'],
+    standalone: false
 })
 export class DdataUiConfirmDialogComponent implements OnInit {
   @Input() title = '';

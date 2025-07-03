@@ -4,9 +4,10 @@ import { InputHelperServiceInterface } from '../../services/input/helper/input-h
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 @Component({
-  selector: 'dd-input-time',
-  templateUrl: './time-input.component.html',
-  styleUrls: ['./time-input.component.scss']
+    selector: 'dd-input-time',
+    templateUrl: './time-input.component.html',
+    styleUrls: ['./time-input.component.scss'],
+    standalone: false
 })
 export class DdataInputTimeComponent implements OnInit, AfterViewInit {
   helperService: InputHelperServiceInterface = DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);

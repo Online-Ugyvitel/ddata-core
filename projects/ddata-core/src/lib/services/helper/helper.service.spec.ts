@@ -1,6 +1,6 @@
 // tslint:disable: max-line-length
 import 'zone.js/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injector } from '@angular/core';
 import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
@@ -20,6 +20,7 @@ import { request } from 'http';
 import { EventEmitter } from 'protractor';
 import { model } from 'src/app/i18n/product-category.lang';
 import { emit } from 'process';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
 class FakeProxy {
@@ -63,17 +64,16 @@ xdescribe('HelperService', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        RouterTestingModule
-      ],
-      providers: [
+    imports: [RouterTestingModule],
+    providers: [
         Injector,
         { provide: HelperService, useValue: new Tag() },
         { provide: ProxyService, useClass: FakeProxy },
-        { provide: RouterTestingModule, useValue: routerSpy }
-      ]
-    });
+        { provide: RouterTestingModule, useValue: routerSpy },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+});
   }));
 
   beforeEach(() => {

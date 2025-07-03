@@ -4,9 +4,10 @@ import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'dd-notification',
-  templateUrl: './notification.component.html',
-  styleUrls: ['./notification.component.scss']
+    selector: 'dd-notification',
+    templateUrl: './notification.component.html',
+    styleUrls: ['./notification.component.scss'],
+    standalone: false
 })
 export class DdataUiNotificationComponent implements OnInit, OnDestroy {
   subscription: Subscription;

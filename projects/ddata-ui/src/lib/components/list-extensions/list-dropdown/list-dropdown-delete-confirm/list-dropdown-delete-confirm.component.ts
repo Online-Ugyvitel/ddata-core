@@ -4,9 +4,10 @@ import { Global } from 'src/app/models/global.model';
 import { ID } from 'src/app/models/base-model/base-data-type.model';
 
 @Component({
-  selector: 'app-list-dropdown-delete-confirm',
-  templateUrl: './list-dropdown-delete-confirm.component.html',
-  styleUrls: ['./list-dropdown-delete-confirm.component.scss']
+    selector: 'app-list-dropdown-delete-confirm',
+    templateUrl: './list-dropdown-delete-confirm.component.html',
+    styleUrls: ['./list-dropdown-delete-confirm.component.scss'],
+    standalone: false
 })
 export class ListDropdownDeleteConfirmComponent implements OnInit {
   @Input() alternateDeleteText = ''; // ha van megadva alternateDeleteText, akkor meg kell adni a service-t is.

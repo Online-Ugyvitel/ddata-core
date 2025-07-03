@@ -10,9 +10,10 @@ import { Global } from 'src/app/models/global.model';
 import { getMatLegacyTooltipInvalidPositionError as getMatTooltipInvalidPositionError } from '@angular/material/legacy-tooltip';
 
 @Component({
-  selector: 'app-multilanguage-name',
-  templateUrl: './multilanguage-name.component.html',
-  styleUrls: ['./multilanguage-name.component.scss'],
+    selector: 'app-multilanguage-name',
+    templateUrl: './multilanguage-name.component.html',
+    styleUrls: ['./multilanguage-name.component.scss'],
+    standalone: false
 })
 export class MultilanguageNameComponent implements OnInit {
   @Input() model: MultilanguageNameInterface;

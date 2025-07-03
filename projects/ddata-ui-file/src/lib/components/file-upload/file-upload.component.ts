@@ -11,9 +11,10 @@ import { ModuleConfiguration } from '../../models/module-configuration/module-co
 import { FileAndFolderHelperService } from '../../services/file/file-and-folder-helper.service';
 
 @Component({
-  selector: 'dd-file-upload',
-  templateUrl: './file-upload.component.html',
-  styleUrls: ['./file-upload.component.css']
+    selector: 'dd-file-upload',
+    templateUrl: './file-upload.component.html',
+    styleUrls: ['./file-upload.component.css'],
+    standalone: false
 })
 /**
  * @param {json} inputData JSON format data what will be send with every file as 'data' parameter in form

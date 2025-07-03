@@ -15,9 +15,10 @@ interface AutocompleteResult extends BaseModelInterface<any> {
 }
 
 @Component({
-  selector: 'app-autocomplete-box',
-  templateUrl: './autocomplete-box.component.html',
-  styleUrls: ['./autocomplete-box.component.scss']
+    selector: 'app-autocomplete-box',
+    templateUrl: './autocomplete-box.component.html',
+    styleUrls: ['./autocomplete-box.component.scss'],
+    standalone: false
 })
 export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   _field = '';

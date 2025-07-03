@@ -3,8 +3,9 @@ import { DdataChooseSelectedButtonComponentInterface } from './dd-choose-selecte
 
 // @dynamic
 @Component({
-  selector: 'dd-choose-selected-button',
-  templateUrl: 'dd-choose-selected-button.component.html',
+    selector: 'dd-choose-selected-button',
+    templateUrl: 'dd-choose-selected-button.component.html',
+    standalone: false
 })
 export class DdataChooseSelectedButtonComponent implements DdataChooseSelectedButtonComponentInterface {
   @Input() multipleSelectEnabled = true;

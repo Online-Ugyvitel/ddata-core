@@ -4,9 +4,10 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'dd-paginate',
-  templateUrl: './paginate.component.html',
-  styleUrls: ['./paginate.component.css']
+    selector: 'dd-paginate',
+    templateUrl: './paginate.component.html',
+    styleUrls: ['./paginate.component.css'],
+    standalone: false
 })
 export class DdataUiPaginateComponent implements OnInit {
   @Input() paginate: Subject<PaginateInterface>;

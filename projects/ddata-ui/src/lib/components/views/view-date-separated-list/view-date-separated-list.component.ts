@@ -7,9 +7,10 @@ import { Global } from 'src/app/models/global.model';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
-  selector: 'app-view-date-separated-list',
-  templateUrl: './view-date-separated-list.component.html',
-  styleUrls: ['./view-date-separated-list.component.scss']
+    selector: 'app-view-date-separated-list',
+    templateUrl: './view-date-separated-list.component.html',
+    styleUrls: ['./view-date-separated-list.component.scss'],
+    standalone: false
 })
 export class ViewDateSeparatedListComponent implements OnInit, AfterViewInit {
   @Input() set data(data: BehaviorSubject<CasefileInterface[]>) {

@@ -9,8 +9,9 @@ import { TagListComponent } from '../tag-list/tag-list.component';
 import { TagInterface } from '../tag.interface';
 
 @Component({
-  selector: 'app-dd-select-single-examples',
-  templateUrl: './dd-select-single-examples.component.html',
+    selector: 'app-dd-select-single-examples',
+    templateUrl: './dd-select-single-examples.component.html',
+    standalone: false
 })
 export class DdSelectSingleExamplesComponent {
   address1: AddressInterface = new Address();

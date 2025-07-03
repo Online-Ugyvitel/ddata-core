@@ -1,6 +1,9 @@
 import { Pipe } from "@angular/core";
 
-@Pipe({ name: "prettyJson" })
+@Pipe({
+    name: "prettyJson",
+    standalone: false
+})
 export class PrettyJsonPipe {
   transform(json: any, args?: any): string {
     if (typeof json !== 'string') {

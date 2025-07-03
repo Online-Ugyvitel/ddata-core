@@ -4,9 +4,10 @@ import { InputHelperServiceInterface } from '../../../services/input/helper/inpu
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
 
 @Component({
-  selector: 'simple-select',
-  templateUrl: './simple-select.component.html',
-  styleUrls: ['./simple-select.component.scss']
+    selector: 'simple-select',
+    templateUrl: './simple-select.component.html',
+    styleUrls: ['./simple-select.component.scss'],
+    standalone: false
 })
 export class DdataSimpleSelectComponent {
   private helperService: InputHelperServiceInterface =

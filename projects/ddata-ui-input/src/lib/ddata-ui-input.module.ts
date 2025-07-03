@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DdataUiCommonModule } from 'ddata-ui-common';
-import { ColorPickerModule } from 'ngx-color-picker';
+import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
@@ -37,7 +37,8 @@ import { DdataInputTimeComponent } from './components/time/time-input.component'
     DdataMultipleSelectDialogComponent,
   ],
   imports: [
-    ColorPickerModule,
+    ColorPickerComponent,
+    ColorPickerDirective,
     CommonModule,
     FontAwesomeModule,
     FormsModule,

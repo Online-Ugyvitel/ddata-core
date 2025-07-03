@@ -39,9 +39,10 @@ import { CertificateScrappingProtocolCreateEditComponent } from 'src/app/modules
 import { Company } from 'src/app/models/company/company.model';
 
 @Component({
-  selector: 'app-list-dropdown',
-  templateUrl: './list-dropdown.component.html',
-  styleUrls: ['./list-dropdown.component.scss']
+    selector: 'app-list-dropdown',
+    templateUrl: './list-dropdown.component.html',
+    styleUrls: ['./list-dropdown.component.scss'],
+    standalone: false
 })
 export class ListDropdownComponent implements OnInit {
   @Input() customDropdownItems: ListDropdownItemInterface[] = []; // {name: '', icon: '', eventMsg: ''}

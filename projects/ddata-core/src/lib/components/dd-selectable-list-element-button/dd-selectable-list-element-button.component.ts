@@ -5,8 +5,9 @@ import { DdataSelectableListElementButtonComponentInterface } from './dd-selecta
 
 // @dynamic
 @Component({
-  selector: 'dd-selectable-list-element-button',
-  templateUrl: 'dd-selectable-list-element-button.component.html',
+    selector: 'dd-selectable-list-element-button',
+    templateUrl: 'dd-selectable-list-element-button.component.html',
+    standalone: false
 })
 export class DdataSelectableListElementButtonComponent implements DdataSelectableListElementButtonComponentInterface {
   @Input() model: SelectableInterface = new Selectable();

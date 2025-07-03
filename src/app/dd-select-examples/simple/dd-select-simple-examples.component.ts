@@ -6,8 +6,9 @@ import { CountryInterface } from '../country.interface';
 import { DdSelectExampleService } from '../dd-select-example.service';
 
 @Component({
-  selector: 'app-dd-select-simple-examples',
-  templateUrl: './dd-select-simple-examples.component.html',
+    selector: 'app-dd-select-simple-examples',
+    templateUrl: './dd-select-simple-examples.component.html',
+    standalone: false
 })
 export class DdSelectSimpleExamplesComponent {
   address: AddressInterface = new Address();

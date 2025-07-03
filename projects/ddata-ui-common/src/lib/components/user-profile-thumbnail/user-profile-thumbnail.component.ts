@@ -10,9 +10,10 @@ interface UserInterface {
 }
 
 @Component({
-  selector: 'app-user-profile-thumbnail',
-  templateUrl: './user-profile-thumbnail.component.html',
-  styleUrls: ['./user-profile-thumbnail.component.scss']
+    selector: 'app-user-profile-thumbnail',
+    templateUrl: './user-profile-thumbnail.component.html',
+    styleUrls: ['./user-profile-thumbnail.component.scss'],
+    standalone: false
 })
 export class DdataUiUserThumbnailComponent implements OnInit {
   @Input() set user(value: UserInterface) {
