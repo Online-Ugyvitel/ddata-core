@@ -1,20 +1,23 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { DdataCoreModule, SpinnerService, SpinnerServiceInterface } from 'ddata-core';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'dd-loading-overlay',
   templateUrl: './loading-overlay.component.html',
-  styleUrls: ['./loading-overlay.component.css']
+  styleUrls: ['./loading-overlay.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
   subscriptions: Subscription = new Subscription();
-  // tslint:disable-next-line: variable-name
-  _spinner = true;
-  @Input() loadingInProgress = false;
+  spinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  loadingInProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  @Input() set loadingInProgress(value: boolean) {
+    this.loadingInProgress$.next(!!value);
+  }
   @Input() set spinner(value: boolean) {
-    this._spinner = value;
+    this.spinner$.next(value);
   }
   @Input() spinnerService: SpinnerServiceInterface = DdataCoreModule.InjectorInstance.get<SpinnerService>(SpinnerService);
 
@@ -27,7 +30,7 @@ export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscriptions.add(
       this.spinnerService.watch().subscribe((isLoading: boolean) => {
-        this.loadingInProgress = isLoading;
+        this.loadingInProgress$.next(isLoading);
       })
     );
   }
@@ -35,5 +38,4 @@ export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
 }
