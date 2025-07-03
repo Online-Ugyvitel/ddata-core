@@ -83,7 +83,7 @@ export interface BaseModelInterface<T> extends BaseModelWithoutTypeDefinitionInt
   initAsNumberWithDefaults(fields: Array<string>, data: unknown): void;
   initAsString(fields: Partial<T>, data: unknown): void;
   initAsStringWithDefaults(fields: Array<string>, data: unknown): void;
-  prepareFieldsToSaveAsBooelan(fields: Partial<T>): Partial<T>;
+  prepareFieldsToSaveAsBoolean(fields: Partial<T>): Partial<T>;
   prepareFieldsToSaveAsNumber(fields: Partial<T>): Partial<T>;
   prepareFieldsToSaveAsString(fields: Partial<T>): Partial<T>;
 }
@@ -257,7 +257,7 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     return result;
   }
 
-  prepareFieldsToSaveAsBooelan(fields: Partial<ModelWithId>): Partial<ModelWithId> {
+  prepareFieldsToSaveAsBoolean(fields: Partial<ModelWithId>): Partial<ModelWithId> {
     const result = {};
 
     Object.keys(fields).forEach((field: string) => {
