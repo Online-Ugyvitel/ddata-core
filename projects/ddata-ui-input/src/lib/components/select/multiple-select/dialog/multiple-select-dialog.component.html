@@ -7,13 +7,17 @@
     <div class="modal-content">
       <!-- header -->
       <div class="modal-header">
-        <h5 class="modal-title">
-          {{ modalTitle }}
-        </h5>
+        <div class="col-10">
+          <h5 class="modal-title">
+            {{ modalTitle }}
+          </h5>
+        </div>
 
-        <button type="button" class="close" (click)="hideModal()" aria-label="Bezárás">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <div class="col-2 text-end">
+          <button type="button" class="btn btn-light close" (click)="hideModal()" aria-label="Bezárás">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
       </div>
 
       <!-- body -->
