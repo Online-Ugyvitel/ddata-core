@@ -43,7 +43,7 @@ class DummyData extends BaseModel implements DummyDataInterface {
   }
 }
 
-xdescribe('RemoteDataService', () => {
+xxdescribe('RemoteDataService', () => {
   let service: RemoteDataService<DummyDataInterface>;
   // create a fake paginate response from server
   const fakePlainObject = {
