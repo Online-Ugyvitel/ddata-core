@@ -22,7 +22,6 @@ export * from './lib/components/color/color-input.component';
 export * from './lib/components/date/date-input.component';
 export * from './lib/components/input/input.component';
 export * from './lib/components/search/search.component';
-export * from './lib/components/select/autocomplete-select/autocomplete-select.component';
 export * from './lib/components/select/select.component';
 export * from './lib/components/select/select.type';
 export * from './lib/components/textarea/textarea.component';
