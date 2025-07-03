@@ -40,6 +40,8 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@ng-bootstrap/ng-bootstrap": "^14.2.0",
+    "@popperjs/core": "^2.11.8",
+    "luxon": "^3.6.1",
     "moment": "^2.29.4",
     "ngx-color-picker": "^10.1.0",
     "ngx-daterangepicker-material": "^5.0.1",
