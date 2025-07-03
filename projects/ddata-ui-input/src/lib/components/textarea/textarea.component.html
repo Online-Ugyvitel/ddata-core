@@ -45,7 +45,7 @@
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-  <div ngIf="displayWordCounterWarning && wordCounterWarningMessage !== ''" class="d-flex pb-2">
+  <div *ngIf="displayWordCounterWarning && wordCounterWarningMessage !== ''" class="d-flex pb-2">
     <div class="col-12 col-md-7 offset-md-3 bg-warning p-2 rounded">
       {{ wordCounterWarningMessage }}
     </div>
