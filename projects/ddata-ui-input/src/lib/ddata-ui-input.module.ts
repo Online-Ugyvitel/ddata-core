@@ -12,6 +12,7 @@ import { DdataInputColorComponent } from './components/color/color-input.compone
 import { DdataInputDateComponent } from './components/date/date-input.component';
 import { DdataInputComponent } from './components/input/input.component';
 import { DdataInputSearchComponent } from './components/search/search.component';
+import { DdataAutocompleteSelectComponent } from './components/select/autocomplete-select/autocomplete-select.component';
 import { DdataMultipleSelectDialogComponent } from './components/select/multiple-select/dialog/multiple-select-dialog.component';
 import { DdataMultipleSelectComponent } from './components/select/multiple-select/multiple-select.component';
 import { DdataSelectComponent } from './components/select/select.component';
@@ -31,6 +32,7 @@ import { DdataInputTimeComponent } from './components/time/time-input.component'
     DdataSelectComponent,
     DdataTextareaComponent,
     DdataSimpleSelectComponent,
+    DdataAutocompleteSelectComponent,
     DdataMultipleSelectComponent,
     DdataMultipleSelectDialogComponent,
   ],

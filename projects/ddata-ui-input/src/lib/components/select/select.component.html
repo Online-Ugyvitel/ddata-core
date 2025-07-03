@@ -74,3 +74,26 @@
     (selectModel)="selectModelEmit($event)"
   ></simple-select>
 </ng-container>
+
+<ng-container *ngIf="_mode === 'autocomplete'">
+  <autocomplete-select
+    [wrapperClass]="wrapperClass"
+    [isRequired]="_isRequired"
+    [disabledAppearance]="disabledAppearance"
+    [disabled]="disabled"
+    [addEmptyOption]="addEmptyOption"
+    [labelClass]="labelClass"
+    [showLabel]="showLabel"
+    [labelText]="_label"
+    [prepend]="_prepend"
+    [append]="_append"
+    [model]="_model"
+    [field]="_field"
+    [items]="_items"
+    [text]="text"
+    [valueField]="valueField"
+
+    (selected)="selectedEmit($event)"
+    (selectModel)="selectModelEmit($event)"
+  ></autocomplete-select>
+</ng-container>
