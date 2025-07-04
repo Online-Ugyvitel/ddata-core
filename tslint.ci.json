@@ -1,0 +1,60 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "array-type": false,
+    "arrow-return-shorthand": true,
+    "curly": true,
+    "eofline": true,
+    "import-blacklist": [
+      true,
+      "rxjs/Rx"
+    ],
+    "import-spacing": true,
+    "indent": {
+      "options": [
+        "spaces"
+      ]
+    },
+    "max-classes-per-file": false,
+    "max-line-length": [
+      true,
+      140
+    ],
+    "no-console": [
+      true,
+      "debug",
+      "info",
+      "time",
+      "timeEnd",
+      "trace"
+    ],
+    "no-empty": false,
+    "no-inferrable-types": [
+      true,
+      "ignore-params"
+    ],
+    "no-non-null-assertion": true,
+    "no-switch-case-fall-through": true,
+    "no-var-requires": false,
+    "object-literal-key-quotes": [
+      true,
+      "as-needed"
+    ],
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "semicolon": {
+      "options": [
+        "always"
+      ]
+    },
+    "variable-name": {
+      "options": [
+        "ban-keywords",
+        "check-format",
+        "allow-pascal-case"
+      ]
+    }
+  }
+}
