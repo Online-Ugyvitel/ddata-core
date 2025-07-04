@@ -1,4 +1,3 @@
-
 <!-- do NOT show title if we show the list in a select dialog -->
 <ng-container *ngIf="!isSelectionList">
   <h1>Country list</h1>
@@ -22,7 +21,7 @@
     <!-- <input type="checkbox" [attr.checked]="model.is_selected ? true : null" (click)="selected(model)"> -->
     <button
       class="btn"
-      [ngClass]="{'btn-light': !model.is_selected, 'btn-primary': model.is_selected}"
+      [ngClass]="{ 'btn-light': !model.is_selected, 'btn-primary': model.is_selected }"
       (click)="selected(model)"
     >
       {{ model.is_selected ? '☑️' : '🟦' }}

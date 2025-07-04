@@ -1,13 +1,11 @@
 
-import 'zone.js/testing';
-import { TestBed, inject, async } from '@angular/core/testing';
-import { StorageService } from './storage.service';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injector } from '@angular/core';
-import { EmployeeService } from '../employee/employee.service';
-import { AppModule } from 'src/app/app.module';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import 'zone.js/testing';
+import { StorageService } from './storage.service';
 
 xdescribe('StorageService', () => {
   beforeAll(() => {
@@ -18,7 +16,7 @@ xdescribe('StorageService', () => {
 }
     );
   });
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
     imports: [],
     providers: [
@@ -30,7 +28,6 @@ xdescribe('StorageService', () => {
 });
   }));
   beforeEach(() => {
-    AppModule.InjectorInstance = TestBed;
     TestBed.inject(StorageService);
   });
 

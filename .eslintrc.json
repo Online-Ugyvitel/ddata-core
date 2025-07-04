@@ -147,7 +147,7 @@
         "@typescript-eslint/no-for-in-array": 2,
         "@typescript-eslint/no-require-imports": 2,
         "@typescript-eslint/no-this-alias": 2,
-        "@typescript-eslint/no-unnecessary-boolean-literal-compare": 2,
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": 0,
         "@typescript-eslint/no-unnecessary-type-arguments": 2,
         "@typescript-eslint/no-unnecessary-type-assertion": 2,
         "@typescript-eslint/no-var-requires": 2,
@@ -419,7 +419,7 @@
         "ecmaVersion": 2020,
         "sourceType": "module",
         "project": [
-          "./tsconfig.app.json"
+          "./tsconfig.spec.json"
         ],
         "createDefaultProgram": true
       },
@@ -553,7 +553,7 @@
         "@typescript-eslint/no-for-in-array": 2,
         "@typescript-eslint/no-require-imports": 2,
         "@typescript-eslint/no-this-alias": 2,
-        "@typescript-eslint/no-unnecessary-boolean-literal-compare": 2,
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": 0,
         "@typescript-eslint/no-unnecessary-type-arguments": 2,
         "@typescript-eslint/no-unnecessary-type-assertion": 2,
         "@typescript-eslint/no-var-requires": 2,
@@ -818,24 +818,24 @@
         ],
         "valid-typeof": 2,
         "yoda": 2,
-        "expect-matcher": 1,
-        "expect-single-argument": 1,
-        "missing-expect": [
+        "jasmine/expect-matcher": 1,
+        "jasmine/expect-single-argument": 1,
+        "jasmine/missing-expect": [
           2,
           "expect()"
         ],
-        "named-spy": 1,
-        "new-line-before-expect": 1,
-        "new-line-between-declarations": 1,
-        "no-expect-in-setup-teardown": 1,
-        "no-focused-tests": 2,
-        "no-global-setup": 2,
-        "no-spec-dupes": 1,
-        "no-suite-callback-args": 2,
-        "no-suite-dupes": 1,
-        "no-unsafe-spy": 1,
-        "prefer-jasmine-matcher": 1,
-        "prefer-toBeUndefined": 2
+        "jasmine/named-spy": 1,
+        "jasmine/new-line-before-expect": 1,
+        "jasmine/new-line-between-declarations": 1,
+        "jasmine/no-expect-in-setup-teardown": 1,
+        "jasmine/no-focused-tests": 2,
+        "jasmine/no-global-setup": 2,
+        "jasmine/no-spec-dupes": 1,
+        "jasmine/no-suite-callback-args": 2,
+        "jasmine/no-suite-dupes": 1,
+        "jasmine/no-unsafe-spy": 1,
+        "jasmine/prefer-jasmine-matcher": 1,
+        "jasmine/prefer-toBeUndefined": 2
       }
     },
     {

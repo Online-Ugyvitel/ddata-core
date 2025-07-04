@@ -1,10 +1,9 @@
-import 'zone.js/testing';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { DdataUiTagComponent } from './tag.component';
-import { DdataUiCommonModule } from '../../ddata-ui-common.module';
 import { BaseModel } from 'ddata-core';
+import 'zone.js/testing';
+import { DdataUiTagComponent } from './tag.component';
 
 xdescribe('DdataUiTagComponent', () => {
   let component: DdataUiTagComponent;
@@ -32,7 +31,6 @@ xdescribe('DdataUiTagComponent', () => {
   });
 
   beforeEach(() => {
-    DdataUiCommonModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataUiTagComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;

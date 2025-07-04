@@ -1,8 +1,7 @@
-import 'zone.js/testing';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { DdataUiCommonModule } from '../../ddata-ui-common.module';
+import 'zone.js/testing';
 import { DdataUiUserThumbnailComponent } from './user-profile-thumbnail.component';
 
 xdescribe('DdataUiUserThumbnailComponent', () => {
@@ -31,7 +30,6 @@ xdescribe('DdataUiUserThumbnailComponent', () => {
   });
 
   beforeEach(() => {
-    DdataUiCommonModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataUiUserThumbnailComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;

@@ -1,32 +1,32 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'clearModel',
-    standalone: false
+  name: 'clearModel',
+  standalone: true
 })
 export class ClearModelPipe implements PipeTransform {
-  removeProperties(model: any): any {
-    delete model.api_endpoint;
-    delete model.use_localstorage;
-    delete model.isValid;
-    delete model.validationErrors;
-    delete model.validationRules;
-    delete model.fields;
+  removeProperties(model: Record<string, unknown>): Record<string, unknown> {
+    const cleanedModel = { ...model };
 
-    return model;
+    delete cleanedModel.api_endpoint;
+    delete cleanedModel.use_localstorage;
+    delete cleanedModel.isValid;
+    delete cleanedModel.validationErrors;
+    delete cleanedModel.validationRules;
+    delete cleanedModel.fields;
+
+    return cleanedModel;
   }
 
-  transform(model: any, args?: any): any {
-    // let model = { ...value };
+  transform(model: Record<string, unknown>): Record<string, unknown> {
+    const cleanedModel = this.removeProperties(model);
 
-    model = this.removeProperties(model);
-
-    Object.keys(model).forEach(key => {
-      if (model[key] instanceof Object) {
-        model[key] = this.removeProperties(model[key]);
+    Object.keys(cleanedModel).forEach((key) => {
+      if (cleanedModel[key] instanceof Object && cleanedModel[key] !== null) {
+        cleanedModel[key] = this.removeProperties(cleanedModel[key] as Record<string, unknown>);
       }
     });
 
-    return model;
+    return cleanedModel;
   }
 }

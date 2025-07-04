@@ -1,4 +1,8 @@
-import { BaseModel, FieldContainerInterface, ID } from '../../../projects/ddata-core/src/public-api';
+import {
+  BaseModel,
+  FieldContainerInterface,
+  ID
+} from '../../../projects/ddata-core/src/public-api';
 import { AddressInterface, AddressUIFieldsInterface } from './address.interface';
 import { CountryInterface } from './country.interface';
 import { Country } from './country.model';
@@ -15,7 +19,7 @@ export class Address extends BaseModel implements AddressInterface {
   country: CountryInterface = new Country().init();
   tag_id = 0; // for single select demo
   tag: TagInterface = null; // for single select demo
-  tags: TagInterface[] = []; // for multiple select demo
+  tags: Array<TagInterface> = []; // for multiple select demo
 
   fields: FieldContainerInterface<AddressUIFieldsInterface> = {
     zip: undefined,

@@ -1,14 +1,13 @@
-import { ViewDateSeparatedList } from 'src/app/models/view/date/separated/list/view-date-spearated-list.interface';
-import { ISODate, ID } from 'src/app/models/base-model/base-data-type.model';
-import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
-import { style } from '@angular/animations';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppModule } from 'src/app/app.module';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ID, ISODate } from 'src/app/models/base-model/base-data-type.model';
+import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
+import { ViewDateSeparatedList } from 'src/app/models/view/date/separated/list/view-date-spearated-list.interface';
 
-import { ViewDateSeparatedListComponent } from './view-date-separated-list.component';
+import { ElementRef, Renderer2 } from '@angular/core';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { Renderer2, ElementRef } from '@angular/core';
 import * as moment from 'moment';
+import { ViewDateSeparatedListComponent } from './view-date-separated-list.component';
 
 xdescribe('ViewDateSeparatedListComponent', () => {
   let component: ViewDateSeparatedListComponent;

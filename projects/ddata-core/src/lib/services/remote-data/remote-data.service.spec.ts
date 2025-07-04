@@ -2,7 +2,7 @@
 import 'zone.js/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injector } from '@angular/core';
-import { async, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
+import { waitForAsync, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 import { DdataCoreModule } from '../../ddata-core.module';
 import { ID } from '../../models/base/base-data.type';
@@ -44,7 +44,7 @@ class DummyData extends BaseModel implements DummyDataInterface {
 }
 
 xdescribe('RemoteDataService', () => {
-  let service: RemoteDataService<DummyDataInterface>;
+  let service: RemoteDataService<any>;
   // create a fake paginate response from server
   const fakePlainObject = {
     id: 1,
@@ -63,7 +63,7 @@ xdescribe('RemoteDataService', () => {
   });
 
   // set TestBed before each tests
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
     imports: [],
     providers: [
@@ -76,9 +76,8 @@ xdescribe('RemoteDataService', () => {
   }));
 
   beforeEach(() => {
-    DdataCoreModule.InjectorInstance = TestBed;
     TestBed.inject(RemoteDataService);
-    service = new RemoteDataService<DummyDataInterface>(new DummyData());
+    service = new RemoteDataService<any>(new DummyData());
   });
 
 
