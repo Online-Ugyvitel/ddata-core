@@ -1,4 +1,4 @@
-import { BaseModelInterface, ID } from 'ddata-core';
+import { BaseModelInterface, ID } from '../../../projects/ddata-core/src/public-api';
 import { CountryInterface } from './country.interface';
 import { TagInterface } from './tag.interface';
 

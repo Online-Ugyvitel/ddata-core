@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SelectableListComponent } from 'ddata-core';
+import { SelectableListComponent } from '../../../../projects/ddata-core/src/public-api';
 import { TagInterface } from 'src/app/dd-select-examples/tag.interface';
 import { DdSelectExampleService } from '../dd-select-example.service';
 import { Tag } from '../tag.model';

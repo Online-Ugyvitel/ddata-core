@@ -1,4 +1,4 @@
-import { BaseModel, FieldContainerInterface, ID } from 'ddata-core';
+import { BaseModel, FieldContainerInterface, ID } from '../../../projects/ddata-core/src/public-api';
 import { AddressInterface, AddressUIFieldsInterface } from './address.interface';
 import { CountryInterface } from './country.interface';
 import { Country } from './country.model';

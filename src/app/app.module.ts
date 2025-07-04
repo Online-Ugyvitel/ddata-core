@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { DdataUiInputModule, InputHelperService } from '../../projects/ddata-ui-input/src/public-api';
-import { DdataCoreModule, ValidatorService } from 'ddata-core';
+import { DdataCoreModule, ValidatorService } from '../../projects/ddata-core/src/public-api';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';

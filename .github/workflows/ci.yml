@@ -15,17 +15,25 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
-        cache: 'npm'
+        node-version: '22.12.0'
+        # Disable npm cache to avoid authentication issues
+        # cache: 'npm'
 
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: |
+        rm -f .npmrc
+        rm -f package-lock.json
+        npm config set registry https://registry.npmjs.org/
+        npm config delete //registry.npmjs.org/:_authToken || true
+        npm whoami || echo "Not logged in to npm (this is expected)"
+        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts --no-optional
+        npm run build:core
 
     - name: Run lint
-      run: npx tslint -c tslint.ci.json -p tsconfig.json "src/**/*.ts" "projects/**/*.ts" --format stylish
+      run: npm run lint
 
     - name: Run tests
-      run: npm run test ddata-lib -- --watch=false --browsers=ChromeHeadless
+      run: npm run test
       continue-on-error: true
 
     - name: Test results summary
