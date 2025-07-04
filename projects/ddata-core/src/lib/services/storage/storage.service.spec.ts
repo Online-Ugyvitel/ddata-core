@@ -9,7 +9,7 @@ import { EmployeeService } from '../employee/employee.service';
 import { AppModule } from 'src/app/app.module';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
-xxdescribe('StorageService', () => {
+xdescribe('StorageService', () => {
   beforeAll(() => {
     TestBed.initTestEnvironment(
       BrowserDynamicTestingModule,
