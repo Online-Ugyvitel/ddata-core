@@ -104,24 +104,31 @@ export class DdataMultipleSelectComponent implements OnInit {
 
     if (this.mode === 'multiple') {
       // TODO avoid duplicate add
-      this.model[this.getObjectFieldName()].push(event);
+      this.model[this.field].push(event);
     }
 
     this.selectModel.emit(event);
   }
 
   deleteFromMultipleSelectedList(item: any): void {
-    const index = this.model[this.field].indexOf(item);
-    if (index !== -1) {
+    // Remove from model field array
+    if (this.model && this.model[this.field] && Array.isArray(this.model[this.field])) {
+      const index = this.model[this.field].indexOf(item);
+      if (index !== -1) {
         this.model[this.field].splice(index, 1);
+      }
     }
 
-    const dialogIndex = this._dialogSettings.listOptions.selectedElements.indexOf(item);
-
-    if (dialogIndex !== -1) {
+    // Remove from dialog selected elements
+    if (this._dialogSettings && 
+        this._dialogSettings.listOptions && 
+        Array.isArray(this._dialogSettings.listOptions.selectedElements)) {
+      const dialogIndex = this._dialogSettings.listOptions.selectedElements.indexOf(item);
+      if (dialogIndex !== -1) {
         this._dialogSettings.listOptions.selectedElements.splice(dialogIndex, 1);
+      }
     }
-}
+  }
 
   getObjectFieldName(): string {
     return this.field.split('_id')[0];
