@@ -20,7 +20,9 @@ jobs:
 
     - name: Install dependencies
       run: |
-        npm install --legacy-peer-deps --no-audit --no-fund
+        rm -f .npmrc
+        npm config set registry https://registry.npmjs.org/
+        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
         npm run build:core
 
     - name: Run lint
