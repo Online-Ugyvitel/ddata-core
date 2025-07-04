@@ -10,7 +10,19 @@ export class UnprocessableEntity extends DdataCoreError {
   ) {
     super(originalError);
     console.error('Unprocessable Entry Error: ', originalError.error.message);
-    notificationService.add('Hiba', 'Nem feldolgozható kérés', 'danger' as NotificationType);
+    
+    // Try to extract specific error message from the response
+    let errorMessage = 'Nem feldolgozható kérés'; // fallback message
+    
+    if (!!originalError.error) {
+      if (!!originalError.error.message) {
+        errorMessage = originalError.error.message;
+      } else if (typeof originalError.error === 'string') {
+        errorMessage = originalError.error;
+      }
+    }
+    
+    notificationService.add('Hiba', errorMessage, 'danger' as NotificationType);
   }
 
 }
