@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class DescriptionPipe implements PipeTransform {
 
-  transform(value: string): any {
+  transform(value: string | null | undefined): any {
     value = !!value ? value : '';
     let result = '';
     const parts = value.split('|');
