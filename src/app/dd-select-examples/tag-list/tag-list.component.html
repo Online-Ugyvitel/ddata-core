@@ -1,4 +1,3 @@
-
 <!-- do NOT show title if we show the list in a select dialog -->
 <ng-container *ngIf="!isSelectionList">
   <h1>Tag list</h1>
@@ -23,7 +22,7 @@
       type="checkbox"
       [attr.checked]="model.is_selected ? true : null"
       (click)="toggleSelect(model)"
-    >
+    />
   </div>
 
   <div class="col-2">

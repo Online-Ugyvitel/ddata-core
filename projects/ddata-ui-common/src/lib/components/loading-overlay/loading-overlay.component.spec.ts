@@ -1,14 +1,22 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DdataUiLoadingOverlayComponent } from './loading-overlay.component';
+
+// Mock SpinnerService
+const mockSpinnerService = {
+  spinner$: { subscribe: jasmine.createSpy('subscribe') },
+  loadingInProgress$: { subscribe: jasmine.createSpy('subscribe') }
+};
 
 xdescribe('DdataUiLoadingOverlayComponent', () => {
   let component: DdataUiLoadingOverlayComponent;
   let fixture: ComponentFixture<DdataUiLoadingOverlayComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DdataUiLoadingOverlayComponent ]
+      declarations: [ DdataUiLoadingOverlayComponent ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ] // Allow fa-icon element
     })
     .compileComponents();
   }));
@@ -16,6 +24,10 @@ xdescribe('DdataUiLoadingOverlayComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DdataUiLoadingOverlayComponent);
     component = fixture.componentInstance;
+
+    // Mock the spinnerService input to avoid InjectorInstance issues
+    component.spinnerService = mockSpinnerService as any;
+
     fixture.detectChanges();
   });
 

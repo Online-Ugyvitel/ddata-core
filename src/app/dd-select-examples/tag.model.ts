@@ -1,4 +1,4 @@
-import { BaseModel, TabInterface } from '../../../projects/ddata-core/src/public-api';
+import { BaseModel } from '../../../projects/ddata-core/src/public-api';
 import { TagInterface } from './tag.interface';
 
 export class Tag extends BaseModel implements TagInterface {
@@ -10,8 +10,8 @@ export class Tag extends BaseModel implements TagInterface {
 
   is_selected = false;
 
-  init(data: any): TagInterface {
-    const incoming = !!data ? data : {};
+  init(data?: Partial<TagInterface>): TagInterface {
+    const incoming = data ?? {};
 
     this.initAsNumberWithDefaults(['id'], incoming);
 

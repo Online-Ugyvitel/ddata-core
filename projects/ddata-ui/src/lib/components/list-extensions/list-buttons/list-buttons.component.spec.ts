@@ -1,9 +1,9 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { AppModule } from 'src/app/app.module';
-import { ListButtonsComponent } from './list-buttons.component';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { AppModule } from 'src/app/app.module';
+import { ListButtonsComponent } from './list-buttons.component';
 
 xdescribe('ListButtonsComponent', () => {
   let component: ListButtonsComponent;

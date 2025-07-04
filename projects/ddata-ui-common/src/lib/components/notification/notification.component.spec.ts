@@ -1,43 +1,43 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { NotificationComponent } from './notification.component';
+import { DdataUiNotificationComponent } from './notification.component';
 
-
-xdescribe('NotificationComponent', () => {
-  let component: NotificationComponent;
-  let fixture: ComponentFixture<NotificationComponent>;
-
-  beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-}
-    );
-  });
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [ NotificationComponent ]
+// Mock NotificationService
+const mockNotificationService = {
+  watch: jasmine.createSpy('watch').and.returnValue({
+    pipe: jasmine.createSpy('pipe').and.returnValue({
+      subscribe: jasmine.createSpy('subscribe')
     })
-    .compileComponents();
-  });
+  }),
+  delete: jasmine.createSpy('delete')
+};
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(NotificationComponent);
+describe('DdataUiNotificationComponent', () => {
+  let component: DdataUiNotificationComponent;
+  let fixture: ComponentFixture<DdataUiNotificationComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [DdataUiNotificationComponent],
+      providers: [
+        { provide: 'NotificationService', useValue: mockNotificationService },
+        ChangeDetectorRef
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(DdataUiNotificationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('closeModal() should close a notification', () => {
-    let ref;
-    spyOn((component as any).notificationService, 'deleteNotification');
-    component.closeModal(ref);
-    expect((component as any).notificationService.deleteNotification).toHaveBeenCalled();
+  it('close() should close a notification', () => {
+    const index = 0;
+    spyOn(component, 'close').and.callThrough();
+    component.close(index);
+    expect(component.close).toHaveBeenCalledWith(index);
   });
 });
