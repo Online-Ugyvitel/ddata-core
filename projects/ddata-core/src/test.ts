@@ -19,6 +19,3 @@ getTestBed().initTestEnvironment(
 // const context = require.context('./', true, /\.spec\.ts$/);
 // And load the modules.
 // context.keys().map(context);
-
-// Import specific test for Selectable model
-import './lib/models/selectable/selectable.model.spec';
