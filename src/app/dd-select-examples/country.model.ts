@@ -1,4 +1,4 @@
-import { BaseModel } from 'ddata-core';
+import { BaseModel } from '../../../projects/ddata-core/src/public-api';
 import { CountryInterface } from './country.interface';
 
 export class Country extends BaseModel implements CountryInterface {

@@ -1,4 +1,4 @@
-import { BaseModel, TabInterface } from 'ddata-core';
+import { BaseModel, TabInterface } from '../../../projects/ddata-core/src/public-api';
 import { TagInterface } from './tag.interface';
 
 export class Tag extends BaseModel implements TagInterface {

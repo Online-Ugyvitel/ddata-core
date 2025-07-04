@@ -1,4 +1,4 @@
-import { BaseModelInterface, ID, SelectableInterface } from 'ddata-core';
+import { BaseModelInterface, ID, SelectableInterface } from '../../../projects/ddata-core/src/public-api';
 
 export interface CountryUIFieldsInterface {
   name: string;

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { SelectableListComponent } from 'ddata-core';
+import { SelectableListComponent } from '../../../../projects/ddata-core/src/public-api';
 import { CountryInterface } from '../country.interface';
 import { Country } from '../country.model';
 import { DdSelectExampleService } from '../dd-select-example.service';
