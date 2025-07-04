@@ -19,13 +19,13 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: npm ci
 
     - name: Run lint
-      run: npx tslint -c tslint.ci.json -p tsconfig.json "src/**/*.ts" "projects/**/*.ts" --format stylish
+      run: ng lint
 
     - name: Run tests
-      run: npm run test ddata-lib -- --watch=false --browsers=ChromeHeadless
+      run: ng test --watch=false --browsers=ChromeHeadless
       continue-on-error: true
 
     - name: Test results summary
