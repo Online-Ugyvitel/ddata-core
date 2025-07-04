@@ -1,0 +1,897 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "projects/**/*"
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"],
+    "sourceType": "module"
+  },
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:import/recommended",
+        "plugin:prettier/recommended",
+        "prettier"
+      ],
+      "plugins": [
+        "import"
+      ],
+      "rules": {
+        "@angular-eslint/component-max-inline-declarations": [
+          2,
+          {
+            "animations": 10,
+            "styles": 10,
+            "template": 10
+          }
+        ],
+        "@angular-eslint/contextual-decorator": 2,
+        "@angular-eslint/contextual-lifecycle": 2,
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "app",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/no-attribute-decorator": 2,
+        "@angular-eslint/no-conflicting-lifecycle": 2,
+        "@angular-eslint/no-forward-ref": 0,
+        "@angular-eslint/no-lifecycle-call": 2,
+        "@angular-eslint/no-input-rename": 1,
+        "@angular-eslint/no-host-metadata-property": 2,
+        "@angular-eslint/no-inputs-metadata-property": 2,
+        "@angular-eslint/no-outputs-metadata-property": 2,
+        "@angular-eslint/no-output-on-prefix": 1,
+        "@angular-eslint/no-output-rename": 1,
+        "@angular-eslint/no-pipe-impure": 2,
+        "@angular-eslint/no-queries-metadata-property": 2,
+        "@angular-eslint/prefer-output-readonly": 2,
+        "@angular-eslint/prefer-on-push-component-change-detection": 1,
+        "@angular-eslint/relative-url-prefix": 2,
+        "@angular-eslint/use-injectable-provided-in": 2,
+        "@angular-eslint/use-component-view-encapsulation": 2,
+        "@angular-eslint/use-lifecycle-interface": 2,
+        "@angular-eslint/use-pipe-transform-interface": 2,
+        "@typescript-eslint/array-type": [
+          2,
+          {
+            "default": "generic"
+          }
+        ],
+        "@typescript-eslint/no-extraneous-class": [
+          2,
+          {
+            "allowWithDecorator": true,
+            "allowStaticOnly": true
+          }
+        ],
+        "@typescript-eslint/await-thenable": 2,
+        "@typescript-eslint/no-empty-object-type": "error",
+        "@typescript-eslint/no-unsafe-function-type": "off",
+        "@typescript-eslint/no-wrapper-object-types": "error",
+        "@typescript-eslint/comma-dangle": 0,
+        "@typescript-eslint/consistent-type-definitions": 2,
+        "@typescript-eslint/dot-notation": 0,
+        "@typescript-eslint/explicit-function-return-type": 2,
+        "@typescript-eslint/explicit-member-accessibility": [
+          2,
+          {
+            "accessibility": "no-public"
+          }
+        ],
+        "@typescript-eslint/indent": 0,
+        "@typescript-eslint/member-ordering": [
+          2,
+          {
+            "default": [
+              "signature",
+              "private-static-field",
+              "protected-static-field",
+              "public-static-field",
+              "private-decorated-field",
+              "protected-decorated-field",
+              "public-decorated-field",
+              "private-instance-field",
+              "protected-instance-field",
+              "public-instance-field",
+              "protected-abstract-field",
+              "public-abstract-field",
+              "constructor",
+              "public-static-method",
+              "protected-static-method",
+              "private-static-method",
+              "public-decorated-method",
+              "protected-decorated-method",
+              "private-decorated-method",
+              "public-instance-method",
+              "protected-instance-method",
+              "private-instance-method",
+              "public-abstract-method",
+              "protected-abstract-method"
+            ]
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2,
+          {
+            "fixToUnknown": false,
+            "ignoreRestArgs": true
+          }
+        ],
+        "@typescript-eslint/no-floating-promises": 0,
+        "@typescript-eslint/no-for-in-array": 2,
+        "@typescript-eslint/no-require-imports": 2,
+        "@typescript-eslint/no-this-alias": 2,
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": 2,
+        "@typescript-eslint/no-unnecessary-type-arguments": 2,
+        "@typescript-eslint/no-unnecessary-type-assertion": 2,
+        "@typescript-eslint/no-var-requires": 2,
+        "@typescript-eslint/prefer-includes": 2,
+        "@typescript-eslint/prefer-readonly": 2,
+        "@typescript-eslint/promise-function-async": 2,
+        "@typescript-eslint/require-await": 2,
+        "@typescript-eslint/restrict-plus-operands": 2,
+        "@typescript-eslint/naming-convention": [
+          2,
+          {
+            "selector": "class",
+            "format": [
+              "PascalCase"
+            ],
+            "modifiers": [
+              "abstract"
+            ],
+            "suffix": [
+              "Abstract"
+            ]
+          },
+          {
+            "selector": "interface",
+            "format": [
+              "PascalCase"
+            ],
+            "suffix": [
+              "Interface"
+            ]
+          },
+          {
+            "selector": "enum",
+            "format": [
+              "PascalCase"
+            ],
+            "suffix": [
+              "Enum"
+            ]
+          },
+          {
+            "selector": "variable",
+            "format": [
+              "camelCase"
+            ]
+          },
+          {
+            "selector": "classProperty",
+            "modifiers": [
+              "private"
+            ],
+            "format": [
+              "camelCase",
+              "snake_case"
+            ],
+            "leadingUnderscore": "allow"
+          },
+          {
+            "selector": "variable",
+            "types": [
+              "boolean"
+            ],
+            "format": [
+              "PascalCase"
+            ],
+            "prefix": [
+              "are",
+              "is",
+              "should",
+              "would",
+              "could",
+              "has",
+              "have",
+              "had",
+              "was",
+              "were",
+              "can",
+              "do",
+              "does",
+              "did",
+              "will",
+              "need"
+            ]
+          },
+          {
+            "selector": "variable",
+            "modifiers": [
+              "exported",
+              "const"
+            ],
+            "format": [
+              "snake_case",
+              "strictCamelCase"
+            ]
+          },
+          {
+            "selector": "parameter",
+            "modifiers": [
+              "unused"
+            ],
+            "format": [
+              "camelCase"
+            ],
+            "leadingUnderscore": "allow"
+          }
+        ],
+        "@typescript-eslint/no-unused-expressions": 0,
+        "@typescript-eslint/unbound-method": 0,
+        "arrow-parens": 0,
+        "brace-style": 0,
+        "class-methods-use-this": 0,
+        "comma-dangle": 0,
+        "complexity": [
+          2,
+          {
+            "max": 20
+          }
+        ],
+        "default-case": 2,
+        "id-blacklist": 0,
+        "id-match": 0,
+        "import/no-default-export": 0,
+        "import/prefer-default-export": 0,
+        "import/no-extraneous-dependencies": 2,
+        "import/no-unassigned-import": 0,
+        "import/order": [
+          1,
+          {
+            "groups": [],
+            "pathGroups": [
+              {
+                "pattern": "~/**",
+                "group": "internal"
+              }
+            ]
+          }
+        ],
+        "no-unused-vars": "off",
+        "lines-between-class-members": [
+          "error",
+          "always",
+          {
+            "exceptAfterSingleLine": true
+          }
+        ],
+        "max-classes-per-file": [
+          2,
+          1
+        ],
+        "max-depth": [
+          2,
+          3
+        ],
+        "max-lines": [
+          2,
+          500
+        ],
+        "prettier/prettier": 2,
+        "max-len": [
+          2,
+          {
+            "code": 100,
+            "tabWidth": 4,
+            "ignoreStrings": true,
+            "ignoreTemplateLiterals": true,
+            "ignoreComments": true,
+            "ignoreUrls": true,
+            "ignorePattern": "^import*|^export*"
+          }
+        ],
+        "newline-per-chained-call": 2,
+        "no-duplicate-case": 2,
+        "no-duplicate-imports": 2,
+        "no-extra-bind": 2,
+        "no-extra-boolean-cast": 0,
+        "no-invalid-this": 0,
+        "no-multiple-empty-lines": [
+          2,
+          {
+            "max": 1
+          }
+        ],
+        "no-new-func": 2,
+        "no-null/no-null": 0,
+        "no-param-reassign": 2,
+        "no-plusplus": 0,
+        "no-prototype-builtins": 1,
+        "no-redeclare": 2,
+        "no-restricted-syntax": [
+          2,
+          "WithStatement"
+        ],
+        "no-return-await": 2,
+        "no-sequences": 2,
+        "no-sparse-arrays": 2,
+        "no-template-curly-in-string": 2,
+        "no-underscore-dangle": 0,
+        "no-unused-expressions": [
+          2,
+          {
+            "allowShortCircuit": true,
+            "allowTernary": true
+          }
+        ],
+        "no-useless-constructor": 0,
+        "no-void": 2,
+        "no-console": ["error", { "allow": ["warn", "error"] }],
+        "no-constant-condition": [
+          2,
+          {
+            "checkLoops": false
+          }
+        ],
+        "padding-line-between-statements": [
+          2,
+          {
+            "blankLine": "always",
+            "prev": "*",
+            "next": "return"
+          },
+          {
+            "blankLine": "always",
+            "prev": "*",
+            "next": "block-like"
+          },
+          {
+            "blankLine": "always",
+            "prev": "block-like",
+            "next": "*"
+          },
+          {
+            "blankLine": "always",
+            "prev": [
+              "const",
+              "let"
+            ],
+            "next": "*"
+          },
+          {
+            "blankLine": "never",
+            "prev": "*",
+            "next": [
+              "const",
+              "let"
+            ]
+          }
+        ],
+        "prefer-arrow/prefer-arrow-functions": 0,
+        "prefer-object-spread": 2,
+        "prefer-template": 2,
+        "radix": 0,
+        "space-in-parens": [
+          2,
+          "never"
+        ],
+        "valid-typeof": 2,
+        "yoda": 2
+      }
+    },
+    {
+      "files": [
+        "*.spec.ts"
+      ],
+      "env": {
+        "jasmine": true
+      },
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaVersion": 2020,
+        "sourceType": "module",
+        "project": [
+          "./tsconfig.app.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:jasmine/recommended",
+        "eslint:recommended",
+        "plugin:prettier/recommended",
+        "prettier"
+      ],
+      "plugins": [
+        "@angular-eslint",
+        "prettier",
+        "eslint-plugin-no-null",
+        "eslint-plugin-unicorn",
+        "jasmine"
+      ],
+      "rules": {
+        "@angular-eslint/component-max-inline-declarations": [
+          2,
+          {
+            "animations": 10,
+            "styles": 10,
+            "template": 10
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          2,
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/contextual-decorator": 2,
+        "@angular-eslint/contextual-lifecycle": 2,
+        "@angular-eslint/directive-selector": [
+          1,
+          {
+            "type": "attribute",
+            "prefix": "app",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/no-attribute-decorator": 2,
+        "@angular-eslint/no-conflicting-lifecycle": 2,
+        "@angular-eslint/no-forward-ref": 0,
+        "@angular-eslint/no-lifecycle-call": 2,
+        "@angular-eslint/no-input-rename": 1,
+        "@angular-eslint/no-host-metadata-property": 2,
+        "@angular-eslint/no-inputs-metadata-property": 2,
+        "@angular-eslint/no-outputs-metadata-property": 2,
+        "@angular-eslint/no-output-on-prefix": 1,
+        "@angular-eslint/no-output-rename": 1,
+        "@angular-eslint/no-pipe-impure": 2,
+        "@angular-eslint/no-queries-metadata-property": 2,
+        "@angular-eslint/prefer-output-readonly": 2,
+        "@angular-eslint/prefer-on-push-component-change-detection": 1,
+        "@angular-eslint/relative-url-prefix": 2,
+        "@angular-eslint/use-injectable-provided-in": 2,
+        "@angular-eslint/use-component-view-encapsulation": 2,
+        "@angular-eslint/use-lifecycle-interface": 2,
+        "@angular-eslint/use-pipe-transform-interface": 2,
+        "@typescript-eslint/array-type": [
+          2,
+          {
+            "default": "generic"
+          }
+        ],
+        "@typescript-eslint/no-extraneous-class": [
+          2,
+          {
+            "allowWithDecorator": true,
+            "allowStaticOnly": true
+          }
+        ],
+        "@typescript-eslint/await-thenable": 2,
+        "@typescript-eslint/no-empty-object-type": "error",
+        "@typescript-eslint/no-unsafe-function-type": "off",
+        "@typescript-eslint/no-wrapper-object-types": "error",
+        "@typescript-eslint/comma-dangle": 0,
+        "@typescript-eslint/consistent-type-definitions": 2,
+        "@typescript-eslint/dot-notation": 0,
+        "@typescript-eslint/explicit-function-return-type": 2,
+        "@typescript-eslint/explicit-member-accessibility": [
+          2,
+          {
+            "accessibility": "no-public"
+          }
+        ],
+        "@typescript-eslint/indent": 0,
+        "@typescript-eslint/member-ordering": [
+          2,
+          {
+            "default": [
+              "signature",
+              "private-static-field",
+              "protected-static-field",
+              "public-static-field",
+              "private-decorated-field",
+              "protected-decorated-field",
+              "public-decorated-field",
+              "private-instance-field",
+              "protected-instance-field",
+              "public-instance-field",
+              "protected-abstract-field",
+              "public-abstract-field",
+              "constructor",
+              "public-static-method",
+              "protected-static-method",
+              "private-static-method",
+              "public-decorated-method",
+              "protected-decorated-method",
+              "private-decorated-method",
+              "public-instance-method",
+              "protected-instance-method",
+              "private-instance-method",
+              "public-abstract-method",
+              "protected-abstract-method"
+            ]
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [
+          2,
+          {
+            "fixToUnknown": false,
+            "ignoreRestArgs": true
+          }
+        ],
+        "@typescript-eslint/no-floating-promises": 0,
+        "@typescript-eslint/no-for-in-array": 2,
+        "@typescript-eslint/no-require-imports": 2,
+        "@typescript-eslint/no-this-alias": 2,
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": 2,
+        "@typescript-eslint/no-unnecessary-type-arguments": 2,
+        "@typescript-eslint/no-unnecessary-type-assertion": 2,
+        "@typescript-eslint/no-var-requires": 2,
+        "@typescript-eslint/prefer-includes": 2,
+        "@typescript-eslint/prefer-readonly": 2,
+        "@typescript-eslint/promise-function-async": 2,
+        "@typescript-eslint/require-await": 2,
+        "@typescript-eslint/restrict-plus-operands": 2,
+        "@typescript-eslint/naming-convention": [
+          2,
+          {
+            "selector": "class",
+            "format": [
+              "PascalCase"
+            ],
+            "modifiers": [
+              "abstract"
+            ],
+            "suffix": [
+              "Abstract"
+            ]
+          },
+          {
+            "selector": "interface",
+            "format": [
+              "PascalCase"
+            ],
+            "suffix": [
+              "Interface"
+            ]
+          },
+          {
+            "selector": "enum",
+            "format": [
+              "PascalCase"
+            ],
+            "suffix": [
+              "Enum"
+            ]
+          },
+          {
+            "selector": "variable",
+            "format": [
+              "camelCase"
+            ]
+          },
+          {
+            "selector": "classProperty",
+            "modifiers": [
+              "private"
+            ],
+            "format": [
+              "camelCase",
+              "snake_case"
+            ],
+            "leadingUnderscore": "allow"
+          },
+          {
+            "selector": "variable",
+            "types": [
+              "boolean"
+            ],
+            "format": [
+              "PascalCase"
+            ],
+            "prefix": [
+              "are",
+              "is",
+              "should",
+              "would",
+              "could",
+              "has",
+              "have",
+              "had",
+              "was",
+              "were",
+              "can",
+              "do",
+              "does",
+              "did",
+              "will",
+              "need"
+            ]
+          },
+          {
+            "selector": "variable",
+            "modifiers": [
+              "exported",
+              "const"
+            ],
+            "format": [
+              "snake_case",
+              "strictCamelCase"
+            ]
+          },
+          {
+            "selector": "parameter",
+            "modifiers": [
+              "unused"
+            ],
+            "format": [
+              "camelCase"
+            ],
+            "leadingUnderscore": "allow"
+          }
+        ],
+        "@typescript-eslint/no-unused-expressions": 0,
+        "@typescript-eslint/unbound-method": 0,
+        "arrow-parens": 0,
+        "brace-style": 0,
+        "class-methods-use-this": 0,
+        "comma-dangle": 0,
+        "complexity": [
+          2,
+          {
+            "max": 20
+          }
+        ],
+        "default-case": 2,
+        "id-blacklist": 0,
+        "id-match": 0,
+        "import/no-default-export": 0,
+        "import/prefer-default-export": 0,
+        "import/no-extraneous-dependencies": 2,
+        "import/no-unassigned-import": 0,
+        "import/order": [
+          1,
+          {
+            "groups": [],
+            "pathGroups": [
+              {
+                "pattern": "~/**",
+                "group": "internal"
+              }
+            ]
+          }
+        ],
+        "lines-between-class-members": [
+          "error",
+          "always",
+          {
+            "exceptAfterSingleLine": true
+          }
+        ],
+        "max-classes-per-file": [
+          2,
+          1
+        ],
+        "max-depth": [
+          2,
+          3
+        ],
+        "max-lines": [
+          2,
+          500
+        ],
+        "prettier/prettier": 2,
+        "max-len": [
+          2,
+          {
+            "code": 100,
+            "tabWidth": 4,
+            "ignoreStrings": true,
+            "ignoreTemplateLiterals": true,
+            "ignoreComments": true,
+            "ignoreUrls": true,
+            "ignorePattern": "^import*|^export*"
+          }
+        ],
+        "newline-per-chained-call": 2,
+        "no-console": ["error", { "allow": ["warn", "error"] }],
+        "no-duplicate-case": 2,
+        "no-duplicate-imports": 2,
+        "no-extra-bind": 2,
+        "no-extra-boolean-cast": 0,
+        "no-invalid-this": 0,
+        "no-multiple-empty-lines": [
+          2,
+          {
+            "max": 1
+          }
+        ],
+        "no-new-func": 2,
+        "no-null/no-null": 0,
+        "no-param-reassign": 2,
+        "no-plusplus": 0,
+        "no-prototype-builtins": 1,
+        "no-redeclare": 2,
+        "no-restricted-syntax": [
+          2,
+          {
+            "selector": "CallExpression[callee.name='fdescribe']",
+            "message": "Do not commit `fdescribe`. Use `describe` instead."
+          },
+          {
+            "selector": "CallExpression[callee.name='fit']",
+            "message": "Do not commit `fit`. Use `it` instead."
+          },
+          "WithStatement"
+        ],
+        "no-return-await": 2,
+        "no-sequences": 2,
+        "no-sparse-arrays": 2,
+        "no-template-curly-in-string": 2,
+        "no-underscore-dangle": 0,
+        "no-unused-expressions": [
+          2,
+          {
+            "allowShortCircuit": true,
+            "allowTernary": true
+          }
+        ],
+        "no-useless-constructor": 0,
+        "no-void": 2,
+        "no-constant-condition": [
+          2,
+          {
+            "checkLoops": false
+          }
+        ],
+        "padding-line-between-statements": [
+          2,
+          {
+            "blankLine": "always",
+            "prev": "*",
+            "next": "return"
+          },
+          {
+            "blankLine": "always",
+            "prev": "*",
+            "next": "block-like"
+          },
+          {
+            "blankLine": "always",
+            "prev": "block-like",
+            "next": "*"
+          },
+          {
+            "blankLine": "always",
+            "prev": [
+              "const",
+              "let"
+            ],
+            "next": "*"
+          },
+          {
+            "blankLine": "never",
+            "prev": "*",
+            "next": [
+              "const",
+              "let"
+            ]
+          }
+        ],
+        "prefer-arrow/prefer-arrow-functions": 0,
+        "prefer-object-spread": 2,
+        "prefer-template": 2,
+        "radix": 0,
+        "space-in-parens": [
+          2,
+          "never"
+        ],
+        "valid-typeof": 2,
+        "yoda": 2,
+        "expect-matcher": 1,
+        "expect-single-argument": 1,
+        "missing-expect": [
+          2,
+          "expect()"
+        ],
+        "named-spy": 1,
+        "new-line-before-expect": 1,
+        "new-line-between-declarations": 1,
+        "no-expect-in-setup-teardown": 1,
+        "no-focused-tests": 2,
+        "no-global-setup": 2,
+        "no-spec-dupes": 1,
+        "no-suite-callback-args": 2,
+        "no-suite-dupes": 1,
+        "no-unsafe-spy": 1,
+        "prefer-jasmine-matcher": 1,
+        "prefer-toBeUndefined": 2
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
+      "rules": {
+        "@angular-eslint/template/no-positive-tabindex": "warn",
+        "@angular-eslint/template/conditional-complexity": 2,
+        "@angular-eslint/template/cyclomatic-complexity": [
+          2,
+          {
+            "maxComplexity": 10
+          }
+        ],
+        "@angular-eslint/template/i18n": 0,
+        "@angular-eslint/template/no-call-expression": 0,
+        "@angular-eslint/template/alt-text": "warn",
+        "@angular-eslint/template/elements-content": "warn",
+        "@angular-eslint/template/label-has-associated-control": "warn",
+        "@angular-eslint/template/table-scope": "warn",
+        "@angular-eslint/template/valid-aria": "warn"
+      }
+    },
+    {
+      "files": [
+        "*.component.html"
+      ],
+      "excludedFiles": [
+        "*inline-template-*.component.html"
+      ],
+      "extends": [
+        "plugin:prettier/recommended",
+        "prettier"
+      ],
+      "rules": {
+        "@angular-eslint/template/conditional-complexity": 2,
+        "@angular-eslint/template/cyclomatic-complexity": [
+          2,
+          {
+            "maxComplexity": 10
+          }
+        ],
+        "@angular-eslint/template/i18n": 0,
+        "@angular-eslint/template/no-call-expression": 0,
+        "prettier/prettier": [
+          2,
+          {
+            "parser": "angular"
+          }
+        ],
+        "@angular-eslint/template/alt-text": 1
+      }
+    }
+  ]
+}
