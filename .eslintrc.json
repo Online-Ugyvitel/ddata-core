@@ -1,8 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": [
-    "projects/**/*"
-  ],
+  "ignorePatterns": [],
   "settings": {
     "import/resolver": {
       "typescript": {}

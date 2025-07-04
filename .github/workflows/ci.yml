@@ -29,11 +29,68 @@ jobs:
         npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts --no-optional
         npm run build:core
 
-    - name: Run lint
+    - name: Run lint (main app)
       run: npm run lint
 
-    - name: Run tests
+    - name: Run tests (main app)
       run: npm run test
+      continue-on-error: true
+
+    # Lint and test each project
+    - name: Lint ddata-core
+      run: ng lint ddata-core
+      continue-on-error: true
+
+    - name: Test ddata-core
+      run: ng test ddata-core --no-watch --browsers=ChromeHeadless
+      continue-on-error: true
+
+    - name: Lint ddata-ui
+      run: ng lint ddata-ui
+      continue-on-error: true
+
+    - name: Test ddata-ui
+      run: ng test ddata-ui --no-watch --browsers=ChromeHeadless
+      continue-on-error: true
+
+    - name: Lint ddata-ui-input
+      run: ng lint ddata-ui-input
+      continue-on-error: true
+
+    - name: Test ddata-ui-input
+      run: ng test ddata-ui-input --no-watch --browsers=ChromeHeadless
+      continue-on-error: true
+
+    - name: Lint ddata-ui-file
+      run: ng lint ddata-ui-file
+      continue-on-error: true
+
+    - name: Test ddata-ui-file
+      run: ng test ddata-ui-file --no-watch --browsers=ChromeHeadless
+      continue-on-error: true
+
+    - name: Lint ddata-ui-dialog
+      run: ng lint ddata-ui-dialog
+      continue-on-error: true
+
+    - name: Test ddata-ui-dialog
+      run: ng test ddata-ui-dialog --no-watch --browsers=ChromeHeadless
+      continue-on-error: true
+
+    - name: Lint ddata-ui-common
+      run: ng lint ddata-ui-common
+      continue-on-error: true
+
+    - name: Test ddata-ui-common
+      run: ng test ddata-ui-common --no-watch --browsers=ChromeHeadless
+      continue-on-error: true
+
+    - name: Lint ddata-a11y
+      run: ng lint ddata-a11y
+      continue-on-error: true
+
+    - name: Test ddata-a11y
+      run: ng test ddata-a11y --no-watch --browsers=ChromeHeadless
       continue-on-error: true
 
     - name: Test results summary
