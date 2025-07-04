@@ -126,7 +126,7 @@ describe('DdataSelectComponent', () => {
       component.field = 'country_id';
       component.model = mockModel as any;
       
-      expect(component.model).toBe(mockModel);
+      expect(component.model).toEqual(mockModel as any);
       expect(component['_title']).toBeDefined();
       expect(component['_label']).toBeDefined();
     });

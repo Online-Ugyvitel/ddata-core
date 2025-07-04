@@ -167,7 +167,7 @@ describe('DdataMultipleSelectComponent', () => {
     });
 
     it('should set is_selected to true on event', () => {
-      const event = { id: 4, name: 'New Tag' };
+      const event: any = { id: 4, name: 'New Tag' };
       spyOn(component.selectModel, 'emit');
       
       component.selectModelEmit(event);
@@ -207,8 +207,8 @@ describe('DdataMultipleSelectComponent', () => {
       
       component.selectModelEmit(event);
       
-      expect(component.model.tag).toBe(event);
-      expect(component.model.tag_id).toBe(5);
+      expect((component.model as any).tag).toBe(event);
+      expect((component.model as any).tag_id).toBe(5);
       expect(component.selectModel.emit).toHaveBeenCalledWith(event);
     });
   });
@@ -357,13 +357,13 @@ describe('DdataMultipleSelectComponent', () => {
       component.selectModelEmit(mockTag1);
       component.selectModelEmit(mockTag2);
       
-      expect(component.model.tags).toEqual([mockTag1, mockTag2]);
+      expect((component.model as any).tags).toEqual([mockTag1, mockTag2]);
       
       // Remove one item
       component._dialogSettings.listOptions.selectedElements = [mockTag1, mockTag2];
       component.deleteFromMultipleSelectedList(mockTag1);
       
-      expect(component.model.tags).toEqual([mockTag2]);
+      expect((component.model as any).tags).toEqual([mockTag2]);
       expect(component._dialogSettings.listOptions.selectedElements).toEqual([mockTag2]);
     });
 
@@ -378,20 +378,20 @@ describe('DdataMultipleSelectComponent', () => {
         component._dialogSettings.listOptions.selectedElements.push(tag);
       });
       
-      expect(component.model.tags).toHaveLength(3);
-      expect(component._dialogSettings.listOptions.selectedElements).toHaveLength(3);
+      expect((component.model as any).tags).toEqual(jasmine.arrayWithExactContents([mockTag1, mockTag2, mockTag3]));
+      expect(component._dialogSettings.listOptions.selectedElements).toEqual(jasmine.arrayWithExactContents([mockTag1, mockTag2, mockTag3]));
       
       // Remove middle item
       component.deleteFromMultipleSelectedList(mockTag2);
       
-      expect(component.model.tags).toEqual([mockTag1, mockTag3]);
+      expect((component.model as any).tags).toEqual([mockTag1, mockTag3]);
       expect(component._dialogSettings.listOptions.selectedElements).toEqual([mockTag1, mockTag3]);
       
       // Remove remaining items
       component.deleteFromMultipleSelectedList(mockTag1);
       component.deleteFromMultipleSelectedList(mockTag3);
       
-      expect(component.model.tags).toEqual([]);
+      expect((component.model as any).tags).toEqual([]);
       expect(component._dialogSettings.listOptions.selectedElements).toEqual([]);
     });
   });
