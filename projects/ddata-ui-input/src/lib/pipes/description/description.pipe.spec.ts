@@ -1,6 +1,6 @@
 import { DescriptionPipe } from './description.pipe';
 
-xdescribe('DescriptionPipe', () => {
+describe('DescriptionPipe', () => {
   let pipe: DescriptionPipe;
 
   beforeEach(() => {
