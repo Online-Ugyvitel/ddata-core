@@ -16,13 +16,17 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '22.12.0'
-        cache: 'npm'
+        # Disable npm cache to avoid authentication issues
+        # cache: 'npm'
 
     - name: Install dependencies
       run: |
         rm -f .npmrc
+        rm -f package-lock.json
         npm config set registry https://registry.npmjs.org/
-        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
+        npm config delete //registry.npmjs.org/:_authToken || true
+        npm whoami || echo "Not logged in to npm (this is expected)"
+        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts --no-optional
         npm run build:core
 
     - name: Run lint
