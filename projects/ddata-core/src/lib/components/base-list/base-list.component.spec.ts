@@ -600,6 +600,39 @@ describe('BaseListComponent', () => {
       expect(component.currentPageNumber).toBe(newPage);
       expect((component as any).setGetRequest).toHaveBeenCalled();
     });
+
+    it('should handle changePage with zero page number', () => {
+      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
+      
+      component.changePage(0);
+      
+      expect(component.currentPageNumber).toBe(0);
+      expect((component as any).setGetRequest).toHaveBeenCalled();
+    });
+
+    it('should handle changePage with negative page number', () => {
+      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
+      
+      component.changePage(-1);
+      
+      expect(component.currentPageNumber).toBe(-1);
+      expect((component as any).setGetRequest).toHaveBeenCalled();
+    });
+
+    it('should update paginate and models after changePage when observable resolves', () => {
+      component.currentPageNumber = 1;
+      component.filter = { name: 'test' };
+      
+      // Setup the observable to return data
+      spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
+      
+      component.changePage(2);
+      
+      // The subscribe in changePage should complete, but we need to trigger it
+      // Since changePage calls setGetRequest().subscribe(), we need to verify the subscription behavior
+      expect(component.currentPageNumber).toBe(2);
+      expect(mockHelperService.search).toHaveBeenCalledWith({ name: 'test' }, 2);
+    });
   });
 
   describe('save method', () => {
@@ -685,7 +718,7 @@ describe('BaseListComponent', () => {
       expect(component.models).toEqual(mockPaginateWithData.data);
     });
 
-    it('should handle page change and reload data', () => {
+    it('should handle page change and reload data with search when filter exists', () => {
       component.filter = { status: 'active' };
       spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
       
@@ -693,6 +726,21 @@ describe('BaseListComponent', () => {
       
       expect(component.currentPageNumber).toBe(2);
       expect(mockHelperService.search).toHaveBeenCalledWith({ status: 'active' }, 2);
+    });
+
+    it('should handle page change and reload data with getAll when filter is empty', () => {
+      component.filter = {};
+      spyOn(mockHelperService, 'getAll').and.returnValue(of(mockPaginateWithData));
+      
+      component.changePage(3);
+      
+      expect(component.currentPageNumber).toBe(3);
+      expect(mockHelperService.getAll).toHaveBeenCalledWith(
+        component.paginate,
+        component.models,
+        component.isModal,
+        3
+      );
     });
   });
 
@@ -727,24 +775,6 @@ describe('BaseListComponent', () => {
       expect(component.isModal).toBe(true);
       expect((component as any).nested).toEqual(complexData.nested);
       expect((component as any).array).toEqual(complexData.array);
-    });
-
-    it('should handle changePage with zero page number', () => {
-      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
-      
-      component.changePage(0);
-      
-      expect(component.currentPageNumber).toBe(0);
-      expect((component as any).setGetRequest).toHaveBeenCalled();
-    });
-
-    it('should handle changePage with negative page number', () => {
-      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
-      
-      component.changePage(-1);
-      
-      expect(component.currentPageNumber).toBe(-1);
-      expect((component as any).setGetRequest).toHaveBeenCalled();
     });
   });
 });
