@@ -1,27 +1,28 @@
 import { Observable } from 'rxjs';
 import { Type } from '@angular/core';
+import { BaseModelWithoutTypeDefinitionInterface } from 'ddata-core';
 
 interface DialogOptionsInterface {
-  saveModel?: Observable<any>;
-  select?: Observable<any>;
+  saveModel?: Observable<BaseModelWithoutTypeDefinitionInterface>;
+  select?: Observable<BaseModelWithoutTypeDefinitionInterface>;
   isModal?: boolean;
   multipleSelectEnabled?: boolean;
   isSelectionList?: boolean;
-  selectedElements?: any[];
-  models?: any[];
+  selectedElements?: Array<BaseModelWithoutTypeDefinitionInterface>;
+  models?: Array<BaseModelWithoutTypeDefinitionInterface>;
   loadData?: boolean;
-  filter?: any;
+  filter?: Record<string, unknown>;
   datasArrived?: number;
 }
 
 export interface DialogContentInterface extends DialogOptionsInterface {
-  component: any;
-  data: any;
+  component: Type<unknown>;
+  data: Record<string, unknown>;
 }
 
 export interface DialogContentWithOptionsInterface {
-  createEditComponent?: Type<any>;
+  createEditComponent?: Type<unknown>;
   createEditOptions?: DialogOptionsInterface;
-  listComponent?: Type<any>;
+  listComponent?: Type<unknown>;
   listOptions?: DialogOptionsInterface;
 }
