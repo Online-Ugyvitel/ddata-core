@@ -1,34 +1,34 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'filesize',
-    standalone: false
+  name: 'filesize',
+  standalone: false
 })
 export class FilesizePipe implements PipeTransform {
-
-  transform(value: number, unit?: string, decimals?: number): any {
+  transform(value: number, unit?: string, decimals?: number): number | null {
     if (!value) {
       return null;
     }
-    if (!decimals || decimals < 0) {
-      decimals = 0;
+    let actualDecimals = decimals;
+
+    if (!actualDecimals || actualDecimals < 0) {
+      actualDecimals = 0;
+    }
+    let convertedValue = value;
+
+    if (unit === 'kb') {
+      convertedValue = convertedValue / 1024;
     }
 
-    if ( unit === 'kb' ) {
-      value = value / 1024;
+    if (unit === 'mb') {
+      convertedValue = convertedValue / 1024 / 1024;
     }
 
-    if ( unit === 'mb' ) {
-      value = value / 1024 / 1024;
+    if (unit === 'gb') {
+      convertedValue = convertedValue / 1024 / 1024 / 1024;
     }
+    const finalValue = Number(convertedValue.toFixed(actualDecimals));
 
-    if ( unit === 'gb' ) {
-      value = value / 1024 / 1024 / 1024;
-    }
-
-    value = Number( value.toFixed(decimals) );
-
-    return value;
+    return finalValue;
   }
-
 }
