@@ -112,22 +112,33 @@ export class DdataMultipleSelectComponent {
 
     if (this.mode === 'multiple') {
       // TODO avoid duplicate add
-      this.model[this.getObjectFieldName()].push(event);
+      this.model[this.field].push(event);
     }
 
     this.selectModel.emit(event);
   }
 
-  deleteFromMultipleSelectedList(item: unknown): void {
-    const index = this.model[this.field].indexOf(item);
+  deleteFromMultipleSelectedList(item: BaseModelInterface<unknown>): void {
+    // Remove from model field array
+    if (this.model && this.model[this.field] && Array.isArray(this.model[this.field])) {
+      const index = this.model[this.field].indexOf(item);
 
-    if (index !== -1) {
-      this.model[this.field].splice(index, 1);
+      if (index !== -1) {
+        this.model[this.field].splice(index, 1);
+      }
     }
-    const dialogIndex = this.internalDialogSettings.listOptions.selectedElements.indexOf(item);
 
-    if (dialogIndex !== -1) {
-      this.internalDialogSettings.listOptions.selectedElements.splice(dialogIndex, 1);
+    // Remove from dialog selected elements
+    if (
+      this.dialogSettings &&
+      this.dialogSettings.listOptions &&
+      Array.isArray(this.dialogSettings.listOptions.selectedElements)
+    ) {
+      const dialogIndex = this.dialogSettings.listOptions.selectedElements.indexOf(item);
+
+      if (dialogIndex !== -1) {
+        this.dialogSettings.listOptions.selectedElements.splice(dialogIndex, 1);
+      }
     }
   }
 
