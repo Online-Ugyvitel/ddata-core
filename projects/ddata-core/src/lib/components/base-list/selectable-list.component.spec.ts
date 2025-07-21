@@ -125,6 +125,31 @@ describe('SelectableListComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should extend BaseListComponent', () => {
+    expect(component instanceof SelectableListComponent).toBe(true);
+    // Should have inherited properties from BaseListComponent
+    expect(component.models).toBeDefined();
+    expect(component.filter).toBeDefined();
+    expect(component.editModel).toBeDefined();
+    expect(component.deleteModel).toBeDefined();
+  });
+
+  it('should implement SelectableListComponentInterface', () => {
+    // Verify all interface properties and methods exist
+    expect(component.isModal).toBeDefined();
+    expect(component.multipleSelectEnabled).toBeDefined();
+    expect(component.isSelectionList).toBeDefined();
+    expect(component.loadData).toBeDefined();
+    expect(component.selectedElements).toBeDefined();
+    expect(component.removeSelection).toBeDefined();
+    expect(component.setSelection).toBeDefined();
+    expect(component.emitSelected).toBeDefined();
+    expect(component.datasArrived).toBeDefined();
+    expect(component.select).toBeDefined();
+    expect(typeof component.toggleSelect).toBe('function');
+    expect(typeof component.chooseSelect).toBe('function');
+  });
+
   describe('Properties initialization', () => {
     it('should initialize with default values', () => {
       expect(component._selectedElements).toEqual(new Set([]));
@@ -409,6 +434,96 @@ describe('SelectableListComponent', () => {
       // Set should deduplicate automatically
       expect(component._selectedElements.size).toBe(2);
       expect(component.selectedElements.length).toBe(2);
+    });
+
+    it('should handle selectedElements with null/undefined items in array', () => {
+      // This tests forEach loop handling null items
+      const arrayWithNulls = [testModel1, null, testModel2, undefined] as any[];
+      
+      expect(() => {
+        component.selectedElements = arrayWithNulls;
+      }).not.toThrow();
+      
+      // Should still add the valid models to the set
+      expect(component._selectedElements.size).toBe(4); // Set includes null/undefined
+      expect(testModel1.is_selected).toBe(true);
+      expect(testModel2.is_selected).toBe(true);
+    });
+
+    it('should handle selectedElements with items having no id property', () => {
+      const itemWithoutId = { is_selected: false } as any;
+      
+      expect(() => {
+        component.selectedElements = [testModel1, itemWithoutId];
+      }).not.toThrow();
+      
+      expect(component._selectedElements.size).toBe(2);
+      expect(testModel1.is_selected).toBe(true);
+    });
+
+    it('should handle selectedElements with string ids matching numeric ids', () => {
+      // Tests the == comparison (not ===) in line 26
+      const modelWithStringId = { id: '1', is_selected: false } as any;
+      
+      component.selectedElements = [modelWithStringId];
+      
+      // Should match testModel1 (id: 1) due to == comparison
+      expect(testModel1.is_selected).toBe(true);
+      expect(component._selectedElements.has(modelWithStringId)).toBe(true);
+    });
+
+    it('should handle selectedElements with complex id types', () => {
+      // Test edge case where ids are objects or other types
+      const modelWithObjectId = { id: { value: 1 }, is_selected: false } as any;
+      
+      expect(() => {
+        component.selectedElements = [modelWithObjectId];
+      }).not.toThrow();
+      
+      // Should not match any existing model
+      expect(testModel1.is_selected).toBe(false);
+      expect(testModel2.is_selected).toBe(false);
+      expect(testModel3.is_selected).toBe(false);
+    });
+
+    it('should reset is_selected to false for all models even when setting empty array', () => {
+      // First set some models as selected
+      testModel1.is_selected = true;
+      testModel2.is_selected = true;
+      testModel3.is_selected = true;
+      
+      // Set empty array - should still reset all
+      component.selectedElements = [];
+      
+      expect(testModel1.is_selected).toBe(false);
+      expect(testModel2.is_selected).toBe(false);
+      expect(testModel3.is_selected).toBe(false);
+    });
+
+    it('should handle BehaviorSubject initial values correctly', () => {
+      // Test that datasArrived starts with 0
+      expect(component.datasArrived.value).toBe(0);
+      
+      // Test that select starts with null
+      expect(component.select.value).toBe(null);
+    });
+
+    it('should maintain Set properties when toggling same model multiple times rapidly', () => {
+      // Rapid toggle sequence
+      component.toggleSelect(testModel1);
+      expect(component._selectedElements.has(testModel1)).toBe(true);
+      
+      component.toggleSelect(testModel1);
+      expect(component._selectedElements.has(testModel1)).toBe(false);
+      
+      component.toggleSelect(testModel1);
+      expect(component._selectedElements.has(testModel1)).toBe(true);
+      
+      component.toggleSelect(testModel1);
+      expect(component._selectedElements.has(testModel1)).toBe(false);
+      
+      // Final state should be empty
+      expect(component._selectedElements.size).toBe(0);
     });
   });
 });
