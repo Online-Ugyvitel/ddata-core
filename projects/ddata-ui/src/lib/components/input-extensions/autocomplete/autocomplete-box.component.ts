@@ -1,5 +1,13 @@
 // tslint:disable: deprecation
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { faSpinner } from '@fortawesome/pro-solid-svg-icons';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
@@ -11,14 +19,14 @@ import { AppModule } from 'src/app/app.module';
 interface AutocompleteResult extends BaseModelInterface<any> {
   name: string;
   fields: [];
-  getValidatedErrorFields(): any[];
+  getValidatedErrorFields(): Array<any>;
 }
 
 @Component({
-    selector: 'app-autocomplete-box',
-    templateUrl: './autocomplete-box.component.html',
-    styleUrls: ['./autocomplete-box.component.scss'],
-    standalone: false
+  selector: 'dd-autocomplete-box',
+  templateUrl: './autocomplete-box.component.html',
+  styleUrls: ['./autocomplete-box.component.scss'],
+  standalone: false
 })
 export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   _field = '';
@@ -31,6 +39,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   _model: BaseModel = new BaseModel();
   @Input() set model(value: BaseModel) {
     this._model = value;
+
     if (!!this._model && !!this._model.fields[this._field]) {
       this._title = this._model.fields[this._field].title ?? '';
       this._label = this._model.fields[this._field].label ?? '';
@@ -38,13 +47,16 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
       this._prepend = this.getPrepend();
       this._append = this.getAppend();
     }
+
     if (!!this._model && !!this._model.validationRules[this._field]) {
       this._is_required = this.model.validationRules[this._field].includes('required');
     }
   }
+
   get model() {
     return this._model;
   }
+
   @Input() set field(value: string) {
     if (value === 'undefined') {
       value = 'isValid';
@@ -52,6 +64,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
 
     this._field = value;
   }
+
   @Input() set append(value: string) {
     if (value === 'undefined') {
       value = '';
@@ -59,6 +72,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
 
     this._append = value;
   }
+
   @Input() set prepend(value: string) {
     if (value === 'undefined') {
       value = '';
@@ -66,6 +80,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
 
     this._prepend = value;
   }
+
   @Input() disabled: boolean;
   @Input() type = 'text';
   @Input() inputClass = 'form-control';
@@ -77,13 +92,14 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   @Input() autocomplete = false;
   @Input() autocompleteService: ProxyServiceInterface<any> = null;
   @ViewChild('inputBox') inputBox: ElementRef;
-  autocompleteSuggestions: AutocompleteResult[] = [];
+  autocompleteSuggestions: Array<AutocompleteResult> = [];
   autocompleteCursor = -1;
   random: string = this.randChars();
   inputValue: Subject<string> = new Subject();
   spinner = faSpinner;
   autocompleteLoading = false;
-  validatorService: ValidatorService = AppModule.InjectorInstance.get<ValidatorService>(ValidatorService);
+  validatorService: ValidatorService =
+    AppModule.InjectorInstance.get<ValidatorService>(ValidatorService);
 
   @HostListener('document:click', ['$event']) clickout(event: any) {
     if (this.autocomplete && !this.elementRef.nativeElement.contains(event.target)) {
@@ -91,9 +107,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
     }
   }
 
-  constructor(
-    private elementRef: ElementRef,
-  ) { }
+  constructor(private readonly elementRef: ElementRef) {}
 
   ngOnInit() {
     this.registerAutocompleteSearch();
@@ -144,7 +158,6 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
       }
 
       this.setName();
-
     } else if (event.keyCode === 38) {
       // UP arrow key
       if (this.autocompleteCursor > 0) {
@@ -152,16 +165,13 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
       }
 
       this.setName();
-
     } else if (event.keyCode === 13) {
       // ENTER key
       event.preventDefault();
       this.setContent();
-
     } else if (event.keyCode === 27) {
       // ESC key
       this.clearSuggestions();
-
     } else if (!this.enabledKeyCode(event.keyCode)) {
       // diabled keys, do nothing
       return;
@@ -176,6 +186,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
     if (keyCode === 8) {
       return true;
     }
+
     // space
     if (keyCode === 32) {
       return true;
@@ -194,10 +205,12 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
     if (keyCode >= 160 && keyCode <= 165) {
       return true;
     }
+
     if (keyCode >= 170 && keyCode <= 171) {
       return true;
     }
-    if (keyCode >= 186 && keyCode <= 226 || keyCode === 231) {
+
+    if ((keyCode >= 186 && keyCode <= 226) || keyCode === 231) {
       return true;
     }
 
@@ -209,8 +222,8 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
 
-    for (let i = 0; i < 50; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    for (let i = 0; i < 50; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
 
     return result;
@@ -218,15 +231,22 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
 
   validateField() {
     if (!this.model.validationRules[this._field]) {
-      console.error('Missing validation rule:' + this._field + ' from model: ' + this.model.constructor.name);
+      console.error(
+        `Missing validation rule:${this._field} from model: ${this.model.constructor.name}`
+      );
     } else {
-      if (!this.validatorService.validate(this.model[this._field], this.model.validationRules[this._field])) {
+      if (
+        !this.validatorService.validate(
+          this.model[this._field],
+          this.model.validationRules[this._field]
+        )
+      ) {
         if (!this.model.validationErrors.includes(this._field)) {
           this.model.validationErrors.push(this._field);
         }
       } else {
         if (this.model.validationErrors.includes(this._field)) {
-          this.model.validationErrors.splice( this.model.validationErrors.indexOf(this._field), 1);
+          this.model.validationErrors.splice(this.model.validationErrors.indexOf(this._field), 1);
         }
       }
     }
@@ -254,7 +274,10 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
     }
 
     if (!this.autocompleteService) {
-      console.error(`Autocomplete is on the '${this._field}' field, but autocompleteService isn't defined.`);
+      console.error(
+        `Autocomplete is on the '${this._field}' field, but autocompleteService isn't defined.`
+      );
+
       return;
     }
 
@@ -266,11 +289,13 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
         // if value is the same, ignore
         distinctUntilChanged(),
         // start connection
-        switchMap(term => {
+        switchMap((term) => {
           this.autocompleteLoading = true;
-          return this.autocompleteService.searchWithoutPaginate({term: this.model[this._field]});
-        }),
-      ).subscribe((result: AutocompleteResult[]) => {
+
+          return this.autocompleteService.searchWithoutPaginate({ term: this.model[this._field] });
+        })
+      )
+      .subscribe((result: Array<AutocompleteResult>) => {
         this.autocompleteSuggestions = result;
         this.autocompleteLoading = false;
       });

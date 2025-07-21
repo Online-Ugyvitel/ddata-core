@@ -10,7 +10,10 @@
       <!-- add button -->
       <button *ngIf="showAddButton" class="btn btn-light" type="button" (click)="create()">
         <fa-icon [icon]="icon.plus"></fa-icon>
-        Új {{ transformToLowerCase ? model.fields.title.label.toLowerCase() : model.fields.title.label }}
+        Új
+        {{
+          transformToLowerCase ? model.fields.title.label.toLowerCase() : model.fields.title.label
+        }}
       </button>
 
       <!-- additional buttons -->
@@ -18,11 +21,16 @@
 
       <!-- xls, csv downloads -->
       <ng-container *ngIf="showDownloadButtons">
-        <app-xls-button-export [model]="model" ></app-xls-button-export>
+        <app-xls-button-export [model]="model"></app-xls-button-export>
       </ng-container>
 
       <!-- delete selected button -->
-      <button *ngIf="selection.selected.length > 0" class="ml-1 btn btn-light" type="button" (click)="delete()">
+      <button
+        *ngIf="selection.selected.length > 0"
+        class="ml-1 btn btn-light"
+        type="button"
+        (click)="delete()"
+      >
         <fa-icon [icon]="icon.trash"></fa-icon>
         Kijelölt{{ selection.selected.length > 1 ? 'ek' : '' }} törlése
       </button>

@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  Renderer2,
+  ViewChild
+} from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
 import { CasefileStatusInterface } from 'src/app/models/casefile/status/casefile-status.interface';
@@ -9,39 +18,39 @@ import { ViewKanbanInterface } from 'src/app/models/view/kanban/view-kanban.inte
 import { ViewKanban } from 'src/app/models/view/kanban/view-kanban.model';
 
 @Component({
-    selector: 'app-view-kanban',
-    templateUrl: './view-kanban.component.html',
-    styleUrls: ['./view-kanban.component.scss'],
-    standalone: false
+  selector: 'dd-view-kanban',
+  templateUrl: './view-kanban.component.html',
+  styleUrls: ['./view-kanban.component.scss'],
+  standalone: false
 })
 export class ViewKanbanComponent implements AfterViewInit {
-  @Input() set data(data: BehaviorSubject<CasefileInterface[]>) {
-    data.subscribe((models: CasefileInterface[]) => {
+  @Input() set data(data: BehaviorSubject<Array<CasefileInterface>>) {
+    data.subscribe((models: Array<CasefileInterface>) => {
       this.originalData = models;
       this.kanbanData = this.convertToKanban(this.originalData);
     });
   }
+
   @Input() title = 'Kanban nézet';
-  @Input() set statuses(subject: BehaviorSubject<CasefileStatusInterface[]>) {
-    subject.subscribe((statuses: CasefileStatusInterface[]) => {
+  @Input() set statuses(subject: BehaviorSubject<Array<CasefileStatusInterface>>) {
+    subject.subscribe((statuses: Array<CasefileStatusInterface>) => {
       this._statuses = statuses;
       this.kanbanData = this.convertToKanban(this.originalData);
     });
   }
+
   @Output() openCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
   @Output() updateCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
   @ViewChild('kanbanStatusContainer') kanbanStatusContainer: ElementRef;
-  _statuses: CasefileStatusInterface[] = [];
+  _statuses: Array<CasefileStatusInterface> = [];
   kanbanData: ViewKanbanInterface;
-  originalData: CasefileInterface[] = [];
+  originalData: Array<CasefileInterface> = [];
   dragFromStatus: KanbanStatusInterface = null;
   dragOverStatus: KanbanStatusInterface = null;
   dragOverCasefileContainer: KanbanCasefileInterface = null;
   dragCasefile: CasefileInterface = null;
 
-  constructor(
-    private renderer: Renderer2,
-  ) { }
+  constructor(private readonly renderer: Renderer2) {}
 
   ngAfterViewInit() {
     this.setHeight();
@@ -50,35 +59,40 @@ export class ViewKanbanComponent implements AfterViewInit {
   setHeight() {
     if (!!this.kanbanStatusContainer) {
       const newHeight = document.documentElement.clientHeight - 189;
+
       this.renderer.setStyle(this.kanbanStatusContainer.nativeElement, 'height', `${newHeight}px`);
     }
   }
 
-  convertToKanban(data: CasefileInterface[]): ViewKanbanInterface {
-    const kanbanDataSet = new ViewKanban().init({name: this.title});
+  convertToKanban(data: Array<CasefileInterface>): ViewKanbanInterface {
+    const kanbanDataSet = new ViewKanban().init({ name: this.title });
 
     // set statuses
     this._statuses.forEach((status: KanbanStatusInterface) => {
-      kanbanDataSet.statuses.push(new KanbanStatus().init({
-        id: status.id,
-        name: status.name,
-        color: status.color,
-        casefiles: [],
-      }));
+      kanbanDataSet.statuses.push(
+        new KanbanStatus().init({
+          id: status.id,
+          name: status.name,
+          color: status.color,
+          casefiles: []
+        })
+      );
     });
 
     data.forEach((item: CasefileInterface) => {
       // find status
-      const status = kanbanDataSet.statuses.find(_status => _status.id === item.status_id);
+      const status = kanbanDataSet.statuses.find((_status) => _status.id === item.status_id);
 
       if (!status) {
         // if status doesn't exists, create it and add the item
-        kanbanDataSet.statuses.push(new KanbanStatus().init({
-          id: item.status.id,
-          name: item.status.name,
-          color: item.status.color,
-          casefiles: [item],
-        }));
+        kanbanDataSet.statuses.push(
+          new KanbanStatus().init({
+            id: item.status.id,
+            name: item.status.name,
+            color: item.status.color,
+            casefiles: [item]
+          })
+        );
 
         return;
       }
@@ -96,8 +110,8 @@ export class ViewKanbanComponent implements AfterViewInit {
   dragstart(casefile: CasefileInterface, status: KanbanStatusInterface) {
     this.dragCasefile = casefile;
     this.dragFromStatus = status;
-
     const statuses = Array.from(document.getElementsByClassName('kanban-status'));
+
     statuses.forEach((_status: HTMLElement) => {
       _status.classList.add('drag-active');
     });
@@ -111,6 +125,7 @@ export class ViewKanbanComponent implements AfterViewInit {
     // add to new status
     if (!!this.dragOverCasefileContainer) {
       const index = this.dragOverStatus.casefiles.indexOf(this.dragOverCasefileContainer);
+
       if (index !== -1) {
         this.dragOverStatus.casefiles.splice(index, 0, this.dragCasefile);
       } else {
@@ -121,16 +136,19 @@ export class ViewKanbanComponent implements AfterViewInit {
     }
 
     // remove from old status
-    this.dragFromStatus.casefiles.splice(this.dragFromStatus.casefiles.indexOf(this.dragCasefile), 1);
-
+    this.dragFromStatus.casefiles.splice(
+      this.dragFromStatus.casefiles.indexOf(this.dragCasefile),
+      1
+    );
     // clean up CSS classes
     const statuses = Array.from(document.getElementsByClassName('kanban-status'));
+
     statuses.forEach((status: HTMLElement) => {
       status.classList.remove('drag-active');
     });
-
     // find original casefile
     const casefile = this.findData(this.dragCasefile);
+
     // set new status on original casefile
     casefile.status.id = this.dragCasefile.status.id;
     casefile.status.name = this.dragCasefile.status.name;
@@ -141,7 +159,9 @@ export class ViewKanbanComponent implements AfterViewInit {
   }
 
   dragover(status: KanbanStatusInterface) {
-    this.kanbanData.statuses.forEach((_status: KanbanStatusInterface) => _status.is_drag_over = false);
+    this.kanbanData.statuses.forEach(
+      (_status: KanbanStatusInterface) => (_status.is_drag_over = false)
+    );
     status.is_drag_over = true;
     this.dragOverStatus = status;
   }
@@ -151,7 +171,7 @@ export class ViewKanbanComponent implements AfterViewInit {
   }
 
   private findData(casefile: KanbanCasefileInterface): CasefileInterface {
-    return this.originalData.find(item => item.id === casefile.id);
+    return this.originalData.find((item) => item.id === casefile.id);
   }
 
   getEstimatedTimes(status: KanbanStatusInterface): string {
@@ -169,7 +189,12 @@ export class ViewKanbanComponent implements AfterViewInit {
       return 0;
     }
 
-    return (Number(time.split(':')[0]) * 60 * 60 + Number(time.split(':')[1]) * 60 + Number(time.split(':')[2])) * 1000;
+    return (
+      (Number(time.split(':')[0]) * 60 * 60 +
+        Number(time.split(':')[1]) * 60 +
+        Number(time.split(':')[2])) *
+      1000
+    );
   }
 
   private convertToTime(miliseconds: number): string {
@@ -183,18 +208,15 @@ export class ViewKanbanComponent implements AfterViewInit {
     const text = [];
 
     if (hoursString !== '0') {
-      text.push(hoursString + 'ó');
+      text.push(`${hoursString}ó`);
     }
 
     if (minutesString !== '0') {
-      text.push(minutesString + 'p');
+      text.push(`${minutesString}p`);
     }
 
     return text.join(' ');
   }
-
-
-
 
   // /**
   //  * Moves an item one index in an array to another.

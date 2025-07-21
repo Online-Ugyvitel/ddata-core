@@ -5,10 +5,10 @@ import { BaseModel, BaseModelInterface } from 'src/app/models/base-model/base-mo
 import { Global } from 'src/app/models/global.model';
 
 @Component({
-    selector: 'app-list-buttons',
-    templateUrl: './list-buttons.component.html',
-    styleUrls: ['./list-buttons.component.scss'],
-    standalone: false
+  selector: 'dd-list-buttons',
+  templateUrl: './list-buttons.component.html',
+  styleUrls: ['./list-buttons.component.scss'],
+  standalone: false
 })
 export class ListButtonsComponent implements OnInit {
   /**
@@ -56,7 +56,9 @@ export class ListButtonsComponent implements OnInit {
    * as empty array.
    */
   // tslint:disable-next-line: max-line-length
-  @Input() selection: SelectionModel<BaseModelInterface<any>> = new SelectionModel<BaseModelInterface<any>>(this.multipleSelectEnabled, []);
+  @Input() selection: SelectionModel<BaseModelInterface<any>> = new SelectionModel<
+    BaseModelInterface<any>
+  >(this.multipleSelectEnabled, []);
 
   /**
    * `EventEmitter<any>` emitting when user click on "Add new" button & `createButtonNavigateToUrl` is false.
@@ -74,12 +76,9 @@ export class ListButtonsComponent implements OnInit {
   @Output() deleteSelected: EventEmitter<any> = new EventEmitter();
   icon = new Global().icon;
 
-  constructor(
-    private router: Router,
-  ) { }
+  constructor(private readonly router: Router) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   select() {
     this.emitSelected.emit();
@@ -87,7 +86,8 @@ export class ListButtonsComponent implements OnInit {
 
   create() {
     if (this.createButtonNavigateToUrl) {
-      this.router.navigateByUrl(this.model.api_endpoint + '/create');
+      this.router.navigateByUrl(`${this.model.api_endpoint}/create`);
+
       return;
     }
 
@@ -97,5 +97,4 @@ export class ListButtonsComponent implements OnInit {
   delete() {
     this.deleteSelected.emit();
   }
-
 }

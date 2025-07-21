@@ -1,13 +1,12 @@
 // tslint:disable: max-line-length
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Global } from 'src/app/models/global.model';
-import { ID } from 'src/app/models/base-model/base-data-type.model';
 
 @Component({
-    selector: 'app-list-dropdown-delete-confirm',
-    templateUrl: './list-dropdown-delete-confirm.component.html',
-    styleUrls: ['./list-dropdown-delete-confirm.component.scss'],
-    standalone: false
+  selector: 'dd-list-dropdown-delete-confirm',
+  templateUrl: './list-dropdown-delete-confirm.component.html',
+  styleUrls: ['./list-dropdown-delete-confirm.component.scss'],
+  standalone: false
 })
 export class ListDropdownDeleteConfirmComponent implements OnInit {
   @Input() alternateDeleteText = ''; // ha van megadva alternateDeleteText, akkor meg kell adni a service-t is.
@@ -20,16 +19,21 @@ export class ListDropdownDeleteConfirmComponent implements OnInit {
   deleteText: string;
   icon = new Global().icon;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
     this.deleteText = 'Biztos törölni szeretné ezt: ';
-    this.deleteText += (this.instanceName === 'multilanguagename') ? (this.model.names[0].name + '?') : (this.model[this.instanceName] + '?');
+    this.deleteText +=
+      this.instanceName === 'multilanguagename'
+        ? `${this.model.names[0].name}?`
+        : `${this.model[this.instanceName]}?`;
+
     if (this.alternateDeleteText.length > 0) {
-      this.service.isInUse(this.model.id).subscribe(result => {
+      this.service.isInUse(this.model.id).subscribe((result) => {
         if (result > 0) {
           this.deleteText = this.alternateDeleteText;
         }
+
         this.isModalVisible = true;
       });
     } else {

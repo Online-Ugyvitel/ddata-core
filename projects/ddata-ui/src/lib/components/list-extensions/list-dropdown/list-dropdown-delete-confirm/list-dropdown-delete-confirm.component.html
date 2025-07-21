@@ -4,7 +4,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Biztos törölni szeretné?</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="onCancel()"
+        >
           <fa-icon [icon]="icon.close"></fa-icon>
         </button>
       </div>
@@ -19,12 +25,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="confirmModal()">
-          Törlés
-        </button>
-        <button type="button" class="btn btn-secondary" (click)="onCancel()">
-          Mégsem
-        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmModal()">Törlés</button>
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">Mégsem</button>
       </div>
     </div>
   </div>

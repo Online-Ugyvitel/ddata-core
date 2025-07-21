@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
-    selector: 'app-password-strength-o-meter',
-    templateUrl: './password-strength-o-meter.component.html',
-    styleUrls: ['./password-strength-o-meter.component.css'],
-    standalone: false
+  selector: 'dd-password-strength-o-meter',
+  templateUrl: './password-strength-o-meter.component.html',
+  styleUrls: ['./password-strength-o-meter.component.css'],
+  standalone: false
 })
 export class PasswordStrengthOMeterComponent implements OnInit {
   // _level = 0;
@@ -15,8 +15,9 @@ export class PasswordStrengthOMeterComponent implements OnInit {
     'bg-warning': this.progress >= 50 && this.progress < 70,
     'bg-success': this.progress >= 70
   };
+
   @Input() set password(value: string) {
-    if ( !value ) {
+    if (!value) {
       // this._level = 0;
       value = '';
     }
@@ -27,42 +28,58 @@ export class PasswordStrengthOMeterComponent implements OnInit {
     const specialCharacterRegExp = new RegExp(/[\W]/);
 
     // lowercase
-    if ( lowercaseRegExp.test(value) ) { passwordLevel++; }
+    if (lowercaseRegExp.test(value)) {
+      passwordLevel++;
+    }
 
     // uppercase
-    if ( uppercaseRegExp.test(value) ) { passwordLevel++; }
+    if (uppercaseRegExp.test(value)) {
+      passwordLevel++;
+    }
 
     // number
-    if ( numberRegExp.test(value) ) { passwordLevel++; }
+    if (numberRegExp.test(value)) {
+      passwordLevel++;
+    }
 
     // speacial character
-    if ( specialCharacterRegExp.test(value) ) { passwordLevel++; }
+    if (specialCharacterRegExp.test(value)) {
+      passwordLevel++;
+    }
 
     // length 1
-    if ( value.length > 8 ) { passwordLevel++; }
+    if (value.length > 8) {
+      passwordLevel++;
+    }
 
     // length 2
-    if ( value.length > 10 ) { passwordLevel++; }
+    if (value.length > 10) {
+      passwordLevel++;
+    }
 
     // length 3
-    if ( value.length > 12 ) { passwordLevel++; }
-
+    if (value.length > 12) {
+      passwordLevel++;
+    }
     // is a shit password?
     let is_shit = 0;
-    this.shitPasswordList.forEach(item => {
-      if ( item === value.toLowerCase() ) {
+
+    this.shitPasswordList.forEach((item) => {
+      if (item === value.toLowerCase()) {
         is_shit = 1;
       }
     });
-    if ( is_shit === 0 ) {
+
+    if (is_shit === 0) {
       passwordLevel++;
     } else {
       passwordLevel = 0;
     }
 
-    if ( value.length < 6 ) {
+    if (value.length < 6) {
       passwordLevel = 0;
     }
+
     this.progress = Number(passwordLevel / 8) * 100;
   }
   // @Input() set level(value: string) {
@@ -103,12 +120,10 @@ export class PasswordStrengthOMeterComponent implements OnInit {
     'jelszo1',
     'jelszó',
     'mindegy',
-    'mind1',
+    'mind1'
   ];
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

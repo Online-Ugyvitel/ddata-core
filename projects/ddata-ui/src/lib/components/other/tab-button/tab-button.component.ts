@@ -3,10 +3,10 @@ import { TabService } from 'src/app/services/tab/tab.service';
 import { TabsetComponent } from 'ngx-bootstrap/tabs';
 
 @Component({
-    selector: 'app-tab-button',
-    templateUrl: './tab-button.component.html',
-    styleUrls: ['./tab-button.component.scss'],
-    standalone: false
+  selector: 'dd-tab-button',
+  templateUrl: './tab-button.component.html',
+  styleUrls: ['./tab-button.component.scss'],
+  standalone: false
 })
 export class TabButtonComponent implements OnInit {
   @Input() service: TabService;
@@ -16,10 +16,9 @@ export class TabButtonComponent implements OnInit {
   lastTab: boolean;
   tabLength: number;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   previousTab() {
     this.service.moveInTabsLeft(this.tabSetComponent);
@@ -38,7 +37,7 @@ export class TabButtonComponent implements OnInit {
       this.currentTab = tabset.tabs.map((i) => i.active).indexOf(true);
       this.tabLength = tabset.tabs.length;
 
-      if ((this.currentTab + 1 ) === this.tabLength) {
+      if (this.currentTab + 1 === this.tabLength) {
         this.lastTab = true;
       }
     }

@@ -17,23 +17,10 @@ import { DdataUiFileUploadComponent } from 'projects/ddata-ui-file/src/lib/compo
 import { DdataUiNoDataComponent } from 'ddata-ui-common';
 
 @NgModule({
-  declarations: [
-    DdataUiFileListComponent,
-    DdataUiFileUploadComponent,
-    DdataUiNoDataComponent,
-  ],
-  imports: [
-    CommonModule,
-    FontAwesomeModule,
-  ],
-  exports: [
-    DdataUiFileListComponent,
-    DdataUiFileUploadComponent,
-    DdataUiNoDataComponent,
-  ],
-  providers: [
-    ProxyService,
-  ]
+  declarations: [DdataUiFileListComponent, DdataUiFileUploadComponent, DdataUiNoDataComponent],
+  imports: [CommonModule, FontAwesomeModule],
+  exports: [DdataUiFileListComponent, DdataUiFileUploadComponent, DdataUiNoDataComponent],
+  providers: [ProxyService]
 })
 export class DdataUiModule {
   static InjectorInstance: Injector;
@@ -45,9 +32,7 @@ export class DdataUiModule {
   static forRoot(config: ModuleConfiguration): ModuleWithProviders<any> {
     return {
       ngModule: DdataUiModule,
-      providers: [
-        FileModel, { provide: 'config', useValue: config },
-      ]
+      providers: [FileModel, { provide: 'config', useValue: config }]
     };
   }
 }

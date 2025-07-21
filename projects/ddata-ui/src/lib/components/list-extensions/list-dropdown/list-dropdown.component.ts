@@ -39,15 +39,15 @@ import { CertificateScrappingProtocolCreateEditComponent } from 'src/app/modules
 import { Company } from 'src/app/models/company/company.model';
 
 @Component({
-    selector: 'app-list-dropdown',
-    templateUrl: './list-dropdown.component.html',
-    styleUrls: ['./list-dropdown.component.scss'],
-    standalone: false
+  selector: 'dd-list-dropdown',
+  templateUrl: './list-dropdown.component.html',
+  styleUrls: ['./list-dropdown.component.scss'],
+  standalone: false
 })
 export class ListDropdownComponent implements OnInit {
-  @Input() customDropdownItems: ListDropdownItemInterface[] = []; // {name: '', icon: '', eventMsg: ''}
+  @Input() customDropdownItems: Array<ListDropdownItemInterface> = []; // {name: '', icon: '', eventMsg: ''}
   // @Input() showCertificateFromCompany = false;
-  @Input() certificationTypes: CertificationTypeInterface[] = [];
+  @Input() certificationTypes: Array<CertificationTypeInterface> = [];
   @Input() company: CompanyInterface;
   @Input() companyShop: CompanyShopInterface;
   @Input() showDelete = true;
@@ -60,60 +60,89 @@ export class ListDropdownComponent implements OnInit {
 
   icon = new Global().icon;
 
-  constructor() {
-  }
+  constructor() {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   /**
    * A paraméterben megadott bizonylatból hozzon létre egy új példányt a sorban lévő partner adataival
    * @param id convert ot this certification_type_id
    */
   createCertificate(id: number) {
-    if ( !!this.company && !!this.company.id ) {
+    if (!!this.company && !!this.company.id) {
       // bejövő bizonylatok esetén a seller_company-nak, kimenő esetén a buyer_company-nak adja át a kiválasztott partnert
-      const data = ( id === 4 || id === 8 || id === 19 ) ? {
-        seller_company_id: this.company.id,
-        seller_company: new Company().init(this.company),
-      } :
-      {
-        buyer_company_id: this.company.id,
-        buyer_company: new Company().init(this.company),
-      };
+      const data =
+        id === 4 || id === 8 || id === 19
+          ? {
+              seller_company_id: this.company.id,
+              seller_company: new Company().init(this.company)
+            }
+          : {
+              buyer_company_id: this.company.id,
+              buyer_company: new Company().init(this.company)
+            };
       let newCertificate: CertificationInterface;
+
       switch (id) {
         case 2:
           newCertificate = new CertificationCommercialTakebackOne().init(data);
-          this.showModal.emit( new DialogContentItem(CertificationCommercialTakebackOneCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(
+              CertificationCommercialTakebackOneCreateEditComponent,
+              newCertificate
+            )
+          );
           break;
         case 3:
           newCertificate = new CertificationCommercialStockUpload().init(data);
-          this.showModal.emit( new DialogContentItem(CertificationCommercialStockUploadCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(
+              CertificationCommercialStockUploadCreateEditComponent,
+              newCertificate
+            )
+          );
           break;
         case 5:
           newCertificate = new CertificationCommercialWeightLoss().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateCommercialWeightLossCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(
+              CertificateCommercialWeightLossCreateEditComponent,
+              newCertificate
+            )
+          );
           break;
         case 6:
           newCertificate = new CertificationCustomerOrder().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateCustomerOrderCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateCustomerOrderCreateEditComponent, newCertificate)
+          );
           break;
         case 7:
           newCertificate = new CertificationIncomingDeliveryNote().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateIncomingDeliveryNoteCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(
+              CertificateIncomingDeliveryNoteCreateEditComponent,
+              newCertificate
+            )
+          );
           break;
         case 8:
           newCertificate = new CertificationIncomingGuarantee().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateIncomingGuaranteeCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateIncomingGuaranteeCreateEditComponent, newCertificate)
+          );
           break;
         case 9:
           newCertificate = new CertificationIncomingInvoice().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateIncomingInvoiceCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateIncomingInvoiceCreateEditComponent, newCertificate)
+          );
           break;
         case 10:
           newCertificate = new CertificationInventoryControl().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateInventoryControlCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateInventoryControlCreateEditComponent, newCertificate)
+          );
           break;
         case 11:
           console.log('Model hiba');
@@ -122,15 +151,24 @@ export class ListDropdownComponent implements OnInit {
           break;
         case 12:
           newCertificate = new CertificationOutgoingDeliveryNote().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateOutgoingDeliveryNoteCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(
+              CertificateOutgoingDeliveryNoteCreateEditComponent,
+              newCertificate
+            )
+          );
           break;
         case 13:
           newCertificate = new CertificationOutgoingGuarantee().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateOutgoingGuaranteeCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateOutgoingGuaranteeCreateEditComponent, newCertificate)
+          );
           break;
         case 14:
           newCertificate = new CertificationOutgoingInvoice().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateOutgoingInvoiceCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateOutgoingInvoiceCreateEditComponent, newCertificate)
+          );
           break;
         case 17:
           console.log('Model hiba');
@@ -144,15 +182,24 @@ export class ListDropdownComponent implements OnInit {
           break;
         case 19:
           newCertificate = new CertificationReturnedFromCustomer().init(data);
-          this.showModal.emit( new DialogContentItem(CertificationReturnedFromCustomerCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(
+              CertificationReturnedFromCustomerCreateEditComponent,
+              newCertificate
+            )
+          );
           break;
         case 20:
           newCertificate = new CertificationReturnedToProducer().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateReturnToProducerCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateReturnToProducerCreateEditComponent, newCertificate)
+          );
           break;
         case 21:
           newCertificate = new CertificationScrappingProtocol().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateScrappingProtocolCreateEditComponent, newCertificate));
+          this.showModal.emit(
+            new DialogContentItem(CertificateScrappingProtocolCreateEditComponent, newCertificate)
+          );
           break;
 
         default:
@@ -165,9 +212,10 @@ export class ListDropdownComponent implements OnInit {
 
   isShowElement(id: number) {
     // a Bizományos visszavétel csak akkor látszódjon, ha a bolt bizományos bolt
-    if ( id === 4 ) {
-      return (!!this.companyShop && this.companyShop.is_commercial_warehouse);
+    if (id === 4) {
+      return !!this.companyShop && this.companyShop.is_commercial_warehouse;
     }
+
     return true;
   }
 }

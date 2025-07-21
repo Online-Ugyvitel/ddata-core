@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
-    selector: 'character-counter',
-    templateUrl: './character-counter.component.html',
-    styleUrls: ['./character-counter.component.css'],
-    standalone: false
+  selector: 'dd-character-counter',
+  templateUrl: './character-counter.component.html',
+  styleUrls: ['./character-counter.component.css'],
+  standalone: false
 })
 export class CharacterCounterComponent implements OnInit {
   _currentLength = '';
@@ -15,9 +15,7 @@ export class CharacterCounterComponent implements OnInit {
     }
   }
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }
