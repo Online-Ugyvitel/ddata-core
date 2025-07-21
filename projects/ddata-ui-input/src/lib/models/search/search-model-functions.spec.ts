@@ -1,4 +1,4 @@
-import { faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { SearchModelFunctions } from './search-model-functions';
 
 describe('SearchModelFunctions', () => {
@@ -18,14 +18,15 @@ describe('SearchModelFunctions', () => {
   describe('Properties', () => {
     it('should have all required properties after init', () => {
       model.init();
-      expect(model.hasOwnProperty('id')).toBeTruthy();
-      expect(model.hasOwnProperty('name')).toBeTruthy();
-      expect(model.hasOwnProperty('description')).toBeTruthy();
-      expect(model.hasOwnProperty('type')).toBeTruthy();
-      expect(model.hasOwnProperty('found_model_name')).toBeTruthy();
-      expect(model.hasOwnProperty('icon')).toBeTruthy();
-      expect(model.hasOwnProperty('url')).toBeTruthy();
-      expect(model.hasOwnProperty('icons')).toBeTruthy();
+
+      expect(Object.prototype.hasOwnProperty.call(model, 'id')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(model, 'name')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(model, 'description')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(model, 'type')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(model, 'found_model_name')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(model, 'icon')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(model, 'url')).toBeTruthy();
+      expect(Object.prototype.hasOwnProperty.call(model, 'icons')).toBeTruthy();
     });
 
     it('should have icons property with correct default value', () => {
@@ -35,6 +36,7 @@ describe('SearchModelFunctions', () => {
 
     it('should have correct property types after initialization', () => {
       model.init();
+
       expect(typeof model.id).toBe('number');
       expect(typeof model.name).toBe('string');
       expect(typeof model.description).toBe('string');
@@ -48,7 +50,7 @@ describe('SearchModelFunctions', () => {
   describe('init() method', () => {
     it('should initialize with default values when no data provided', () => {
       const result = model.init();
-      
+
       expect(result).toBe(model);
       expect(model.name).toBe('');
       expect(model.description).toBe('');
@@ -60,7 +62,7 @@ describe('SearchModelFunctions', () => {
 
     it('should initialize with default values when empty object provided', () => {
       const result = model.init({});
-      
+
       expect(result).toBe(model);
       expect(model.name).toBe('');
       expect(model.description).toBe('');
@@ -78,9 +80,8 @@ describe('SearchModelFunctions', () => {
         type: 'test_type',
         found_model_name: 'TestModel'
       };
-
       const result = model.init(testData);
-      
+
       expect(result).toBe(model);
       expect(model.name).toBe('Test Name');
       expect(model.description).toBe('Test Description');
@@ -92,7 +93,7 @@ describe('SearchModelFunctions', () => {
 
     it('should handle undefined data parameter', () => {
       const result = model.init(undefined);
-      
+
       expect(result).toBe(model);
       expect(model.name).toBe('');
       expect(model.description).toBe('');
@@ -104,7 +105,7 @@ describe('SearchModelFunctions', () => {
 
     it('should handle null data parameter', () => {
       const result = model.init(null);
-      
+
       expect(result).toBe(model);
       expect(model.name).toBe('');
       expect(model.description).toBe('');
@@ -120,7 +121,7 @@ describe('SearchModelFunctions', () => {
       };
 
       model.init(testData);
-      
+
       expect(model.url).toBe('user/profile');
       expect(model.icon).toBe(faCog); // Since 'user_profile' is not in icons, should default to cog
     });
@@ -129,26 +130,31 @@ describe('SearchModelFunctions', () => {
   describe('setUrl() method', () => {
     it('should replace underscores with forward slashes', () => {
       const result = model['setUrl']('test_type');
+
       expect(result).toBe('test/type');
     });
 
     it('should handle multiple underscores', () => {
       const result = model['setUrl']('user_profile_settings');
+
       expect(result).toBe('user/profile/settings');
     });
 
     it('should handle type without underscores', () => {
       const result = model['setUrl']('simple');
+
       expect(result).toBe('simple');
     });
 
     it('should handle empty string', () => {
       const result = model['setUrl']('');
+
       expect(result).toBe('');
     });
 
     it('should handle type with consecutive underscores', () => {
       const result = model['setUrl']('test__double__underscore');
+
       expect(result).toBe('test/double/underscore');
     });
   });
@@ -156,21 +162,27 @@ describe('SearchModelFunctions', () => {
   describe('setIcon() method', () => {
     it('should return cog icon for empty type', () => {
       const result = model['setIcon']('');
+
       expect(result).toBe(faCog);
     });
 
     it('should return cog icon for null type', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = model['setIcon'](null as any);
+
       expect(result).toBe(faCog);
     });
 
     it('should return cog icon for undefined type', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = model['setIcon'](undefined as any);
+
       expect(result).toBe(faCog);
     });
 
     it('should return cog icon for unknown type', () => {
       const result = model['setIcon']('unknown_type');
+
       expect(result).toBe(faCog);
     });
 
@@ -178,12 +190,15 @@ describe('SearchModelFunctions', () => {
       // First add an icon to the icons collection
       model.icons['test'] = faCog;
       const result = model['setIcon']('test');
+
       expect(result).toBe(faCog);
     });
 
     it('should return cog icon as fallback when type exists but has falsy value', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       model.icons['test'] = null as any;
       const result = model['setIcon']('test');
+
       expect(result).toBe(faCog);
     });
   });
@@ -197,9 +212,8 @@ describe('SearchModelFunctions', () => {
         type: undefined,
         found_model_name: false
       };
-
       const result = model.init(testData);
-      
+
       expect(result).toBe(model);
       expect(typeof model.name).toBe('string');
       expect(typeof model.description).toBe('string');
@@ -208,7 +222,8 @@ describe('SearchModelFunctions', () => {
     });
 
     it('should maintain method chaining capability', () => {
-      const result = model.init({name: 'Test'});
+      const result = model.init({ name: 'Test' });
+
       expect(result).toBe(model);
       expect(result.name).toBe('Test');
     });

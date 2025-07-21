@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { BaseModel, BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
 import { DialogContentWithOptionsInterface } from '../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
@@ -6,25 +6,13 @@ import { InputHelperService } from '../../services/input/helper/input-helper.ser
 import { SelectType } from './select.type';
 
 @Component({
-    selector: 'dd-select',
-    templateUrl: './select.component.html',
-    styleUrls: ['./select.component.scss'],
-    standalone: false
+  selector: 'dd-select',
+  templateUrl: './select.component.html',
+  styleUrls: ['./select.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
-export class DdataSelectComponent implements OnInit {
-  private helperService: InputHelperServiceInterface =
-    DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
-  _field = '';
-  _title = '';
-  _label = '';
-  _prepend = '';
-  _append = '';
-  _isRequired = false;
-  _items = [];
-  _model: BaseModelInterface<any> & FieldsInterface<any> = new BaseModel();
-  _selectedModelName = '';
-  _mode = 'simple';
-
+export class DdataSelectComponent {
   /**
    * @deprecated use `mode` input attribute
    */
@@ -33,6 +21,7 @@ export class DdataSelectComponent implements OnInit {
       this._mode = 'single';
     }
   }
+
   /**
    * @deprecated use `mode` input attribute
    */
@@ -48,6 +37,7 @@ export class DdataSelectComponent implements OnInit {
       this._mode = 'multiple';
     }
   }
+
   /**
    * @deprecated use `mode` input attribute
    */
@@ -59,7 +49,7 @@ export class DdataSelectComponent implements OnInit {
     this._mode = value ?? 'simple';
   }
 
-  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any> | null) {
+  @Input() set model(value: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null) {
     if (!value) {
       return;
     }
@@ -75,7 +65,10 @@ export class DdataSelectComponent implements OnInit {
 
     // if model's used field is not defined or null
     if (!this._model.fields[this._field]) {
-      console.error(`The ${this._model.model_name}'s ${this._field} field is `, this._model.fields[this._field]);
+      console.error(
+        `The ${this._model.model_name}'s ${this._field} field is `,
+        this._model.fields[this._field]
+      );
 
       return;
     }
@@ -95,23 +88,21 @@ export class DdataSelectComponent implements OnInit {
 
     // add 'name' property as default value on fake single select mode if model is set
     if (!!this._model && this.fakeSingleSelect) {
-      this._selectedModelName = this._model['name'] ?? '';
+      this._selectedModelName = (this._model as { name?: string }).name ?? '';
     }
   }
 
-  get model(): BaseModelInterface<any> & FieldsInterface<any> {
+  get model(): BaseModelInterface<unknown> & FieldsInterface<unknown> {
     return this._model;
   }
 
   @Input() set field(value: string) {
-    if (value === 'undefined') {
-      value = 'id';
-    }
+    const fieldValue = value === 'undefined' ? 'id' : value;
 
-    this._field = value;
+    this._field = fieldValue;
   }
 
-  @Input() set items(value: any[] | null) {
+  @Input() set items(value: Array<unknown> | null) {
     if (!value) {
       return;
     }
@@ -138,17 +129,28 @@ export class DdataSelectComponent implements OnInit {
   @Input() selectedElementsBlockClass = 'col-12 d-flex flex-wrap px-0';
   @Input() selectedElementsBlockExtraClass = 'col-md-9 d-flex flex-wrap';
 
-  @Output() selected: EventEmitter<any> = new EventEmitter();
-  @Output() selectModel: EventEmitter<any> = new EventEmitter();
+  @Output() readonly selected: EventEmitter<unknown> = new EventEmitter();
+  @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter();
 
-  ngOnInit(): void {
-  }
+  private readonly helperService: InputHelperServiceInterface =
+    DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
 
-  selectedEmit(value: any): void {
+  private _field = '';
+  private _title = '';
+  private _label = '';
+  private _prepend = '';
+  private _append = '';
+  private _isRequired = false;
+  private _items = [];
+  private _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
+  private _selectedModelName = '';
+  private _mode = 'simple';
+
+  selectedEmit(value: unknown): void {
     this.selected.emit(value);
   }
 
-  selectModelEmit(value: any): void {
+  selectModelEmit(value: unknown): void {
     this.selectModel.emit(value);
   }
 }

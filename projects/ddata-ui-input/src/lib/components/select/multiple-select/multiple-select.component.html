@@ -1,19 +1,13 @@
+<!-- eslint-disable @angular-eslint/template/cyclomatic-complexity -->
 <div [class]="wrapperClass">
   <!-- label -->
-  <label
-    [class]="labelClass"
-    [for]="id"
-    *ngIf="showLabel"
-  >
+  <label [class]="labelClass" [for]="id" *ngIf="showLabel">
     {{ labelText }}:
 
     <span *ngIf="isRequired"> *</span>
   </label>
 
-  <div
-    [class]="inputBlockClass"
-    [ngClass]="showLabel ? inputBlockExtraClass : ''"
-  >
+  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
     <!-- prepend -->
     <div class="input-group-prepend" *ngIf="!!prepend">
       <div class="input-group-text">{{ prepend }}</div>
@@ -22,8 +16,8 @@
     <!-- select -->
     <div
       class="form-control multiple-select text-muted"
-      [ngClass]="{'disabled': disabled}"
-      (click)="showModal('list')"
+      [ngClass]="{ disabled: disabled }"
+      (click)="showModal()"
     >
       <!-- if there isn't any selected items -->
       <ng-container *ngIf="!model[field] || model[field].length === 0; else hasSelectedItems">
@@ -48,13 +42,15 @@
       <div class="input-group-text">{{ append }}</div>
     </div>
   </div>
-
 </div>
 <!-- multiple select - selected items -->
 <ng-container *ngIf="mode === 'multiple' && !disableShowSelectedItems">
   <div *ngIf="model[field].length > 0" class="d-flex justify-content-end">
-    <div [class]="selectedElementsBlockClass" [ngClass]="showLabel ? selectedElementsBlockExtraClass : ''">
-      <ng-container *ngFor="let element of model[field]">
+    <div
+      [class]="selectedElementsBlockClass"
+      [ngClass]="showLabel ? selectedElementsBlockExtraClass : ''"
+    >
+      <ng-container *ngFor="let element of model[field]; trackBy: trackByFn">
         <dd-tag
           [tag]="element"
           [class]="'d-inline-block pl-2 mb-1 bg-light me-2'"
@@ -76,9 +72,8 @@
     [items]="items"
     [text]="text"
     [valueField]="valueField"
-
     (selectionFinished)="hideModal()"
     (selected)="selectedEmit($event)"
     (selectModel)="selectModelEmit($event)"
-    ></multiple-select-dialog>
+  ></multiple-select-dialog>
 </ng-container>

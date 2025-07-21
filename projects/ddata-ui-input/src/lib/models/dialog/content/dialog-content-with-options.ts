@@ -1,8 +1,8 @@
 import { Type } from '@angular/core';
 
-export class DialogContentItem {
+export class DialogContentWithOptions {
   constructor(
     public component: Type<unknown>,
-    public data: unknown
+    public options: unknown
   ) {}
 }

@@ -20,7 +20,6 @@ import { DdataSimpleSelectComponent } from './components/select/simple-select/si
 import { DdataTextareaComponent } from './components/textarea/textarea.component';
 import { DdataInputTimeComponent } from './components/time/time-input.component';
 
-
 @NgModule({
   declarations: [
     DdataInputCheckboxComponent,
@@ -34,7 +33,7 @@ import { DdataInputTimeComponent } from './components/time/time-input.component'
     DdataSimpleSelectComponent,
     DdataAutocompleteSelectComponent,
     DdataMultipleSelectComponent,
-    DdataMultipleSelectDialogComponent,
+    DdataMultipleSelectDialogComponent
   ],
   imports: [
     ColorPickerComponent,
@@ -54,7 +53,7 @@ import { DdataInputTimeComponent } from './components/time/time-input.component'
     DdataInputSearchComponent,
     DdataInputTimeComponent,
     DdataSelectComponent,
-    DdataTextareaComponent,
+    DdataTextareaComponent
   ]
 })
-export class DdataUiInputModule { }
+export class DdataUiInputModule {}
