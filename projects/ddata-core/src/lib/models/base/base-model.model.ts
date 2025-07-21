@@ -14,8 +14,8 @@ export interface FieldInterface {
   append?: string;
   prepend?: string;
   validateByType?: boolean;
-  validationRules?: Rule[];
-  additionalValidationRules?: Rule[];
+  validationRules?: Array<Rule>;
+  additionalValidationRules?: Array<Rule>;
 }
 
 export type FieldContainerInterface<T> = {
@@ -26,7 +26,7 @@ export interface FieldColumnInterface<T> {
   cssClass?: string;
   cssId?: string;
   cssStyle?: string;
-  fields: FieldContainerInterface<T>[];
+  fields: Array<FieldContainerInterface<T>>;
 }
 
 export interface TabInterface<T> {
@@ -34,30 +34,55 @@ export interface TabInterface<T> {
   label: string;
   cssId?: string;
   cssClass?: string;
-  columns: FieldColumnInterface<T>[];
+  columns: Array<FieldColumnInterface<T>>;
 }
 
-type Rule = 'string' | 'boolean' | 'number' | 'integer' | 'required' | 'nullable' | 'name' | 'email' | 'domain' | 'url' |
-  'iso_date' | 'driving_licence' | 'id_card_number' | 'address_card_number' | 'phonenumber' | 'bankaccount' |
-  'taxnumber' | 'social_insurance_number' | 'not_zero' | 'lang' | 'register_number' |
-  'array' | 'not_empty' | 'empty' | 'person_taxnumber' | 'color_code' | 'iban_code' | 'swift_code';
+type Rule =
+  | 'string'
+  | 'boolean'
+  | 'number'
+  | 'integer'
+  | 'required'
+  | 'nullable'
+  | 'name'
+  | 'email'
+  | 'domain'
+  | 'url'
+  | 'iso_date'
+  | 'driving_licence'
+  | 'id_card_number'
+  | 'address_card_number'
+  | 'phonenumber'
+  | 'bankaccount'
+  | 'taxnumber'
+  | 'social_insurance_number'
+  | 'not_zero'
+  | 'lang'
+  | 'register_number'
+  | 'array'
+  | 'not_empty'
+  | 'empty'
+  | 'person_taxnumber'
+  | 'color_code'
+  | 'iban_code'
+  | 'swift_code';
 
 export interface ValidationRuleInterface {
-  [key: string]: Rule[];
+  [key: string]: Array<Rule>;
 }
 
-export interface BaseModelWithoutTypeDefinitionInterface  {
+export interface BaseModelWithoutTypeDefinitionInterface {
   readonly api_endpoint: string;
   readonly use_localstorage: boolean;
   readonly model_name: string;
   id: ID;
   isValid: boolean;
-  validationErrors: string[];
+  validationErrors: Array<string>;
   validationRules: ValidationRuleInterface;
   init(data?: any): any;
   prepareToSave(): any;
   validate(): void;
-  getValidatedErrorFields(): string[];
+  getValidatedErrorFields(): Array<string>;
   setDate(date: Date, days: number): ISODate;
   getCurrentUserId(): ID;
   getCurrentISODate(): ISODate;
@@ -89,8 +114,7 @@ export interface BaseModelInterface<T> extends BaseModelWithoutTypeDefinitionInt
 }
 
 // tslint:disable-next-line: no-empty-interface
-interface ModelWithId {
-}
+interface ModelWithId {}
 
 export class BaseModel implements BaseModelInterface<ModelWithId> {
   id: ID;
@@ -98,29 +122,32 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
   use_localstorage = false;
   model_name = 'NotDefined';
   isValid = false;
-  validationErrors: string[] = [];
+  validationErrors: Array<string> = [];
   validationRules: ValidationRuleInterface = {};
 
   fields: FieldContainerInterface<ModelWithId> = {};
 
   init(data: any = null): any {
-      throw new Error('init() function is not implemented');
+    throw new Error('init() function is not implemented');
   }
 
   prepareToSave(): any {
-      throw new Error('prepareToSave() function is not implemented');
+    throw new Error('prepareToSave() function is not implemented');
   }
 
   validate(preparedData?: any): void {
-    const validatorService: ValidatorServiceInterface = DdataCoreModule.InjectorInstance.get<ValidatorServiceInterface>(ValidatorService);
+    const validatorService: ValidatorServiceInterface =
+      DdataCoreModule.InjectorInstance.get<ValidatorServiceInterface>(ValidatorService);
 
     try {
       [this.isValid, this.validationErrors] = validatorService.validateObject(
-        !!preparedData ? preparedData : this.prepareToSave(), this.validationRules, true,
-        {message: 'Validation Error'}
+        !!preparedData ? preparedData : this.prepareToSave(),
+        this.validationRules,
+        true,
+        { message: 'Validation Error' }
       );
     } catch (error) {
-      const newErrorSettings: ValidationErrorSettingsInterface = {message: error.message};
+      const newErrorSettings: ValidationErrorSettingsInterface = { message: error.message };
 
       if (error instanceof ValidationError) {
         this.validationErrors = error.invalids;
@@ -134,8 +161,8 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     }
   }
 
-  getValidatedErrorFields(): string[] {
-    const errorNames: string[] = [];
+  getValidatedErrorFields(): Array<string> {
+    const errorNames: Array<string> = [];
 
     this.validationErrors.forEach((item: string) => {
       errorNames.push(!!this.fields[item] ? this.fields[item].label : item);
@@ -149,7 +176,9 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
   }
 
   setDate(date: Date, days = 0): ISODate {
-    const new_date = new Date(date.setDate(date.getDate() + Number(days))).toISOString().split('T')[0];
+    const new_date = new Date(date.setDate(date.getDate() + Number(days)))
+      .toISOString()
+      .split('T')[0];
 
     return new_date as ISODate;
   }
@@ -217,14 +246,16 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     const currentDate = new Date(date);
     let calculatedDate = '';
     let newDate = 0;
-
     let i = 0;
+
     while (i < Number(days)) {
-      sequence === 'down' ? newDate = currentDate.setDate(currentDate.getDate() - 1) : newDate = currentDate.setDate(currentDate.getDate() + 1);
+      sequence === 'down'
+        ? (newDate = currentDate.setDate(currentDate.getDate() - 1))
+        : (newDate = currentDate.setDate(currentDate.getDate() + 1));
       const day = new Date(newDate).getDay();
 
       if (day > 0 && day < 6) {
-          i ++;
+        i++;
       }
     }
 

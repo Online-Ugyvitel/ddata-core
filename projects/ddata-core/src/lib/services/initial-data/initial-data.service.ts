@@ -13,12 +13,11 @@ import { InitialDataServiceInterface } from './initial-data-service.interface';
   providedIn: 'root'
 })
 export class InitialDataService extends ProxyService<any> implements InitialDataServiceInterface {
-  private initModel: InitialDataInterface = new InitialData();
-  private spinner: SpinnerService = DdataCoreModule.InjectorInstance.get<SpinnerService>(SpinnerService);
+  private readonly initModel: InitialDataInterface = new InitialData();
+  private readonly spinner: SpinnerService =
+    DdataCoreModule.InjectorInstance.get<SpinnerService>(SpinnerService);
 
-  constructor(
-    private storageService: StorageService,
-  ) {
+  constructor(private readonly storageService: StorageService) {
     super(new InitialData());
   }
 
@@ -28,15 +27,17 @@ export class InitialDataService extends ProxyService<any> implements InitialData
   refresh(): Observable<boolean> {
     this.spinner.on('dashboard-init');
 
-    return this.getUri(this.initModel.api_endpoint).pipe(map( (result: any) => {
-      // we get here key-value based object, then storage them into localStorage
-      Object.keys(result).forEach(key => {
-        this.storageService.setItem(key, JSON.stringify(result[key]));
-      });
+    return this.getUri(this.initModel.api_endpoint).pipe(
+      map((result: any) => {
+        // we get here key-value based object, then storage them into localStorage
+        Object.keys(result).forEach((key) => {
+          this.storageService.setItem(key, JSON.stringify(result[key]));
+        });
 
-      this.spinner.off('dashboard-init');
+        this.spinner.off('dashboard-init');
 
-      return true;
-    }));
+        return true;
+      })
+    );
   }
 }

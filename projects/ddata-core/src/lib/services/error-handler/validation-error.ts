@@ -3,14 +3,10 @@ import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 export class AppValidationError extends DdataCoreError {
-  constructor(
-    originalError: any,
-    notificationService: NotificationService
-  ) {
+  constructor(originalError: any, notificationService: NotificationService) {
     super(originalError);
 
     console.error('Validation Error: ', originalError.error);
-
     let str = 'Valamelyik adatmező nem a megfeleő formátumú';
 
     if (!!originalError.error.errors) {
@@ -18,10 +14,9 @@ export class AppValidationError extends DdataCoreError {
     }
 
     if (!!originalError.error.invalids) {
-      str = 'A következő mezők rosszul lettek kitöltve:<br>' + originalError.error.invalids.join(', ');
+      str = `A következő mezők rosszul lettek kitöltve:<br>${originalError.error.invalids.join(', ')}`;
     }
 
     notificationService.add('Hiba', str, 'danger' as NotificationType);
   }
-
 }

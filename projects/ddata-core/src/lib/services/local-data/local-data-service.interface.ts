@@ -3,13 +3,13 @@ import { DataServiceAbstractInterface } from '../data/data-service-abstract.inte
 
 export interface LocalDataServiceInterface<T> extends DataServiceAbstractInterface<T> {
   watch(): Observable<any>;
-  allFromLocal(): T[];
+  allFromLocal(): Array<T>;
   save(model: T, id: number): void;
   delete(model: T): boolean;
-  updateLocalstorage(data: T[]): void;
-  allFromLocalSortedBy(fieldName: string): T[];
-  allFromLocalSortedByDesc(fieldName: string): T[];
+  updateLocalstorage(data: Array<T>): void;
+  allFromLocalSortedBy(fieldName: string): Array<T>;
+  allFromLocalSortedByDesc(fieldName: string): Array<T>;
   findById(id: number): T;
   findByField(field: string, value: any): T;
-  filterByField(field: string, value: any): T[];
+  filterByField(field: string, value: any): Array<T>;
 }

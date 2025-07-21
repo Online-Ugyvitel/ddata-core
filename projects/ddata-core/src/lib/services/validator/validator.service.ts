@@ -3,30 +3,49 @@ import { Injectable } from '@angular/core';
 import { ValidationErrorSettingsInterface } from '../../models/error/validation-error-settings.model';
 import { ValidationError } from '../../models/error/validation-error.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ValidatorService {
-  private addressCardNumberRegExp: RegExp = new RegExp(/^([A-Z]{2}\d{6})$/);
-  private bankaccountRegExp: RegExp = new RegExp(/^(\d{8}\-)(\d{8})(-\d{8})?$/);
-  private colorCodeRegExp: RegExp = new RegExp(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
-  private creditCardAmericanExpressRegExp = new RegExp(/^(?:3[47][0-9]{13})$/);
-  private creditCardDiscoverRegExp = new RegExp(/^(?:6(?:011|5[0-9][0-9])[0-9]{12})$/);
-  private creditCardMastercardRegExp = new RegExp(/^(?:5[1-5][0-9]{14})$/);
-  private creditCardVisaRegExp = new RegExp(/^(?:4[0-9]{12}(?:[0-9]{3})?)$/);
-  private domainRegExp: RegExp = new RegExp(/^(?:(?:(?:[a-zA-Z\-]+)\:\/{1,3})?(?:[a-zA-Z0-9])(?:[a-zA-Z0-9-\.]){1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+|\[(?:(?:(?:[a-fA-F0-9]){1,4})(?::(?:[a-fA-F0-9]){1,4}){7}|::1|::)\]|(?:(?:[0-9]{1,3})(?:\.[0-9]{1,3}){3}))(?:\:[0-9]{1,5})?$/);
-  private drivingLicenceRegExp: RegExp = new RegExp(/^([A-Z]{2}\d{6})$/);
-  private emailRegExp: RegExp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
-  private ibanCodeRegExp: RegExp = new RegExp(/^([A-Z]{2}\d{2})|([A-Z]{4})|(\d{4})$/);
-  private idCardNumberRegExp: RegExp = new RegExp(/^(([A-Z]{2}\d{6})|(\d{6}[A-Z]{2}))$/);
-  private isoDateRegExp: RegExp = new RegExp(/^(\d{4})([\.\-\/])(0[0-9]|1[0-2])([\.\-\/])([0-2][0-9]|3[0-1])$/);
-  private langRegExp = new RegExp(/^[A-Za-z]{2}$/);
-  private nameRegExp: RegExp = new RegExp(/^([a-zA-Z]+[\.]? )*([A-ZÁÉÍÓÖŐÚÜŰ][a-záéíúüűóöő]*)([ -]([A-ZÁÉÍÓÖŐÚÜŰ][a-záéíúüűóöő-]*))*([MD])?$/);
-  private personTaxNumberRegExp: RegExp = new RegExp(/^\d{10}$/);
-  private phonenumberRegExp: RegExp = new RegExp(/^[+]\d{10,}$/);
-  private registerNumberRegExp: RegExp = new RegExp(/^(\d{2}\-)(\d{2})(-\d{6})$/);
-  private socialInsuranceNumberRegExp: RegExp = new RegExp(/^(\d{3}[ \-]?){2}(\d{3})$/);
-  private swiftCodeRegExp: RegExp = new RegExp(/^((\d{8})|(\d{11}))$/);
-  private taxnumberRegExp: RegExp = new RegExp(/^(\d{8})\-\d\-(\d\d)$|^(AT|BE|BG|CY|CZ|DE|DK|EE|EL|ES|FI|FR|GB|HR|HU|IE|IT|LT|LU|LV|MT|NL|PL|PT|RO|SE|SI|SK)\d{8}$/);
-  private urlRegExp: RegExp = new RegExp(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,})/);
+  private readonly addressCardNumberRegExp: RegExp = new RegExp(/^([A-Z]{2}\d{6})$/);
+  private readonly bankaccountRegExp: RegExp = new RegExp(/^(\d{8}\-)(\d{8})(-\d{8})?$/);
+  private readonly colorCodeRegExp: RegExp = new RegExp(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
+  private readonly creditCardAmericanExpressRegExp = new RegExp(/^(?:3[47][0-9]{13})$/);
+  private readonly creditCardDiscoverRegExp = new RegExp(/^(?:6(?:011|5[0-9][0-9])[0-9]{12})$/);
+  private readonly creditCardMastercardRegExp = new RegExp(/^(?:5[1-5][0-9]{14})$/);
+  private readonly creditCardVisaRegExp = new RegExp(/^(?:4[0-9]{12}(?:[0-9]{3})?)$/);
+  private readonly domainRegExp: RegExp = new RegExp(
+    /^(?:(?:(?:[a-zA-Z\-]+)\:\/{1,3})?(?:[a-zA-Z0-9])(?:[a-zA-Z0-9-\.]){1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+|\[(?:(?:(?:[a-fA-F0-9]){1,4})(?::(?:[a-fA-F0-9]){1,4}){7}|::1|::)\]|(?:(?:[0-9]{1,3})(?:\.[0-9]{1,3}){3}))(?:\:[0-9]{1,5})?$/
+  );
+
+  private readonly drivingLicenceRegExp: RegExp = new RegExp(/^([A-Z]{2}\d{6})$/);
+  private readonly emailRegExp: RegExp = new RegExp(
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+
+  private readonly ibanCodeRegExp: RegExp = new RegExp(/^([A-Z]{2}\d{2})|([A-Z]{4})|(\d{4})$/);
+  private readonly idCardNumberRegExp: RegExp = new RegExp(/^(([A-Z]{2}\d{6})|(\d{6}[A-Z]{2}))$/);
+  private readonly isoDateRegExp: RegExp = new RegExp(
+    /^(\d{4})([\.\-\/])(0[0-9]|1[0-2])([\.\-\/])([0-2][0-9]|3[0-1])$/
+  );
+
+  private readonly langRegExp = new RegExp(/^[A-Za-z]{2}$/);
+  private readonly nameRegExp: RegExp = new RegExp(
+    /^([a-zA-Z]+[\.]? )*([A-ZÁÉÍÓÖŐÚÜŰ][a-záéíúüűóöő]*)([ -]([A-ZÁÉÍÓÖŐÚÜŰ][a-záéíúüűóöő-]*))*([MD])?$/
+  );
+
+  private readonly personTaxNumberRegExp: RegExp = new RegExp(/^\d{10}$/);
+  private readonly phonenumberRegExp: RegExp = new RegExp(/^[+]\d{10,}$/);
+  private readonly registerNumberRegExp: RegExp = new RegExp(/^(\d{2}\-)(\d{2})(-\d{6})$/);
+  private readonly socialInsuranceNumberRegExp: RegExp = new RegExp(/^(\d{3}[ \-]?){2}(\d{3})$/);
+  private readonly swiftCodeRegExp: RegExp = new RegExp(/^((\d{8})|(\d{11}))$/);
+  private readonly taxnumberRegExp: RegExp = new RegExp(
+    /^(\d{8})\-\d\-(\d\d)$|^(AT|BE|BG|CY|CZ|DE|DK|EE|EL|ES|FI|FR|GB|HR|HU|IE|IT|LT|LU|LV|MT|NL|PL|PT|RO|SE|SI|SK)\d{8}$/
+  );
+
+  private readonly urlRegExp: RegExp = new RegExp(
+    /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,})/
+  );
 
   /**
    * Validate JSON objects based on custom rules.
@@ -44,19 +63,24 @@ export class ValidatorService {
    * }
    * ```
    */
-  validateObject(data: any, rules: any, isThrowError = true, settings?: ValidationErrorSettingsInterface): [boolean, string[]] {
-    const results: boolean[] = [];
-    const invalids: string[] = [];
+  validateObject(
+    data: any,
+    rules: any,
+    isThrowError = true,
+    settings?: ValidationErrorSettingsInterface
+  ): [boolean, Array<string>] {
+    const results: Array<boolean> = [];
+    const invalids: Array<string> = [];
 
     Object.keys(rules).forEach((key: string) => {
       const fieldValidationResult = this.validate(data[key], rules[key]);
+
       results.push(fieldValidationResult);
 
       if (!fieldValidationResult) {
         invalids.push(key);
       }
     });
-
     const result = results.every(this.isTrue);
 
     if (!result && isThrowError) {
@@ -67,22 +91,26 @@ export class ValidatorService {
     return [result, invalids];
   }
 
-  validate(data: any, rules: string | string[]): boolean {
-    const ruleList: string[] = typeof rules === 'string' ? [rules] : rules;
-    const results: boolean[] = [];
+  validate(data: any, rules: string | Array<string>): boolean {
+    const ruleList: Array<string> = typeof rules === 'string' ? [rules] : rules;
+    const results: Array<boolean> = [];
 
     if (ruleList.includes('nullable') && data == null) {
       return true;
     }
 
     // if nullable rule enabled
-    if ((ruleList.includes('nullable') && data === undefined) || (ruleList.includes('nullable') && data.length === 0)) {
+    if (
+      (ruleList.includes('nullable') && data === undefined) ||
+      (ruleList.includes('nullable') && data.length === 0)
+    ) {
       return true;
     }
 
     // TODO megcsinálni, hogy kitalálja a függvény a szabályt a típus alapján. Pl. BankAccountNumber - bankaacount
 
-    ruleList.forEach((rule: string)  => {
+    // eslint-disable-next-line complexity
+    ruleList.forEach((rule: string) => {
       const [ruleType, ruleValue] = rule.split(':');
 
       switch (ruleType) {
@@ -180,7 +208,6 @@ export class ValidatorService {
         default:
           results.push(false);
       }
-
     });
 
     return results.every(this.isTrue);
@@ -229,7 +256,6 @@ export class ValidatorService {
   }
 
   isRequired(data: any): boolean {
-
     if (data instanceof Array && data.length === 0) {
       return false;
     }
@@ -334,7 +360,7 @@ export class ValidatorService {
   }
 
   isCreditCard(data: any): boolean {
-    const results: boolean[] = [
+    const results: Array<boolean> = [
       this.isCreditCardVisa(data),
       this.isCreditCardMastercard(data),
       this.isCreditCardAmericanExpress(data),
@@ -370,7 +396,6 @@ export class ValidatorService {
     }
 
     return false;
-
   }
 
   isNotEmpty(data: any): boolean {
@@ -381,6 +406,7 @@ export class ValidatorService {
     if (!data) {
       return false;
     }
+
     return this.personTaxNumberRegExp.test(data);
   }
 
@@ -388,6 +414,7 @@ export class ValidatorService {
     if (!data) {
       return false;
     }
+
     return this.colorCodeRegExp.test(data);
   }
 

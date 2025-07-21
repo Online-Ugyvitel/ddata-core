@@ -3,7 +3,7 @@ import { ValidationErrorSettingsInterface } from './validation-error-settings.mo
 export interface ValidationErrorInterface extends Error {
   name: string;
   message: string;
-  invalids: string[];
+  invalids: Array<string>;
   status: number;
   originalError: any;
 }
@@ -12,14 +12,14 @@ export class ValidationError extends Error implements ValidationErrorInterface {
   readonly name = 'ValidationError';
   readonly status = 480; // Custom error code: Validation Error on client side
   message: string;
-  invalids: string[] = [];
+  invalids: Array<string> = [];
   originalError = {
     status: this.status,
     error: {
       name: this.name,
       message: this.message,
       invalids: this.invalids,
-      trace: [],
+      trace: []
     }
   };
 

@@ -5,7 +5,7 @@ export class PaginateInterface {
   per_page: number;
   from: number;
   to: number;
-  data: any[] = [];
+  data: Array<any> = [];
   total: number;
   last_page: number;
 }

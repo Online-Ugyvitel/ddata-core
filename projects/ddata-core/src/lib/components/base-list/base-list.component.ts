@@ -11,16 +11,16 @@ import { BaseListComponentInterface } from './base-list-component.interface';
 
 // @dynamic
 @Component({
-    template: '',
-    standalone: false
+  template: '',
+  standalone: false
 })
 export abstract class BaseListComponent<T extends BaseModelInterface<T>>
-  implements OnInit, BaseListComponentInterface<T> {
-
+  implements OnInit, BaseListComponentInterface<T>
+{
   @Input() isModal = false;
   @Input() isEmbed = false;
   @Input() loadData = true;
-  @Input() models: T[] = [];
+  @Input() models: Array<T> = [];
   @Input() filter: any = {};
   @Input() set data(value: any) {
     if (!!value) {
@@ -34,19 +34,19 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
 
   @Output() editModel: EventEmitter<T> = new EventEmitter();
   @Output() deleteModel: EventEmitter<T> = new EventEmitter();
-  @Output() deleteMultipleModels: EventEmitter<T[]> = new EventEmitter();
+  @Output() deleteMultipleModels: EventEmitter<Array<T>> = new EventEmitter();
   @Output() saveModel: EventEmitter<T> = new EventEmitter();
 
   model: T = new this.type().init();
   paginate: PaginateInterface = new Paginate(this.model);
   transformToLowerCase = true;
   helperService: HelperServiceInterface<T> = new HelperFactoryService<T>().get(this.type);
-  activatedRoute: ActivatedRoute = DdataCoreModule.InjectorInstance.get<ActivatedRoute>(ActivatedRoute);
+  activatedRoute: ActivatedRoute =
+    DdataCoreModule.InjectorInstance.get<ActivatedRoute>(ActivatedRoute);
+
   currentPageNumber = 0;
 
-  constructor(
-    @Inject('type') private type: new () => T,
-  ) {}
+  constructor(@Inject('type') private readonly type: new () => T) {}
 
   ngOnInit(): void {
     this.load();
@@ -73,7 +73,12 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
   private setGetRequest(): Observable<any> {
     if (this.isEmptyObject(this.filter)) {
       // it hasn't got filter options
-      return this.helperService.getAll(this.paginate, this.models, this.isModal, this.currentPageNumber);
+      return this.helperService.getAll(
+        this.paginate,
+        this.models,
+        this.isModal,
+        this.currentPageNumber
+      );
     } else {
       // it has got filter options
       return this.helperService.search(this.filter, this.currentPageNumber);
@@ -128,7 +133,7 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
    *
    * @param models instances of model
    */
-  deleteMultiple(models: T[]): void {
+  deleteMultiple(models: Array<T>): void {
     this.helperService.deleteMultiple(models, this).subscribe();
   }
 
@@ -151,5 +156,4 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
   save(model: T): void {
     this.helperService.save(model, this.isModal, this.saveModel).subscribe();
   }
-
 }

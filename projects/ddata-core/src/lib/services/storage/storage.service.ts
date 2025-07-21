@@ -6,9 +6,9 @@ import { StorageServiceInterface } from './storage-service.interface';
   providedIn: 'root'
 })
 export class StorageService implements StorageServiceInterface {
-  private storageSub = new Subject<boolean>();
+  private readonly storageSub = new Subject<boolean>();
 
-  constructor() { }
+  constructor() {}
 
   watchStorage(): Observable<any> {
     return this.storageSub.asObservable();

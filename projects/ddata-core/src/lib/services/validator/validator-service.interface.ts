@@ -1,9 +1,14 @@
 import { ValidationErrorSettingsInterface } from '../../models/error/validation-error-settings.model';
 
 export interface ValidatorServiceInterface {
-  validateObject(data: any, rules: any, isThrowError: boolean, settings?: ValidationErrorSettingsInterface): [boolean, string[]];
+  validateObject(
+    data: any,
+    rules: any,
+    isThrowError: boolean,
+    settings?: ValidationErrorSettingsInterface
+  ): [boolean, Array<string>];
 
-  validate(data: any, rules: string | string[]): boolean;
+  validate(data: any, rules: string | Array<string>): boolean;
 
   // rule functions
   min(data: any, minimum: number): boolean;

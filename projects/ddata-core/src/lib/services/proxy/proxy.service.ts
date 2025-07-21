@@ -14,16 +14,16 @@ import { RemoteDataServiceInterface } from '../remote-data/remote-data-service.i
 import { RemoteDataService } from '../remote-data/remote-data.service';
 
 // @dynamic
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAbstract<T> {
-  private notificationService: NotificationServiceInterface;
-  private localStorageService: LocalDataServiceInterface<T>;
-  private remoteStorageService: RemoteDataServiceInterface<T>;
-  private type: new () => T;
+  private readonly notificationService: NotificationServiceInterface;
+  private readonly localStorageService: LocalDataServiceInterface<T>;
+  private readonly remoteStorageService: RemoteDataServiceInterface<T>;
+  private readonly type: new () => T;
 
-  constructor(
-    private instance: T,
-  ) {
+  constructor(private readonly instance: T) {
     super(instance);
     this.notificationService = new NotificationService();
     this.localStorageService = new LocalDataService(this.instance);
@@ -41,35 +41,44 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
   getAll(pageNumber: number = 0): Observable<PaginateInterface> {
     if (this.instance.use_localstorage) {
       const paginate = new Paginate(this.instance);
+
       paginate.data = this.localStorageService.allFromLocal();
 
       return of(paginate);
     } else {
-      return this.remoteStorageService.getAll(pageNumber).pipe(map((result: PaginateInterface) => result));
+      return this.remoteStorageService
+        .getAll(pageNumber)
+        .pipe(map((result: PaginateInterface) => result));
     }
   }
 
-  getAllWithoutPaginate(): Observable<T[]> {
+  getAllWithoutPaginate(): Observable<Array<T>> {
     if (this.instance.use_localstorage) {
       return of(this.localStorageService.allFromLocal());
     } else {
-      return this.remoteStorageService.getAllWithoutPaginate().pipe(map((result: T[]) => result));
+      return this.remoteStorageService
+        .getAllWithoutPaginate()
+        .pipe(map((result: Array<T>) => result));
     }
   }
 
-  getAllSortedBy(fieldName: string = 'name'): Observable<T[]> {
+  getAllSortedBy(fieldName: string = 'name'): Observable<Array<T>> {
     if (this.instance.use_localstorage) {
       return of(this.localStorageService.allFromLocalSortedBy(fieldName));
     } else {
-      return this.remoteStorageService.getAllWithoutPaginate().pipe(map((result: T[]) => result));
+      return this.remoteStorageService
+        .getAllWithoutPaginate()
+        .pipe(map((result: Array<T>) => result));
     }
   }
 
-  getAllSortedByDesc(fieldName: string = 'name'): Observable<T[]> {
+  getAllSortedByDesc(fieldName: string = 'name'): Observable<Array<T>> {
     if (this.instance.use_localstorage) {
       return of(this.localStorageService.allFromLocalSortedByDesc(fieldName));
     } else {
-      return this.remoteStorageService.getAllWithoutPaginate().pipe(map((result: T[]) => result));
+      return this.remoteStorageService
+        .getAllWithoutPaginate()
+        .pipe(map((result: Array<T>) => result));
     }
   }
 
@@ -77,7 +86,9 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     if (this.instance.use_localstorage) {
       // TODO meg kell csinálni, hogy itt is egy lapozót adjon vissza
     } else {
-      return this.remoteStorageService.getPage(pageNumber).pipe(map( (resolve: PaginateInterface) => resolve));
+      return this.remoteStorageService
+        .getPage(pageNumber)
+        .pipe(map((resolve: PaginateInterface) => resolve));
     }
   }
 
@@ -105,7 +116,7 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     }
   }
 
-  filterByField(fieldName: string, value: any): Observable<T[]> {
+  filterByField(fieldName: string, value: any): Observable<Array<T>> {
     if (this.instance.use_localstorage) {
       return of(this.localStorageService.filterByField(fieldName, value));
     } else {
@@ -113,20 +124,24 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     }
   }
 
-  search(data: any,  pageNumber?: number): Observable<PaginateInterface> {
-    const uri = !!pageNumber ? `/search?page=${ pageNumber }` : '/search';
+  search(data: any, pageNumber?: number): Observable<PaginateInterface> {
+    const uri = !!pageNumber ? `/search?page=${pageNumber}` : '/search';
 
-    return this.remoteStorageService.postUri(data, uri).pipe(map((result: PaginateInterface) =>
-      this.getNewPaginateObject(this.type, result)));
+    return this.remoteStorageService
+      .postUri(data, uri)
+      .pipe(map((result: PaginateInterface) => this.getNewPaginateObject(this.type, result)));
   }
 
-  searchWithoutPaginate(data: any): Observable<T[]> {
+  searchWithoutPaginate(data: any): Observable<Array<T>> {
     const uri = '/search?paginate=off';
 
-    return this.remoteStorageService.postUri(data, uri).pipe(map((result: T[]) => {
-      result = this.hydrateArray(result);
-      return result;
-    }));
+    return this.remoteStorageService.postUri(data, uri).pipe(
+      map((result: Array<T>) => {
+        result = this.hydrateArray(result);
+
+        return result;
+      })
+    );
   }
 
   save(model: T): Observable<number> {
@@ -135,18 +150,22 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     }
 
     if (model.use_localstorage) {
-      return this.remoteStorageService.save(model).pipe(map( (resolve: number) => {
-        this.localStorageService.save(model, resolve);
-        this.successNotify();
+      return this.remoteStorageService.save(model).pipe(
+        map((resolve: number) => {
+          this.localStorageService.save(model, resolve);
+          this.successNotify();
 
-        return resolve;
-      }));
+          return resolve;
+        })
+      );
     } else {
-      return this.remoteStorageService.save(model).pipe(map((resolve: number) => {
-        this.successNotify();
+      return this.remoteStorageService.save(model).pipe(
+        map((resolve: number) => {
+          this.successNotify();
 
-        return resolve;
-      }));
+          return resolve;
+        })
+      );
     }
   }
 
@@ -158,10 +177,11 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     if (!model) {
       return of(paginate);
     }
-
     const models = paginate.data;
+
     if (model.id === 0) {
-      models.splice( models.indexOf(model), 1);
+      models.splice(models.indexOf(model), 1);
+
       return of(paginate);
     }
 
@@ -172,33 +192,41 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
             this.localStorageService.delete(model);
           }
         }),
-        switchMap((): Observable<PaginateInterface> => this.remoteStorageService.getAll().pipe(
-          map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll)
-        ))
+        switchMap(
+          (): Observable<PaginateInterface> =>
+            this.remoteStorageService
+              .getAll()
+              .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
+        )
       );
     } else {
-      return this.remoteStorageService.delete(model).pipe(map((result: number) => {
-        if (result) {
-          models.splice( models.indexOf(model), 1);
-        }
+      return this.remoteStorageService.delete(model).pipe(
+        map((result: number) => {
+          if (result) {
+            models.splice(models.indexOf(model), 1);
+          }
 
-        return paginate;
-      }));
+          return paginate;
+        })
+      );
     }
   }
 
-  deleteMultiple(models: T[], paginate: PaginateInterface): Observable<PaginateInterface | Observable<PaginateInterface>> {
+  deleteMultiple(
+    models: Array<T>,
+    paginate: PaginateInterface
+  ): Observable<PaginateInterface | Observable<PaginateInterface>> {
     if (!models) {
       return of(paginate);
     }
-
     const modelsToShow = paginate.data;
+
     models.forEach((model: T) => {
       if (model.id === 0) {
-        modelsToShow.splice( modelsToShow.indexOf(model), 1);
+        modelsToShow.splice(modelsToShow.indexOf(model), 1);
+
         return of(paginate);
       }
-
     });
 
     if (this.instance.use_localstorage) {
@@ -210,20 +238,25 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
             });
           }
         }),
-        switchMap((): Observable<PaginateInterface> => this.remoteStorageService.getAll().pipe(
-          map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll)
-        ))
+        switchMap(
+          (): Observable<PaginateInterface> =>
+            this.remoteStorageService
+              .getAll()
+              .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
+        )
       );
     } else {
-      return this.remoteStorageService.deleteMultiple(models).pipe(map((result: boolean) => {
-        if (result) {
-          models.forEach((model: T) => {
-            modelsToShow.splice( modelsToShow.indexOf(model), 1);
-          });
-        }
+      return this.remoteStorageService.deleteMultiple(models).pipe(
+        map((result: boolean) => {
+          if (result) {
+            models.forEach((model: T) => {
+              modelsToShow.splice(modelsToShow.indexOf(model), 1);
+            });
+          }
 
-        return paginate;
-      }));
+          return paginate;
+        })
+      );
     }
   }
 
@@ -232,18 +265,22 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
   }
 
   // TODO törölhető funkció
-  registerObserver(target: T[], sortBy: string = 'name'): void {
+  registerObserver(target: Array<T>, sortBy: string = 'name'): void {
     this.watch().subscribe((refresh: boolean) => {
       if (refresh) {
-        this.getAllSortedBy(sortBy).subscribe((result: T[]) => {
+        this.getAllSortedBy(sortBy).subscribe((result: Array<T>) => {
           target = result;
         });
       }
     });
   }
 
-
-  sendFiles(subUri: string, id: number, files: Set<File>, data?: any): Observable<FileUploadProcessInterface>[] {
+  sendFiles(
+    subUri: string,
+    id: number,
+    files: Set<File>,
+    data?: any
+  ): Array<Observable<FileUploadProcessInterface>> {
     return this.remoteStorageService.sendFiles(subUri, id, files, !!data ? data : null);
   }
 }

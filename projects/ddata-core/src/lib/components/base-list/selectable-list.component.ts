@@ -7,20 +7,20 @@ import { SelectableListComponentInterface } from './selectable-list.component.in
 
 // @dynamic
 @Component({
-    template: '',
-    standalone: false
+  template: '',
+  standalone: false
 })
 export abstract class SelectableListComponent<T extends BaseModelInterface<T> & SelectableInterface>
   extends BaseListComponent<T>
-  implements SelectableListComponentInterface<T> {
-
+  implements SelectableListComponentInterface<T>
+{
   _selectedElements: Set<T> = new Set([]);
   @Input() isModal = true;
   @Input() multipleSelectEnabled = true;
   @Input() isSelectionList = true;
   @Input() loadData = false;
-  @Input() set selectedElements(value: T[]) {
-    this.models.map((obj: T) => obj.is_selected = false);
+  @Input() set selectedElements(value: Array<T>) {
+    this.models.map((obj: T) => (obj.is_selected = false));
 
     value.forEach((item: any) => {
       const selectedModel = this.models.findIndex((obj: T) => obj.id == item.id);
@@ -32,16 +32,17 @@ export abstract class SelectableListComponent<T extends BaseModelInterface<T> & 
 
     this._selectedElements = new Set(!!value.length ? value : []);
   }
-  get selectedElements(): T[] {
+
+  get selectedElements(): Array<T> {
     return Array.from(this._selectedElements);
   }
 
-  @Output() removeSelection: EventEmitter<T[]> = new EventEmitter();
-  @Output() setSelection: EventEmitter<T[]> = new EventEmitter();
-  @Output() emitSelected: EventEmitter<T[]> = new EventEmitter();
+  @Output() removeSelection: EventEmitter<Array<T>> = new EventEmitter();
+  @Output() setSelection: EventEmitter<Array<T>> = new EventEmitter();
+  @Output() emitSelected: EventEmitter<Array<T>> = new EventEmitter();
 
   datasArrived: BehaviorSubject<number> = new BehaviorSubject(0);
-  select: BehaviorSubject<T[]> = new BehaviorSubject(null);
+  select: BehaviorSubject<Array<T>> = new BehaviorSubject(null);
 
   toggleSelect(model: T): void {
     const found: boolean = this._selectedElements.has(model);
