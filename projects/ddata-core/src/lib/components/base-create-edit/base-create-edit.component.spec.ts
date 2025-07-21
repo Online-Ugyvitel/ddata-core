@@ -1,7 +1,10 @@
 import 'zone.js/testing';
 import { Component, EventEmitter, Injector } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { of } from 'rxjs';
 import { BaseCreateEditComponent } from './base-create-edit.component';
 import { BaseModelInterface, ValidationRuleInterface } from '../../models/base/base-model.model';
@@ -21,18 +24,20 @@ class TestModel implements TestModelInterface {
   readonly api_endpoint = '/test';
   readonly model_name = 'TestModel';
   readonly use_localstorage = false;
-  
+
   id: ID = 0 as ID;
   name: string = '';
   tabs?: any;
   isValid = false;
-  validationErrors: string[] = [];
+  validationErrors: Array<string> = [];
   validationRules: ValidationRuleInterface = {};
 
   init(data?: any): TestModelInterface {
     const incoming = !!data ? data : {};
-    this.id = !!incoming.id ? incoming.id as ID : 0 as ID;
+
+    this.id = !!incoming.id ? (incoming.id as ID) : (0 as ID);
     this.name = !!incoming.name ? incoming.name : '';
+
     return this;
   }
 
@@ -114,13 +119,15 @@ class TestModel implements TestModelInterface {
     this.isValid = true;
   }
 
-  getValidatedErrorFields(): string[] {
+  getValidatedErrorFields(): Array<string> {
     return this.validationErrors;
   }
 
   setDate(date: Date, days: number): ISODate {
     const newDate = new Date(date);
+
     newDate.setDate(newDate.getDate() + days);
+
     return newDate.toISOString().split('T')[0] as ISODate;
   }
 
@@ -142,7 +149,9 @@ class TestModel implements TestModelInterface {
 
   calculateDateWithoutWeekend(date: string, days: number, sequence: string): ISODate {
     const startDate = new Date(date);
+
     startDate.setDate(startDate.getDate() + days);
+
     return startDate.toISOString().split('T')[0] as ISODate;
   }
 
@@ -150,7 +159,6 @@ class TestModel implements TestModelInterface {
     return new Date().toTimeString();
   }
 }
-
 // Mock PaginateInterface implementation
 const mockPaginate: PaginateInterface = {
   current_page: 1,
@@ -168,15 +176,23 @@ class MockHelperService implements HelperServiceInterface<TestModelInterface> {
     return of(true);
   }
 
-  save(model: TestModelInterface, isModal: boolean, emitter: EventEmitter<TestModelInterface>, saveBackend?: boolean, navigateAfterSuccess?: string) {
+  save(
+    model: TestModelInterface,
+    isModal: boolean,
+    emitter: EventEmitter<TestModelInterface>,
+    saveBackend?: boolean,
+    navigateAfterSuccess?: string
+  ) {
     if (isModal && !saveBackend) {
       emitter.emit(model);
     }
+
     return of(true);
   }
 
   saveAsNew(model: TestModelInterface) {
     model.id = 0 as ID;
+
     return of(true);
   }
 
@@ -188,11 +204,15 @@ class MockHelperService implements HelperServiceInterface<TestModelInterface> {
     return of(true);
   }
 
-  deleteMultiple(models: TestModelInterface[], reference: any) {
+  deleteMultiple(models: Array<TestModelInterface>, reference: any) {
     return of(true);
   }
 
-  stepBack(model: TestModelInterface, isModal: boolean, emitter: EventEmitter<TestModelInterface>): void {
+  stepBack(
+    model: TestModelInterface,
+    isModal: boolean,
+    emitter: EventEmitter<TestModelInterface>
+  ): void {
     if (isModal) {
       emitter.emit(null);
     } else {
@@ -200,7 +220,7 @@ class MockHelperService implements HelperServiceInterface<TestModelInterface> {
     }
   }
 
-  changeToPage(turnToPage: number, paginate: any, models: TestModelInterface[]) {
+  changeToPage(turnToPage: number, paginate: any, models: Array<TestModelInterface>) {
     return of(true);
   }
 
@@ -208,7 +228,7 @@ class MockHelperService implements HelperServiceInterface<TestModelInterface> {
     return of(true);
   }
 
-  getAll(paginate: any, models: TestModelInterface[], isModal?: boolean, pageNumber?: number) {
+  getAll(paginate: any, models: Array<TestModelInterface>, isModal?: boolean, pageNumber?: number) {
     return of(paginate);
   }
 
@@ -223,7 +243,7 @@ class MockHelperService implements HelperServiceInterface<TestModelInterface> {
 
 // Mock HelperFactoryService
 class MockHelperFactoryService extends HelperFactoryService<TestModelInterface> {
-  get(newable: new() => TestModelInterface): HelperServiceInterface<TestModelInterface> {
+  get(newable: new () => TestModelInterface): HelperServiceInterface<TestModelInterface> {
     return new MockHelperService();
   }
 }
@@ -248,11 +268,11 @@ describe('BaseCreateEditComponent', () => {
   beforeEach(() => {
     mockHelperService = new MockHelperService();
     mockHelperFactoryService = new MockHelperFactoryService();
-
     // Mock DdataCoreModule.InjectorInstance completely
     const mockInjector = {
       get: jasmine.createSpy('get').and.returnValue({})
     };
+
     (DdataCoreModule as any).InjectorInstance = mockInjector;
 
     TestBed.configureTestingModule({
@@ -269,13 +289,14 @@ describe('BaseCreateEditComponent', () => {
 
     fixture = TestBed.createComponent(TestCreateEditComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
 
   afterEach(() => {
     if (fixture && fixture.debugElement) {
       const nativeElement = fixture.debugElement.nativeElement;
+
       if (nativeElement && nativeElement.parentNode) {
         nativeElement.parentNode.removeChild(nativeElement);
       }
@@ -319,7 +340,6 @@ describe('BaseCreateEditComponent', () => {
       model: 'should not be set', // Should be excluded
       loadData: 'should not be set' // Should be excluded
     };
-
     // Store original values
     const originalSaveToStorage = component.saveToStorage;
 
@@ -344,7 +364,6 @@ describe('BaseCreateEditComponent', () => {
       customNumber: 42, // Truthy, should be set
       customZero: 0 // Falsy, should not be set
     };
-
     const originalSaveToStorage = component.saveToStorage;
 
     component.data = testData;
@@ -367,18 +386,21 @@ describe('BaseCreateEditComponent', () => {
   it('should call load function in ngOnInit', () => {
     spyOn(component, 'load');
     component.ngOnInit();
+
     expect(component.load).toHaveBeenCalled();
   });
 
   it('should call helperService.getOne in load function', () => {
     spyOn(component.helperService, 'getOne').and.returnValue(of(true));
     component.load();
+
     expect(component.helperService.getOne).toHaveBeenCalledWith(component.model, component.isModal);
   });
 
   it('should call helperService.save in save function', () => {
     spyOn(component.helperService, 'save').and.returnValue(of(true));
     component.save();
+
     expect(component.helperService.save).toHaveBeenCalledWith(
       component.model,
       component.isModal,
@@ -390,12 +412,14 @@ describe('BaseCreateEditComponent', () => {
   it('should call helperService.saveAsNew in saveAsNew function', () => {
     spyOn(component.helperService, 'saveAsNew').and.returnValue(of(true));
     component.saveAsNew();
+
     expect(component.helperService.saveAsNew).toHaveBeenCalledWith(component.model);
   });
 
   it('should call helperService.stepBack in stepBack function', () => {
     spyOn(component.helperService, 'stepBack');
     component.stepBack();
+
     expect(component.helperService.stepBack).toHaveBeenCalledWith(
       component.model,
       component.isModal,
@@ -407,6 +431,7 @@ describe('BaseCreateEditComponent', () => {
     component.isModal = false;
     spyOn(component.helperService, 'stepBack');
     component.stepBack();
+
     expect(component.helperService.stepBack).toHaveBeenCalledWith(
       component.model,
       false,
@@ -422,9 +447,9 @@ describe('BaseCreateEditComponent', () => {
         emitter.emit(null);
       }
     });
-    
+
     component.stepBack();
-    
+
     expect(component.saveModel.emit).toHaveBeenCalledWith(null);
   });
 
@@ -442,11 +467,12 @@ describe('BaseCreateEditComponent', () => {
 
   it('should skip null or undefined values in data input', () => {
     const originalIsModal = component.isModal;
+
     component.data = {
       isModal: null,
       someProperty: undefined
     };
-    
+
     // Should not change isModal since the value was null
     expect(component.isModal).toBe(originalIsModal);
   });

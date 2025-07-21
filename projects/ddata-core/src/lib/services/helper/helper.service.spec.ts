@@ -34,10 +34,11 @@ class TestModel extends BaseModel {
 
   init(data: any = null): TestModel {
     if (data) {
-      this.id = data.id || 1 as ID;
+      this.id = data.id || (1 as ID);
       this.name = data.name || 'Test Name';
       this.testField = data.testField || false;
     }
+
     return this;
   }
 
@@ -65,6 +66,7 @@ class MockProxyService {
   save(model: any): any {
     return of(1); // Return a mock ID
   }
+
   delete(model: any, paginate?: any): any {
     return of({
       data: [],
@@ -79,10 +81,11 @@ class MockProxyService {
 }
 
 class MockRouter {
-  navigate(commands: any[]): Promise<boolean> {
+  async navigate(commands: Array<any>): Promise<boolean> {
     return Promise.resolve(true);
   }
-  navigateByUrl(url: string): Promise<boolean> {
+
+  async navigateByUrl(url: string): Promise<boolean> {
     return Promise.resolve(true);
   }
 }
@@ -114,22 +117,25 @@ describe('HelperService', () => {
     mockSpinnerService = new MockSpinnerService();
     mockProxyService = new MockProxyService();
     mockRouter = new MockRouter();
-
     // Mock both injector instances
     const mockInjector = {
       get: jasmine.createSpy('get').and.callFake((token: any) => {
         if (token === SpinnerService) {
           return mockSpinnerService;
         }
+
         if (token === Router) {
           return mockRouter;
         }
+
         if (token === ActivatedRoute) {
           return new MockActivatedRoute();
         }
+
         if (token === EnvService) {
           return new MockEnvService();
         }
+
         return {};
       })
     };
@@ -176,7 +182,7 @@ describe('HelperService', () => {
 
   describe('booleanChange', () => {
     it('should return false for null model', (done) => {
-      service.booleanChange(null, 'testField').subscribe(result => {
+      service.booleanChange(null, 'testField').subscribe((result) => {
         expect(result).toBe(false);
         done();
       });
@@ -186,24 +192,24 @@ describe('HelperService', () => {
       spyOn(mockSpinnerService, 'on').and.callThrough();
       spyOn(mockSpinnerService, 'off').and.callThrough();
       spyOn(mockProxyService, 'save').and.returnValue(of(true));
-
       const originalValue = testModel.testField;
 
-      service.booleanChange(testModel, 'testField').subscribe(result => {
+      service.booleanChange(testModel, 'testField').subscribe((result) => {
         expect(result).toBe(true);
         expect(testModel.testField).toBe(!originalValue);
         expect(mockSpinnerService.on).toHaveBeenCalledWith('booleanChange - TestModel - testField');
-        expect(mockSpinnerService.off).toHaveBeenCalledWith('booleanChange - TestModel - testField');
+        expect(mockSpinnerService.off).toHaveBeenCalledWith(
+          'booleanChange - TestModel - testField'
+        );
         done();
       });
     });
 
     it('should revert field value on save failure', (done) => {
       spyOn(mockProxyService, 'save').and.returnValue(of(false));
-
       const originalValue = testModel.testField;
 
-      service.booleanChange(testModel, 'testField').subscribe(result => {
+      service.booleanChange(testModel, 'testField').subscribe((result) => {
         expect(result).toBe(false);
         expect(testModel.testField).toBe(originalValue);
         done();
@@ -212,7 +218,6 @@ describe('HelperService', () => {
 
     it('should handle save error (field remains toggled due to deprecated error handling)', (done) => {
       spyOn(mockProxyService, 'save').and.returnValue(throwError('Save error'));
-
       const originalValue = testModel.testField;
 
       service.booleanChange(testModel, 'testField').subscribe({
@@ -240,7 +245,7 @@ describe('HelperService', () => {
         testModel.isValid = false;
       });
 
-      service.save(testModel).subscribe(result => {
+      service.save(testModel).subscribe((result) => {
         expect(result).toBe(false);
         done();
       });
@@ -248,9 +253,10 @@ describe('HelperService', () => {
 
     it('should emit model in modal mode without backend save', (done) => {
       const emitter = new EventEmitter<TestModel>();
+
       spyOn(emitter, 'emit').and.callThrough();
 
-      service.save(testModel, true, emitter, false).subscribe(result => {
+      service.save(testModel, true, emitter, false).subscribe((result) => {
         expect(result).toBe(true);
         expect(emitter.emit).toHaveBeenCalledWith(testModel);
         done();
@@ -261,9 +267,9 @@ describe('HelperService', () => {
       spyOn(mockSpinnerService, 'on').and.callThrough();
       spyOn(mockSpinnerService, 'off').and.callThrough();
       spyOn(mockProxyService, 'save').and.returnValue(of(123));
-      spyOn(mockRouter, 'navigateByUrl').and.returnValue(Promise.resolve(true));
+      spyOn(mockRouter, 'navigateByUrl').and.resolveTo(true);
 
-      service.save(testModel).subscribe(result => {
+      service.save(testModel).subscribe((result) => {
         expect(result).toBe(true);
         expect(testModel.id).toBe(123 as ID);
         expect(mockSpinnerService.on).toHaveBeenCalledWith('save');
@@ -278,9 +284,9 @@ describe('HelperService', () => {
     it('should reset id to 0 and save model', (done) => {
       testModel.id = 999 as ID;
       spyOn(mockProxyService, 'save').and.returnValue(of(456));
-      spyOn(mockRouter, 'navigateByUrl').and.returnValue(Promise.resolve(true));
+      spyOn(mockRouter, 'navigateByUrl').and.resolveTo(true);
 
-      service.saveAsNew(testModel).subscribe(result => {
+      service.saveAsNew(testModel).subscribe((result) => {
         expect(result).toBe(true);
         expect(testModel.id).toBe(456 as ID);
         done();
@@ -291,6 +297,7 @@ describe('HelperService', () => {
   describe('stepBack', () => {
     it('should emit null in modal mode', () => {
       const emitter = new EventEmitter<TestModel>();
+
       spyOn(emitter, 'emit').and.callThrough();
 
       service.stepBack(testModel, true, emitter);
@@ -299,7 +306,7 @@ describe('HelperService', () => {
     });
 
     it('should navigate in non-modal mode', () => {
-      spyOn(mockRouter, 'navigateByUrl').and.returnValue(Promise.resolve(true));
+      spyOn(mockRouter, 'navigateByUrl').and.resolveTo(true);
 
       service.stepBack(testModel, false);
 
@@ -313,6 +320,7 @@ describe('HelperService', () => {
         isModal: true,
         editModel: new EventEmitter<TestModel>()
       };
+
       spyOn(reference.editModel, 'emit').and.callThrough();
 
       service.edit(testModel, reference);
@@ -322,7 +330,8 @@ describe('HelperService', () => {
 
     it('should navigate in non-modal mode', () => {
       const reference = { isModal: false };
-      spyOn(mockRouter, 'navigate').and.returnValue(Promise.resolve(true));
+
+      spyOn(mockRouter, 'navigate').and.resolveTo(true);
 
       service.edit(testModel, reference);
 
@@ -336,9 +345,10 @@ describe('HelperService', () => {
         isModal: true,
         deleteModel: new EventEmitter<TestModel>()
       };
+
       spyOn(reference.deleteModel, 'emit').and.callThrough();
 
-      service.delete(testModel, reference).subscribe(result => {
+      service.delete(testModel, reference).subscribe((result) => {
         expect(result).toBe(false);
         expect(reference.deleteModel.emit).toHaveBeenCalledWith(testModel);
         done();
@@ -365,7 +375,7 @@ describe('HelperService', () => {
       spyOn(mockSpinnerService, 'off').and.callThrough();
       spyOn(mockProxyService, 'delete').and.returnValue(of(mockPaginate));
 
-      service.delete(testModel, reference).subscribe(result => {
+      service.delete(testModel, reference).subscribe((result) => {
         expect(result).toBe(true);
         expect(reference.models).toEqual([]);
         expect(reference.paginate).toEqual(mockPaginate);
