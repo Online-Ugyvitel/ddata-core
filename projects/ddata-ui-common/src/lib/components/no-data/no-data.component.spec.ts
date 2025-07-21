@@ -8,10 +8,9 @@ describe('DdataUiNoDataComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DdataUiNoDataComponent ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ] // This allows custom elements like fa-icon
-    })
-    .compileComponents();
+      declarations: [DdataUiNoDataComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] // This allows custom elements like fa-icon
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -26,6 +25,7 @@ describe('DdataUiNoDataComponent', () => {
 
   it('icons should contain the created component', () => {
     component = new DdataUiNoDataComponent();
-    expect((component as any).icons).toContain(component.randomIcon);
+
+    expect(component.icons).toContain(component.randomIcon);
   });
 });

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { faTag, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 interface TagInterface {
@@ -6,33 +6,29 @@ interface TagInterface {
 }
 
 @Component({
-    selector: 'dd-tag',
-    templateUrl: './tag.component.html',
-    styleUrls: ['./tag.component.scss'],
-    standalone: false
+  selector: 'dd-tag',
+  templateUrl: './tag.component.html',
+  styleUrls: ['./tag.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
-export class DdataUiTagComponent implements OnInit {
+export class DdataUiTagComponent {
+  @Input() tag: TagInterface;
+  @Input() showIcon = true;
+  @Output() readonly delete: EventEmitter<TagInterface> = new EventEmitter();
+
   // tslint:disable-next-line: variable-name
   _class: string;
-  @Input() tag: TagInterface;
   @Input() set class(value: string) {
-    this._class = value + ' tag';
+    this._class = `${value} tag`;
   }
-  @Input() showIcon = true;
-  @Output() delete: EventEmitter<TagInterface> = new EventEmitter();
 
   icon = {
     tag: faTag,
-    times: faTimes,
+    times: faTimes
   };
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
 
   deleteTag(): void {
     this.delete.emit(this.tag);
   }
-
 }

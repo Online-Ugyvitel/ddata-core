@@ -10,17 +10,16 @@ describe('DdataUiPaginateComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DdataUiPaginateComponent ]
-    })
-    .compileComponents();
+      declarations: [DdataUiPaginateComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(DdataUiPaginateComponent);
     component = fixture.componentInstance;
-
     // Mock the required input property
     const mockPaginateSubject = new Subject<PaginateInterface>();
+
     component.paginate = mockPaginateSubject;
 
     // Emit a sample paginate response

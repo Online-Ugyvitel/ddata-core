@@ -8,9 +8,8 @@ describe('DdataUiProgressbarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DdataUiProgressbarComponent ]
-    })
-    .compileComponents();
+      declarations: [DdataUiProgressbarComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
