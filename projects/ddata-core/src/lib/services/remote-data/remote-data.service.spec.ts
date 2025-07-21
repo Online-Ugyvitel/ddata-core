@@ -68,9 +68,7 @@ xdescribe('RemoteDataService', () => {
   };
 
   beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
+    // TestBed environment is already initialized in test.ts
   });
 
   // set TestBed before each tests

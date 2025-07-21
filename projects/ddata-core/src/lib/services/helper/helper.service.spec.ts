@@ -23,6 +23,7 @@ import { EnvService } from '../env/env.service';
 import { ProxyService } from '../proxy/proxy.service';
 import { SpinnerService } from '../spinner/spinner.service';
 import { HelperService } from './helper.service';
+import { HelperActivatedRouteService } from './helper-activated-route.service';
 
 // Mock model for testing
 class TestModel extends BaseModel {

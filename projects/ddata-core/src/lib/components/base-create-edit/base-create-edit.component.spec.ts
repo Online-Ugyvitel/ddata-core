@@ -13,7 +13,6 @@ import { HelperServiceInterface } from '../../services/helper/helper-service.int
 import { HelperFactoryService } from '../../services/helper/helper-service.factory';
 import { DdataCoreModule } from '../../ddata-core.module';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
-import { configureTestBed } from './test-bed-configuration.spec';
 import { TestModel, TestModelInterface } from './test.model.spec';
 import { ID } from '../../models/base/base-data.type';
 // Mock PaginateInterface implementation
@@ -105,7 +104,8 @@ class MockHelperFactoryService extends HelperFactoryService<TestModelInterface> 
 
 // Concrete test component extending the abstract BaseCreateEditComponent
 @Component({
-  template: '<div>Test Component</div>'
+  template: '<div>Test Component</div>',
+  standalone: false
 })
 class TestCreateEditComponent extends BaseCreateEditComponent<TestModelInterface> {
   constructor() {
@@ -120,7 +120,8 @@ describe('BaseCreateEditComponent', () => {
   let mockHelperFactoryService: MockHelperFactoryService;
 
   beforeEach(() => {
-    configureTestBed();
+    // Don't call configureTestBed as it resets the test environment
+    // configureTestBed();
 
     mockHelperService = new MockHelperService();
     mockHelperFactoryService = new MockHelperFactoryService();

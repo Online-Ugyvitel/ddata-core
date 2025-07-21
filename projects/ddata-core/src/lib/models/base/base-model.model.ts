@@ -217,9 +217,9 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
    * @returns string
    */
   toISOTime(date: Date): string {
-    const hours = (date.getHours() < 10 ? '0' : '') + date.getHours();
-    const minutes = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-    const seconds = (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+    const hours = (date.getUTCHours() < 10 ? '0' : '') + date.getUTCHours();
+    const minutes = (date.getUTCMinutes() < 10 ? '0' : '') + date.getUTCMinutes();
+    const seconds = (date.getUTCSeconds() < 10 ? '0' : '') + date.getUTCSeconds();
 
     return `${hours}:${minutes}:${seconds}`;
   }
