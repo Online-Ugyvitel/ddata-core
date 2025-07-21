@@ -1,5 +1,7 @@
 // tslint:disable: variable-name
-
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable no-param-reassign */
 import { InitialDataInterface } from './initial-data.interface';
 
 export class InitialData implements InitialDataInterface {

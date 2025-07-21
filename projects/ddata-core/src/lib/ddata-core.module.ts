@@ -18,7 +18,7 @@ export class DdataCoreModule {
     DdataCoreModule.InjectorInstance = injector;
   }
 
-  static forRoot(environment: any): ModuleWithProviders<DdataCoreModule> {
+  static forRoot(environment: unknown): ModuleWithProviders<DdataCoreModule> {
     return {
       ngModule: DdataCoreModule,
       providers: [

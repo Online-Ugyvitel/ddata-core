@@ -52,7 +52,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "app",
+            "prefix": "dd",
             "style": "kebab-case"
           }
         ],

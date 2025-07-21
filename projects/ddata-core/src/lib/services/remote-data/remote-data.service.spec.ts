@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-param-reassign */
+/* eslint-disable jasmine/no-disabled-tests */
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 // tslint:disable: variable-name
 import 'zone.js/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router } from '@angular/router';
 import { DdataCoreError } from './ddata-core-error';
 import { StorageService } from '../storage/storage.service';

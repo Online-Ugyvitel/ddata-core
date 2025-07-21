@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { BaseModelInterface } from '../../models/base/base-model.model';
 import { SelectableInterface } from '../../models/selectable/selectable.interface';
@@ -8,13 +8,14 @@ import { SelectableListComponentInterface } from './selectable-list.component.in
 // @dynamic
 @Component({
   template: '',
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export abstract class SelectableListComponent<T extends BaseModelInterface<T> & SelectableInterface>
   extends BaseListComponent<T>
   implements SelectableListComponentInterface<T>
 {
-  _selectedElements: Set<T> = new Set([]);
   @Input() isModal = true;
   @Input() multipleSelectEnabled = true;
   @Input() isSelectionList = true;
@@ -22,42 +23,43 @@ export abstract class SelectableListComponent<T extends BaseModelInterface<T> & 
   @Input() set selectedElements(value: Array<T>) {
     this.models.map((obj: T) => (obj.is_selected = false));
 
-    value.forEach((item: any) => {
-      const selectedModel = this.models.findIndex((obj: T) => obj.id == item.id);
+    value.forEach((item: T) => {
+      const selectedModel = this.models.findIndex((obj: T) => obj.id === item.id);
 
       if (selectedModel !== -1) {
         this.models[selectedModel].is_selected = true;
       }
     });
 
-    this._selectedElements = new Set(!!value.length ? value : []);
+    this.selectedElementsSet = new Set(!!value.length ? value : []);
   }
 
   get selectedElements(): Array<T> {
-    return Array.from(this._selectedElements);
+    return Array.from(this.selectedElementsSet);
   }
 
-  @Output() removeSelection: EventEmitter<Array<T>> = new EventEmitter();
-  @Output() setSelection: EventEmitter<Array<T>> = new EventEmitter();
-  @Output() emitSelected: EventEmitter<Array<T>> = new EventEmitter();
+  @Output() readonly removeSelection: EventEmitter<Array<T>> = new EventEmitter();
+  @Output() readonly setSelection: EventEmitter<Array<T>> = new EventEmitter();
+  @Output() readonly emitSelected: EventEmitter<Array<T>> = new EventEmitter();
 
+  private selectedElementsSet: Set<T> = new Set([]);
   datasArrived: BehaviorSubject<number> = new BehaviorSubject(0);
   select: BehaviorSubject<Array<T>> = new BehaviorSubject(null);
 
   toggleSelect(model: T): void {
-    const found: boolean = this._selectedElements.has(model);
+    const isFound: boolean = this.selectedElementsSet.has(model);
 
-    if (found) {
-      this._selectedElements.delete(model);
-      this.removeSelection.emit(Array.from(this._selectedElements));
+    if (isFound) {
+      this.selectedElementsSet.delete(model);
+      this.removeSelection.emit(Array.from(this.selectedElementsSet));
     } else {
-      this._selectedElements.add(model);
-      this.setSelection.emit(Array.from(this._selectedElements));
+      this.selectedElementsSet.add(model);
+      this.setSelection.emit(Array.from(this.selectedElementsSet));
     }
   }
 
   chooseSelect(): void {
-    this.select.next(Array.from(this._selectedElements));
-    this.emitSelected.emit(Array.from(this._selectedElements));
+    this.select.next(Array.from(this.selectedElementsSet));
+    this.emitSelected.emit(Array.from(this.selectedElementsSet));
   }
 }

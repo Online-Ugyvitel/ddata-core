@@ -1,4 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // tslint:disable: max-line-length
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-useless-escape */
+/* eslint-disable max-len */
 import { Injectable } from '@angular/core';
 import { ValidationErrorSettingsInterface } from '../../models/error/validation-error-settings.model';
 import { ValidationError } from '../../models/error/validation-error.model';

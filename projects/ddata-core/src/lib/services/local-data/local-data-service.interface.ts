@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Observable } from 'rxjs';
 import { DataServiceAbstractInterface } from '../data/data-service-abstract.interface';
 

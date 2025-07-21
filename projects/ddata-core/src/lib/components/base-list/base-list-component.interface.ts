@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EventEmitter } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BaseModelInterface } from '../../models/base/base-model.model';

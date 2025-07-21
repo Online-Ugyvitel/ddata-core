@@ -1,3 +1,5 @@
+/* eslint-disable jasmine/no-disabled-tests */
+/* eslint-disable no-undef */
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injector } from '@angular/core';

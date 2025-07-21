@@ -1,4 +1,6 @@
 // tslint:disable: variable-name
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-param-reassign */
 import { PaginateInterface } from './paginate.interface';
 
 export class Paginate implements PaginateInterface {

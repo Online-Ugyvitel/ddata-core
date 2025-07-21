@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable jasmine/no-spec-dupes */
+/* eslint-disable jasmine/no-disabled-tests */
+/* eslint-disable no-unused-vars */
+/* eslint-disable max-lines */
 import { ValidatorService } from './validator.service';
 const validator = new ValidatorService();
 

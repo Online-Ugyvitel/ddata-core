@@ -1,4 +1,5 @@
 // tslint:disable: variable-name
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export class PaginateInterface {
   current_page: number;

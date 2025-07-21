@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ValidationErrorSettingsInterface } from './validation-error-settings.model';
 
 export interface ValidationErrorInterface extends Error {
@@ -23,10 +24,11 @@ export class ValidationError extends Error implements ValidationErrorInterface {
     }
   };
 
-  constructor(settings: ValidationErrorSettingsInterface) {
-    super(settings.message);
-
-    settings = !!settings ? settings : {};
+  constructor(incomingSettings: ValidationErrorSettingsInterface) {
+    super(incomingSettings.message);
+    const settings = !!incomingSettings
+      ? incomingSettings
+      : ({} as unknown as ValidationErrorSettingsInterface);
 
     this.message = !!settings.message ? settings.message : this.message;
     this.invalids = !!settings.invalids ? settings.invalids : this.invalids;

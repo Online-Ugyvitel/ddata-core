@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable no-console */
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { EnvService } from '../env/env.service';

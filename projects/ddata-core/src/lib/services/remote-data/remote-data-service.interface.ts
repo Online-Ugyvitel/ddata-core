@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { FileUploadProcessInterface } from '../../models/file/file-upload-process.interface';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { NotificationType } from '../../models/base/base-data.type';

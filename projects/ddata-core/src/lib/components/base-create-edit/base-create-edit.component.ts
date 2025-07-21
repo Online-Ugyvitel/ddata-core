@@ -40,6 +40,7 @@ import { BaseCreateEditComponentInterface } from './base-create-edit-component.i
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export abstract class BaseCreateEditComponent<T extends BaseModelInterface<T>>
   implements OnInit, BaseCreateEditComponentInterface<T>
 {

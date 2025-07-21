@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
 declare const addressCardNumber: unique symbol;
 export declare type AddressCardNumber = string & {
   readonly [addressCardNumber]: 'AddressCardNumber';

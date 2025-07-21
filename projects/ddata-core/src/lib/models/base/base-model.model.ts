@@ -1,5 +1,5 @@
-// tslint:disable: max-line-length
-// tslint:disable: variable-name
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { DdataCoreModule } from '../../ddata-core.module';
 import { ValidatorServiceInterface } from '../../services/validator/validator-service.interface';
 import { ValidatorService } from '../../services/validator/validator.service';
@@ -114,6 +114,7 @@ export interface BaseModelInterface<T> extends BaseModelWithoutTypeDefinitionInt
 }
 
 // tslint:disable-next-line: no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/naming-convention
 interface ModelWithId {}
 
 export class BaseModel implements BaseModelInterface<ModelWithId> {
@@ -176,18 +177,20 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
   }
 
   setDate(date: Date, days = 0): ISODate {
-    const new_date = new Date(date.setDate(date.getDate() + Number(days)))
+    const newDate = new Date(date.setDate(date.getDate() + Number(days)))
       .toISOString()
       .split('T')[0];
 
-    return new_date as ISODate;
+    return newDate as ISODate;
   }
 
   /**
    * Return current date as ISODate
    */
   getCurrentISODate(): ISODate {
-    return new Date().toISOString().split('T')[0] as ISODate;
+    const isoString = new Date().toISOString();
+
+    return isoString.split('T')[0] as ISODate;
   }
 
   /**
@@ -201,10 +204,10 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
    * Return a datetime as YYYY-MM-DD hh:mm:ss format
    */
   toISODatetime(date: Date): string {
-    const iso_date = this.toISODate(date);
-    const iso_time = this.toISOTime(date);
+    const isoDate = this.toISODate(date);
+    const isoTime = this.toISOTime(date);
 
-    return `${iso_date} ${iso_time}`;
+    return `${isoDate} ${isoTime}`;
   }
 
   /**
@@ -260,9 +263,13 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     }
 
     if (newDate === 0) {
-      calculatedDate = new Date(date).toISOString().split('T')[0];
+      const isoString = new Date(date).toISOString();
+
+      calculatedDate = isoString.split('T')[0];
     } else {
-      calculatedDate = new Date(newDate).toISOString().split('T')[0];
+      const isoString = new Date(newDate).toISOString();
+
+      calculatedDate = isoString.split('T')[0];
     }
 
     return calculatedDate as ISODate;

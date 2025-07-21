@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ValidationErrorSettingsInterface } from '../../models/error/validation-error-settings.model';
 
 export interface ValidatorServiceInterface {
