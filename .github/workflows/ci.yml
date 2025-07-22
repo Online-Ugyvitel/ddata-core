@@ -5,9 +5,9 @@ on:
     branches: [ master, main ]
 
 jobs:
-  test-and-lint:
+  # Job to install dependencies and build core - this provides artifacts for other jobs
+  setup:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -29,13 +29,121 @@ jobs:
         npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts --no-optional
         npm run build:core
 
-    - name: Run lint
-      run: npm run lint
+    - name: Cache node modules and built artifacts
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          dist
+        key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
+        restore-keys: |
+          ${{ runner.os }}-deps-build-
+          ${{ runner.os }}-deps-
 
-    - name: Run tests
-      run: npm run test
+  # Matrix job for linting each project in parallel
+  lint:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [
+          'ddata-lib',
+          'ddata-core', 
+          'ddata-ui',
+          'ddata-ui-input',
+          'ddata-ui-file', 
+          'ddata-ui-dialog',
+          'ddata-ui-common',
+          'ddata-a11y'
+        ]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.12.0'
+
+    - name: Restore cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          dist
+        key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
+        restore-keys: |
+          ${{ runner.os }}-deps-build-
+          ${{ runner.os }}-deps-
+
+    - name: Run lint for ${{ matrix.project }}
+      run: |
+        if [ "${{ matrix.project }}" = "ddata-lib" ]; then
+          # Main app uses Angular CLI lint
+          npx ng lint ${{ matrix.project }}
+        else
+          # Library projects use tslint directly
+          if [ -f "projects/${{ matrix.project }}/tslint.json" ]; then
+            npx tslint -c projects/${{ matrix.project }}/tslint.json 'projects/${{ matrix.project }}/src/**/*.ts'
+          else
+            echo "No lint configuration found for ${{ matrix.project }}"
+            exit 1
+          fi
+        fi
+
+  # Matrix job for testing each project in parallel  
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [
+          'ddata-lib',
+          'ddata-core',
+          'ddata-ui', 
+          'ddata-ui-input',
+          'ddata-ui-file',
+          'ddata-ui-dialog', 
+          'ddata-ui-common',
+          'ddata-a11y'
+        ]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.12.0'
+
+    - name: Restore cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          dist
+        key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
+        restore-keys: |
+          ${{ runner.os }}-deps-build-
+          ${{ runner.os }}-deps-
+
+    - name: Run tests for ${{ matrix.project }}
+      run: npx ng test ${{ matrix.project }} --no-watch --browsers=ChromeHeadless
       continue-on-error: true
 
-    - name: Test results summary
-      if: always()
-      run: echo "CI pipeline completed. Check individual steps for details."
+  # Summary job that depends on all lint and test jobs
+  ci-summary:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Check all jobs status
+      run: |
+        echo "Lint jobs status: ${{ needs.lint.result }}"
+        echo "Test jobs status: ${{ needs.test.result }}"
+        if [ "${{ needs.lint.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ]; then
+          echo "Some jobs failed. Check individual job logs for details."
+          exit 1
+        else
+          echo "All CI checks passed successfully!"
+        fi
