@@ -4,7 +4,7 @@
     <span *ngIf="_isRequired"> *</span>
   </label>
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div class="input-group-prepend" *ngIf=" _prepend != '' ">
+    <div class="input-group-prepend" *ngIf="_prepend !== ''">
       <div class="input-group-text">{{ _prepend }}</div>
     </div>
 
@@ -21,17 +21,21 @@
         [type]="type"
         [autocomplete]="random"
         (keyup)="validateField()"
-        #inputBox>
-        <ng-container *ngIf="enableCharacterCounter">
-          <character-counter [currentLength]="model[_field]?.length || 0" [maxLength]="maxLength"></character-counter>
-        </ng-container>
-        <ng-container *ngIf="enableWordCounter">
-          <app-word-counter
+        #inputBox
+      />
+      <ng-container *ngIf="enableCharacterCounter">
+        <dd-character-counter
+          [currentLength]="model[_field]?.length || 0"
+          [maxLength]="maxLength"
+        ></dd-character-counter>
+      </ng-container>
+      <ng-container *ngIf="enableWordCounter">
+        <dd-word-counter
           [currentLength]="model[_field]"
           [maxLength]="maxWords"
           (maxLentghReached)="showWordCounterWarning = $event"
-        ></app-word-counter>
-        </ng-container>
+        ></dd-word-counter>
+      </ng-container>
     </ng-container>
 
     <ng-container *ngIf="isViewOnly">
@@ -39,11 +43,12 @@
         [id]="_field + '_' + random"
         [class]="viewOnlyClass"
         [attr.name]="_field + '_' + random"
-        [title]="_title">
-          {{ model[_field] }}
+        [title]="_title"
+      >
+        {{ model[_field] }}
       </div>
     </ng-container>
-    <div class="input-group-append" *ngIf="_append != ''">
+    <div class="input-group-append" *ngIf="_append !== ''">
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>

@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
 import { BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
 import { DialogContentWithOptionsInterface } from '../../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../../services/input/helper/input-helper-service.interface';
@@ -6,16 +13,13 @@ import { InputHelperService } from '../../../services/input/helper/input-helper.
 import { SelectType } from '../select.type';
 
 @Component({
-    selector: 'multiple-select',
-    templateUrl: './multiple-select.component.html',
-    styleUrls: ['./multiple-select.component.scss'],
-    standalone: false
+  selector: 'dd-multiple-select',
+  templateUrl: './multiple-select.component.html',
+  styleUrls: ['./multiple-select.component.scss'],
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DdataMultipleSelectComponent implements OnInit {
-  private helperService: InputHelperServiceInterface =
-    DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
-  private random: string = this.helperService.randChars();
-
+export class DdataMultipleSelectComponent {
   // look & feel
   @Input() wrapperClass = 'd-flex flex-wrap';
   @Input() inputBlockClass = 'col-12 d-flex px-0';
@@ -39,9 +43,9 @@ export class DdataMultipleSelectComponent implements OnInit {
   @Input() append = '';
 
   // data
-  @Input() model: BaseModelInterface<any> & FieldsInterface<any>;
+  @Input() model: BaseModelInterface<unknown> & FieldsInterface<unknown>;
   @Input() field = 'id';
-  @Input() items: any[] = [];
+  @Input() items: Array<unknown> = [];
   @Input() text = 'name';
   @Input() valueField = 'id';
 
@@ -50,19 +54,31 @@ export class DdataMultipleSelectComponent implements OnInit {
   @Input() showIcon = false;
   @Input() selectedElementsBlockClass = 'col-12 d-flex flex-wrap px-0';
   @Input() selectedElementsBlockExtraClass = 'col-md-9 d-flex flex-wrap';
+
   // dialog
   @Input() set dialogSettings(value: DialogContentWithOptionsInterface) {
     if (!value) {
-      console.error(`You try to use dd-select as multiple select, but not defined dialogSettings. Please define it.`);
+      console.error(
+        `You try to use dd-select as multiple select, but not defined dialogSettings. Please define it.`
+      );
 
       return;
     }
 
-    this._dialogSettings = value;
+    this.internalDialogSettings = value;
   }
 
-  @Output() selected: EventEmitter<any> = new EventEmitter<any>();
-  @Output() selectModel: EventEmitter<any> = new EventEmitter<any>();
+  @Output() readonly selected: EventEmitter<unknown> = new EventEmitter<unknown>();
+  @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter<unknown>();
+
+  private readonly helperService: InputHelperServiceInterface =
+    DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
+
+  private readonly random: string = this.helperService.randChars();
+  private internalDialogSettings: DialogContentWithOptionsInterface;
+  isModalVisible = false;
+
+  constructor(private readonly changeDetector: ChangeDetectorRef) {}
 
   get id(): string {
     return `${this.field}_${this.random}`;
@@ -72,15 +88,7 @@ export class DdataMultipleSelectComponent implements OnInit {
     return this.model[this.getObjectFieldName()][this.text];
   }
 
-  isModalVisible = false;
-  _dialogSettings: DialogContentWithOptionsInterface;
-
-  constructor(private readonly changeDetector: ChangeDetectorRef) {}
-
-  ngOnInit(): void {
-  }
-
-  showModal(method: 'create-edit' | 'list'): void {
+  showModal(): void {
     this.isModalVisible = true;
 
     this.changeDetector.detectChanges();
@@ -90,11 +98,11 @@ export class DdataMultipleSelectComponent implements OnInit {
     this.isModalVisible = false;
   }
 
-  selectedEmit(event: any): void {
+  selectedEmit(event: unknown): void {
     this.selected.emit(event);
   }
 
-  selectModelEmit(event: any): void {
+  selectModelEmit(event: Record<string, unknown>): void {
     event.is_selected = true;
 
     if (this.mode === 'single') {
@@ -110,22 +118,26 @@ export class DdataMultipleSelectComponent implements OnInit {
     this.selectModel.emit(event);
   }
 
-  deleteFromMultipleSelectedList(item: any): void {
+  deleteFromMultipleSelectedList(item: BaseModelInterface<unknown>): void {
     // Remove from model field array
     if (this.model && this.model[this.field] && Array.isArray(this.model[this.field])) {
       const index = this.model[this.field].indexOf(item);
+
       if (index !== -1) {
         this.model[this.field].splice(index, 1);
       }
     }
 
     // Remove from dialog selected elements
-    if (this._dialogSettings && 
-        this._dialogSettings.listOptions && 
-        Array.isArray(this._dialogSettings.listOptions.selectedElements)) {
-      const dialogIndex = this._dialogSettings.listOptions.selectedElements.indexOf(item);
+    if (
+      this.dialogSettings &&
+      this.dialogSettings.listOptions &&
+      Array.isArray(this.dialogSettings.listOptions.selectedElements)
+    ) {
+      const dialogIndex = this.dialogSettings.listOptions.selectedElements.indexOf(item);
+
       if (dialogIndex !== -1) {
-        this._dialogSettings.listOptions.selectedElements.splice(dialogIndex, 1);
+        this.dialogSettings.listOptions.selectedElements.splice(dialogIndex, 1);
       }
     }
   }

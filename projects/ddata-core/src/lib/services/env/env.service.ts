@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Inject, Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class EnvService {
-  public environment: any = {};
+  environment: any = {};
 
-  constructor(@Inject('env') private env?: any) {
+  constructor(@Inject('env') private readonly env?: any) {
     this.environment = env ?? {};
   }
 }

@@ -3,6 +3,7 @@
  */
 
 export * from './lib/models/dialog/content/dialog-content-item';
+export * from './lib/models/dialog/content/dialog-content-with-options';
 export * from './lib/models/dialog/content/dialog-content.interface';
 
 export * from './lib/models/icon-set/icon-set.interface';

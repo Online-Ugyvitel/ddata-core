@@ -1,13 +1,11 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-
 @Component({
-    selector: 'app-word-counter',
-    templateUrl: './word-counter.component.html',
-    styleUrls: ['./word-counter.component.scss'],
-    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
-    changeDetection: ChangeDetectionStrategy.Default,
-    standalone: false
+  selector: 'dd-word-counter',
+  templateUrl: './word-counter.component.html',
+  styleUrls: ['./word-counter.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class WordCounterComponent {
   @Input() maxLength = 0;

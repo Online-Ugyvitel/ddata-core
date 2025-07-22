@@ -4,29 +4,33 @@ import { DdataCoreModule, SpinnerService, SpinnerServiceInterface } from 'ddata-
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 @Component({
-    selector: 'dd-loading-overlay',
-    templateUrl: './loading-overlay.component.html',
-    styleUrls: ['./loading-overlay.component.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'dd-loading-overlay',
+  templateUrl: './loading-overlay.component.html',
+  styleUrls: ['./loading-overlay.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
+  @Input() spinnerService: SpinnerServiceInterface =
+    DdataCoreModule.InjectorInstance.get<SpinnerService>(SpinnerService);
+
   subscriptions: Subscription = new Subscription();
   spinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   loadingInProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
   @Input() set loadingInProgress(value: boolean) {
     this.loadingInProgress$.next(!!value);
   }
+
   @Input() set spinner(value: boolean) {
     this.spinner$.next(value);
   }
-  @Input() spinnerService: SpinnerServiceInterface = DdataCoreModule.InjectorInstance.get<SpinnerService>(SpinnerService);
 
   icon = {
     spinner: faSpinner
   };
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
     this.subscriptions.add(

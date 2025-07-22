@@ -1,6 +1,10 @@
 <div class="position-fixed notification-container">
   <ng-container *ngFor="let notification of _notifications; index as i">
-    <div class="notification alert" role="alert" aria-live="assertive" aria-atomic="true"
+    <div
+      class="notification alert"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
       [class.alert-primary]="notification.type === 'primary'"
       [class.alert-secondary]="notification.type === 'secondary'"
       [class.alert-success]="notification.type === 'success'"
@@ -23,7 +27,6 @@
 
       <!-- body -->
       <div class="notification-body" [innerHTML]="notification.text"></div>
-
     </div>
   </ng-container>
 </div>

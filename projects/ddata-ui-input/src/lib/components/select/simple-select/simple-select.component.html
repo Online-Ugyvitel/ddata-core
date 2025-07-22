@@ -1,48 +1,33 @@
 <div [class]="wrapperClass">
   <!-- label -->
-  <label
-    [class]="labelClass"
-    [for]="id"
-    *ngIf="showLabel"
-  >
+  <label [class]="labelClass" [for]="id" *ngIf="showLabel">
     {{ labelText }}:
 
     <span *ngIf="isRequired"> *</span>
   </label>
 
-
   <!-- select -->
-  <div
-    [class]="inputBlockClass"
-    [ngClass]="showLabel ? inputBlockExtraClass : ''"
-  >
-
+  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
     <!-- prepend -->
     <div class="input-group-prepend" *ngIf="!!prepend">
       <div class="input-group-text">{{ prepend }}</div>
     </div>
 
-    <select class="form-select"
+    <select
+      class="form-select"
       [(ngModel)]="model[field]"
       [class.invalid]="model.validationErrors.includes(field)"
       [class.disable-appearance]="disabledAppearance"
       [disabled]="disabled"
       (change)="selectItem()"
     >
-
-      <option *ngIf="addEmptyOption" data-default value="0">
-        -- {{ unselectedText }} --
-      </option>
+      <option *ngIf="addEmptyOption" data-default value="0">-- {{ unselectedText }} --</option>
 
       <ng-container *ngFor="let item of items">
-        <option
-          [value]="item[valueField]"
-          [selected]="item[valueField] === model[field]"
-        >
+        <option [value]="item[valueField]" [selected]="item[valueField] === model[field]">
           {{ item[text] }}
         </option>
       </ng-container>
-
     </select>
 
     <!-- append -->

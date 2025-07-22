@@ -21,11 +21,11 @@ describe('filesize.pipe', () => {
     });
 
     it('should return null when value is false', () => {
-      expect(pipe.transform(false as any, 'gb', 0)).toBe(null);
+      expect(pipe.transform(false as unknown as number, 'gb', 0)).toBe(null);
     });
 
     it('should return null when value is empty string', () => {
-      expect(pipe.transform('' as any, 'gb', 0)).toBe(null);
+      expect(pipe.transform('' as unknown as number, 'gb', 0)).toBe(null);
     });
 
     it('should return null when value is NaN', () => {
@@ -39,7 +39,7 @@ describe('filesize.pipe', () => {
     });
 
     it('should default to 0 decimals when decimals is null', () => {
-      expect(pipe.transform(1048576, 'mb', null as any)).toBe(1);
+      expect(pipe.transform(1048576, 'mb', null as unknown as number)).toBe(1);
     });
 
     it('should default to 0 decimals when decimals is 0', () => {
@@ -51,7 +51,7 @@ describe('filesize.pipe', () => {
     });
 
     it('should default to 0 decimals when decimals is false', () => {
-      expect(pipe.transform(1048576, 'mb', false as any)).toBe(1);
+      expect(pipe.transform(1048576, 'mb', false as unknown as number)).toBe(1);
     });
 
     it('should use specified decimals when valid positive number', () => {
@@ -125,4 +125,3 @@ describe('filesize.pipe', () => {
     });
   });
 });
-

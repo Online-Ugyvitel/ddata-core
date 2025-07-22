@@ -1,5 +1,16 @@
 import {
-  ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, ViewContainerRef
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  ComponentRef,
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  ViewContainerRef,
+  AfterViewInit
 } from '@angular/core';
 import { BaseModelInterface, FieldsInterface } from 'ddata-core';
 import { ComponentRendererService } from '../../../../services/select/component-renderer.service';
@@ -9,23 +20,19 @@ import { DialogContentWithOptionsInterface } from '../../../../models/dialog/con
 import { SelectType } from '../../select.type';
 
 @Component({
-    selector: 'multiple-select-dialog',
-    templateUrl: './multiple-select-dialog.component.html',
-    styleUrls: ['./multiple-select-dialog.component.scss'],
-    standalone: false
+  selector: 'dd-multiple-select-dialog',
+  templateUrl: './multiple-select-dialog.component.html',
+  styleUrls: ['./multiple-select-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
-export class DdataMultipleSelectDialogComponent implements OnInit {
-  private componentRendererService: ComponentRendererService;
-  private componentRef: any;
-  private subscription: Subscription = new Subscription();
-  private selectedModel: any;
-
+export class DdataMultipleSelectDialogComponent implements OnInit, AfterViewInit {
   @Input() settings: DialogContentWithOptionsInterface;
   @Input() method: 'create-edit' | 'list' = 'list';
   @Input() mode: SelectType = 'multiple';
 
   // for example: an Address model
-  @Input() model: BaseModelInterface<any> & FieldsInterface<any>;
+  @Input() model: BaseModelInterface<unknown> & FieldsInterface<unknown>;
 
   // for example: tag_id
   @Input() field = 'id';
@@ -37,22 +44,30 @@ export class DdataMultipleSelectDialogComponent implements OnInit {
   @Input() valueField = 'id';
 
   // for example: Array of Tag
-  @Input() items: any[] = [];
+  @Input() items: Array<unknown> = [];
   @Input() modalTitle = 'Dialog';
 
-  @Output() selectionFinished: EventEmitter<any> = new EventEmitter();
-  @Output() selected: EventEmitter<any> = new EventEmitter();
-  @Output() selectModel: EventEmitter<any> = new EventEmitter();
+  @Output() readonly selectionFinished: EventEmitter<unknown> = new EventEmitter();
+  @Output() readonly selected: EventEmitter<unknown> = new EventEmitter();
+  @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter();
 
   @ViewChild('dialogHost', { read: ViewContainerRef }) dialogHost: ViewContainerRef;
 
-  // close dialog on esc
-  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent): void {
-    this.selectionFinished.emit();
-  }
+  private readonly componentRendererService: ComponentRendererService;
+  private readonly componentRef: ComponentRef<unknown>;
+  private readonly subscription: Subscription = new Subscription();
+  private selectedModel: unknown;
 
   constructor(readonly changeDetector: ChangeDetectorRef) {
     this.componentRendererService = new ComponentRendererService(changeDetector);
+  }
+
+  // close dialog on esc
+  @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    event: KeyboardEvent
+  ): void {
+    this.selectionFinished.emit();
   }
 
   ngOnInit(): void {
@@ -79,47 +94,39 @@ export class DdataMultipleSelectDialogComponent implements OnInit {
       const selectedModel = this.model[this.getObjectFieldName()];
 
       if (!!selectedModel) {
-        this.componentRendererService.setSelectedModels([
-          selectedModel
-        ]);
+        this.componentRendererService.setSelectedModels([selectedModel]);
       }
     }
 
     if (this.mode === 'multiple') {
-      this.componentRendererService.setSelectedModels(
-        this.model[this.field]
-      );
+      this.componentRendererService.setSelectedModels(this.model[this.field]);
     }
 
     // for edit component
-    this.subscription.add(instance.saveModel.subscribe((model: any) => this.setModel(model)));
+    this.subscription.add(instance.saveModel.subscribe((model: unknown) => this.setModel(model)));
 
     this.subscription.add(
-      instance.select.pipe(
-        tap(() => {
-          if (this.mode === 'multiple') {
-            this.model[this.field] = [];
-            this.settings.listOptions.selectedElements = [];
-          }
-        }),
+      instance.select
+        .pipe(
+          tap(() => {
+            if (this.mode === 'multiple') {
+              this.model[this.field] = [];
+              this.settings.listOptions.selectedElements = [];
+            }
+          }),
 
-        map((models: any[]) => {
-          if (models === null) {
+          map((models: Array<unknown>) => {
+            if (models === null) {
+              return models;
+            }
+
+            this.emitEvents(models);
+
             return models;
-          }
-
-          this.emitEvents(models);
-
-          return models;
-        }),
-      ).subscribe()
+          })
+        )
+        .subscribe()
     );
-  }
-
-  private getSelectedItems(): void {
-    if (this.mode === 'single') {
-      this.selectedModel = this.model[this.field];
-    }
   }
 
   hideModal(): void {
@@ -133,8 +140,14 @@ export class DdataMultipleSelectDialogComponent implements OnInit {
     this.componentRendererService.resetSelectedModels();
   }
 
-  private emitEvents(models: any[]): void {
-    models.forEach((model: any) => {
+  private getSelectedItems(): void {
+    if (this.mode === 'single') {
+      this.selectedModel = this.model[this.field];
+    }
+  }
+
+  private emitEvents(models: Array<unknown>): void {
+    models.forEach((model: unknown) => {
       // this must be happen on multiple select and on signle select case too
       this.selectModel.emit(model);
     });
@@ -146,7 +159,9 @@ export class DdataMultipleSelectDialogComponent implements OnInit {
     return this.field.split('_id')[0];
   }
 
-  private setModel(model: any): any {
+  private setModel(model: unknown): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const unused = model;
     // TODO test this on edit case
   }
 }

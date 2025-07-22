@@ -152,6 +152,15 @@
             "tsConfig": "projects/ddata-core/tsconfig.spec.json",
             "karmaConfig": "projects/ddata-core/karma.conf.js"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-core/**/*.ts",
+              "projects/ddata-core/**/*.html"
+            ]
+          }
         }
       }
     },
@@ -179,6 +188,15 @@
             "main": "projects/ddata-ui/src/test.ts",
             "tsConfig": "projects/ddata-ui/tsconfig.spec.json",
             "karmaConfig": "projects/ddata-ui/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-ui/**/*.ts",
+              "projects/ddata-ui/**/*.html"
+            ]
           }
         }
       }
@@ -208,6 +226,15 @@
             "tsConfig": "projects/ddata-ui-input/tsconfig.spec.json",
             "karmaConfig": "projects/ddata-ui-input/karma.conf.js"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-ui-input/**/*.ts",
+              "projects/ddata-ui-input/**/*.html"
+            ]
+          }
         }
       }
     },
@@ -235,6 +262,15 @@
             "main": "projects/ddata-ui-file/src/test.ts",
             "tsConfig": "projects/ddata-ui-file/tsconfig.spec.json",
             "karmaConfig": "projects/ddata-ui-file/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-ui-file/**/*.ts",
+              "projects/ddata-ui-file/**/*.html"
+            ]
           }
         }
       }
@@ -264,6 +300,15 @@
             "tsConfig": "projects/ddata-ui-dialog/tsconfig.spec.json",
             "karmaConfig": "projects/ddata-ui-dialog/karma.conf.js"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-ui-dialog/**/*.ts",
+              "projects/ddata-ui-dialog/**/*.html"
+            ]
+          }
         }
       }
     },
@@ -292,6 +337,15 @@
             "tsConfig": "projects/ddata-ui-common/tsconfig.spec.json",
             "karmaConfig": "projects/ddata-ui-common/karma.conf.js"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-ui-common/**/*.ts",
+              "projects/ddata-ui-common/**/*.html"
+            ]
+          }
         }
       }
     },
@@ -319,6 +373,15 @@
             "main": "projects/ddata-a11y/src/test.ts",
             "tsConfig": "projects/ddata-a11y/tsconfig.spec.json",
             "karmaConfig": "projects/ddata-a11y/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-a11y/**/*.ts",
+              "projects/ddata-a11y/**/*.html"
+            ]
           }
         }
       }

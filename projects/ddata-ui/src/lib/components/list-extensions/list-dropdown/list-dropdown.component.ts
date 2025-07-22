@@ -1,8 +1,7 @@
 // tslint:disable: max-line-length
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CertificateIncomingGuaranteeCreateEditComponent } from 'src/app/components/certificate/incoming/guarantee/certificate-incoming-guarantee-create-edit/certificate-incoming-guarantee-create-edit.component';
 import { CertificateOutgoingGuaranteeCreateEditComponent } from 'src/app/components/certificate/outgoing/guarantee/certificate-outgoing-guarantee-create-edit/certificate-guarantee-create-edit.component';
-import { ID } from 'src/app/models/base-model/base-data-type.model';
 import { CertificationInterface } from 'src/app/models/certification/certification.interface';
 import { CertificationCommercialStockUpload } from 'src/app/models/certification/commercial/stock/upload/certification-commercial-stock-upload.model';
 import { CertificationCommercialTakebackOne } from 'src/app/models/certification/commercial/takeback/one/certification-commercial-takeback-one.model';
@@ -21,8 +20,8 @@ import { CertificationScrappingProtocol } from 'src/app/models/certification/scr
 import { CertificationTypeInterface } from 'src/app/models/certification/type/certification-type.interface';
 import { CompanyInterface } from 'src/app/models/company/company.interface';
 import { CompanyShopInterface } from 'src/app/models/company/shop/company-shop.interface';
-import { DialogContentItem } from 'src/app/models/dialog/content/dialog-content-item';
-import { Global } from 'src/app/models/global.model';
+import { DialogContentItem } from 'ddata-ui-dialog';
+import { Global } from '../../../models/global.model';
 import { ListDropdownItemInterface } from 'src/app/models/list-dropdown-item/list-dropdown-item.interface';
 import { CertificationCommercialStockUploadCreateEditComponent } from 'src/app/modules/sales/components/commercial/stock/upload/certification-commercial-stock-upload-create-edit/certification-commercial-stock-upload-create-edit.component';
 import { CertificationCommercialTakebackOneCreateEditComponent } from 'src/app/modules/sales/components/commercial/takeback/one/certification-commercial-takeback-one-create-edit/certification-commercial-takeback-one.component';
@@ -39,15 +38,16 @@ import { CertificateScrappingProtocolCreateEditComponent } from 'src/app/modules
 import { Company } from 'src/app/models/company/company.model';
 
 @Component({
-    selector: 'app-list-dropdown',
-    templateUrl: './list-dropdown.component.html',
-    styleUrls: ['./list-dropdown.component.scss'],
-    standalone: false
+  selector: 'dd-list-dropdown',
+  templateUrl: './list-dropdown.component.html',
+  styleUrls: ['./list-dropdown.component.scss'],
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListDropdownComponent implements OnInit {
-  @Input() customDropdownItems: ListDropdownItemInterface[] = []; // {name: '', icon: '', eventMsg: ''}
+export class ListDropdownComponent {
+  @Input() customDropdownItems: Array<ListDropdownItemInterface> = []; // {name: '', icon: '', eventMsg: ''}
   // @Input() showCertificateFromCompany = false;
-  @Input() certificationTypes: CertificationTypeInterface[] = [];
+  @Input() certificationTypes: Array<CertificationTypeInterface> = [];
   @Input() company: CompanyInterface;
   @Input() companyShop: CompanyShopInterface;
   @Input() showDelete = true;
@@ -55,120 +55,120 @@ export class ListDropdownComponent implements OnInit {
   @Input() showHref = false;
   @Input() href = '';
   @Input() hrefText = '';
-  @Output() showModal: EventEmitter<DialogContentItem> = new EventEmitter();
-  @Output() customDropdownEvent: EventEmitter<string> = new EventEmitter();
+  @Output() readonly showModal: EventEmitter<DialogContentItem> = new EventEmitter();
+  @Output() readonly customDropdownEvent: EventEmitter<string> = new EventEmitter();
 
   icon = new Global().icon;
 
-  constructor() {
-  }
+  constructor() {}
 
-  ngOnInit(): void {
-  }
+  // ngOnInit(): void {} // Empty lifecycle method removed
 
   /**
    * A paraméterben megadott bizonylatból hozzon létre egy új példányt a sorban lévő partner adataival
    * @param id convert ot this certification_type_id
    */
-  createCertificate(id: number) {
-    if ( !!this.company && !!this.company.id ) {
-      // bejövő bizonylatok esetén a seller_company-nak, kimenő esetén a buyer_company-nak adja át a kiválasztott partnert
-      const data = ( id === 4 || id === 8 || id === 19 ) ? {
-        seller_company_id: this.company.id,
-        seller_company: new Company().init(this.company),
-      } :
-      {
-        buyer_company_id: this.company.id,
-        buyer_company: new Company().init(this.company),
-      };
-      let newCertificate: CertificationInterface;
-      switch (id) {
-        case 2:
-          newCertificate = new CertificationCommercialTakebackOne().init(data);
-          this.showModal.emit( new DialogContentItem(CertificationCommercialTakebackOneCreateEditComponent, newCertificate));
-          break;
-        case 3:
-          newCertificate = new CertificationCommercialStockUpload().init(data);
-          this.showModal.emit( new DialogContentItem(CertificationCommercialStockUploadCreateEditComponent, newCertificate));
-          break;
-        case 5:
-          newCertificate = new CertificationCommercialWeightLoss().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateCommercialWeightLossCreateEditComponent, newCertificate));
-          break;
-        case 6:
-          newCertificate = new CertificationCustomerOrder().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateCustomerOrderCreateEditComponent, newCertificate));
-          break;
-        case 7:
-          newCertificate = new CertificationIncomingDeliveryNote().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateIncomingDeliveryNoteCreateEditComponent, newCertificate));
-          break;
-        case 8:
-          newCertificate = new CertificationIncomingGuarantee().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateIncomingGuaranteeCreateEditComponent, newCertificate));
-          break;
-        case 9:
-          newCertificate = new CertificationIncomingInvoice().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateIncomingInvoiceCreateEditComponent, newCertificate));
-          break;
-        case 10:
-          newCertificate = new CertificationInventoryControl().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateInventoryControlCreateEditComponent, newCertificate));
-          break;
-        case 11:
-          console.log('Model hiba');
-          // newCertificate = new CertificationMovementBetweenWarehouses().init(data);
-          // this.showModal.emit( new DialogContentItem(MovementBetweenWarehousesCreateEditComponent, newCertificate));
-          break;
-        case 12:
-          newCertificate = new CertificationOutgoingDeliveryNote().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateOutgoingDeliveryNoteCreateEditComponent, newCertificate));
-          break;
-        case 13:
-          newCertificate = new CertificationOutgoingGuarantee().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateOutgoingGuaranteeCreateEditComponent, newCertificate));
-          break;
-        case 14:
-          newCertificate = new CertificationOutgoingInvoice().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateOutgoingInvoiceCreateEditComponent, newCertificate));
-          break;
-        case 17:
-          console.log('Model hiba');
-          // newCertificate = new CertificationProductExplodeNote().init(data);
-          // this.showModal.emit( new DialogContentItem(CertificateProductExplodeNoteCreateEditComponent, newCertificate));
-          break;
-        case 18:
-          console.log('Model hiba');
-          // newCertificate = new CertificationProductImplodeNote().init(data);
-          // this.showModal.emit( new DialogContentItem(CertificateProductImplodeNoteCreateEditComponent, newCertificate));
-          break;
-        case 19:
-          newCertificate = new CertificationReturnedFromCustomer().init(data);
-          this.showModal.emit( new DialogContentItem(CertificationReturnedFromCustomerCreateEditComponent, newCertificate));
-          break;
-        case 20:
-          newCertificate = new CertificationReturnedToProducer().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateReturnToProducerCreateEditComponent, newCertificate));
-          break;
-        case 21:
-          newCertificate = new CertificationScrappingProtocol().init(data);
-          this.showModal.emit( new DialogContentItem(CertificateScrappingProtocolCreateEditComponent, newCertificate));
-          break;
+  createCertificate(id: number): void {
+    if (!this.company || !this.company.id) {
+      throw new Error('Missing company data.');
+    }
+    const data = this.getCompanyData(id);
+    const newCertificate = this.createCertificateByType(id, data);
 
-        default:
-          console.error('Certificate_id (', id, ') is not valid.');
-      }
-    } else {
-      console.error('Missing company data.');
+    if (newCertificate) {
+      this.emitCertificateModal(id, newCertificate);
     }
   }
 
-  isShowElement(id: number) {
+  isShowElement(id: number): boolean {
     // a Bizományos visszavétel csak akkor látszódjon, ha a bolt bizományos bolt
-    if ( id === 4 ) {
-      return (!!this.companyShop && this.companyShop.is_commercial_warehouse);
+    if (id === 4) {
+      return !!this.companyShop && this.companyShop.is_commercial_warehouse;
     }
+
     return true;
+  }
+
+  private getCompanyData(id: number): object {
+    const isIncomingCertificate = id === 4 || id === 8 || id === 19;
+
+    return isIncomingCertificate
+      ? {
+          seller_company_id: this.company.id,
+          seller_company: new Company().init(this.company)
+        }
+      : {
+          buyer_company_id: this.company.id,
+          buyer_company: new Company().init(this.company)
+        };
+  }
+
+  private createCertificateByType(id: number, data: object): CertificationInterface | null {
+    switch (id) {
+      case 2:
+        return new CertificationCommercialTakebackOne().init(data);
+      case 3:
+        return new CertificationCommercialStockUpload().init(data);
+      case 5:
+        return new CertificationCommercialWeightLoss().init(data);
+      case 6:
+        return new CertificationCustomerOrder().init(data);
+      case 7:
+        return new CertificationIncomingDeliveryNote().init(data);
+      case 8:
+        return new CertificationIncomingGuarantee().init(data);
+      case 9:
+        return new CertificationIncomingInvoice().init(data);
+      case 10:
+        return new CertificationInventoryControl().init(data);
+      case 12:
+        return new CertificationOutgoingDeliveryNote().init(data);
+      case 13:
+        return new CertificationOutgoingGuarantee().init(data);
+      case 14:
+        return new CertificationOutgoingInvoice().init(data);
+      case 19:
+        return new CertificationReturnedFromCustomer().init(data);
+      case 20:
+        return new CertificationReturnedToProducer().init(data);
+      case 21:
+        return new CertificationScrappingProtocol().init(data);
+      case 11:
+      case 17:
+      case 18:
+        // Note: Model error - implementation needed
+        return null;
+      default:
+        throw new Error(`Certificate_id (${id}) is not valid.`);
+    }
+  }
+
+  private emitCertificateModal(id: number, certificate: CertificationInterface): void {
+    const componentMap = this.getComponentMap();
+    const component = componentMap[id];
+
+    if (component) {
+      this.showModal.emit(new DialogContentItem(component, certificate));
+    }
+  }
+
+  private getComponentMap(): { [key: number]: unknown } {
+    return {
+      2: CertificationCommercialTakebackOneCreateEditComponent,
+      3: CertificationCommercialStockUploadCreateEditComponent,
+      5: CertificateCommercialWeightLossCreateEditComponent,
+      6: CertificateCustomerOrderCreateEditComponent,
+      7: CertificateIncomingDeliveryNoteCreateEditComponent,
+      8: CertificateIncomingGuaranteeCreateEditComponent,
+      9: CertificateIncomingInvoiceCreateEditComponent,
+      10: CertificateInventoryControlCreateEditComponent,
+      12: CertificateOutgoingDeliveryNoteCreateEditComponent,
+      13: CertificateOutgoingGuaranteeCreateEditComponent,
+      14: CertificateOutgoingInvoiceCreateEditComponent,
+      19: CertificationReturnedFromCustomerCreateEditComponent,
+      20: CertificateReturnToProducerCreateEditComponent,
+      21: CertificateScrappingProtocolCreateEditComponent
+    };
   }
 }
 

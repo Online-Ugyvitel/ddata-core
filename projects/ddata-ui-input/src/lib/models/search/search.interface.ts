@@ -10,11 +10,10 @@ export interface SearchUIFieldsInterface {
   url: string;
 }
 
-export interface SearchInterface extends
-SearchUIFieldsInterface,
-BaseModelInterface<SearchInterface>,
-BaseModelWithoutTypeDefinitionInterface {
-
+export interface SearchInterface
+  extends SearchUIFieldsInterface,
+    BaseModelInterface<SearchInterface>,
+    BaseModelWithoutTypeDefinitionInterface {
   id: ID;
   icon: IconDefinition;
 }

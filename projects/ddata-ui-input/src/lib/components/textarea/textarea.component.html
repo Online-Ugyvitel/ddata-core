@@ -4,11 +4,12 @@
     <span *ngIf="_isRequired"> *</span>
   </label>
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div class="input-group-prepend" *ngIf=" _prepend != '' ">
+    <div class="input-group-prepend" *ngIf="_prepend !== ''">
       <div class="input-group-text">{{ _prepend }}</div>
     </div>
 
-    <textarea *ngIf="!isViewOnly"
+    <textarea
+      *ngIf="!isViewOnly"
       [id]="_field + '_' + random"
       [attr.name]="_field + '_' + random"
       [class.invalid]="_model.validationErrors.includes(_field)"
@@ -19,7 +20,8 @@
       [title]="_title"
       [disabled]="disabled"
       (keyup)="validateField()"
-      #inputBox>
+      #inputBox
+    >
       <ng-container *ngIf="enableCharacterCounter">
         <character-counter [currentLength]="model[_field]?.length || 0" [maxLength]="maxLength"></character-counter>
       </ng-container>
@@ -32,16 +34,11 @@
       </ng-container>
     </textarea>
 
-    <div *ngIf="isViewOnly"
-      [id]="field"
-      [name]="field"
-      [title]="_title"
-      [class]="viewOnlyClass">
-
+    <div *ngIf="isViewOnly" [id]="field" [name]="field" [title]="_title" [class]="viewOnlyClass">
       {{ _model[_field] }}
     </div>
 
-    <div class="input-group-append" *ngIf="_append != ''">
+    <div class="input-group-append" *ngIf="_append !== ''">
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>

@@ -1,20 +1,23 @@
-import { Pipe } from "@angular/core";
+import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: "prettyJson",
-    standalone: false
+  name: 'prettyJson',
+  standalone: true
 })
-export class PrettyJsonPipe {
-  transform(json: any, args?: any): string {
-    if (typeof json !== 'string') {
-      json = JSON.stringify(json, null, 2);
-    }
+export class PrettyJsonPipe implements PipeTransform {
+  transform(json: unknown): string {
+    let jsonString: string;
 
-    json = json
+    if (typeof json !== 'string') {
+      jsonString = JSON.stringify(json, null, 2);
+    } else {
+      jsonString = json;
+    }
+    const escapedJson = jsonString
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
 
-    return json;
+    return escapedJson;
   }
 }

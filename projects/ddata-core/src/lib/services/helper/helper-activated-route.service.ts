@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { Params } from '@angular/router';
 import { Observable, of } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class HelperActivatedRouteService {
-
   /**
    * Return object what contains the `id` from the current URL as Observable<Params>
    *
@@ -17,9 +18,9 @@ export class HelperActivatedRouteService {
    * ```
    */
   params(): Observable<Params> {
-    const params: any = of({
-        id: this.getId(),
-      });
+    const params: Observable<Params> = of({
+      id: this.getId()
+    });
 
     return params;
   }
@@ -39,7 +40,10 @@ export class HelperActivatedRouteService {
     const itemsNumber = urlParts.length - 1;
     const regex = new RegExp(/^\d+$/);
 
-    if ( (urlParts[itemsNumber - 1] === 'edit' || urlParts[itemsNumber - 1] === 'list') && regex.test(urlParts[itemsNumber])) {
+    if (
+      (urlParts[itemsNumber - 1] === 'edit' || urlParts[itemsNumber - 1] === 'list') &&
+      regex.test(urlParts[itemsNumber])
+    ) {
       id = Number(urlParts[itemsNumber]);
     }
 
@@ -63,13 +67,12 @@ export class HelperActivatedRouteService {
     const url = window.location.href;
     const urlParts = url.split('/');
     const regex = new RegExp(/^\d+$/);
-
     const isUrlIncludeList = urlParts.includes('list');
 
     if (isUrlIncludeList) {
       const itemsNumber = urlParts.indexOf('list');
 
-      if ( urlParts[itemsNumber] === 'list' && regex.test(urlParts[itemsNumber + 1])) {
+      if (urlParts[itemsNumber] === 'list' && regex.test(urlParts[itemsNumber + 1])) {
         id = Number(urlParts[itemsNumber + 1]);
       }
     }
@@ -88,13 +91,12 @@ export class HelperActivatedRouteService {
     const url = window.location.href;
     const urlParts = url.split('/');
     const regex = new RegExp(/^\d+$/);
-
     const isUrlIncludeList = urlParts.includes(lastWord);
 
     if (isUrlIncludeList) {
       const itemsNumber = urlParts.indexOf(lastWord);
 
-      if ( urlParts[itemsNumber] === lastWord && regex.test(urlParts[itemsNumber + 1])) {
+      if (urlParts[itemsNumber] === lastWord && regex.test(urlParts[itemsNumber + 1])) {
         id = Number(urlParts[itemsNumber + 1]);
       }
     }

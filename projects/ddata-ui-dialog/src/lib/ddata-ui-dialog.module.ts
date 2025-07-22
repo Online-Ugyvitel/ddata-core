@@ -8,20 +8,8 @@ import { DdataUiConfirmDialogComponent } from './components/confirm-dialog/confi
 import { DdataUiModalDialogComponent } from './components/modal-dialog/modal-dialog.component';
 
 @NgModule({
-  declarations: [
-    DdataUiConfirmDialogComponent,
-    DdataUiModalDialogComponent,
-  ],
-  imports: [
-    CommonModule,
-    DdataCoreModule,
-    DdataUiCommonModule,
-    FontAwesomeModule,
-  ],
-  exports: [
-    DdataUiConfirmDialogComponent,
-    DdataUiModalDialogComponent,
-
-  ]
+  declarations: [DdataUiConfirmDialogComponent, DdataUiModalDialogComponent],
+  imports: [CommonModule, DdataCoreModule, DdataUiCommonModule, FontAwesomeModule],
+  exports: [DdataUiConfirmDialogComponent, DdataUiModalDialogComponent]
 })
-export class DdataUiDialogModule { }
+export class DdataUiDialogModule {}

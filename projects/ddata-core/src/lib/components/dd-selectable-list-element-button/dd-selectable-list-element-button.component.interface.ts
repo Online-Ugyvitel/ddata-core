@@ -4,7 +4,7 @@ import { SelectableInterface } from '../../models/selectable/selectable.interfac
 export interface DdataSelectableListElementButtonComponentInterface {
   model: SelectableInterface;
 
-  choosed: EventEmitter<any>;
+  choosed: EventEmitter<SelectableInterface>;
 
   chooseSelect(model: SelectableInterface): void;
 }

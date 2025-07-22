@@ -1,20 +1,22 @@
-
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AddressInterface } from '../address.interface';
 import { Address } from '../address.model';
 import { CountryInterface } from '../country.interface';
 import { DdSelectExampleService } from '../dd-select-example.service';
 
 @Component({
-    selector: 'app-dd-select-simple-examples',
-    templateUrl: './dd-select-simple-examples.component.html',
-    standalone: false
+  selector: 'app-dd-select-simple-examples',
+  templateUrl: './dd-select-simple-examples.component.html',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DdSelectSimpleExamplesComponent {
-  address: AddressInterface = new Address();
-  countries: CountryInterface[] = [];
+  private readonly service = inject(DdSelectExampleService);
 
-  constructor(private readonly service: DdSelectExampleService) {
+  address: AddressInterface = new Address();
+  countries: Array<CountryInterface> = [];
+
+  constructor() {
     this.countries = this.service.getAllCountry();
   }
 }

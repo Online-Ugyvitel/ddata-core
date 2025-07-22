@@ -1,6 +1,15 @@
 // import { FolderInterface } from '../folder/folder.interface';
 // tslint:disable-next-line: max-line-length
-import { FileNameSlug, FileName, FileNameWithPath, FileSizeInByte, ID, BaseModelWithoutTypeDefinitionInterface, FieldsInterface, MimeType } from 'ddata-core';
+import {
+  FileNameSlug,
+  FileName,
+  FileNameWithPath,
+  FileSizeInByte,
+  ID,
+  BaseModelWithoutTypeDefinitionInterface,
+  FieldsInterface,
+  MimeType
+} from 'ddata-core';
 
 export interface FileModelUIFieldsInterface {
   file_name_and_path: FileNameWithPath;
@@ -12,11 +21,10 @@ export interface FileModelUIFieldsInterface {
   is_primary: boolean;
   title: string;
 }
-export interface FileModelInterface extends
-FileModelUIFieldsInterface,
-BaseModelWithoutTypeDefinitionInterface,
-FieldsInterface<FileModelUIFieldsInterface> {
-
+export interface FileModelInterface
+  extends FileModelUIFieldsInterface,
+    BaseModelWithoutTypeDefinitionInterface,
+    FieldsInterface<FileModelUIFieldsInterface> {
   id: ID;
   is_image: boolean; // UI fields only
 

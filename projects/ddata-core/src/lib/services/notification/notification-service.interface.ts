@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Observable } from 'rxjs';
 import { NotificationInterface } from '../../models/notification/notification.interface';
 
 export interface NotificationServiceInterface {
-  watch(): Observable<NotificationInterface[]>;
+  watch(): Observable<Array<NotificationInterface>>;
 
   add(title: string, text: string, type: string): void;
 

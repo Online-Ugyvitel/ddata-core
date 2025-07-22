@@ -9,10 +9,10 @@
     <div class="col-12 content">
       <div class="col-12 px-0 pb-3 new-file">
         <!-- routerLink="/file/upload" -->
-          <button type="button" class="btn btn-light" (click)="openDialog()">
-            <fa-icon [icon]="icon.plus"></fa-icon>
-            {{ i18n.upload_button.label }}
-          </button>
+        <button type="button" class="btn btn-light" (click)="openDialog()">
+          <fa-icon [icon]="icon.plus"></fa-icon>
+          {{ i18n.upload_button.label }}
+        </button>
       </div>
     </div>
   </div>
@@ -42,17 +42,27 @@
           <!-- icon / preview -->
           <div class="col-2">
             <div *ngIf="file.is_image">
-              <img src="/api/file/image/{{ file.id }}?token={{ token }}"
-                style="height: auto; max-height: 150px; width: 100%; max-width: 150px;">
+              <img
+                src="/api/file/image/{{ file.id }}?token={{ token }}"
+                alt="{{ file.file_name }}"
+                style="height: auto; max-height: 150px; width: 100%; max-width: 150px"
+              />
             </div>
-            <div class="text-muted d-flex justify-content-center align-items-center" *ngIf="!file.is_image">
+            <div
+              class="text-muted d-flex justify-content-center align-items-center"
+              *ngIf="!file.is_image"
+            >
               <fa-icon [icon]="fileType(file)" size="3x"></fa-icon>
             </div>
           </div>
 
           <div class="col-1">
             <ng-container *ngIf="file.is_image">
-              <button class="btn btn-light" (click)="setPrimaryImage(file)" [title]="i18n.is_primary.title">
+              <button
+                class="btn btn-light"
+                (click)="setPrimaryImage(file)"
+                [title]="i18n.is_primary.title"
+              >
                 <fa-icon [icon]="file.is_primary ? icon.checkedCircle : icon.circle"></fa-icon>
               </button>
             </ng-container>
@@ -66,17 +76,16 @@
           </div>
 
           <!-- size -->
-          <div class="col-2 text-right">
-            {{file.size | filesize:'kb':'2' }} KB
-          </div>
+          <div class="col-2 text-right">{{ file.size | filesize: 'kb' : '2' }} KB</div>
 
           <!-- buttons -->
           <div class="col-1">
-              <dd-confirm-dialog
-                [title]="i18n.delete_question_title.label"
-                [content]="i18n.delete_question_content.label"
-                type="delete"
-                (confirm)="delete(file)"></dd-confirm-dialog>
+            <dd-confirm-dialog
+              [title]="i18n.delete_question_title.label"
+              [content]="i18n.delete_question_content.label"
+              type="delete"
+              (confirm)="delete(file)"
+            ></dd-confirm-dialog>
           </div>
         </div>
       </ng-container>
@@ -89,8 +98,13 @@
   [dialogContent]="fileUploadDialogContent"
   [showDialog]="showDialog"
   (success)="fileuploadSuccess($event)"
-  (fail)="closeDialog()"></dd-modal-dialog>
+  (fail)="closeDialog()"
+></dd-modal-dialog>
 
 <ng-container *ngIf="showNoData">
-  <dd-no-data *ngIf="model.files.length === 0" [text]="i18n.no_data_text.label" [attr.class]="w-100"></dd-no-data>
+  <dd-no-data
+    *ngIf="model.files.length === 0"
+    [text]="i18n.no_data_text.label"
+    [attr.class]="w - 100"
+  ></dd-no-data>
 </ng-container>

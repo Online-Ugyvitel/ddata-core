@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Inject, Injectable, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnInit,
+  Output,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { BaseModelInterface } from '../../models/base/base-model.model';
 import { HelperFactoryService } from '../../services/helper/helper-service.factory';
 import { HelperServiceInterface } from '../../services/helper/helper-service.interface';
@@ -28,16 +36,18 @@ import { BaseCreateEditComponentInterface } from './base-create-edit-component.i
  */
 // @dynamic
 @Component({
-    template: '',
-    standalone: false
+  template: '',
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export abstract class BaseCreateEditComponent<T extends BaseModelInterface<T>>
-  implements OnInit, BaseCreateEditComponentInterface<T> {
-
+  implements OnInit, BaseCreateEditComponentInterface<T>
+{
   @Input() isModal = false;
   @Input() saveToStorage = true;
   @Input() model: T = new this.type().init();
-  @Input() set data(value: any) {
+  @Input() set data(value: unknown) {
     if (!!value) {
       Object.keys(value).forEach((key: string) => {
         if (!!value[key] && key !== 'model' && key !== 'loadData') {
@@ -47,13 +57,11 @@ export abstract class BaseCreateEditComponent<T extends BaseModelInterface<T>>
     }
   }
 
-  @Output() saveModel: EventEmitter<T> = new EventEmitter();
+  @Output() readonly saveModel: EventEmitter<T> = new EventEmitter();
 
   helperService: HelperServiceInterface<T> = new HelperFactoryService<T>().get(this.type);
 
-  constructor(
-    @Inject('type') private type: new () => T,
-  ) {}
+  constructor(@Inject('type') private readonly type: new () => T) {}
 
   ngOnInit(): void {
     this.load();
@@ -70,7 +78,9 @@ export abstract class BaseCreateEditComponent<T extends BaseModelInterface<T>>
    * Save the current model.
    */
   save(): void {
-    this.helperService.save(this.model, this.isModal, this.saveModel, this.saveToStorage).subscribe();
+    this.helperService
+      .save(this.model, this.isModal, this.saveModel, this.saveToStorage)
+      .subscribe();
   }
 
   /**

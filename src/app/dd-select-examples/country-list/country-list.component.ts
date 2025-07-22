@@ -1,27 +1,25 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { SelectableListComponent } from '../../../../projects/ddata-core/src/public-api';
 import { CountryInterface } from '../country.interface';
 import { Country } from '../country.model';
 import { DdSelectExampleService } from '../dd-select-example.service';
 
 @Component({
-    selector: 'app-country-list',
-    templateUrl: './country-list.component.html',
-    standalone: false
+  selector: 'app-country-list',
+  templateUrl: './country-list.component.html',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CountryListComponent extends SelectableListComponent<CountryInterface> implements OnInit {
-  models: CountryInterface[] = [];
+export class CountryListComponent extends SelectableListComponent<CountryInterface> {
+  private readonly service = inject(DdSelectExampleService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
-  constructor(
-    private readonly service: DdSelectExampleService,
-    private readonly changeDetector: ChangeDetectorRef
-  ) {
+  models: Array<CountryInterface> = [];
+
+  constructor() {
     super(Country);
-
     this.models = this.service.getAllCountry();
   }
-
-  ngOnInit(): void {}
 
   load(): void {}
 

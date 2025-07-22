@@ -49,10 +49,10 @@ jobs:
       matrix:
         project: [
           'ddata-lib',
-          'ddata-core', 
+          'ddata-core',
           'ddata-ui',
           'ddata-ui-input',
-          'ddata-ui-file', 
+          'ddata-ui-file',
           'ddata-ui-dialog',
           'ddata-ui-common',
           'ddata-a11y'
@@ -83,7 +83,7 @@ jobs:
         npx ng lint ${{ matrix.project }}
         echo "Lint completed successfully for ${{ matrix.project }}"
 
-  # Matrix job for testing each project in parallel  
+  # Matrix job for testing each project in parallel
   test:
     needs: setup
     runs-on: ubuntu-latest
@@ -93,10 +93,10 @@ jobs:
         project: [
           'ddata-lib',
           'ddata-core',
-          'ddata-ui', 
+          'ddata-ui',
           'ddata-ui-input',
           'ddata-ui-file',
-          'ddata-ui-dialog', 
+          'ddata-ui-dialog',
           'ddata-ui-common',
           'ddata-a11y'
         ]

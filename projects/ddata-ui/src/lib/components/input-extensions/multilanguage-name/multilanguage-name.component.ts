@@ -1,46 +1,37 @@
-import { value } from './../../i18n/banknote.lang';
-import { Component, Input, OnInit } from '@angular/core';
-import { faPlus } from '@fortawesome/pro-regular-svg-icons';
-import { of } from 'rxjs';
-import { Name, MultilanguageNameInterface } from 'src/app/models/name/name.model';
-import { LangService } from 'src/app/services/lang/lang.service';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Global } from '../../../models/global.model';
 import { LangInterface } from 'src/app/models/lang/lang.interface';
-import { trigger, state, style } from '@angular/animations';
-import { Global } from 'src/app/models/global.model';
-import { getMatLegacyTooltipInvalidPositionError as getMatTooltipInvalidPositionError } from '@angular/material/legacy-tooltip';
+import { MultilanguageNameInterface, Name } from 'src/app/models/name/name.model';
+import { LangService } from 'src/app/services/lang/lang.service';
 
 @Component({
-    selector: 'app-multilanguage-name',
-    templateUrl: './multilanguage-name.component.html',
-    styleUrls: ['./multilanguage-name.component.scss'],
-    standalone: false
+  selector: 'dd-multilanguage-name',
+  templateUrl: './multilanguage-name.component.html',
+  styleUrls: ['./multilanguage-name.component.scss'],
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MultilanguageNameComponent implements OnInit {
+export class MultilanguageNameComponent {
   @Input() model: MultilanguageNameInterface;
   @Input() placeholder = 'Név';
   @Input() title = 'Név';
 
   show = true;
-  langs: LangInterface[] = [];
+  langs: Array<LangInterface> = [];
   global: Global = new Global();
   icon = this.global.icon;
 
-  constructor(
-    langService: LangService
-  ) {
-    langService.getAllSortedBy('name').subscribe((result: LangInterface[]) => {
+  constructor(langService: LangService) {
+    langService.getAllSortedBy('name').subscribe((result: Array<LangInterface>) => {
       this.langs = result;
     });
   }
 
-  ngOnInit() {
+  addName(): void {
+    this.model.names.push(new Name().init({ lang_id: 1 }));
   }
 
-  addName() {
-    this.model.names.push(new Name().init({lang_id: 1}));
-  }
-
-  deleteName(name: Name) {
+  deleteName(name: Name): void {
     if (!name) {
       return;
     }
@@ -48,7 +39,7 @@ export class MultilanguageNameComponent implements OnInit {
     this.model.names.splice(this.model.names.indexOf(name), 1);
   }
 
- getTotal() {
+  getTotal(): number {
     return this.model.names.length - 1;
   }
 }

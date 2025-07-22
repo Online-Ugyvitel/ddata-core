@@ -1,17 +1,19 @@
 import { ChangeDetectorRef } from '@angular/core';
 import { BaseModelInterface } from 'ddata-core';
 import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';
-import { DialogContentInterface, DialogContentWithOptionsInterface } from '../../models/dialog/content/dialog-content.interface';
+import {
+  DialogContentInterface,
+  DialogContentWithOptionsInterface
+} from '../../models/dialog/content/dialog-content.interface';
 
 export class ComponentRendererService {
   method: 'create-edit' | 'list' = 'list';
   settings: DialogContentWithOptionsInterface;
-  dialogHost: any;
-  componentRef: any;
+  dialogHost: unknown;
+  componentRef: unknown;
   instance: DialogContentInterface;
 
-  constructor(private readonly changeDetector: ChangeDetectorRef) {
-  }
+  constructor(private readonly changeDetector: ChangeDetectorRef) {}
 
   setMethod(method: 'create-edit' | 'list' = 'list'): ComponentRendererService {
     this.method = method;
@@ -25,7 +27,7 @@ export class ComponentRendererService {
     return this;
   }
 
-  setDialogHost(dialogHost: any): ComponentRendererService {
+  setDialogHost(dialogHost: unknown): ComponentRendererService {
     if (!dialogHost) {
       console.error(`DialogHost can't be undefined. DialogHost is not set.`);
 
@@ -37,7 +39,7 @@ export class ComponentRendererService {
     return this;
   }
 
-  setComponentRef(componentRef: any): ComponentRendererService {
+  setComponentRef(componentRef: unknown): ComponentRendererService {
     this.componentRef = componentRef;
 
     return this;
@@ -46,12 +48,16 @@ export class ComponentRendererService {
   render(): DialogContentInterface {
     if (!this.dialogHost) {
       console.error('dialogHost is not set');
+
       return;
     }
-
-    const dialogContent: DialogContentItem = this.method === 'create-edit' ?
-      new DialogContentItem(this.settings?.createEditComponent, this.settings?.createEditOptions) :
-      new DialogContentItem(this.settings?.listComponent, this.settings?.listOptions);
+    const dialogContent: DialogContentItem =
+      this.method === 'create-edit'
+        ? new DialogContentItem(
+            this.settings?.createEditComponent,
+            this.settings?.createEditOptions
+          )
+        : new DialogContentItem(this.settings?.listComponent, this.settings?.listOptions);
 
     this.changeDetector.detectChanges();
 
@@ -78,15 +84,15 @@ export class ComponentRendererService {
     return this.instance;
   }
 
-  getSelectedModels(): Array<BaseModelInterface<any>> {
+  getSelectedModels(): Array<BaseModelInterface<unknown>> {
     if (!this.instance) {
       return [];
     }
 
-    return this.instance.selectedElements;
+    return this.instance.selectedElements || [];
   }
 
-  setSelectedModels(selectedModels: Array<BaseModelInterface<any>>): ComponentRendererService {
+  setSelectedModels(selectedModels: Array<unknown>): ComponentRendererService {
     if (!this.instance) {
       return this;
     }

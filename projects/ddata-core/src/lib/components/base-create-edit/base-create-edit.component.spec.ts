@@ -1,156 +1,20 @@
+/* eslint-disable max-classes-per-file */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable jasmine/prefer-toHaveBeenCalledWith */
+/* eslint-disable @angular-eslint/prefer-on-push-component-change-detection */
 import 'zone.js/testing';
 import { Component, EventEmitter, Injector } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
+
 import { BaseCreateEditComponent } from './base-create-edit.component';
-import { BaseModelInterface, ValidationRuleInterface } from '../../models/base/base-model.model';
 import { HelperServiceInterface } from '../../services/helper/helper-service.interface';
 import { HelperFactoryService } from '../../services/helper/helper-service.factory';
-import { ID, ISODate } from '../../models/base/base-data.type';
 import { DdataCoreModule } from '../../ddata-core.module';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
-
-// Test model interface
-interface TestModelInterface extends BaseModelInterface<TestModelInterface> {
-  name: string;
-}
-
-// Test model implementation
-class TestModel implements TestModelInterface {
-  readonly api_endpoint = '/test';
-  readonly model_name = 'TestModel';
-  readonly use_localstorage = false;
-  
-  id: ID = 0 as ID;
-  name: string = '';
-  tabs?: any;
-  isValid = false;
-  validationErrors: string[] = [];
-  validationRules: ValidationRuleInterface = {};
-
-  init(data?: any): TestModelInterface {
-    const incoming = !!data ? data : {};
-    this.id = !!incoming.id ? incoming.id as ID : 0 as ID;
-    this.name = !!incoming.name ? incoming.name : '';
-    return this;
-  }
-
-  // Implement all required methods from BaseModelInterface
-  fieldAsBoolean(field: string, defaultValue: boolean, data: unknown): void {
-    this[field] = data && data[field] !== undefined ? data[field] : defaultValue;
-  }
-
-  fieldAsNumber(field: string, defaultValue: number, data: unknown): void {
-    this[field] = data && data[field] !== undefined ? data[field] : defaultValue;
-  }
-
-  fieldAsString(field: string, defaultValue: string, data: unknown): void {
-    this[field] = data && data[field] !== undefined ? data[field] : defaultValue;
-  }
-
-  initModelOrNull(fields: Partial<TestModelInterface>, data: unknown): void {
-    Object.keys(fields).forEach((field: string) => {
-      this[field] = fields[field]?.init(data[field]) ?? null;
-    });
-  }
-
-  initAsBoolean(fields: Partial<TestModelInterface>, data: unknown): void {
-    Object.keys(fields).forEach((field: string) => {
-      this.fieldAsBoolean(field, fields[field], data);
-    });
-  }
-
-  initAsBooleanWithDefaults(fields: Array<string>, data: unknown): void {
-    fields.forEach((field: string) => {
-      this.fieldAsBoolean(field, false, data);
-    });
-  }
-
-  initAsNumber(fields: Partial<TestModelInterface>, data: unknown): void {
-    Object.keys(fields).forEach((field: string) => {
-      this.fieldAsNumber(field, fields[field], data);
-    });
-  }
-
-  initAsNumberWithDefaults(fields: Array<string>, data: unknown): void {
-    fields.forEach((field: string) => {
-      this.fieldAsNumber(field, 0, data);
-    });
-  }
-
-  initAsString(fields: Partial<TestModelInterface>, data: unknown): void {
-    Object.keys(fields).forEach((field: string) => {
-      this.fieldAsString(field, fields[field], data);
-    });
-  }
-
-  initAsStringWithDefaults(fields: Array<string>, data: unknown): void {
-    fields.forEach((field: string) => {
-      this.fieldAsString(field, '', data);
-    });
-  }
-
-  prepareFieldsToSaveAsBoolean(fields: Partial<TestModelInterface>): Partial<TestModelInterface> {
-    return fields;
-  }
-
-  prepareFieldsToSaveAsNumber(fields: Partial<TestModelInterface>): Partial<TestModelInterface> {
-    return fields;
-  }
-
-  prepareFieldsToSaveAsString(fields: Partial<TestModelInterface>): Partial<TestModelInterface> {
-    return fields;
-  }
-
-  prepareToSave(): any {
-    return {
-      id: this.id,
-      name: this.name
-    };
-  }
-
-  validate(): void {
-    this.isValid = true;
-  }
-
-  getValidatedErrorFields(): string[] {
-    return this.validationErrors;
-  }
-
-  setDate(date: Date, days: number): ISODate {
-    const newDate = new Date(date);
-    newDate.setDate(newDate.getDate() + days);
-    return newDate.toISOString().split('T')[0] as ISODate;
-  }
-
-  getCurrentUserId(): ID {
-    return 1 as ID;
-  }
-
-  getCurrentISODate(): ISODate {
-    return new Date().toISOString().split('T')[0] as ISODate;
-  }
-
-  toISODate(date: Date): ISODate {
-    return date.toISOString().split('T')[0] as ISODate;
-  }
-
-  toISODatetime(date: Date): string {
-    return date.toISOString();
-  }
-
-  calculateDateWithoutWeekend(date: string, days: number, sequence: string): ISODate {
-    const startDate = new Date(date);
-    startDate.setDate(startDate.getDate() + days);
-    return startDate.toISOString().split('T')[0] as ISODate;
-  }
-
-  getCurrentTime(): string {
-    return new Date().toTimeString();
-  }
-}
-
+import { TestModel, TestModelInterface } from './test.model.spec';
+import { ID } from '../../models/base/base-data.type';
 // Mock PaginateInterface implementation
 const mockPaginate: PaginateInterface = {
   current_page: 1,
@@ -164,35 +28,45 @@ const mockPaginate: PaginateInterface = {
 
 // Mock HelperService
 class MockHelperService implements HelperServiceInterface<TestModelInterface> {
-  booleanChange(model: TestModelInterface, fieldName: string) {
+  booleanChange(): Observable<boolean> {
     return of(true);
   }
 
-  save(model: TestModelInterface, isModal: boolean, emitter: EventEmitter<TestModelInterface>, saveBackend?: boolean, navigateAfterSuccess?: string) {
-    if (isModal && !saveBackend) {
+  save(
+    model: TestModelInterface,
+    isModal: boolean,
+    emitter: EventEmitter<TestModelInterface>
+  ): Observable<boolean> {
+    if (isModal) {
       emitter.emit(model);
     }
+
     return of(true);
   }
 
-  saveAsNew(model: TestModelInterface) {
+  saveAsNew(model: TestModelInterface): Observable<boolean> {
     model.id = 0 as ID;
+
     return of(true);
   }
 
-  edit(model: TestModelInterface, reference: any): void {
+  edit(): void {
     // Mock implementation
   }
 
-  delete(model: TestModelInterface, reference: any) {
+  delete(): Observable<boolean> {
     return of(true);
   }
 
-  deleteMultiple(models: TestModelInterface[], reference: any) {
+  deleteMultiple(): Observable<boolean> {
     return of(true);
   }
 
-  stepBack(model: TestModelInterface, isModal: boolean, emitter: EventEmitter<TestModelInterface>): void {
+  stepBack(
+    model: TestModelInterface,
+    isModal: boolean,
+    emitter: EventEmitter<TestModelInterface>
+  ): void {
     if (isModal) {
       emitter.emit(null);
     } else {
@@ -200,30 +74,30 @@ class MockHelperService implements HelperServiceInterface<TestModelInterface> {
     }
   }
 
-  changeToPage(turnToPage: number, paginate: any, models: TestModelInterface[]) {
+  changeToPage(): Observable<boolean> {
     return of(true);
   }
 
-  getOne(model: TestModelInterface, isModal: boolean, handleLoader?: boolean) {
+  getOne(): Observable<boolean> {
     return of(true);
   }
 
-  getAll(paginate: any, models: TestModelInterface[], isModal?: boolean, pageNumber?: number) {
-    return of(paginate);
+  getAll(paginate: unknown): Observable<PaginateInterface> {
+    return of(paginate as PaginateInterface);
   }
 
-  search(data: any, pageNumber?: number) {
+  search(): Observable<PaginateInterface> {
     return of(mockPaginate);
   }
 
-  searchWithoutPaginate(data: any) {
+  searchWithoutPaginate(): Observable<Array<TestModelInterface>> {
     return of([]);
   }
 }
 
 // Mock HelperFactoryService
 class MockHelperFactoryService extends HelperFactoryService<TestModelInterface> {
-  get(newable: new() => TestModelInterface): HelperServiceInterface<TestModelInterface> {
+  get(): HelperServiceInterface<TestModelInterface> {
     return new MockHelperService();
   }
 }
@@ -246,13 +120,16 @@ describe('BaseCreateEditComponent', () => {
   let mockHelperFactoryService: MockHelperFactoryService;
 
   beforeEach(() => {
+    // Don't call configureTestBed as it resets the test environment
+    // configureTestBed();
+
     mockHelperService = new MockHelperService();
     mockHelperFactoryService = new MockHelperFactoryService();
-
     // Mock DdataCoreModule.InjectorInstance completely
     const mockInjector = {
       get: jasmine.createSpy('get').and.returnValue({})
     };
+
     (DdataCoreModule as any).InjectorInstance = mockInjector;
 
     TestBed.configureTestingModule({
@@ -269,13 +146,14 @@ describe('BaseCreateEditComponent', () => {
 
     fixture = TestBed.createComponent(TestCreateEditComponent);
     component = fixture.componentInstance;
-    
+
     fixture.detectChanges();
   });
 
   afterEach(() => {
     if (fixture && fixture.debugElement) {
       const nativeElement = fixture.debugElement.nativeElement;
+
       if (nativeElement && nativeElement.parentNode) {
         nativeElement.parentNode.removeChild(nativeElement);
       }
@@ -319,7 +197,6 @@ describe('BaseCreateEditComponent', () => {
       model: 'should not be set', // Should be excluded
       loadData: 'should not be set' // Should be excluded
     };
-
     // Store original values
     const originalSaveToStorage = component.saveToStorage;
 
@@ -344,7 +221,6 @@ describe('BaseCreateEditComponent', () => {
       customNumber: 42, // Truthy, should be set
       customZero: 0 // Falsy, should not be set
     };
-
     const originalSaveToStorage = component.saveToStorage;
 
     component.data = testData;
@@ -367,18 +243,21 @@ describe('BaseCreateEditComponent', () => {
   it('should call load function in ngOnInit', () => {
     spyOn(component, 'load');
     component.ngOnInit();
+
     expect(component.load).toHaveBeenCalled();
   });
 
   it('should call helperService.getOne in load function', () => {
     spyOn(component.helperService, 'getOne').and.returnValue(of(true));
     component.load();
+
     expect(component.helperService.getOne).toHaveBeenCalledWith(component.model, component.isModal);
   });
 
   it('should call helperService.save in save function', () => {
     spyOn(component.helperService, 'save').and.returnValue(of(true));
     component.save();
+
     expect(component.helperService.save).toHaveBeenCalledWith(
       component.model,
       component.isModal,
@@ -390,12 +269,14 @@ describe('BaseCreateEditComponent', () => {
   it('should call helperService.saveAsNew in saveAsNew function', () => {
     spyOn(component.helperService, 'saveAsNew').and.returnValue(of(true));
     component.saveAsNew();
+
     expect(component.helperService.saveAsNew).toHaveBeenCalledWith(component.model);
   });
 
   it('should call helperService.stepBack in stepBack function', () => {
     spyOn(component.helperService, 'stepBack');
     component.stepBack();
+
     expect(component.helperService.stepBack).toHaveBeenCalledWith(
       component.model,
       component.isModal,
@@ -407,6 +288,7 @@ describe('BaseCreateEditComponent', () => {
     component.isModal = false;
     spyOn(component.helperService, 'stepBack');
     component.stepBack();
+
     expect(component.helperService.stepBack).toHaveBeenCalledWith(
       component.model,
       false,
@@ -422,9 +304,9 @@ describe('BaseCreateEditComponent', () => {
         emitter.emit(null);
       }
     });
-    
+
     component.stepBack();
-    
+
     expect(component.saveModel.emit).toHaveBeenCalledWith(null);
   });
 
@@ -441,13 +323,14 @@ describe('BaseCreateEditComponent', () => {
   });
 
   it('should skip null or undefined values in data input', () => {
-    const originalIsModal = component.isModal;
+    const isOriginalModal = component.isModal;
+
     component.data = {
       isModal: null,
       someProperty: undefined
     };
-    
+
     // Should not change isModal since the value was null
-    expect(component.isModal).toBe(originalIsModal);
+    expect(component.isModal).toBe(isOriginalModal);
   });
 });
