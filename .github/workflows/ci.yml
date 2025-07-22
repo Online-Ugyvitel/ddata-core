@@ -79,7 +79,11 @@ jobs:
     - name: Run lint for ${{ matrix.project }}
       run: |
         echo "Starting lint for project: ${{ matrix.project }}"
-        ng lint ${{ matrix.project }}
+        if [ "${{ matrix.project }}" = "ddata-lib" ]; then
+          npx eslint src/ --ext .ts,.html
+        else
+          npx eslint projects/${{ matrix.project }}/ --ext .ts,.html
+        fi
         echo "Lint completed successfully for ${{ matrix.project }}"
 
   # Matrix job for testing each project in parallel
