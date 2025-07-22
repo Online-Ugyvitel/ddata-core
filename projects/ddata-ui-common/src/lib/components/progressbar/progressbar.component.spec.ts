@@ -81,6 +81,18 @@ describe('DdataUiProgressbarComponent', () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it('should call calculateProgress when max setter is used', () => {
+    const spy = spyOn<any>(component, 'calculateProgress');
+    component.max = 50;
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should call calculateProgress when current setter is used', () => {
+    const spy = spyOn<any>(component, 'calculateProgress');
+    component.current = 25;
+    expect(spy).toHaveBeenCalled();
+  });
+
   it('should render progress bar with correct width style', () => {
     component.max = 100;
     component.current = 30;
