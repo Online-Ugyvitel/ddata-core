@@ -264,6 +264,42 @@ describe('InitialDataService', () => {
       expect(observableResult).toBe(true);
     }));
 
+    it('should handle HTTP error and propagate it correctly', fakeAsync(() => {
+      let errorOccurred = false;
+      let observableResult: boolean | undefined;
+
+      service.refresh().subscribe({
+        next: result => {
+          observableResult = result;
+        },
+        error: error => {
+          errorOccurred = true;
+          expect(error.status).toBe(500);
+        }
+      });
+
+      // Verify spinner.on was called
+      expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
+
+      // Handle the HTTP request and simulate an error
+      const req = httpMock.expectOne('http://dummy.test/api/init');
+      expect(req.request.method).toBe('GET');
+      
+      // Flush an error response
+      req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+      tick();
+
+      // Verify that error was propagated
+      expect(errorOccurred).toBe(true);
+      expect(observableResult).toBeUndefined();
+
+      // Verify storage service was not called due to error
+      expect(storageServiceSpy.setItem).not.toHaveBeenCalled();
+
+      // Note: spinner.off would not be called in error scenarios since the map operator wouldn't execute
+      // This is the actual behavior of the service - it only calls spinner.off on success
+    }));
+
     it('should be idempotent - multiple calls should work correctly', fakeAsync(() => {
       const mockResponse1 = { data1: 'value1' };
       const mockResponse2 = { data2: 'value2' };
