@@ -383,4 +383,71 @@ describe('InputBoxComponent', () => {
     expect(component._model).toEqual(new BaseModel());
   });
 
+  // Test helperService initialization
+  it('should initialize helperService', () => {
+    expect(component.helperService).toBeDefined();
+    expect(component.helperService).toEqual(jasmine.any(InputHelperService));
+  });
+
+  // Test model setter when fields exist but validationRules don't exist for field
+  it('should handle model setter when validationRules is missing for field', () => {
+    const model = new FakeModel();
+    component._field = 'textField';
+    
+    // Remove validation rules for this field
+    delete model.validationRules['textField'];
+    
+    component.model = model;
+    
+    // Should still set the helper service values but not call isRequired
+    expect(component._model).toBe(model);
+  });
+
+  // Test model setter when validationRules exist but field doesn't exist in validationRules
+  it('should not call isRequired when validationRules field does not exist', () => {
+    spyOn(component.helperService, 'isRequired');
+    
+    const model = new FakeModel();
+    component._field = 'nonExistentValidationField';
+    
+    component.model = model;
+    
+    expect(component.helperService.isRequired).not.toHaveBeenCalled();
+  });
+
+  // Test edge case where model and fields exist but _field is empty
+  it('should handle model setter when _field is empty', () => {
+    spyOn(console, 'error');
+    const model = new FakeModel();
+    component._field = '';
+    
+    component.model = model;
+    
+    expect(console.error).toHaveBeenCalledWith(`The ${model.model_name}'s  field is `, undefined);
+  });
+
+  // Test edge case where model.validationRules is undefined
+  it('should handle model setter when validationRules is undefined', () => {
+    const model = new FakeModel();
+    model.validationRules = undefined;
+    component._field = 'textField';
+    
+    // Should not throw error and should not call isRequired
+    expect(() => component.model = model).not.toThrow();
+  });
+
+  // Test constructor
+  it('should create component via constructor', () => {
+    const newComponent = new DdataInputComponent();
+    expect(newComponent).toBeTruthy();
+  });
+
+  // Test when autoFocus is true but inputBox is undefined
+  it('should handle ngAfterViewInit when inputBox is undefined', () => {
+    component.autoFocus = true;
+    component.inputBox = undefined;
+    
+    expect(() => component.ngAfterViewInit()).not.toThrow();
+  });
+
 });
