@@ -7,20 +7,14 @@ import { DdataUiCommonModule } from 'ddata-ui-common';
 // import { DdataUiFileListComponent } from './c  omponents/file-list/file-list.component';
 // import { DdataUiFileUploadComponent } from './components/file-upload/file-upload.component';
 import { FileModel } from './models/file/file.model';
-import { ModuleConfiguration } from './models/module-configuration/module-configuration.interface';
+import { ModuleConfigurationInterface } from './models/module-configuration/module-configuration.interface';
 
 @NgModule({
   declarations: [
     // DdataUiFileListComponent,
     // DdataUiFileUploadComponent,
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    FontAwesomeModule,
-    DdataCoreModule,
-    DdataUiCommonModule
-  ],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, DdataCoreModule, DdataUiCommonModule],
   exports: [
     // DdataUiFileListComponent,
     // DdataUiFileUploadComponent,
@@ -33,12 +27,10 @@ export class DdataUiFileModule {
     DdataUiFileModule.InjectorInstance = injector;
   }
 
-  static forRoot(config: ModuleConfiguration): ModuleWithProviders<any> {
+  static forRoot(config: ModuleConfigurationInterface): ModuleWithProviders<DdataUiFileModule> {
     return {
       ngModule: DdataUiFileModule,
-      providers: [
-        FileModel, { provide: 'config', useValue: config },
-      ]
+      providers: [FileModel, { provide: 'config', useValue: config }]
     };
   }
 }

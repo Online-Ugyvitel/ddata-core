@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { StorageServiceInterface } from './storage-service.interface';
@@ -6,9 +7,9 @@ import { StorageServiceInterface } from './storage-service.interface';
   providedIn: 'root'
 })
 export class StorageService implements StorageServiceInterface {
-  private storageSub = new Subject<boolean>();
+  private readonly storageSub = new Subject<boolean>();
 
-  constructor() { }
+  constructor() {}
 
   watchStorage(): Observable<any> {
     return this.storageSub.asObservable();

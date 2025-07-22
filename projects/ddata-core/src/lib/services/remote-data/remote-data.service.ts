@@ -1,4 +1,19 @@
-import { HttpClient, HttpErrorResponse, HttpEvent, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-console */
+/* eslint-disable max-lines */
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpEvent,
+  HttpEventType,
+  HttpHeaders,
+  HttpRequest,
+  HttpResponse
+} from '@angular/common/http';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { DdataInjectorModule } from '../../ddata-injector.module';
@@ -13,43 +28,41 @@ import { RemoteDataServiceInterface } from './remote-data-service.interface';
 // @dynamic
 export class RemoteDataService<T extends BaseModelInterface<T>>
   extends DataServiceAbstract<T>
-  implements RemoteDataServiceInterface<T> {
-
+  implements RemoteDataServiceInterface<T>
+{
   /**
    * Application environment variable from the root application
    */
-  private appEnv = DdataInjectorModule.InjectorInstance.get(EnvService);
+  private readonly appEnv = DdataInjectorModule.InjectorInstance.get(EnvService);
 
   /**
    * Application URL
    */
-  public url = this.appEnv.environment.apiUrl;
+  url = this.appEnv.environment.apiUrl;
 
   /**
    * Headers to all requests
    */
-  public headers: any;
+  headers: any;
 
   /**
    * Options to all requests
    */
-  public options: any;
+  options: any;
 
   /**
    * Angular HttpClient
    */
-  private http: HttpClient;
+  private readonly http: HttpClient;
 
   /**
    * Model's data type
    */
-  public type: new () => T;
+  type: new () => T;
 
   // @Inject('DdataInjectorModule') private data: DdataInjectorModule;
 
-  constructor(
-    model: T,
-  ) {
+  constructor(model: T) {
     super(model);
     this.setupHeaders();
 
@@ -62,7 +75,7 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
   setupHeaders(): void {
     this.headers = new HttpHeaders({
       // tslint:disable-next-line: object-literal-key-quotes
-      'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
       'Content-Type': 'application/json',
       'Accepted-Encoding': 'application/json'
     });
@@ -95,13 +108,15 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    */
   getAll(pageNumber: number = 0): Observable<PaginateInterface> {
     this.setupHeaders();
-    const url = this.url + this.model.api_endpoint + (!!pageNumber ? '?page=' + pageNumber : '');
+    const url = this.url + this.model.api_endpoint + (!!pageNumber ? `?page=${pageNumber}` : '');
 
     if (!!this.appEnv.environment.debug) {
       console.log('URL - getAll()', url);
     }
 
-    return this.http.get(url, this.options).pipe(map((result: any) => this.getNewPaginateObject(this.type, result)));
+    return this.http
+      .get(url, this.options)
+      .pipe(map((result: any) => this.getNewPaginateObject(this.type, result)));
   }
 
   /**
@@ -135,13 +150,15 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    */
   getPage(pageNumber: number, uniqueUri: string = ''): Observable<PaginateInterface> {
     this.setupHeaders();
-    const url = this.url + this.model.api_endpoint + uniqueUri + '?page=' + pageNumber;
+    const url = `${this.url + this.model.api_endpoint + uniqueUri}?page=${pageNumber}`;
 
     if (!!this.appEnv.environment.debug) {
       console.log('URL - getPaginatePage()', url);
     }
 
-    return this.http.get(url, this.options).pipe(map((result: any) => this.getNewPaginateObject(this.type, result)));
+    return this.http
+      .get(url, this.options)
+      .pipe(map((result: any) => this.getNewPaginateObject(this.type, result)));
   }
 
   /**
@@ -164,9 +181,9 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    *   this.myRemotStorageService.getAllWithoutPaginate().subscribe();
    * }
    */
-  getAllWithoutPaginate(): Observable<T[]> {
+  getAllWithoutPaginate(): Observable<Array<T>> {
     this.setupHeaders();
-    const url = this.url + this.model.api_endpoint +  '/list';
+    const url = `${this.url + this.model.api_endpoint}/list`;
 
     if (!!this.appEnv.environment.debug) {
       console.log('URL - getAllWithoutPaginate()', url);
@@ -198,14 +215,15 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    */
   getOne(id: number): Observable<T> {
     this.setupHeaders();
-    const url = this.url + this.model.api_endpoint + '/' + id;
+    const url = `${this.url + this.model.api_endpoint}/${id}`;
 
     if (!!this.appEnv.environment.debug) {
       console.log('URL - getOne()', url);
     }
 
-    return this.http.get(url, this.options).pipe(map((result: any) =>
-      this.hydrate(this.model, this.model).init(result)));
+    return this.http
+      .get(url, this.options)
+      .pipe(map((result: any) => this.hydrate(this.model, this.model).init(result)));
   }
 
   /**
@@ -270,7 +288,9 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
       console.log('URL - uniquePost()', url);
     }
 
-    return this.http.post(url, JSON.stringify(resource), this.options).pipe(map((result: any) => result));
+    return this.http
+      .post(url, JSON.stringify(resource), this.options)
+      .pipe(map((result: any) => result));
   }
 
   /**
@@ -310,34 +330,32 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
         throw error;
       });
     }
-
     const preparedData = model.prepareToSave();
 
     if (!model.id) {
       // create
       const url = this.url + model.api_endpoint;
+
       if (!!this.appEnv.environment.debug) {
         console.log('URL - create()', url, preparedData);
       }
 
-      return this.http.post(url, JSON.stringify(preparedData), this.options)
-        .pipe(
-          map((result: any) => result.id),
-          catchError(err => of(this.handleValidatioErrorFeedback(err, model)))
-        );
+      return this.http.post(url, JSON.stringify(preparedData), this.options).pipe(
+        map((result: any) => result.id),
+        catchError((err) => of(this.handleValidatioErrorFeedback(err, model)))
+      );
     } else {
       // update
-      const url = this.url + model.api_endpoint + '/' + model.id;
+      const url = `${this.url + model.api_endpoint}/${model.id}`;
 
       if (!!this.appEnv.environment.debug) {
         console.log('URL - update()', url, preparedData);
       }
 
-      return this.http.put(url, JSON.stringify(preparedData), this.options)
-        .pipe(
-          map((result: any) => result.id),
-          catchError(err => of(this.handleValidatioErrorFeedback(err, model)))
-        );
+      return this.http.put(url, JSON.stringify(preparedData), this.options).pipe(
+        map((result: any) => result.id),
+        catchError((err) => of(this.handleValidatioErrorFeedback(err, model)))
+      );
     }
   }
 
@@ -362,7 +380,7 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    * }
    */
   delete(model: T): Observable<number> {
-    const url = this.url + this.model.api_endpoint + '/' + model.id;
+    const url = `${this.url + this.model.api_endpoint}/${model.id}`;
 
     if (!!this.appEnv.environment.debug) {
       console.log('URL - delete()', url);
@@ -395,15 +413,14 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    *   this.myRemotStorageService.deleteMultiple(posts).subscribe();
    * }
    */
-  deleteMultiple(models: T[]): Observable<{}> {
-    const idsForDelete: number[] = [];
-    const url = this.url + this.model.api_endpoint + '/multiple/delete';
+  deleteMultiple(models: Array<T>): Observable<{}> {
+    const idsForDelete: Array<number> = [];
+    const url = `${this.url + this.model.api_endpoint}/multiple/delete`;
 
     models.forEach((model: T) => {
       idsForDelete.push(model.id);
     });
-
-    const preparedData = JSON.stringify({data: idsForDelete});
+    const preparedData = JSON.stringify({ data: idsForDelete });
 
     if (!!this.appEnv.environment.debug) {
       console.log('URL - deleteMultiple()', url, preparedData);
@@ -445,32 +462,35 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    *   this.myRemotStorageService.deleteMultiple('/file', files, datas).subscribe();
    * }
    */
-  sendFiles(uri: string, id: number, files: Set<File>, data?: any): Observable<FileUploadProcessInterface>[] {
+  sendFiles(
+    uri: string,
+    id: number,
+    files: Set<File>,
+    data?: any
+  ): Array<Observable<FileUploadProcessInterface>> {
     // set up custom headers to post
     const customHeaders = new HttpHeaders({
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
       'Accepted-Encoding': 'application/json'
     });
-
     // set up options to report progress in file uploading
     const customOptions = {
       headers: customHeaders,
       reportProgress: true
     };
-
     // create statuses array to contain observables of file uploading
-    const statuses: Observable<FileUploadProcessInterface>[] = [];
-    files.forEach(file => {
+    const statuses: Array<Observable<FileUploadProcessInterface>> = [];
+
+    files.forEach((file) => {
       // create URL
       const url = this.url + this.model.api_endpoint + uri;
-
       // create FormData object
       const formData: FormData = new FormData();
+
       // add file with file name to FormData
       formData.append('file', file, file.name);
       // add data to FormData object
-      formData.append('data', JSON.stringify(data) );
-
+      formData.append('data', JSON.stringify(data));
       // create a new HttpRequest object for the post of FormData
       const req = new HttpRequest('POST', url, formData, customOptions);
       // create a subject to follow the upload progress
@@ -481,33 +501,34 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
       if (!!this.appEnv.environment.debug) {
         console.log('URL - sendFiles()', url, file, formData);
       }
+      const requestPipe = this.http.request(req).pipe(
+        map((event: HttpEvent<any>) => {
+          // variable to store the file name on the remote storage
+          let remoteFileDatas: string = null;
 
-      const requestPipe = this.http.request(req).pipe(map((event: HttpEvent<any>) => {
-        // variable to store the file name on the remote storage
-        let remoteFileDatas: string = null;
+          if (event.type === HttpEventType.UploadProgress) {
+            // while the upload is in progress we just calculate & update the upload progress percent
+            const percentDone = Math.round((100 * event.loaded) / event.total);
 
-        if (event.type === HttpEventType.UploadProgress) {
-          // while the upload is in progress we just calculate & update the upload progress percent
-          const percentDone = Math.round(100 * event.loaded / event.total);
-          percent = percentDone;
-          progress.next(percentDone);
-        } else if (event instanceof HttpResponse) {
-          // if the upload is done we catch the remote file datas
-          remoteFileDatas = event.body ? event.body as string : null;
-          progress.complete();
-        }
+            percent = percentDone;
+            progress.next(percentDone);
+          } else if (event instanceof HttpResponse) {
+            // if the upload is done we catch the remote file datas
+            remoteFileDatas = event.body ? (event.body as string) : null;
+            progress.complete();
+          }
+          const fileUploadProcessInterface: FileUploadProcessInterface = {
+            // remote file datas - null until upload isn't done
+            remoteFileDatas,
+            // the original file name
+            file: file.name,
+            // observable upload progress percent
+            progress: progress.asObservable()
+          };
 
-        const fileUploadProcessInterface: FileUploadProcessInterface = {
-          // remote file datas - null until upload isn't done
-          remoteFileDatas,
-          // the original file name
-          file: file.name,
-          // observable upload progress percent
-          progress: progress.asObservable(),
-        };
-
-        return fileUploadProcessInterface;
-      }));
+          return fileUploadProcessInterface;
+        })
+      );
 
       statuses.push(requestPipe);
     });
@@ -520,7 +541,7 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    *
    * @param error HTTP Error Response
    */
-  handleError = (error: HttpErrorResponse) => throwError( new DdataCoreError(error) );
+  handleError = (error: HttpErrorResponse) => throwError(new DdataCoreError(error));
 
   /**
    * Handle validation error feedback.
@@ -533,7 +554,7 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
       console.log(err);
     }
 
-    if ( err.status === 480) {
+    if (err.status === 480) {
       model.validationErrors = Object.keys(err.error.errors);
     }
 

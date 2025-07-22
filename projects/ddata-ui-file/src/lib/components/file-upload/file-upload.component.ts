@@ -1,47 +1,69 @@
-import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
-import { faCheckSquare, faCopy, faFolderOpen, faSquare, faTimes, faTrashAlt, faUpload } from '@fortawesome/free-solid-svg-icons';
-import { FileUploadProcessInterface, ID, ProxyFactoryService, ProxyServiceInterface, SpinnerService, SpinnerServiceInterface } from 'ddata-core';
-import { forkJoin, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  Output,
+  ChangeDetectionStrategy
+} from '@angular/core';
+import {
+  faCheckSquare,
+  faCopy,
+  faFolderOpen,
+  faSquare,
+  faTimes,
+  faTrashAlt,
+  faUpload,
+  IconDefinition
+} from '@fortawesome/free-solid-svg-icons';
+import { ID, SpinnerService, SpinnerServiceInterface } from 'ddata-core';
+import { forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { DdataUiFileModule } from '../../ddata-ui-file.module';
 import { fileText } from '../../i18n/file.lang';
 import { FileModelInterface } from '../../models/file/file-model.interface';
 import { FileModel } from '../../models/file/file.model';
-import { ModuleConfiguration } from '../../models/module-configuration/module-configuration.interface';
+import { ModuleConfigurationInterface } from '../../models/module-configuration/module-configuration.interface';
 import { FileAndFolderHelperService } from '../../services/file/file-and-folder-helper.service';
 
 @Component({
-    selector: 'dd-file-upload',
-    templateUrl: './file-upload.component.html',
-    styleUrls: ['./file-upload.component.css'],
-    standalone: false
+  selector: 'dd-file-upload',
+  templateUrl: './file-upload.component.html',
+  styleUrls: ['./file-upload.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 /**
  * @param {json} inputData JSON format data what will be send with every file as 'data' parameter in form
  */
-export class DdataUiFileUploadComponent implements OnInit {
-  @Inject('config') config: ModuleConfiguration = {lang: 'en'};
-  i18n = fileText[this.config.lang];
+export class DdataUiFileUploadComponent {
+  @Input() accpetedTypes = '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.pdf';
 
-  // tslint:disable-next-line: variable-name
-  _inputData = {
-    folder_id: 1 as ID,
-  };
-  @Input() set inputData(value: any) {
+  @Input() set inputData(value: Record<string, unknown>) {
     this._inputData = value;
   }
-  @Input() accpetedTypes = '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.pdf';
-  @Output() changeFiles: EventEmitter<any> = new EventEmitter();
-  @Output() fileUploadDone: EventEmitter<any> = new EventEmitter();
-  @Output() saveModel: EventEmitter<FileModelInterface[]> = new EventEmitter();
-  files: any;
+
+  @Output() readonly changeFiles: EventEmitter<Array<FileModelInterface>> = new EventEmitter();
+  @Output() readonly fileUploadDone: EventEmitter<Array<FileModelInterface>> = new EventEmitter();
+  @Output() readonly saveModel: EventEmitter<Array<FileModelInterface>> = new EventEmitter();
+
+  @Inject('config') config: ModuleConfigurationInterface = { lang: 'en' };
+
+  // tslint:disable-next-line: variable-name
+  _inputData: Record<string, unknown> = {
+    folder_id: 1 as ID
+  };
+
+  i18n = fileText[this.config.lang];
+  files: FileList | null = null;
   filesSet: Set<File> = new Set();
-  fileData = [];
-  fileselector: any;
-  urls = [];
-  isImage = [];
-  fileTypes = [];
-  uploadProgress = [];
+  fileData: Array<File> = [];
+  fileselector: HTMLInputElement | null = null;
+  urls: Array<string> = [];
+  isImage: Array<boolean> = [];
+  fileTypes: Array<string> = [];
+  fileIcons: Array<IconDefinition> = [];
+  uploadProgress: Array<number> = [];
   uploadIsDone = false;
   icon = {
     trash: faTrashAlt,
@@ -50,20 +72,17 @@ export class DdataUiFileUploadComponent implements OnInit {
     open: faFolderOpen,
     square: faSquare,
     check: faCheckSquare,
-    times: faTimes,
+    times: faTimes
   };
-  progress = {};
+
+  progress: Record<string, unknown> = {};
   summaryProgressbar = 0;
-  progresses = {};
-  // fileService: ProxyServiceInterface<FileModelInterface> = new ProxyFactoryService<FileModelInterface>().get(FileModel);
-  spinner: SpinnerServiceInterface = DdataUiFileModule.InjectorInstance.get<SpinnerServiceInterface>(SpinnerService);
+  progresses: Record<string, unknown> = {};
 
-  constructor(
-    private helper: FileAndFolderHelperService,
-  ) { }
+  spinner: SpinnerServiceInterface =
+    DdataUiFileModule.InjectorInstance.get<SpinnerServiceInterface>(SpinnerService);
 
-  ngOnInit(): void {
-  }
+  constructor(private readonly helper: FileAndFolderHelperService) {}
 
   getSum(total: number, num: number): number {
     return total + Math.round(num);
@@ -73,12 +92,12 @@ export class DdataUiFileUploadComponent implements OnInit {
     const reachLimit = this.urls.length * 100;
     let sum = 0;
 
-    for (const value of Object.values(this.progress) ) {
+    for (const value of Object.values(this.progress)) {
       // tslint:disable-next-line: no-string-literal
       sum += value['percent'];
     }
 
-    this.summaryProgressbar = sum / reachLimit * 100;
+    this.summaryProgressbar = (sum / reachLimit) * 100;
   }
 
   startUploadAll(): void {
@@ -93,39 +112,47 @@ export class DdataUiFileUploadComponent implements OnInit {
 
     // start upload, if done we emit the saveModel() and it closes the dialog
     this.spinner.on('file-upload');
-    forkJoin(allProgressObservables).pipe(
-      tap(() => {
-        const uploadedFilesDatas: FileModelInterface[] = [];
+    forkJoin(allProgressObservables)
+      .pipe(
+        tap(() => {
+          const uploadedFilesDatas: Array<FileModelInterface> = [];
 
-        Object.keys(this.progress).forEach((element: string) => {
-          uploadedFilesDatas.push(new FileModel().init(this.progress[element].file_on_server.file));
-        });
+          Object.keys(this.progress).forEach((element: string) => {
+            const progressItem = this.progress[element] as {
+              file_on_server: { file: unknown };
+            };
 
-        this.uploadIsDone = true;
-        this.spinner.off('file-upload');
-        this.saveModel.emit(uploadedFilesDatas);
+            uploadedFilesDatas.push(new FileModel().init(progressItem.file_on_server.file));
+          });
 
-      })
-    ).subscribe();
+          this.uploadIsDone = true;
+          this.spinner.off('file-upload');
+          this.saveModel.emit(uploadedFilesDatas);
+        })
+      )
+      .subscribe();
   }
 
   readAndSetup(file: File): void {
     const reader = new FileReader();
 
-    reader.onload = (event: any) => {
-      this.urls.push( event.target.result );
-      this.isImage.push(true);
-      this.fileTypes.push('image');
-      this.fileData.push(file);
+    reader.onload = (event: ProgressEvent<FileReader>): void => {
+      if (event.target?.result && typeof event.target.result === 'string') {
+        this.urls.push(event.target.result);
+        this.isImage.push(true);
+        this.fileTypes.push('image');
+        this.fileData.push(file);
+      }
     };
 
-    if ( file.type.match(/^image\//) ) {
+    if (file.type.match(/^image\//)) {
       reader.readAsDataURL(file);
     } else {
       // ezt a stringet a template dolgozza fel és ennek megfelelő ikont jelenít meg
       this.urls.push(file.type);
       this.isImage.push(false);
-      this.fileTypes.push( this.helper.setFileType(file.type) );
+      this.fileTypes.push(file.type);
+      this.fileIcons.push(this.helper.setFileType(file.type));
       this.fileData.push(file);
     }
   }
@@ -133,9 +160,9 @@ export class DdataUiFileUploadComponent implements OnInit {
   onSelectFile(files: FileList): void {
     // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < Array.from(files).length; i++) {
-      this.readAndSetup( Array.from(files)[i] );
-      this.filesSet.add( Array.from(files)[i] );
-      this.progress[ Array.from(files)[i].name ] = {progress: undefined, percent: 0};
+      this.readAndSetup(Array.from(files)[i]);
+      this.filesSet.add(Array.from(files)[i]);
+      this.progress[Array.from(files)[i].name] = { progress: undefined, percent: 0 };
     }
   }
 
@@ -148,7 +175,6 @@ export class DdataUiFileUploadComponent implements OnInit {
   }
 
   close(): void {
-    this.changeFiles.emit('close');
+    this.changeFiles.emit([]);
   }
-
 }

@@ -29,6 +29,8 @@
     "pluralize": "^8.0.0"
   },
   "dependencies": {
+    "@angular/router": "^20.0.6",
+    "rxjs": "^7.8.2",
     "tslib": "^2.0.0"
   }
 }

@@ -1,37 +1,32 @@
-import 'zone.js/testing';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { DdataUiCommonModule } from '../../ddata-ui-common.module';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
+import 'zone.js/testing';
 import { DdataUiUserThumbnailComponent } from './user-profile-thumbnail.component';
 
-xdescribe('DdataUiUserThumbnailComponent', () => {
+describe('DdataUiUserThumbnailComponent', () => {
   let component: DdataUiUserThumbnailComponent;
   let fixture: ComponentFixture<DdataUiUserThumbnailComponent>;
   let debugElement;
   let element;
 
   beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-}
-    );
+    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+      teardown: { destroyAfterEach: false }
+    });
   });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DdataUiUserThumbnailComponent],
-      providers: [
-        Injector
-      ]
-    })
-      .compileComponents();
+      providers: [Injector]
+    }).compileComponents();
   });
 
   beforeEach(() => {
-    DdataUiCommonModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataUiUserThumbnailComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;
@@ -46,20 +41,19 @@ xdescribe('DdataUiUserThumbnailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('getThumbnailContent() method should call getFirstLetter', () => {
-    const fakeSpy = spyOn((component as any), 'getFirstLetter');
-    expect(fakeSpy).toHaveBeenCalled();
+  it('should set first letter when user is set', () => {
+    const testUser = { name: 'John' };
+
+    component.user = testUser;
+
+    expect(component.firstLetter).toBe('J');
   });
 
-  it('getFirstLetter() method should return with the user name\'s first letter  ', () => {
-    const fakeSpy = spyOn((String.prototype as any), 'split').and.callThrough();
-    const fakeSpy2 = spyOn((String.prototype as any), 'toUpperCase').and.callThrough();
-    expect((component as any).getFirstLetter()).toBe('X');
-    expect(fakeSpy).toHaveBeenCalled();
-    expect(fakeSpy2).toHaveBeenCalled();
+  it('should handle user name first letter extraction', () => {
+    const testUser = { name: 'Anybody' };
 
-    const fakeModel = {name: 'Anybody'};
-    component.user = fakeModel;
-    expect((component as any).getFirstLetter()).toBe('A');
+    component.user = testUser;
+
+    expect(component.firstLetter).toBe('A');
   });
 });

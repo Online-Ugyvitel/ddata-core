@@ -2,7 +2,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { DdataUiInputModule, InputHelperService } from '../../projects/ddata-ui-input/src/public-api';
+import {
+  DdataUiInputModule,
+  InputHelperService
+} from '../../projects/ddata-ui-input/src/public-api';
 import { DdataCoreModule, ValidatorService } from '../../projects/ddata-core/src/public-api';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -18,25 +21,27 @@ import { CountryListComponent } from './dd-select-examples/country-list/country-
 import { ClearModelPipe } from './pipes/clear-model.pipe';
 import { PrettyJsonPipe } from './pipes/pretty-json.pipe';
 
-@NgModule({ declarations: [
-        AppComponent,
-        DdSelectExamplesComponent,
-        DdSelectSimpleExamplesComponent,
-        DdSelectMultipleBasicExamplesComponent,
-        DdSelectSingleExamplesComponent,
-        TagListComponent,
-        CountryListComponent,
-        ClearModelPipe,
-        PrettyJsonPipe,
-    ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        DdataUiInputModule,
-        DdataCoreModule.forRoot(environment),
-        RouterModule.forRoot([]),
-        FormsModule,
-        NgxDaterangepickerMd.forRoot()], providers: [
-        InputHelperService,
-        ValidatorService,
-        provideHttpClient(withInterceptorsFromDi()),
-    ] })
-export class AppModule { }
+@NgModule({
+  declarations: [
+    AppComponent,
+    DdSelectExamplesComponent,
+    DdSelectSimpleExamplesComponent,
+    DdSelectMultipleBasicExamplesComponent,
+    DdSelectSingleExamplesComponent,
+    TagListComponent,
+    CountryListComponent,
+    ClearModelPipe,
+    PrettyJsonPipe
+  ],
+  bootstrap: [AppComponent],
+  imports: [
+    BrowserModule,
+    DdataUiInputModule,
+    DdataCoreModule.forRoot(environment),
+    RouterModule.forRoot([]),
+    FormsModule,
+    NgxDaterangepickerMd.forRoot()
+  ],
+  providers: [InputHelperService, ValidatorService, provideHttpClient(withInterceptorsFromDi())]
+})
+export class AppModule {}

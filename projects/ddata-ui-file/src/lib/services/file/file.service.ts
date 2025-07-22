@@ -7,7 +7,6 @@ import { ProxyService } from 'ddata-core';
   providedIn: 'root'
 })
 export class FileService extends ProxyService<FileModelInterface> {
-
   constructor() {
     super(new FileModel());
   }

@@ -6,7 +6,7 @@ export interface BaseCreateEditComponentInterface<T extends BaseModelInterface<T
   isModal: boolean;
   saveToStorage: boolean;
   model: T;
-  data: any;
+  data: unknown;
   saveModel: EventEmitter<T>;
   helperService: HelperServiceInterface<T>;
 

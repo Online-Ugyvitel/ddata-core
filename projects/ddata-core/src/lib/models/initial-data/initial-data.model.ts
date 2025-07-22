@@ -1,5 +1,7 @@
 // tslint:disable: variable-name
-
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable no-param-reassign */
 import { InitialDataInterface } from './initial-data.interface';
 
 export class InitialData implements InitialDataInterface {
@@ -8,12 +10,12 @@ export class InitialData implements InitialDataInterface {
   readonly model_name = 'Init';
   loaded = true;
 
-  constructor() { }
+  constructor() {}
 
   data: {};
 
   set refreshTime(miliseconds: number) {
-    if ( miliseconds === null || miliseconds < 5000 ) {
+    if (miliseconds === null || miliseconds < 5000) {
       // if not set, or less than 5000 we set it to 60 seconds - don't DDoS the server
       miliseconds = 60000;
     }
@@ -24,5 +26,4 @@ export class InitialData implements InitialDataInterface {
   get refreshTime(): number {
     return this._refreshTime;
   }
-
 }

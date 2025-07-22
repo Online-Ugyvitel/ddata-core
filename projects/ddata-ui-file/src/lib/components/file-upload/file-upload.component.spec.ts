@@ -1,33 +1,26 @@
 import { HttpClient, HttpHandler } from '@angular/common/http';
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { ProxyFactoryService } from 'ddata-core';
 import { DdataUiFileUploadComponent } from './file-upload.component';
 
-
-xdescribe('DdataUiFileUploadComponent', () => {
-  let component: DdataUiFileUploadComponent;
+describe('DdataUiFileUploadComponent', () => {
   let fixture: ComponentFixture<DdataUiFileUploadComponent>;
 
   beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-}
-    );
+    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+      teardown: { destroyAfterEach: false }
+    });
   });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ DdataUiFileUploadComponent ],
-      providers: [
-        ProxyFactoryService,
-        HttpClient,
-        HttpHandler
-      ]
-    })
-    .compileComponents();
+      declarations: [DdataUiFileUploadComponent],
+      providers: [ProxyFactoryService, HttpClient, HttpHandler]
+    }).compileComponents();
   });
 
   beforeEach(() => {

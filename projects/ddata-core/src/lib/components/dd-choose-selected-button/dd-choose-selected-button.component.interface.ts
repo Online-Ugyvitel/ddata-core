@@ -2,7 +2,7 @@ import { EventEmitter } from '@angular/core';
 
 export interface DdataChooseSelectedButtonComponentInterface {
   multipleSelectEnabled;
-  choosed: EventEmitter<any>;
+  choosed: EventEmitter<void>;
 
   chooseSelect(): void;
 }

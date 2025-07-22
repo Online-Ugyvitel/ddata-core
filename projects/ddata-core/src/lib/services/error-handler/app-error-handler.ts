@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ErrorHandler, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
@@ -16,16 +17,18 @@ import { UnauthorizedError } from './unauthorized-error';
 import { UnprocessableEntity } from './unprocessable-entity-error';
 import { AppValidationError } from './validation-error';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DdataCoreErrorHandler extends ErrorHandler {
   // storageService: StorageService = DdataInjectorModule.InjectorInstance.get<StorageService>(StorageService);
   // spinner: SpinnerService = DdataInjectorModule.InjectorInstance.get<SpinnerService>(SpinnerService);
   // notificationService: NotificationService = DdataInjectorModule.InjectorInstance.get<NotificationService>(NotificationService);
 
   constructor(
-    private storageService: StorageService,
-    private spinner: SpinnerService,
-    private notificationService: NotificationService,
+    private readonly storageService: StorageService,
+    private readonly spinner: SpinnerService,
+    private readonly notificationService: NotificationService
   ) {
     super();
   }
@@ -38,46 +41,47 @@ export class DdataCoreErrorHandler extends ErrorHandler {
     console.error('A részletes hiba:', err);
 
     if (error.status === 400) {
-      result = throwError( new BadRequest(error, this.notificationService) );
+      result = throwError(new BadRequest(error, this.notificationService));
     }
 
     if (error.status === 401) {
-      result = throwError( new UnauthorizedError(router, error, this.storageService) );
+      result = throwError(new UnauthorizedError(router, error, this.storageService));
     }
 
     if (error.status === 403) {
-      result = throwError( new ForbiddenError(error, this.notificationService) );
+      result = throwError(new ForbiddenError(error, this.notificationService));
     }
 
     if (error.status === 404) {
-      result = throwError( new NotFoundError(error, this.notificationService) );
+      result = throwError(new NotFoundError(error, this.notificationService));
     }
 
     if (error.status === 405) {
-      result = throwError( new MethodNotAllowedError(error, this.notificationService) );
+      result = throwError(new MethodNotAllowedError(error, this.notificationService));
     }
 
     if (error.status === 422) {
-      result = throwError( new UnprocessableEntity(error, this.notificationService) );
+      result = throwError(new UnprocessableEntity(error, this.notificationService));
     }
 
     if (error.status === 430) {
-      result = throwError( new ErrorMessageFromApi(error, this.notificationService) );
+      result = throwError(new ErrorMessageFromApi(error, this.notificationService));
     }
 
     if (error.status === 480 || err instanceof AppValidationError) {
-      result = throwError( new AppValidationError(error, this.notificationService) );
+      result = throwError(new AppValidationError(error, this.notificationService));
     }
 
     if (error.status === 500) {
-      result = throwError( new InternalServerError(error, this.notificationService) );
+      result = throwError(new InternalServerError(error, this.notificationService));
     }
 
     if (error.status === 580) {
-      result = throwError( new ThirdPartyError(error, this.notificationService) );
+      result = throwError(new ThirdPartyError(error, this.notificationService));
     }
 
     this.spinner.off('ERROR_HANDLER');
+
     return result;
     // TODO egyéb hibák kezelését + ismeretlen hibák kezelését is meg kell oldani
   }

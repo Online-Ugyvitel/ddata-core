@@ -1,32 +1,61 @@
-
 <ng-container>
-    <div class="input-group pb-1" >
-      <div class="input-group-prepend w-100 pr-md-5">
-        <select class="form-select col-12 col-sm-6 col-md-3 col-xl-2" name="lang" id="lang" [(ngModel)]="model.names[0].lang_id">
-          <option [value]="lang.id" *ngFor="let lang of langs">{{ lang.name }}</option>
-        </select>
+  <div class="input-group pb-1">
+    <div class="input-group-prepend w-100 pr-md-5">
+      <select
+        class="form-select col-12 col-sm-6 col-md-3 col-xl-2"
+        name="lang"
+        id="lang"
+        [(ngModel)]="model.names[0].lang_id"
+      >
+        <option [value]="lang.id" *ngFor="let lang of langs">{{ lang.name }}</option>
+      </select>
 
-        <input type="text" class="form-control col-12 col-sm-6 col-md-9 col-xl-10" id="name"
-        name="name" [placeholder]="placeholder" [title]="title" autocomplete="new-password" [(ngModel)]="model.names[0].name">
-      </div>
+      <input
+        type="text"
+        class="form-control col-12 col-sm-6 col-md-9 col-xl-10"
+        id="name"
+        name="name"
+        [placeholder]="placeholder"
+        [title]="title"
+        autocomplete="new-password"
+        [(ngModel)]="model.names[0].name"
+      />
     </div>
+  </div>
 </ng-container>
 
-<ng-container *ngIf="model.names.length > 1" >
-  <ng-container *ngFor="let name of model.names" >
+<ng-container *ngIf="model.names.length > 1">
+  <ng-container *ngFor="let name of model.names">
     <ng-container *ngIf="name !== model.names[0]">
       <div class="input-group pb-1" *ngIf="show; else elseBlock">
         <div class="input-group-prepend w-100 pr-md-5">
-          <select class="form-select col-12 col-sm-6 col-md-3 col-xl-2" name="lang" id="lang" [(ngModel)]="name.lang_id">
+          <select
+            class="form-select col-12 col-sm-6 col-md-3 col-xl-2"
+            name="lang"
+            id="lang"
+            [(ngModel)]="name.lang_id"
+          >
             <option [value]="lang.id" *ngFor="let lang of langs">{{ lang.name }}</option>
           </select>
 
-          <input type="text" class="form-control col-12 col-sm-6 col-md-9 col-xl-10" id="name" [(ngModel)]="name.name"
-          name="name" [placeholder]="placeholder" [title]="title" autocomplete="new-password">
+          <input
+            type="text"
+            class="form-control col-12 col-sm-6 col-md-9 col-xl-10"
+            id="name"
+            [(ngModel)]="name.name"
+            name="name"
+            [placeholder]="placeholder"
+            [title]="title"
+            autocomplete="new-password"
+          />
 
           <div class="input-group-append">
-            <app-confirm-dialog title="Biztos törölni szeretné?" content="Biztos törölni szeretné a nevet?"
-            type="delete" (confirm)="deleteName(name)"></app-confirm-dialog>
+            <app-confirm-dialog
+              title="Biztos törölni szeretné?"
+              content="Biztos törölni szeretné a nevet?"
+              type="delete"
+              (confirm)="deleteName(name)"
+            ></app-confirm-dialog>
           </div>
         </div>
       </div>
@@ -39,9 +68,9 @@
   Új nyelv hozzáadása
 </button>
 
-<button class="btn btn-light btn-sm" (click)="show = !show" *ngIf="model.names.length > 1" >
+<button class="btn btn-light btn-sm" (click)="show = !show" *ngIf="model.names.length > 1">
   <span *ngIf="show">Nyelvek elrejtése</span>
-  <span *ngIf="!show">További elérhető nyelvek száma: {{ getTotal () }}</span>
+  <span *ngIf="!show">További elérhető nyelvek száma: {{ getTotal() }}</span>
 </button>
-<br>
+<br />
 <ng-template #elseBlock></ng-template>

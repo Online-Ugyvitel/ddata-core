@@ -1,9 +1,14 @@
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
 declare const addressCardNumber: unique symbol;
-export declare type AddressCardNumber = string & { readonly [addressCardNumber]: 'AddressCardNumber' };
+export declare type AddressCardNumber = string & {
+  readonly [addressCardNumber]: 'AddressCardNumber';
+};
 
 declare const accountAssignmentNumber: unique symbol;
-export declare type AccountAssignmentNumber = string & { readonly [accountAssignmentNumber]: 'AccountAssignmentNumber' };
+export declare type AccountAssignmentNumber = string & {
+  readonly [accountAssignmentNumber]: 'AccountAssignmentNumber';
+};
 
 declare const amountOfCredits: unique symbol;
 export declare type AmountOfCredits = number & { readonly [amountOfCredits]: 'AmountOfCredits' };
@@ -15,7 +20,9 @@ declare const amountOfProduct: unique symbol;
 export declare type AmountOfProduct = number & { readonly [amountOfProduct]: 'AmountOfProduct' };
 
 declare const bankAccountNumber: unique symbol;
-export declare type BankAccountNumber = string & { readonly [bankAccountNumber]: 'BankAccountNumber' };
+export declare type BankAccountNumber = string & {
+  readonly [bankAccountNumber]: 'BankAccountNumber';
+};
 
 declare const barcodeEAN13: unique symbol;
 export declare type BarcodeEAN13 = string & { readonly [barcodeEAN13]: 'BarcodeEAN13' };
@@ -27,10 +34,14 @@ declare const barcodeCode128: unique symbol;
 export declare type BarcodeCode128 = string & { readonly [barcodeCode128]: 'BarcodeCode128' };
 
 declare const certificationNumber: unique symbol;
-export declare type CertificationNumber = string & { readonly [certificationNumber]: 'CertificationNumber' };
+export declare type CertificationNumber = string & {
+  readonly [certificationNumber]: 'CertificationNumber';
+};
 
 declare const certificationTitle: unique symbol;
-export declare type CertificationTitle = string & { readonly [certificationTitle]: 'CertificationTitle' };
+export declare type CertificationTitle = string & {
+  readonly [certificationTitle]: 'CertificationTitle';
+};
 
 declare const colorHexaCode: unique symbol;
 export declare type ColorHexaCode = string & { readonly [colorHexaCode]: 'ColorHexaCode' };
@@ -72,9 +83,26 @@ declare const email: unique symbol;
 export declare type Email = string & { readonly [email]: 'Email' };
 
 declare const encodingName: unique symbol;
-export declare type EncodingName = 'ASCII' | 'UTF-8' | 'UTF-16' | 'Windows-1251' | 'Windows-1252' | 'ISO-8859-1' | 'ISO-8859-2' |
-  'ISO-8859-3' | 'ISO-8859-4' | 'ISO-8859-5' | 'ISO-8859-6' | 'ISO-8859-7' | 'ISO-8859-8' | 'ISO-8859-9' | 'ISO-8859-10' |
-  'ISO-8859-13' | 'ISO-8859-14' | 'ISO-8859-15' | 'KOI8-R';
+export declare type EncodingName =
+  | 'ASCII'
+  | 'UTF-8'
+  | 'UTF-16'
+  | 'Windows-1251'
+  | 'Windows-1252'
+  | 'ISO-8859-1'
+  | 'ISO-8859-2'
+  | 'ISO-8859-3'
+  | 'ISO-8859-4'
+  | 'ISO-8859-5'
+  | 'ISO-8859-6'
+  | 'ISO-8859-7'
+  | 'ISO-8859-8'
+  | 'ISO-8859-9'
+  | 'ISO-8859-10'
+  | 'ISO-8859-13'
+  | 'ISO-8859-14'
+  | 'ISO-8859-15'
+  | 'KOI8-R';
 
 declare const fileSizeInByte: unique symbol;
 export declare type FileSizeInByte = number & { readonly [fileSizeInByte]: 'FileSizeInByte' };
@@ -95,10 +123,14 @@ declare const healthFundNumber: unique symbol;
 export declare type HealthFundNumber = string & { readonly [healthFundNumber]: 'HealthFundNumber' };
 
 declare const historyEventTitle: unique symbol;
-export declare type HistoryEventTitle = string & { readonly [historyEventTitle]: 'HistoryEventTitle' };
+export declare type HistoryEventTitle = string & {
+  readonly [historyEventTitle]: 'HistoryEventTitle';
+};
 
 declare const historyEventDescription: unique symbol;
-export declare type HistoryEventDescription = string & { readonly [historyEventDescription]: 'HistoryEventDescription' };
+export declare type HistoryEventDescription = string & {
+  readonly [historyEventDescription]: 'HistoryEventDescription';
+};
 
 declare const ibanCode: unique symbol;
 export declare type IbanCode = string & { readonly [ibanCode]: 'IbanCode' };
@@ -107,7 +139,9 @@ declare const id: unique symbol;
 export declare type ID = number & { readonly [id]: 'ID' };
 
 declare const identityCardNumber: unique symbol;
-export declare type IdentityCardNumber = string & { readonly [identityCardNumber]: 'IdentityCardNumber' };
+export declare type IdentityCardNumber = string & {
+  readonly [identityCardNumber]: 'IdentityCardNumber';
+};
 
 declare const itemNumber: unique symbol;
 export declare type ItemNumber = string & { readonly [itemNumber]: 'ItemNumber' };
@@ -122,18 +156,191 @@ declare const ipAddress: unique symbol;
 export declare type IPAddress = string & { readonly [ipAddress]: 'IPAddress' };
 
 declare const languageCode_ISO_639_1: unique symbol;
-export declare type LanguageCode_ISO_639_1 = 'aa' | 'ab' | 'ae' | 'af' | 'ak' | 'am' | 'an' | 'ar' | 'as' | 'av' | 'ay' | 'az' |
-  'ba' | 'be' | 'bg' | 'bh' | 'bi' | 'bm' | 'bn' | 'bo' | 'br' | 'bs' | 'ca' | 'ce' | 'ch' | 'co' | 'cr' | 'cs' | 'cu' |
-  'cv' | 'cy' | 'da' | 'de' | 'dv' | 'dz' | 'ee' | 'el' | 'en' | 'eo' | 'es' | 'et' | 'eu' | 'fa' | 'ff' | 'fi' | 'fj' |
-  'fo' | 'fr' | 'fy' | 'ga' | 'gd' | 'gl' | 'gn' | 'gu' | 'gv' | 'ha' | 'he' | 'hi' | 'ho' | 'hr' | 'ht' | 'hu' | 'hy' |
-  'hz' | 'ia' | 'id' | 'ie' | 'ig' | 'ii' | 'ik' | 'io' | 'is' | 'it' | 'iu' | 'ja' | 'jv' | 'ka' | 'kg' | 'ki' | 'kj' |
-  'kk' | 'kl' | 'km' | 'kn' | 'ko' | 'kr' | 'ks' | 'ku' | 'kv' | 'kw' | 'ky' | 'la' | 'lb' | 'lg' | 'li' | 'ln' | 'lo' |
-  'lt' | 'lu' | 'lv' | 'mg' | 'mh' | 'mi' | 'mk' | 'ml' | 'mn' | 'mr' | 'ms' | 'mt' | 'my' | 'na' | 'nb' | 'nd' | 'ne' |
-  'ng' | 'nl' | 'nn' | 'no' | 'nr' | 'nv' | 'ny' | 'oc' | 'oj' | 'om' | 'or' | 'os' | 'pa' | 'pi' | 'pl' | 'ps' | 'pt' |
-  'qu' | 'rm' | 'rn' | 'ro' | 'ru' | 'rw' | 'sa' | 'sc' | 'sd' | 'se' | 'sg' | 'si' | 'sk' | 'sl' | 'sm' | 'sn' | 'so' |
-  'sq' | 'sr' | 'ss' | 'st' | 'su' | 'sv' | 'sw' | 'ta' | 'te' | 'tg' | 'th' | 'ti' | 'tk' | 'tl' | 'tn' | 'to' | 'tr' |
-  'ts' | 'tt' | 'tw' | 'ty' | 'ug' | 'uk' | 'ur' | 'uz' | 've' | 'vi' | 'vo' | 'wa' | 'wo' | 'xh' | 'yi' | 'yo' | 'za' |
-  'zh' | 'zu';
+export declare type LanguageCode_ISO_639_1 =
+  | 'aa'
+  | 'ab'
+  | 'ae'
+  | 'af'
+  | 'ak'
+  | 'am'
+  | 'an'
+  | 'ar'
+  | 'as'
+  | 'av'
+  | 'ay'
+  | 'az'
+  | 'ba'
+  | 'be'
+  | 'bg'
+  | 'bh'
+  | 'bi'
+  | 'bm'
+  | 'bn'
+  | 'bo'
+  | 'br'
+  | 'bs'
+  | 'ca'
+  | 'ce'
+  | 'ch'
+  | 'co'
+  | 'cr'
+  | 'cs'
+  | 'cu'
+  | 'cv'
+  | 'cy'
+  | 'da'
+  | 'de'
+  | 'dv'
+  | 'dz'
+  | 'ee'
+  | 'el'
+  | 'en'
+  | 'eo'
+  | 'es'
+  | 'et'
+  | 'eu'
+  | 'fa'
+  | 'ff'
+  | 'fi'
+  | 'fj'
+  | 'fo'
+  | 'fr'
+  | 'fy'
+  | 'ga'
+  | 'gd'
+  | 'gl'
+  | 'gn'
+  | 'gu'
+  | 'gv'
+  | 'ha'
+  | 'he'
+  | 'hi'
+  | 'ho'
+  | 'hr'
+  | 'ht'
+  | 'hu'
+  | 'hy'
+  | 'hz'
+  | 'ia'
+  | 'id'
+  | 'ie'
+  | 'ig'
+  | 'ii'
+  | 'ik'
+  | 'io'
+  | 'is'
+  | 'it'
+  | 'iu'
+  | 'ja'
+  | 'jv'
+  | 'ka'
+  | 'kg'
+  | 'ki'
+  | 'kj'
+  | 'kk'
+  | 'kl'
+  | 'km'
+  | 'kn'
+  | 'ko'
+  | 'kr'
+  | 'ks'
+  | 'ku'
+  | 'kv'
+  | 'kw'
+  | 'ky'
+  | 'la'
+  | 'lb'
+  | 'lg'
+  | 'li'
+  | 'ln'
+  | 'lo'
+  | 'lt'
+  | 'lu'
+  | 'lv'
+  | 'mg'
+  | 'mh'
+  | 'mi'
+  | 'mk'
+  | 'ml'
+  | 'mn'
+  | 'mr'
+  | 'ms'
+  | 'mt'
+  | 'my'
+  | 'na'
+  | 'nb'
+  | 'nd'
+  | 'ne'
+  | 'ng'
+  | 'nl'
+  | 'nn'
+  | 'no'
+  | 'nr'
+  | 'nv'
+  | 'ny'
+  | 'oc'
+  | 'oj'
+  | 'om'
+  | 'or'
+  | 'os'
+  | 'pa'
+  | 'pi'
+  | 'pl'
+  | 'ps'
+  | 'pt'
+  | 'qu'
+  | 'rm'
+  | 'rn'
+  | 'ro'
+  | 'ru'
+  | 'rw'
+  | 'sa'
+  | 'sc'
+  | 'sd'
+  | 'se'
+  | 'sg'
+  | 'si'
+  | 'sk'
+  | 'sl'
+  | 'sm'
+  | 'sn'
+  | 'so'
+  | 'sq'
+  | 'sr'
+  | 'ss'
+  | 'st'
+  | 'su'
+  | 'sv'
+  | 'sw'
+  | 'ta'
+  | 'te'
+  | 'tg'
+  | 'th'
+  | 'ti'
+  | 'tk'
+  | 'tl'
+  | 'tn'
+  | 'to'
+  | 'tr'
+  | 'ts'
+  | 'tt'
+  | 'tw'
+  | 'ty'
+  | 'ug'
+  | 'uk'
+  | 'ur'
+  | 'uz'
+  | 've'
+  | 'vi'
+  | 'vo'
+  | 'wa'
+  | 'wo'
+  | 'xh'
+  | 'yi'
+  | 'yo'
+  | 'za'
+  | 'zh'
+  | 'zu';
 
 declare const mimeType: unique symbol;
 export declare type MimeType = string & { readonly [mimeType]: 'MimeType' };
@@ -175,7 +382,9 @@ declare const prefixString: unique symbol;
 export declare type PrefixString = string & { readonly [prefixString]: 'PrefixString' };
 
 declare const prefixStartNumber: unique symbol;
-export declare type PrefixStartNumber = number & { readonly [prefixStartNumber]: 'PrefixStartNumber' };
+export declare type PrefixStartNumber = number & {
+  readonly [prefixStartNumber]: 'PrefixStartNumber';
+};
 
 declare const priority: unique symbol;
 export declare type Priority = number & { readonly [priority]: 'Priority' };
@@ -190,7 +399,9 @@ declare const serialNumber: unique symbol;
 export declare type SerialNumber = string & { readonly [serialNumber]: 'SerialNumber' };
 
 declare const socialInsuranceNumber: unique symbol;
-export declare type SocialInsuranceNumber = string & { readonly [socialInsuranceNumber]: 'SocialInsuranceNumber' };
+export declare type SocialInsuranceNumber = string & {
+  readonly [socialInsuranceNumber]: 'SocialInsuranceNumber';
+};
 
 declare const swiftCode: unique symbol;
 export declare type SwiftCode = string & { readonly [swiftCode]: 'SwiftCode' };
@@ -226,11 +437,26 @@ declare const uuid: unique symbol;
 export declare type UUID = string & { readonly [uuid]: 'UUID' };
 
 declare const valueOfDenomination: unique symbol;
-export declare type ValueOfDenomination = number & { readonly [valueOfDenomination]: 'ValueOfDenomination' };
+export declare type ValueOfDenomination = number & {
+  readonly [valueOfDenomination]: 'ValueOfDenomination';
+};
 
 declare const weekDayName: unique symbol;
-export declare type WeekDayName = 'hétfő' | 'kedd' | 'szerda' | 'csütörtök' | 'péntek' | 'szombat' | 'vasárnap' |
-  'Hétfő' | 'Kedd' | 'Szerda' | 'Csütörtök' | 'Péntek' | 'Szombat' | 'Vasárnap';
+export declare type WeekDayName =
+  | 'hétfő'
+  | 'kedd'
+  | 'szerda'
+  | 'csütörtök'
+  | 'péntek'
+  | 'szombat'
+  | 'vasárnap'
+  | 'Hétfő'
+  | 'Kedd'
+  | 'Szerda'
+  | 'Csütörtök'
+  | 'Péntek'
+  | 'Szombat'
+  | 'Vasárnap';
 
 declare const zipCode: unique symbol;
 export declare type ZipCode = string & { readonly [zipCode]: 'ZipCode' };

@@ -3,50 +3,75 @@
     <h3>{{ title }}</h3>
   </div>
   <div class="list-container" #listContainer *ngIf="dateSeparatedListData.length > 0">
-    <div class="list mb-4" *ngFor="let list of dateSeparatedListData" (drop)="drop($event)"
+    <div
+      class="list mb-4"
+      *ngFor="let list of dateSeparatedListData"
+      (drop)="drop($event)"
       (dragover)="dragover(list)"
-      [ngClass]="{'drag-over': list.is_drag_over}">
+      [ngClass]="{ 'drag-over': list.is_drag_over }"
+    >
       <header class="container-fluid list-header py-2">
         <div class="row border-bottom">
           <h6 class="col px-2">
             {{ list.name }}
           </h6>
-          <div class="col-2 small text-right">
-            {{ list.casefiles.length }} ügy
-          </div>
+          <div class="col-2 small text-right">{{ list.casefiles.length }} ügy</div>
         </div>
         <div class="row bg-light py-2">
-          <div class="d-none d-sm-block col-sm-6 col-md-4 col-lg-3 col-xl-4 text-center px-0">Partner</div>
-          <div class="d-none d-sm-block col-sm-6 col-md-4 col-lg-3 col-xl-3 text-center pl-2">Ügy</div>
-          <div class="d-none d-sm-block col-sm-4 col-md-4 col-lg-2 col-xl-2 text-center px-0">Státusz</div>
-          <div class="d-none d-sm-block col-sm-4 col-md-4 offset-md-8 col-lg-2 offset-lg-0 col-xl-2 text-center px-0">Felelős</div>
+          <div class="d-none d-sm-block col-sm-6 col-md-4 col-lg-3 col-xl-4 text-center px-0">
+            Partner
+          </div>
+          <div class="d-none d-sm-block col-sm-6 col-md-4 col-lg-3 col-xl-3 text-center pl-2">
+            Ügy
+          </div>
+          <div class="d-none d-sm-block col-sm-4 col-md-4 col-lg-2 col-xl-2 text-center px-0">
+            Státusz
+          </div>
+          <div
+            class="d-none d-sm-block col-sm-4 col-md-4 offset-md-8 col-lg-2 offset-lg-0 col-xl-2 text-center px-0"
+          >
+            Felelős
+          </div>
           <!-- <div class="col-2 text-center pr-2"></div> -->
         </div>
       </header>
 
       <main>
-        <div class="container-fluid list-item my-1 py-2 border-bottom"
+        <div
+          class="container-fluid list-item my-1 py-2 border-bottom"
           *ngFor="let casefile of list.casefiles"
-          [ngStyle]="{'border-left-color': casefile.priority.color}"
+          [ngStyle]="{ 'border-left-color': casefile.priority.color }"
           draggable="true"
           (dragstart)="dragstart(casefile, list)"
-          (dragend)="dragend()">
+          (dragend)="dragend()"
+        >
           <header class="row">
-            <div class="col-12 pb-2 col-sm-6 pb-sm-0 col-sm-6 col-md-4 col-lg-3 col-xl-4 clickable" (click)="open(casefile)">
+            <div
+              class="col-12 pb-2 col-sm-6 pb-sm-0 col-sm-6 col-md-4 col-lg-3 col-xl-4 clickable"
+              (click)="open(casefile)"
+            >
               {{ casefile.company.name }}
             </div>
 
-            <div class="col-12 pb-2 col-sm-6 pb-sm-0 col-sm-6 col-md-4 col-lg-3 col-xl-3 clickable" (click)="open(casefile)">
+            <div
+              class="col-12 pb-2 col-sm-6 pb-sm-0 col-sm-6 col-md-4 col-lg-3 col-xl-3 clickable"
+              (click)="open(casefile)"
+            >
               {{ casefile.name }}
             </div>
 
             <div class="col-6 col-sm-4 py-sm-2 col-md-4 py-md-0 col-lg-2 col-xl-2">
-              <span class="d-inline-block px-2" [ngStyle]="{'background-color': casefile.status.color}">
+              <span
+                class="d-inline-block px-2"
+                [ngStyle]="{ 'background-color': casefile.status.color }"
+              >
                 {{ casefile.status.name }}
               </span>
             </div>
 
-            <div class="col-6 col-sm-4 py-sm-2 col-md-3 offset-md-8 py-md-0 col-lg-2 offset-lg-0 col-xl-2">
+            <div
+              class="col-6 col-sm-4 py-sm-2 col-md-3 offset-md-8 py-md-0 col-lg-2 offset-lg-0 col-xl-2"
+            >
               {{ casefile.responsible_user.name }}
             </div>
 
@@ -58,23 +83,24 @@
               <button class="btn btn-sm btn-light" title="Törlés" (click)="delete(casefile)">
                 <fa-icon [icon]="icon.trash"></fa-icon>
               </button>
-
             </div>
           </header>
 
           <main class="row">
             <div class="col-12 col-md-4 col-lg-3 col-xl-4">
-              <a href="tel:{{ casefile.company.phone }}">{{ casefile.company.phone }}</a>,
+              <a href="tel:{{ casefile.company.phone }}">{{ casefile.company.phone }}</a
+              >,
               <a href="mailto:{{ casefile.company.email }}">{{ casefile.company.email }}</a>
             </div>
-            <div class="col-12 col-md-8 col-lg-5 card-description text-muted clickable" (click)="open(casefile)">
+            <div
+              class="col-12 col-md-8 col-lg-5 card-description text-muted clickable"
+              (click)="open(casefile)"
+            >
               {{ casefile.description }}
             </div>
           </main>
-
         </div>
       </main>
-
     </div>
   </div>
 

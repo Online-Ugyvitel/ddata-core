@@ -10,8 +10,8 @@ export class Country extends BaseModel implements CountryInterface {
 
   is_selected = false;
 
-  init(data?: any): CountryInterface {
-    const incoming = !!data ? data : {};
+  init(data?: Partial<CountryInterface>): CountryInterface {
+    const incoming = data ?? {};
 
     this.initAsNumberWithDefaults(['id'], incoming);
 

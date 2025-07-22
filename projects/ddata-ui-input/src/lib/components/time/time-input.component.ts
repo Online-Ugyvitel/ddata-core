@@ -1,16 +1,46 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { FieldsInterface, DdataCoreModule, BaseModelInterface, BaseModel } from 'ddata-core';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 @Component({
-    selector: 'dd-input-time',
-    templateUrl: './time-input.component.html',
-    styleUrls: ['./time-input.component.scss'],
-    standalone: false
+  selector: 'dd-input-time',
+  templateUrl: './time-input.component.html',
+  styleUrls: ['./time-input.component.scss'],
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DdataInputTimeComponent implements OnInit, AfterViewInit {
-  helperService: InputHelperServiceInterface = DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
+export class DdataInputTimeComponent implements AfterViewInit {
+  // All @Input and @Output properties first
+  @Input() disabled = false;
+  @Input() isViewOnly = false;
+  @Input() type = 'text';
+  @Input() inputClass = 'form-control';
+  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
+  @Input() inputBlockClass = 'col-12 d-flex px-0';
+  @Input() inputBlockExtraClass = 'col-md-9';
+  @Input() viewOnlyClass = 'form-control border-0 bg-light';
+  @Input() showLabel = true;
+  @Input() autoFocus = false;
+  @Input() wrapperClass = 'd-flex flex-wrap';
+  @Input() format: 12 | 24 = 24;
+
+  @Output() readonly changed: EventEmitter<unknown> = new EventEmitter();
+
+  @ViewChild('inputBox') inputBox: ElementRef;
+
+  // Private and internal fields after @Input/@Output
+  helperService: InputHelperServiceInterface =
+    DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
 
   // tslint:disable: variable-name
   _field = '';
@@ -21,15 +51,18 @@ export class DdataInputTimeComponent implements OnInit, AfterViewInit {
   _append = '';
   _max = '';
   _isRequired = false;
-  _model: BaseModelInterface<any> & FieldsInterface<any> = new BaseModel();
+  _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
 
-  @Input() set model(value: BaseModelInterface<any> & FieldsInterface<any> | null) {
+  random: string = this.helperService.randChars();
+
+  @Input() set model(value: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null) {
     // prevent undefined
     if (!value) {
       console.error('The input-box component get undefined model');
 
       return;
     }
+
     this._model = value;
 
     if (!this._model.fields) {
@@ -39,7 +72,10 @@ export class DdataInputTimeComponent implements OnInit, AfterViewInit {
     }
 
     if (!this._model.fields[this._field]) {
-      console.error(`The ${this._model.model_name}'s ${this._field} field is `, this._model.fields[this._field]);
+      console.error(
+        `The ${this._model.model_name}'s ${this._field} field is `,
+        this._model.fields[this._field]
+      );
 
       return;
     }
@@ -56,61 +92,52 @@ export class DdataInputTimeComponent implements OnInit, AfterViewInit {
       this._isRequired = this.helperService.isRequired(this._model, this._field);
     }
   }
-  get model(): BaseModelInterface<any> & FieldsInterface<any> {
+
+  get model(): BaseModelInterface<unknown> & FieldsInterface<unknown> {
     return this._model;
   }
+
   @Input() set field(value: string) {
-    if (value === 'undefined') {
-      value = 'isValid';
+    let fieldValue = value;
+
+    if (fieldValue === 'undefined') {
+      fieldValue = 'isValid';
     }
 
-    this._field = value;
+    this._field = fieldValue;
   }
+
   @Input() set append(value: string) {
-    if (value === 'undefined') {
-      value = '';
+    let appendValue = value;
+
+    if (appendValue === 'undefined') {
+      appendValue = '';
     }
 
-    this._append = value;
+    this._append = appendValue;
   }
+
   @Input() set prepend(value: string) {
-    if (value === 'undefined') {
-      value = '';
+    let prependValue = value;
+
+    if (prependValue === 'undefined') {
+      prependValue = '';
     }
 
-    this._prepend = value;
+    this._prepend = prependValue;
   }
+
   @Input() set labelText(value: string) {
-    if (value === 'undefined') {
-      value = '';
+    let labelValue = value;
+
+    if (labelValue === 'undefined') {
+      labelValue = '';
     }
 
-    this._label = value;
+    this._label = labelValue;
   }
-  @Input() disabled = false;
-  @Input() isViewOnly = false;
-  @Input() type = 'text';
-  @Input() inputClass = 'form-control';
-  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
-  @Input() inputBlockClass = 'col-12 d-flex px-0';
-  @Input() inputBlockExtraClass = 'col-md-9';
-  @Input() viewOnlyClass = 'form-control border-0 bg-light';
-  @Input() showLabel = true;
-  @Input() autoFocus = false;
-  @Input() wrapperClass = 'd-flex flex-wrap';
-  @Input() format: 12 | 24 = 24;
 
-  @Output() changed: EventEmitter<any> = new EventEmitter();
-
-  @ViewChild('inputBox') inputBox: ElementRef;
-
-  random: string = this.helperService.randChars();
-
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+  constructor() {}
 
   ngAfterViewInit(): void {
     if (this.autoFocus) {

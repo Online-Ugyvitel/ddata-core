@@ -1,19 +1,12 @@
 <div [class]="wrapperClass">
   <!-- label -->
-  <label
-    [class]="labelClass"
-    [for]="id"
-    *ngIf="showLabel"
-  >
+  <label [class]="labelClass" [for]="id" *ngIf="showLabel">
     {{ labelText }}:
     <span *ngIf="isRequired"> *</span>
   </label>
 
   <!-- combobox container -->
-  <div
-    [class]="inputBlockClass"
-    [ngClass]="showLabel ? inputBlockExtraClass : ''"
-  >
+  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
     <!-- prepend -->
     <div class="input-group-prepend" *ngIf="!!prepend">
       <div class="input-group-text">{{ prepend }}</div>
@@ -40,7 +33,7 @@
         (focus)="onInputFocus()"
         (input)="onInput($event)"
         (keydown)="onKeydown($event)"
-      >
+      />
 
       <!-- dropdown listbox -->
       <div
@@ -57,7 +50,7 @@
         >
           Nincs találat
         </div>
-        
+
         <div
           *ngFor="let item of filteredItems; let i = index"
           class="autocomplete-option"

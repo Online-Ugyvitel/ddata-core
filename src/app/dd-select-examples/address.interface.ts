@@ -8,14 +8,13 @@ export interface AddressUIFieldsInterface {
   street: string;
   country_id: number;
   tag_id: number; // for single select demo
-  tags: TagInterface[]; // for multiple select demo
+  tags: Array<TagInterface>; // for multiple select demo
 }
 
 export interface AddressInterface
-  extends
-    AddressUIFieldsInterface,
+  extends AddressUIFieldsInterface,
     BaseModelInterface<AddressInterface> {
-      id: ID;
-      country: CountryInterface;
-      tag: TagInterface; // for single select demo
-    }
+  id: ID;
+  country: CountryInterface;
+  tag: TagInterface; // for single select demo
+}

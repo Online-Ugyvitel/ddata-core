@@ -14,7 +14,12 @@
         </div>
 
         <div class="col-2 text-end">
-          <button type="button" class="btn btn-light close" (click)="hideModal()" aria-label="Bezárás">
+          <button
+            type="button"
+            class="btn btn-light close"
+            (click)="hideModal()"
+            aria-label="Bezárás"
+          >
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -24,7 +29,6 @@
       <div class="modal-body">
         <ng-template dynamicComponent #dialogHost></ng-template>
       </div>
-
     </div>
   </div>
 </div>

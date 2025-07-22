@@ -1,32 +1,34 @@
 import { Injectable } from '@angular/core';
 import { CountryInterface } from './country.interface';
-import { COUNTRIES } from './country.mock-data';
+import { countries } from './country.mock-data';
 import { Country } from './country.model';
 import { TagInterface } from './tag.interface';
-import { TAGS } from './tag.mock-data';
+import { tags } from './tag.mock-data';
 import { Tag } from './tag.model';
 
 @Injectable({ providedIn: 'root' })
 export class DdSelectExampleService {
-  getAllCountry(): CountryInterface[] {
-    const countries: CountryInterface[] = [];
-    const rawCountries = COUNTRIES;
+  getAllCountry(): Array<CountryInterface> {
+    const countryList: Array<CountryInterface> = [];
+    const rawCountries = countries;
 
-    rawCountries.forEach(rawData => {
-      countries.push(new Country().init(rawData));
+    rawCountries.forEach((rawData) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      countryList.push(new Country().init({ ...rawData, id: rawData.id as any }));
     });
 
-    return countries;
+    return countryList;
   }
 
-  getAllTags(): TagInterface[] {
-    const tags: TagInterface[] = [];
-    const rawTags = TAGS;
+  getAllTags(): Array<TagInterface> {
+    const tagList: Array<TagInterface> = [];
+    const rawTags = tags;
 
-    rawTags.forEach(rawData => {
-      tags.push(new Tag().init(rawData));
+    rawTags.forEach((rawData) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tagList.push(new Tag().init({ ...rawData, id: rawData.id as any }));
     });
 
-    return tags;
+    return tagList;
   }
 }

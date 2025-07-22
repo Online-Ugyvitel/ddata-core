@@ -1,35 +1,36 @@
 import { TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { BaseModel, ValidatorService } from 'ddata-core';
 import { DdataTextareaComponent } from './textarea.component';
 
-xdescribe('DdataTextareaComponent', () => {
+declare const document: Document;
+
+describe('DdataTextareaComponent', () => {
   let component: DdataTextareaComponent;
   let fixture;
 
-
   beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-}
-    );
+    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+      teardown: { destroyAfterEach: false }
+    });
   });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DdataTextareaComponent],
       providers: [ValidatorService]
-    })
-      .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {
     // AppModule.InjectorInstance = TestBed;
     fixture = TestBed.overrideComponent(DdataTextareaComponent, {
       set: {
-        template: '<div class="input-group">\
+        template:
+          '<div class="input-group">\
         <label [class]="labelClass" [for]="field" *ngIf="showLabel">\
             Label:\
             <ng-container *ngIf="true">\
@@ -49,16 +50,17 @@ xdescribe('DdataTextareaComponent', () => {
         </div>\
     </div>'
       }
-    })
-      .createComponent(DdataTextareaComponent);
+    }).createComponent(DdataTextareaComponent);
     fixture.detectChanges();
   });
+
   afterEach(() => {
     document.body.removeChild(fixture.debugElement.nativeElement);
   });
 
   it('should create', () => {
     component = new DdataTextareaComponent();
+
     expect(component).toBeTruthy();
   });
 
@@ -68,18 +70,19 @@ xdescribe('DdataTextareaComponent', () => {
     component.model = {
       fields: {
         fake: {
-          title: 'a',
+          title: 'a'
         }
       }
     } as unknown as BaseModel;
-
     let fakestring = component._title;
+
     expect(fakestring).toBeDefined();
     expect(fakestring).toBe('a');
 
     component.model.fields = {};
 
     fakestring = component._title;
+
     expect(fakestring).toBeDefined();
     expect(fakestring).toBe('');
   });
@@ -90,18 +93,19 @@ xdescribe('DdataTextareaComponent', () => {
     component.model = {
       fields: {
         fake: {
-          label: 'a',
+          label: 'a'
         }
       }
     } as unknown as BaseModel;
-
     let fakestring = component._label;
+
     expect(fakestring).toBeDefined();
     expect(fakestring).toBe('a');
 
     component.model.fields = {};
 
     fakestring = component._label;
+
     expect(fakestring).toBeDefined();
     expect(fakestring).toBe('Az adatmező címke nincs definiálva a modelben.');
   });
@@ -112,18 +116,19 @@ xdescribe('DdataTextareaComponent', () => {
     component.model = {
       fields: {
         fake: {
-          placeholder: 'a',
+          placeholder: 'a'
         }
       }
     } as unknown as BaseModel;
-
     let fakestring = component._placeholder;
+
     expect(fakestring).toBeDefined();
     expect(fakestring).toBe('a');
 
     component.model.fields = {};
 
     fakestring = component._placeholder;
+
     expect(fakestring).toBeDefined();
     expect(fakestring).toBe('');
   });

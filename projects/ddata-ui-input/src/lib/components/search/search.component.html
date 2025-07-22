@@ -1,20 +1,34 @@
 <div class="col-12 px-0">
   <!-- kereső input -->
   <div class="input-group" id="dropdownMenuButton">
-    <input #searchInput type="text" autocomplete="off" class="form-control border-0" placeholder="Keresés..."
-      name="search-string" [(ngModel)]="model.searchText">
+    <input
+      #searchInput
+      type="text"
+      autocomplete="off"
+      class="form-control border-0"
+      placeholder="Keresés..."
+      name="search-string"
+      [(ngModel)]="model.searchText"
+    />
 
     <div class="input-group-append">
       <button type="submit" class="btn btn-secondary border-0" (click)="search()">
         <fa-icon [icon]="icon.search" [fixedWidth]="true"></fa-icon>
       </button>
     </div>
-
   </div>
 
   <!-- dropdown menü -->
-  <div class="search-dropdown col-12" *ngIf="models.length > 0" [ngStyle]="{'display': models.length > 0 ? 'block' : 'none' }">
-    <div class="border-bottom text-left dropdown-item" *ngFor="let model of models" (click)="go(model)">
+  <div
+    class="search-dropdown col-12"
+    *ngIf="models.length > 0"
+    [ngStyle]="{ display: models.length > 0 ? 'block' : 'none' }"
+  >
+    <div
+      class="border-bottom text-left dropdown-item"
+      *ngFor="let model of models"
+      (click)="go(model)"
+    >
       <div class="row">
         <!-- icon -->
         <div class="col-1 px-0 text-center text-muted">
@@ -29,7 +43,10 @@
           </div>
           <!-- description -->
           <div class="row">
-            <div class="col-12 small text-muted" [innerHTML]="model.description | description"></div>
+            <div
+              class="col-12 small text-muted"
+              [innerHTML]="model.description | description"
+            ></div>
           </div>
         </div>
       </div>

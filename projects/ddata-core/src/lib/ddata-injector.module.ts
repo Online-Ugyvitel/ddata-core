@@ -5,7 +5,7 @@ import { NgModule, Injector } from '@angular/core';
   declarations: [],
   imports: [],
   providers: [],
-  exports: [],
+  exports: []
 })
 export class DdataInjectorModule {
   static InjectorInstance: Injector;
@@ -13,5 +13,4 @@ export class DdataInjectorModule {
   constructor(injector: Injector) {
     DdataInjectorModule.InjectorInstance = injector;
   }
-
 }

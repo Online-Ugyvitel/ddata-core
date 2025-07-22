@@ -12,18 +12,15 @@ export class SearchModelFunctions extends BaseModel {
   icon: IconDefinition;
   url: string;
   icons: IconSetInterface = {
-    cog: faCog,
+    cog: faCog
   };
 
-  init(data?: any): any {
-    data = !!data ? data : {};
+  init(data?: unknown): unknown {
+    const searchData = !!data ? data : {};
 
-    this.initAsNumberWithDefaults(['id'], data);
+    this.initAsNumberWithDefaults(['id'], searchData);
 
-    this.initAsStringWithDefaults(
-      ['name', 'description', 'type', 'found_model_name'],
-      data
-    );
+    this.initAsStringWithDefaults(['name', 'description', 'type', 'found_model_name'], searchData);
 
     this.icon = this.setIcon(this.type);
 

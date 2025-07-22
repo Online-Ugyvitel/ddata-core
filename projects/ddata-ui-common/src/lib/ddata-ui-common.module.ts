@@ -2,8 +2,6 @@ import { Injector, ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-import { ModuleConfiguration } from './models/module-configuration/module-configuration.interface';
-
 import { DdataUiLoadingOverlayComponent } from './components/loading-overlay/loading-overlay.component';
 import { DdataUiNoDataComponent } from './components/no-data/no-data.component';
 import { DdataUiNotificationComponent } from './components/notification/notification.component';
@@ -21,19 +19,16 @@ import { DdataUiUserThumbnailComponent } from './components/user-profile-thumbna
     DdataUiPaginateComponent,
     DdataUiProgressbarComponent,
     DdataUiTagComponent,
-    DdataUiUserThumbnailComponent,
+    DdataUiUserThumbnailComponent
   ],
-  imports: [
-    CommonModule,
-    FontAwesomeModule,
-  ],
+  imports: [CommonModule, FontAwesomeModule],
   exports: [
     DdataUiNoDataComponent,
     DdataUiNotificationComponent,
     DdataUiLoadingOverlayComponent,
     DdataUiProgressbarComponent,
     DdataUiTagComponent,
-    DdataUiUserThumbnailComponent,
+    DdataUiUserThumbnailComponent
   ]
 })
 export class DdataUiCommonModule {
@@ -43,9 +38,9 @@ export class DdataUiCommonModule {
     DdataUiCommonModule.InjectorInstance = injector;
   }
 
-  static forRoot(config: ModuleConfiguration): ModuleWithProviders<any> {
+  static forRoot(): ModuleWithProviders<DdataUiCommonModule> {
     return {
-      ngModule: DdataUiCommonModule,
+      ngModule: DdataUiCommonModule
     };
   }
 }

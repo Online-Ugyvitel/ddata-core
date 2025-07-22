@@ -1,5 +1,37 @@
-<button type="button" class="btn btn-secondary mt-1 mr-1" title="Gyorsbillentyű: Ctrl + balra nyíl" (click)="previousTab()" *ngIf="currentTab !== 0">Előző oldal</button>
-<button type="button" class="btn btn-secondary mt-1 mr-1" title="Gyorsbillentyű: Ctrl + balra nyíl"(click)="previousTab()" *ngIf="currentTab === 0">Utolsó oldal</button>
+<button
+  type="button"
+  class="btn btn-secondary mt-1 mr-1"
+  title="Gyorsbillentyű: Ctrl + balra nyíl"
+  (click)="previousTab()"
+  *ngIf="currentTab !== 0"
+>
+  Előző oldal
+</button>
+<button
+  type="button"
+  class="btn btn-secondary mt-1 mr-1"
+  title="Gyorsbillentyű: Ctrl + balra nyíl"
+  (click)="previousTab()"
+  *ngIf="currentTab === 0"
+>
+  Utolsó oldal
+</button>
 
-<button type="button" class="btn btn-secondary mt-1 mr-1" title="Gyorsbillentyű: Ctrl + jobbra nyíl" (click)="nextTab()" *ngIf="!lastTab">Következő oldal</button>
-<button type="button" class="btn btn-secondary mt-1 mr-1" title="Gyorsbillentyű: Ctrl + jobbra nyíl" (click)="nextTab()" *ngIf="lastTab">Első oldal</button>
+<button
+  type="button"
+  class="btn btn-secondary mt-1 mr-1"
+  title="Gyorsbillentyű: Ctrl + jobbra nyíl"
+  (click)="nextTab()"
+  *ngIf="!lastTab"
+>
+  Következő oldal
+</button>
+<button
+  type="button"
+  class="btn btn-secondary mt-1 mr-1"
+  title="Gyorsbillentyű: Ctrl + jobbra nyíl"
+  (click)="nextTab()"
+  *ngIf="lastTab"
+>
+  Első oldal
+</button>

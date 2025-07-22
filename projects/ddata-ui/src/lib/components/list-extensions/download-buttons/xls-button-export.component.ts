@@ -1,16 +1,19 @@
-import { Component, Input } from '@angular/core';
-import { BaseModel } from './../../../models/base-model/base-model.model';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { BaseModel } from 'ddata-core';
 
 @Component({
-    selector: 'app-xls-button-export',
-    templateUrl: './xls-button-export.component.html',
-    styleUrls: ['./xls-button-export.component.scss'],
-    standalone: false
+  selector: 'dd-xls-button-export',
+  templateUrl: './xls-button-export.component.html',
+  styleUrls: ['./xls-button-export.component.scss'],
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class XlsButtonExportComponent {
   @Input() model: BaseModel = new BaseModel();
-  @Input() formats: string[] = ['xls', 'csv'];
+  @Input() formats: Array<string> = ['xls', 'csv'];
   token = localStorage.getItem('token') || '';
+
+  constructor() {}
 
   isXlsEnabled(): boolean {
     return this.formats.includes('xls');
@@ -23,11 +26,4 @@ export class XlsButtonExportComponent {
   isPdfEnabled(): boolean {
     return this.formats.includes('pdf');
   }
-
-  isCertificatePdfEnabled(): boolean {
-    return this.formats.includes('pdf');
-  }
-
-  constructor() { }
-
 }

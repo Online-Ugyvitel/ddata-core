@@ -1,6 +1,14 @@
-import { Component, EventEmitter, Inject, Injectable, Input, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnInit,
+  Output
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { DdataCoreModule } from '../../ddata-core.module';
 import { BaseModelInterface } from '../../models/base/base-model.model';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
@@ -11,18 +19,19 @@ import { BaseListComponentInterface } from './base-list-component.interface';
 
 // @dynamic
 @Component({
-    template: '',
-    standalone: false
+  template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export abstract class BaseListComponent<T extends BaseModelInterface<T>>
-  implements OnInit, BaseListComponentInterface<T> {
-
+  implements OnInit, BaseListComponentInterface<T>
+{
   @Input() isModal = false;
   @Input() isEmbed = false;
   @Input() loadData = true;
-  @Input() models: T[] = [];
-  @Input() filter: any = {};
-  @Input() set data(value: any) {
+  @Input() models: Array<T> = [];
+  @Input() filter: Record<string, unknown> = {};
+  @Input() set data(value: Record<string, unknown>) {
     if (!!value) {
       Object.keys(value).forEach((key: string) => {
         if (!!value[key] && key !== 'model' && key !== 'loadData') {
@@ -32,21 +41,21 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
     }
   }
 
-  @Output() editModel: EventEmitter<T> = new EventEmitter();
-  @Output() deleteModel: EventEmitter<T> = new EventEmitter();
-  @Output() deleteMultipleModels: EventEmitter<T[]> = new EventEmitter();
-  @Output() saveModel: EventEmitter<T> = new EventEmitter();
+  @Output() readonly editModel: EventEmitter<T> = new EventEmitter();
+  @Output() readonly deleteModel: EventEmitter<T> = new EventEmitter();
+  @Output() readonly deleteMultipleModels: EventEmitter<Array<T>> = new EventEmitter();
+  @Output() readonly saveModel: EventEmitter<T> = new EventEmitter();
 
   model: T = new this.type().init();
   paginate: PaginateInterface = new Paginate(this.model);
   transformToLowerCase = true;
   helperService: HelperServiceInterface<T> = new HelperFactoryService<T>().get(this.type);
-  activatedRoute: ActivatedRoute = DdataCoreModule.InjectorInstance.get<ActivatedRoute>(ActivatedRoute);
+  activatedRoute: ActivatedRoute =
+    DdataCoreModule.InjectorInstance.get<ActivatedRoute>(ActivatedRoute);
+
   currentPageNumber = 0;
 
-  constructor(
-    @Inject('type') private type: new () => T,
-  ) {}
+  constructor(@Inject('type') private readonly type: new () => T) {}
 
   ngOnInit(): void {
     this.load();
@@ -65,28 +74,6 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
       this.paginate = result;
       this.models = this.paginate.data;
     });
-  }
-
-  /**
-   * Set the data loader request based on filter and paginate state.
-   */
-  private setGetRequest(): Observable<any> {
-    if (this.isEmptyObject(this.filter)) {
-      // it hasn't got filter options
-      return this.helperService.getAll(this.paginate, this.models, this.isModal, this.currentPageNumber);
-    } else {
-      // it has got filter options
-      return this.helperService.search(this.filter, this.currentPageNumber);
-    }
-  }
-
-  /**
-   * Return true if object has any keys. Helps to find out filter has any key or not.
-   *
-   * @param object JSON object
-   */
-  private isEmptyObject(object: any): boolean {
-    return Object.keys(object).length === 0 && object.constructor === Object;
   }
 
   /**
@@ -128,7 +115,7 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
    *
    * @param models instances of model
    */
-  deleteMultiple(models: T[]): void {
+  deleteMultiple(models: Array<T>): void {
     this.helperService.deleteMultiple(models, this).subscribe();
   }
 
@@ -152,4 +139,30 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
     this.helperService.save(model, this.isModal, this.saveModel).subscribe();
   }
 
+  /**
+   * Set the data loader request based on filter and paginate state.
+   */
+  private setGetRequest(): Observable<PaginateInterface> {
+    if (this.isEmptyObject(this.filter)) {
+      // it hasn't got filter options
+      return this.helperService.getAll(
+        this.paginate,
+        this.models,
+        this.isModal,
+        this.currentPageNumber
+      );
+    } else {
+      // it has got filter options
+      return this.helperService.search(this.filter, this.currentPageNumber);
+    }
+  }
+
+  /**
+   * Return true if object has any keys. Helps to find out filter has any key or not.
+   *
+   * @param object JSON object
+   */
+  private isEmptyObject(object: Record<string, unknown>): boolean {
+    return Object.keys(object).length === 0 && object.constructor === Object;
+  }
 }

@@ -4,7 +4,6 @@
       <h1>{{ i18n.upload_dialog_title.label }}</h1>
     </div>
     <div class="col-12 content">
-
       <!-- button container -->
       <div class="row py-3">
         <!-- add button -->
@@ -17,9 +16,18 @@
                 <fa-icon [icon]="icon.files"></fa-icon>
                 {{ i18n.select_files.label }}
               </button>
-              <input hidden type="file" multiple name="fileselector" id="files" [accept]="acceptedTypes"
-                [(ngModel)]="files" #fileInput
-                (change)="onSelectFile($event.target.files)" class="form-control">
+              <input
+                hidden
+                type="file"
+                multiple
+                name="fileselector"
+                id="files"
+                [accept]="acceptedTypes"
+                [(ngModel)]="files"
+                #fileInput
+                (change)="onSelectFile($event.target.files)"
+                class="form-control"
+              />
             </div>
           </div>
         </div>
@@ -30,26 +38,35 @@
             <div class="card-body p-4 bg-light text-body text-center">
               <h5>{{ i18n.step_1.label }}</h5>
               <p>{{ i18n.start_upload.label }}</p>
-              <button class="btn btn-secondary" (click)="startUploadAll()" [disabled]="urls.length === 0">
+              <button
+                class="btn btn-secondary"
+                (click)="startUploadAll()"
+                [disabled]="urls.length === 0"
+              >
                 <fa-icon [icon]="icon.upload"></fa-icon>
                 {{ i18n.upload.label }}
               </button>
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- selected image container -->
       <div class="row">
         <div class="col-12 py-2 border-bottom" *ngFor="let dat of fileData; let i = index">
-        <!-- <div class="col-12 py-2 border-bottom" *ngFor="let url of urls; let i = index"> -->
+          <!-- <div class="col-12 py-2 border-bottom" *ngFor="let url of urls; let i = index"> -->
           <div class="row">
-
             <div class="col-12 col-sm-2" *ngIf="isImage[i]">
-              <img [src]="urls[i]" style="height: auto; max-height: 320px; width: 100%; max-width: 320px;">
+              <img
+                [src]="urls[i]"
+                [alt]="fileData[i].name"
+                style="height: auto; max-height: 320px; width: 100%; max-width: 320px"
+              />
             </div>
-            <div class="col-12 col-sm-2 text-muted d-flex justify-content-center align-items-center" *ngIf="!isImage[i]">
+            <div
+              class="col-12 col-sm-2 text-muted d-flex justify-content-center align-items-center"
+              *ngIf="!isImage[i]"
+            >
               <fa-icon [icon]="fileTypes[i]" size="3x"></fa-icon>
             </div>
 
@@ -58,7 +75,7 @@
                 <h6>{{ fileData[i].name }}</h6>
               </div>
               <div class="col-12 text-muted">
-                {{ i18n.file_size.label }}: {{ fileData[i].size | filesize:'mb':'2' }} MB
+                {{ i18n.file_size.label }}: {{ fileData[i].size | filesize: 'mb' : '2' }} MB
               </div>
               <!-- <div class="col-12" style="max-width: 300px;" *ngIf="progress[fileData[i].name].percent !== 100">
                 <app-progressbar [max]="100" [current]="progress[fileData[i].name].percent"></app-progressbar>
@@ -68,16 +85,22 @@
               </div>
             </div>
 
-            <div class="col-12 col-sm-2 text-center text-sm-right" *ngIf="progress[fileData[i].name].percent === 0">
-              <button type="button" class="btn btn-light" title="{{ i18n.delete_from_list.label }}" (click)="deleteFile(i)">
+            <div
+              class="col-12 col-sm-2 text-center text-sm-right"
+              *ngIf="progress[fileData[i].name].percent === 0"
+            >
+              <button
+                type="button"
+                class="btn btn-light"
+                title="{{ i18n.delete_from_list.label }}"
+                (click)="deleteFile(i)"
+              >
                 <fa-icon [icon]="icon.trash"></fa-icon>
               </button>
             </div>
-
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>

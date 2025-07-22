@@ -4,7 +4,7 @@
     <span *ngIf="_is_required"> *</span>
   </label>
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div class="input-group-prepend" *ngIf=" _prepend != '' ">
+    <div class="input-group-prepend" *ngIf="_prepend !== ''">
       <div class="input-group-text">{{ _prepend }}</div>
     </div>
 
@@ -18,10 +18,17 @@
       </div>
     </ng-container>
     <ng-container *ngIf="autocompleteSuggestions.length > 0">
-      <div class="autocomplete-list-container" [class.autocomplete-spinner-place]="autocompleteLoading">
+      <div
+        class="autocomplete-list-container"
+        [class.autocomplete-spinner-place]="autocompleteLoading"
+      >
         <div class="autocomplete-list">
-          <div class="autocomplete-list-item" *ngFor="let suggestion of autocompleteSuggestions; index as index"
-            [class.active]="index === autocompleteCursor" (click)="setContent(suggestion)">
+          <div
+            class="autocomplete-list-item"
+            *ngFor="let suggestion of autocompleteSuggestions; index as index"
+            [class.active]="index === autocompleteCursor"
+            (click)="setContent(suggestion)"
+          >
             {{ suggestion.name }}
           </div>
         </div>
@@ -41,11 +48,11 @@
       [disabled]="disabled"
       [type]="type"
       [autocomplete]="random"
-      #inputBox>
+      #inputBox
+    />
 
-    <div class="input-group-append" *ngIf="_append != ''">
+    <div class="input-group-append" *ngIf="_append !== ''">
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-
 </div>

@@ -1,24 +1,26 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable no-console */
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { DdataInjectorModule } from '../../ddata-injector.module';
 import { EnvService } from '../env/env.service';
 import { SpinnerServiceInterface } from './spinner-service.interface';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class SpinnerService implements SpinnerServiceInterface {
   /**
    * Application environment variable from the root application
    */
-  private appEnv = new EnvService();
+  private readonly appEnv = new EnvService();
   // TODO ezt vissza kell csinálni
   // private appEnv = DdataInjectorModule.InjectorInstance.get(EnvService);
 
   /**
    * Observable subject of spinner service
    */
-  private spinnerSubject = new Subject<boolean>();
+  private readonly spinnerSubject = new Subject<boolean>();
 
   /**
    * Spinner is visible or not
@@ -109,5 +111,4 @@ export class SpinnerService implements SpinnerServiceInterface {
   getStatus(): boolean {
     return this.spinnerIsVisible;
   }
-
 }

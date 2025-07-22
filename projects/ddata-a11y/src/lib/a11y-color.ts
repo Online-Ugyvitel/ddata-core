@@ -77,9 +77,7 @@ export class A11yColor {
 
       color /= 255;
 
-      color = color > 0.03928
-        ? Math.pow((color + 0.055) / 1.055, 2.4)
-        : (color /= 12.92);
+      color = color > 0.03928 ? Math.pow((color + 0.055) / 1.055, 2.4) : (color /= 12.92);
 
       rgb[key] = color;
     });

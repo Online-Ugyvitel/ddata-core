@@ -1,40 +1,22 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DdataUiNoDataComponent } from './no-data.component';
-import { DdataUiCommonModule } from '../../ddata-ui-common.module';
 
-xdescribe('DdataUiNoDataComponent', () => {
+describe('DdataUiNoDataComponent', () => {
   let component: DdataUiNoDataComponent;
   let fixture: ComponentFixture<DdataUiNoDataComponent>;
-  let debugElement;
-  let element;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-}
-    );
-  });
-
-
-  beforeEach((() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DdataUiNoDataComponent ]
-    })
-    .compileComponents();
+      declarations: [DdataUiNoDataComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] // This allows custom elements like fa-icon
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    DdataUiCommonModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataUiNoDataComponent);
     component = fixture.componentInstance;
-    debugElement = fixture.debugElement;
-    element = debugElement.nativeElement;
-  });
-  afterEach(() => {
-    document.body.removeChild(element);
+    fixture.detectChanges();
   });
 
   it('should be created', () => {
@@ -43,6 +25,7 @@ xdescribe('DdataUiNoDataComponent', () => {
 
   it('icons should contain the created component', () => {
     component = new DdataUiNoDataComponent();
-    expect((component as any).icons).toContain(component.randomIcon);
+
+    expect(component.icons).toContain(component.randomIcon);
   });
 });

@@ -5,7 +5,7 @@
   </label>
 
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div class="input-group-prepend" *ngIf=" _prepend != '' ">
+    <div class="input-group-prepend" *ngIf="_prepend !== ''">
       <div class="input-group-text">{{ _prepend }}</div>
     </div>
 
@@ -24,24 +24,25 @@
         [type]="type"
         [autocomplete]="random"
         (keyup)="validateField()"
-        #inputBox>
-      </ng-container>
+        #inputBox
+      />
+    </ng-container>
 
-      <ng-container *ngIf="isViewOnly">
+    <ng-container *ngIf="isViewOnly">
       <div
         [id]="_field + '_' + random"
         [class]="viewOnlyClass"
         [attr.name]="_field + '_' + random"
-        [title]="_title">
-          {{ model[_field] }}
+        [title]="_title"
+      >
+        {{ model[_field] }}
       </div>
     </ng-container>
 
-    <div class="input-group-append" *ngIf="_append != ''">
+    <div class="input-group-append" *ngIf="_append !== ''">
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-
 </div>
 
-<ngx-material-timepicker #timepicker (timeSet)="setTime($event)" ></ngx-material-timepicker>
+<ngx-material-timepicker #timepicker (timeSet)="setTime($event)"></ngx-material-timepicker>
