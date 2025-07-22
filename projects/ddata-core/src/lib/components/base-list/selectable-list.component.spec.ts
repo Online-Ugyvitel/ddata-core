@@ -1,64 +1,15 @@
 import 'zone.js/testing';
-import { Component, Inject, Injector } from '@angular/core';
+import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { BehaviorSubject, of } from 'rxjs';
-import { BaseModel, BaseModelInterface } from '../../models/base/base-model.model';
-import { SelectableInterface } from '../../models/selectable/selectable.interface';
+import { BehaviorSubject } from 'rxjs';
 import { SelectableListComponent } from './selectable-list.component';
 import { DdataCoreModule } from '../../ddata-core.module';
-import { HelperServiceInterface } from '../../services/helper/helper-service.interface';
 import { HelperFactoryService } from '../../services/helper/helper-service.factory';
 import { ActivatedRoute } from '@angular/router';
-import { ID } from '../../models/base/base-data.type';
-
-// Test model that implements both BaseModelInterface and SelectableInterface
-class TestModel extends BaseModel implements SelectableInterface {
-  id: ID = 0 as ID;
-  is_selected: boolean = false;
-  api_endpoint = '/test';
-  model_name = 'TestModel';
-
-  init(data: any = {}): TestModel {
-    this.id = (data.id || 0) as ID;
-    this.is_selected = data.is_selected || false;
-    return this;
-  }
-
-  prepareToSave(): any {
-    return {
-      id: this.id,
-      is_selected: this.is_selected
-    };
-  }
-}
-
-// Mock HelperService for testing
-class MockHelperService {
-  getAll = jasmine.createSpy('getAll').and.returnValue(of({ data: [], total: 0 }));
-  search = jasmine.createSpy('search').and.returnValue(of({ data: [], total: 0 }));
-  booleanChange = jasmine.createSpy('booleanChange').and.returnValue(of(true));
-  edit = jasmine.createSpy('edit');
-  delete = jasmine.createSpy('delete').and.returnValue(of(true));
-  deleteMultiple = jasmine.createSpy('deleteMultiple').and.returnValue(of(true));
-  save = jasmine.createSpy('save').and.returnValue(of({}));
-  saveAsNew = jasmine.createSpy('saveAsNew').and.returnValue(of({}));
-  stepBack = jasmine.createSpy('stepBack');
-  changeToPage = jasmine.createSpy('changeToPage').and.returnValue(of({}));
-  getOne = jasmine.createSpy('getOne').and.returnValue(of({}));
-  searchWithoutPaginate = jasmine.createSpy('searchWithoutPaginate').and.returnValue(of([]));
-}
-
-// Concrete implementation of SelectableListComponent for testing
-@Component({
-  template: '<div></div>',
-  standalone: false
-})
-class TestSelectableListComponent extends SelectableListComponent<TestModel> {
-  constructor(@Inject('type') type: new () => TestModel) {
-    super(type);
-  }
-}
+import { TestModel } from './test-helpers/test-model';
+import { MockHelperService } from './test-helpers/mock-helper-service';
+import { TestSelectableListComponent } from './test-helpers/test-selectable-list-component';
 
 describe('SelectableListComponent', () => {
   let component: TestSelectableListComponent;
