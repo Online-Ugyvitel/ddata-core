@@ -204,7 +204,6 @@ describe('DdataUiNoDataComponent', () => {
       expect(component.article).toBe('Az');
     });
   });
-  });
 
   describe('constructor', () => {
     it('should select randomIcon from available icons', () => {
