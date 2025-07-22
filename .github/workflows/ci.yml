@@ -27,7 +27,6 @@ jobs:
         npm config delete //registry.npmjs.org/:_authToken || true
         npm whoami || echo "Not logged in to npm (this is expected)"
         npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts --no-optional
-        npm run build:core
 
     - name: Cache node modules and built artifacts
       uses: actions/cache@v4
