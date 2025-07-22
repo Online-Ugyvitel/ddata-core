@@ -128,13 +128,18 @@ describe('HelperFactoryService', () => {
 
     it('should call the constructor of the provided newable class', () => {
       // This test specifically validates that line 10 calls the constructor
-      const constructorSpy = spyOn(MockModel.prototype, 'constructor').and.callThrough();
-      
+      // We'll test this by ensuring the model has the expected default values
       const result = factory.get(MockModel);
       
       expect(result).toBeInstanceOf(HelperService);
-      // Note: constructor spy might not work as expected with 'new' operator
-      // but the model instance creation is already tested above
+      
+      // Verify that a new instance was created with default values
+      const modelInstance = (result as any).instance;
+      expect(modelInstance).toBeInstanceOf(MockModel);
+      expect(modelInstance.id).toBe(0 as ID);
+      expect(modelInstance.model_name).toBe('MockModel');
+      expect(modelInstance.api_endpoint).toBe('/test/mock');
+      expect(modelInstance.use_localstorage).toBe(false);
     });
 
     it('should return HelperService that implements HelperServiceInterface', () => {
@@ -202,6 +207,20 @@ describe('HelperFactoryService', () => {
       expect(result1).toBeInstanceOf(HelperService);
       expect(result2).toBeInstanceOf(HelperService);
       expect(result1).not.toBe(result2);
+    });
+
+    it('should handle the generic type constraint properly', () => {
+      // This test ensures the factory works with the BaseModelInterface constraint
+      const result = factory.get(MockModel);
+      const modelInstance = (result as any).instance;
+      
+      // Verify it has the BaseModelInterface properties
+      expect(typeof modelInstance.init).toBe('function');
+      expect(typeof modelInstance.prepareToSave).toBe('function');
+      expect(typeof modelInstance.validate).toBe('function');
+      expect(modelInstance.hasOwnProperty('id')).toBe(true);
+      expect(modelInstance.hasOwnProperty('api_endpoint')).toBe(true);
+      expect(modelInstance.hasOwnProperty('model_name')).toBe(true);
     });
   });
 });
