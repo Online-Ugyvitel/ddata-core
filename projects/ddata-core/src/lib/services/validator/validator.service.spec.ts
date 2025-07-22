@@ -1,8 +1,11 @@
 import { ValidatorService } from './validator.service';
+import { ValidationError } from '../../models/error/validation-error.model';
+import { ValidationErrorSettingsInterface } from '../../models/error/validation-error-settings.model';
 
 const validator = new ValidatorService();
 
-xdescribe('isString', () => {
+describe('ValidatorService', () => {
+  describe('isString', () => {
   it('Should be false if parameter is null', () => {
     const result = validator.isString(null);
     expect(result).toBe(false);
@@ -25,13 +28,13 @@ xdescribe('isNumber', () => {
     expect(result).toBe(true);
   });
 
-  it('Should be false if parameter is number', () => {
+  it('Should be false if parameter is string', () => {
     const result = validator.isNumber('test');
     expect(result).toBe(false);
   });
 });
 
-xdescribe('isBoolean', () => {
+describe('isBoolean', () => {
   it('Should be true if parameter is boolean', () => {
     const result = validator.isBoolean(true);
     expect(result).toBe(true);
@@ -53,7 +56,7 @@ xdescribe('isBoolean', () => {
   });
 });
 
-xdescribe('isRequired', () => {
+describe('isRequired', () => {
   it('Should be true if parameter is number', () => {
     const result = validator.isRequired(2);
     expect(result).toBe(true);
@@ -70,7 +73,7 @@ xdescribe('isRequired', () => {
   });
 });
 
-xdescribe('isInteger', () => {
+describe('isInteger', () => {
   it('Should be true if parameter is number', () => {
     const result = validator.isInteger(20);
     expect(result).toBe(true);
@@ -92,7 +95,7 @@ xdescribe('isInteger', () => {
   });
 });
 
-xdescribe('isNotZero', () => {
+describe('isNotZero', () => {
   it('Should be true if parameter is boolean', () => {
     const result = validator.isNotZero(true);
     expect(result).toBe(true);
@@ -109,7 +112,7 @@ xdescribe('isNotZero', () => {
   });
 });
 
-xdescribe('isregisterNumber', () => {
+describe('isregisterNumber', () => {
   it('Should be true if parameter is register number', () => {
     const result = validator.isregisterNumber('12-12-123456');
     expect(result).toBe(true);
@@ -131,7 +134,7 @@ xdescribe('isregisterNumber', () => {
   });
 });
 
-xdescribe('isLang', () => {
+describe('isLang', () => {
   it('Should be true if parameter is two large letters', () => {
     const result = validator.isLang('AA');
     expect(result).toBe(true);
@@ -168,7 +171,7 @@ xdescribe('isLang', () => {
   });
 });
 
-xdescribe('isName', () => {
+describe('isName', () => {
   it('Should be true if parameter is full name', () => {
     const result = validator.isName('Teszt Elek');
     expect(result).toBe(true);
@@ -195,7 +198,7 @@ xdescribe('isName', () => {
   });
 });
 
-xdescribe('isEmail', () => {
+describe('isEmail', () => {
   it('Should be true if parameter is valid email only letters', () => {
     const result = validator.isEmail('info@test.com');
     expect(result).toBe(true);
@@ -232,7 +235,7 @@ xdescribe('isEmail', () => {
   });
 });
 
-xdescribe('isDomain', () => {
+describe('isDomain', () => {
   it('Should be true if parameter is valid domain name', () => {
     const result = validator.isDomain('google.com');
     expect(result).toBe(true);
@@ -259,7 +262,7 @@ xdescribe('isDomain', () => {
   });
 });
 
-xdescribe('isUrl', () => {
+describe('isUrl', () => {
   it('Should be true if parameter is url with https://', () => {
     const result = validator.isUrl('https://www.google.com');
     expect(result).toBe(true);
@@ -276,7 +279,7 @@ xdescribe('isUrl', () => {
   });
 });
 
-// xdescribe('isSettlementName', () => {
+// describe('isSettlementName', () => {
 //   it('Should be true if parameter is city', () => {
 //     const result = validator.isSettlementName('Salgótarján');
 //     expect(result).toBe(true);
@@ -303,7 +306,7 @@ xdescribe('isUrl', () => {
 //   });
 // });
 
-xdescribe('isIsoDate', () => {
+describe('isIsoDate', () => {
   it('Should be true if parameter is valid date', () => {
     const result = validator.isIsoDate('2020.01.01');
     expect(result).toBe(true);
@@ -335,7 +338,7 @@ xdescribe('isIsoDate', () => {
   });
 });
 
-xdescribe('isDrivingLicencce', () => {
+describe('isDrivingLicencce', () => {
   it('Should be true if parameter is valid driving licence', () => {
     const result = validator.isDrivingLicence('AA123456');
     expect(result).toBe(true);
@@ -362,7 +365,7 @@ xdescribe('isDrivingLicencce', () => {
   });
 });
 
-xdescribe('isIdCardNumber', () => {
+describe('isIdCardNumber', () => {
   it('Should be true if parameter is valid id card number started with two large letters', () => {
     const result = validator.isIdCardNumber('MA123456');
     expect(result).toBe(true);
@@ -399,7 +402,7 @@ xdescribe('isIdCardNumber', () => {
   });
 });
 
-xdescribe('isAdressCardNumber', () => {
+describe('isAdressCardNumber', () => {
   it('Should be true if parameter is card number started with two large letters', () => {
     const result = validator.isAddressCardNumber('MA123456');
     expect(result).toBe(true);
@@ -436,7 +439,7 @@ xdescribe('isAdressCardNumber', () => {
   });
 });
 
-xdescribe('isPhoneNumber', () => {
+describe('isPhoneNumber', () => {
   it('Should be true if parameter is valid phone number', () => {
     const result = validator.isPhoneNumber('+1234567890');
     expect(result).toBe(true);
@@ -458,7 +461,7 @@ xdescribe('isPhoneNumber', () => {
   });
 });
 
-xdescribe('isBankAccount', () => {
+describe('isBankAccount', () => {
   it('Should be true if parameter is valid bank account', () => {
     const result = validator.isBankAccount('12345678-12345678-12345678');
     expect(result).toBe(true);
@@ -490,7 +493,7 @@ xdescribe('isBankAccount', () => {
   });
 });
 
-xdescribe('isTaxNumber', () => {
+describe('isTaxNumber', () => {
   it('Should be true if parameter is valid tax number', () => {
     const result = validator.isTaxNumber('12345678-1-12');
     expect(result).toBe(true);
@@ -517,7 +520,7 @@ xdescribe('isTaxNumber', () => {
   });
 });
 
-xdescribe('isSocialInsuranceNumber', () => {
+describe('isSocialInsuranceNumber', () => {
   it('Should be true if parameter is valid social insurance number with hyphen', () => {
     const result = validator.isSocialInsuranceNumber('123-123-123');
     expect(result).toBe(true);
@@ -559,7 +562,7 @@ xdescribe('isSocialInsuranceNumber', () => {
   });
 });
 
-xdescribe('isCreditCardVisa', () => {
+describe('isCreditCardVisa', () => {
   it('Should be true if parameter is valid Visa card', () => {
     const result = validator.isCreditCardVisa('4123456789012123');
     expect(result).toBe(true);
@@ -596,7 +599,7 @@ xdescribe('isCreditCardVisa', () => {
   });
 });
 
-xdescribe('isCreditCardMasterCard', () => {
+describe('isCreditCardMasterCard', () => {
   it('Should be true if parameter is valid master card', () => {
     const result = validator.isCreditCardMastercard('5312345678901234');
     expect(result).toBe(true);
@@ -643,7 +646,7 @@ xdescribe('isCreditCardMasterCard', () => {
   });
 });
 
-xdescribe('isCreditCardAmericanExpress', () => {
+describe('isCreditCardAmericanExpress', () => {
   it('Should be true if parameter is valid american express card', () => {
     const result = validator.isCreditCardAmericanExpress('341234567890123');
     expect(result).toBe(true);
@@ -675,7 +678,7 @@ xdescribe('isCreditCardAmericanExpress', () => {
   });
 });
 
-xdescribe('isCreditCardDiscover', () => {
+describe('isCreditCardDiscover', () => {
   it('Should be true if parameter is valid discover card', () => {
     const result = validator.isCreditCardDiscover('6523123456789012');
     expect(result).toBe(true);
@@ -712,7 +715,7 @@ xdescribe('isCreditCardDiscover', () => {
   });
 });
 
-xdescribe('isArray', () => {
+describe('isArray', () => {
   it('Should be true if parameter is array', () => {
     const result = validator.isArray(['test1', 'test2', 'test3', 2]);
     expect(result).toBe(true);
@@ -749,7 +752,7 @@ xdescribe('isArray', () => {
   });
 });
 
-xdescribe('isEmpty', () => {
+describe('isEmpty', () => {
   it('Should be true if parameter is empty string', () => {
     const result = validator.isEmpty('');
     expect(result).toBe(true);
@@ -776,7 +779,7 @@ xdescribe('isEmpty', () => {
   });
 });
 
-xdescribe('isNotEmpty', () => {
+describe('isNotEmpty', () => {
   it('Should be true if parameter is have anything', () => {
     const result = validator.isNotEmpty('aa');
     expect(result).toBe(true);
@@ -788,7 +791,7 @@ xdescribe('isNotEmpty', () => {
   });
 });
 
-xdescribe('isPersonTaxNumber', () => {
+describe('isPersonTaxNumber', () => {
   it('Should be true if parameter is valid person tax number', () => {
     const result = validator.isPersonTaxNumber('1234567890');
     expect(result).toBe(true);
@@ -828,4 +831,670 @@ xdescribe('isPersonTaxNumber', () => {
     const result = validator.isPersonTaxNumber('');
     expect(result).toBe(false);
   });
+});
+
+describe('isColorCode', () => {
+  it('Should be true if parameter is valid 6 digit hex color', () => {
+    const result = validator.isColorCode('#123456');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if parameter is valid 3 digit hex color', () => {
+    const result = validator.isColorCode('#123');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if parameter is valid hex color with uppercase', () => {
+    const result = validator.isColorCode('#ABCDEF');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if parameter is valid hex color with mixed case', () => {
+    const result = validator.isColorCode('#AbCdEf');
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if parameter is missing #', () => {
+    const result = validator.isColorCode('123456');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter has invalid characters', () => {
+    const result = validator.isColorCode('#GHIJKL');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter has wrong length', () => {
+    const result = validator.isColorCode('#12');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter is null', () => {
+    const result = validator.isColorCode(null);
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter is undefined', () => {
+    const result = validator.isColorCode(undefined);
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter is empty string', () => {
+    const result = validator.isColorCode('');
+    expect(result).toBe(false);
+  });
+});
+
+describe('isIbanCode', () => {
+  it('Should be true if parameter is valid IBAN format (2 letters + 2 digits)', () => {
+    const result = validator.isIbanCode('GB29');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if parameter is valid IBAN format (4 letters)', () => {
+    const result = validator.isIbanCode('NWBK');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if parameter is valid IBAN format (4 digits)', () => {
+    const result = validator.isIbanCode('6016');
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if parameter has wrong format', () => {
+    const result = validator.isIbanCode('GB2A');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter has wrong length', () => {
+    const result = validator.isIbanCode('GB');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter is undefined', () => {
+    const result = validator.isIbanCode(undefined);
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter is boolean', () => {
+    const result = validator.isIbanCode(true);
+    expect(result).toBe(false);
+  });
+});
+
+describe('isSwiftCode', () => {
+  it('Should be true if parameter is 8 digit swift code', () => {
+    const result = validator.isSwiftCode('12345678');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if parameter is 11 digit swift code', () => {
+    const result = validator.isSwiftCode('12345678901');
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if parameter has 9 digits', () => {
+    const result = validator.isSwiftCode('123456789');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter has 10 digits', () => {
+    const result = validator.isSwiftCode('1234567890');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter has letters', () => {
+    const result = validator.isSwiftCode('1234567A');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter is undefined', () => {
+    const result = validator.isSwiftCode(undefined);
+    expect(result).toBe(false);
+  });
+
+  it('Should be false if parameter is boolean', () => {
+    const result = validator.isSwiftCode(true);
+    expect(result).toBe(false);
+  });
+});
+
+describe('isCreditCard', () => {
+  it('Should be true for valid Visa card', () => {
+    const result = validator.isCreditCard('4123456789012123');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true for valid Mastercard', () => {
+    const result = validator.isCreditCard('5312345678901234');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true for valid American Express card', () => {
+    const result = validator.isCreditCard('341234567890123');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true for valid Discover card', () => {
+    const result = validator.isCreditCard('6011123456789101');
+    expect(result).toBe(true);
+  });
+
+  it('Should be false for invalid card number', () => {
+    const result = validator.isCreditCard('1234567890123456');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false for string', () => {
+    const result = validator.isCreditCard('invalid');
+    expect(result).toBe(false);
+  });
+
+  it('Should be false for undefined', () => {
+    const result = validator.isCreditCard(undefined);
+    expect(result).toBe(false);
+  });
+});
+
+describe('isNullable', () => {
+  it('Should be true for any value', () => {
+    const result = validator.isNullable('test');
+    expect(result).toBe(true);
+  });
+
+  it('Should be true for null', () => {
+    const result = validator.isNullable(null);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true for undefined', () => {
+    const result = validator.isNullable(undefined);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true for number', () => {
+    const result = validator.isNullable(123);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true for boolean', () => {
+    const result = validator.isNullable(false);
+    expect(result).toBe(true);
+  });
+});
+
+describe('min', () => {
+  it('Should be true if number is greater than minimum', () => {
+    const result = validator.min(10, 5);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if number equals minimum', () => {
+    const result = validator.min(5, 5);
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if number is less than minimum', () => {
+    const result = validator.min(3, 5);
+    expect(result).toBe(false);
+  });
+
+  it('Should be true if array length is greater than minimum', () => {
+    const result = validator.min([1, 2, 3, 4, 5], 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if array length equals minimum', () => {
+    const result = validator.min([1, 2, 3], 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if array length is less than minimum', () => {
+    const result = validator.min([1, 2], 3);
+    expect(result).toBe(false);
+  });
+
+  it('Should be true if string length is greater than minimum', () => {
+    const result = validator.min('hello', 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if string length equals minimum', () => {
+    const result = validator.min('abc', 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if string length is less than minimum', () => {
+    const result = validator.min('ab', 3);
+    expect(result).toBe(false);
+  });
+
+  it('Should be false for other data types', () => {
+    const result = validator.min({}, 1);
+    expect(result).toBe(false);
+  });
+});
+
+describe('max', () => {
+  it('Should be true if number is less than maximum', () => {
+    const result = validator.max(3, 5);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if number equals maximum', () => {
+    const result = validator.max(5, 5);
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if number is greater than maximum', () => {
+    const result = validator.max(7, 5);
+    expect(result).toBe(false);
+  });
+
+  it('Should be true if array length is less than maximum', () => {
+    const result = validator.max([1, 2], 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if array length equals maximum', () => {
+    const result = validator.max([1, 2, 3], 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if array length is greater than maximum', () => {
+    const result = validator.max([1, 2, 3, 4], 3);
+    expect(result).toBe(false);
+  });
+
+  it('Should be true if string length is less than maximum', () => {
+    const result = validator.max('ab', 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be true if string length equals maximum', () => {
+    const result = validator.max('abc', 3);
+    expect(result).toBe(true);
+  });
+
+  it('Should be false if string length is greater than maximum', () => {
+    const result = validator.max('abcd', 3);
+    expect(result).toBe(false);
+  });
+
+  it('Should be false for other data types', () => {
+    const result = validator.max({}, 1);
+    expect(result).toBe(false);
+  });
+});
+
+describe('validate', () => {
+  it('Should return true for valid string validation', () => {
+    const result = validator.validate('test', 'string');
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for valid number validation', () => {
+    const result = validator.validate(123, 'number');
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for valid boolean validation', () => {
+    const result = validator.validate(true, 'boolean');
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for valid integer validation', () => {
+    const result = validator.validate(123, 'integer');
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for valid required validation', () => {
+    const result = validator.validate('test', 'required');
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for valid array of rules', () => {
+    const result = validator.validate('test', ['string', 'required']);
+    expect(result).toBe(true);
+  });
+
+  it('Should return false for invalid validation', () => {
+    const result = validator.validate('test', 'number');
+    expect(result).toBe(false);
+  });
+
+  it('Should return true for nullable with null value', () => {
+    const result = validator.validate(null, 'nullable');
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for nullable with undefined value', () => {
+    const result = validator.validate(undefined, ['nullable', 'string']);
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for nullable with empty string', () => {
+    const result = validator.validate('', ['nullable', 'string']);
+    expect(result).toBe(true);
+  });
+
+  it('Should return true for nullable with empty array', () => {
+    const result = validator.validate([], ['nullable', 'array']);
+    expect(result).toBe(true);
+  });
+
+  it('Should validate name correctly', () => {
+    const result = validator.validate('John Doe', 'name');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate email correctly', () => {
+    const result = validator.validate('test@example.com', 'email');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate domain correctly', () => {
+    const result = validator.validate('example.com', 'domain');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate url correctly', () => {
+    const result = validator.validate('https://www.example.com', 'url');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate iso_date correctly', () => {
+    const result = validator.validate('2023-01-01', 'iso_date');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate driving_licence correctly', () => {
+    const result = validator.validate('AA123456', 'driving_licence');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate id_card_number correctly', () => {
+    const result = validator.validate('MA123456', 'id_card_number');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate address_card_number correctly', () => {
+    const result = validator.validate('AA123456', 'address_card_number');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate phonenumber correctly', () => {
+    const result = validator.validate('+1234567890', 'phonenumber');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate bankaccount correctly', () => {
+    const result = validator.validate('12345678-12345678', 'bankaccount');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate taxnumber correctly', () => {
+    const result = validator.validate('12345678-1-12', 'taxnumber');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate social_insurance_number correctly', () => {
+    const result = validator.validate('123-123-123', 'social_insurance_number');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate not_zero correctly', () => {
+    const result = validator.validate(5, 'not_zero');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate lang correctly', () => {
+    const result = validator.validate('en', 'lang');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate register_number correctly', () => {
+    const result = validator.validate('12-12-123456', 'register_number');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate array correctly', () => {
+    const result = validator.validate(['test'], 'array');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate not_empty correctly', () => {
+    const result = validator.validate('test', 'not_empty');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate empty correctly', () => {
+    const result = validator.validate('', 'empty');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate person_taxnumber correctly', () => {
+    const result = validator.validate('1234567890', 'person_taxnumber');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate color_code correctly', () => {
+    const result = validator.validate('#123456', 'color_code');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate iban_code correctly', () => {
+    const result = validator.validate('GB29', 'iban_code');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate swift_code correctly', () => {
+    const result = validator.validate('12345678', 'swift_code');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate min rule correctly', () => {
+    const result = validator.validate('hello', 'min:3');
+    expect(result).toBe(true);
+  });
+
+  it('Should validate max rule correctly', () => {
+    const result = validator.validate('hi', 'max:5');
+    expect(result).toBe(true);
+  });
+
+  it('Should return false for unknown rule', () => {
+    const result = validator.validate('test', 'unknown_rule');
+    expect(result).toBe(false);
+  });
+
+  it('Should handle nullable rule without adding to results', () => {
+    const result = validator.validate('test', ['nullable', 'string']);
+    expect(result).toBe(true);
+  });
+});
+
+describe('validateObject', () => {
+  const validData = {
+    name: 'John Doe',
+    email: 'john@example.com',
+    age: 25,
+    isActive: true
+  };
+
+  const validRules = {
+    name: ['string', 'required'],
+    email: ['email', 'required'],
+    age: ['integer', 'required'],
+    isActive: ['boolean', 'required']
+  };
+
+  it('Should return [true, []] for valid data', () => {
+    const [result, invalids] = validator.validateObject(validData, validRules, false);
+    expect(result).toBe(true);
+    expect(invalids).toEqual([]);
+  });
+
+  it('Should return [false, [invalidFields]] for invalid data', () => {
+    const invalidData = {
+      name: '',
+      email: 'invalid-email',
+      age: 'not-a-number',
+      isActive: 'not-a-boolean'
+    };
+
+    const [result, invalids] = validator.validateObject(invalidData, validRules, false);
+    expect(result).toBe(false);
+    expect(invalids).toContain('name');
+    expect(invalids).toContain('email');
+    expect(invalids).toContain('age');
+    expect(invalids).toContain('isActive');
+  });
+
+  it('Should throw ValidationError when isThrowError is true (default)', () => {
+    const invalidData = {
+      name: '',
+      email: 'invalid-email'
+    };
+
+    const rules = {
+      name: ['string', 'required'],
+      email: ['email', 'required']
+    };
+
+    const settings: ValidationErrorSettingsInterface = {
+      message: 'Validation failed',
+      invalids: []
+    };
+
+    expect(() => {
+      validator.validateObject(invalidData, rules, true, settings);
+    }).toThrow(ValidationError);
+  });
+
+  it('Should throw ValidationError with correct invalids when validation fails', () => {
+    const invalidData = {
+      name: '',
+      email: 'invalid'
+    };
+
+    const rules = {
+      name: ['required'],
+      email: ['email']
+    };
+
+    const settings: ValidationErrorSettingsInterface = {
+      message: 'Test error',
+      invalids: []
+    };
+
+    try {
+      validator.validateObject(invalidData, rules, true, settings);
+      fail('Should have thrown ValidationError');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ValidationError);
+      expect(error.invalids).toContain('name');
+      expect(error.invalids).toContain('email');
+    }
+  });
+
+  it('Should not throw error when isThrowError is false', () => {
+    const invalidData = {
+      name: '',
+      email: 'invalid'
+    };
+
+    const rules = {
+      name: ['required'],
+      email: ['email']
+    };
+
+    const settings: ValidationErrorSettingsInterface = {
+      message: 'Test error',
+      invalids: []
+    };
+
+    expect(() => {
+      const [result, invalids] = validator.validateObject(invalidData, rules, false, settings);
+      expect(result).toBe(false);
+      expect(invalids.length).toBeGreaterThan(0);
+    }).not.toThrow();
+  });
+
+  it('Should handle empty rules object', () => {
+    const [result, invalids] = validator.validateObject(validData, {}, false);
+    expect(result).toBe(true);
+    expect(invalids).toEqual([]);
+  });
+
+  it('Should handle nullable fields correctly', () => {
+    const dataWithNulls = {
+      name: 'John',
+      optional: null
+    };
+
+    const rulesWithNullable = {
+      name: ['string', 'required'],
+      optional: ['string', 'nullable']
+    };
+
+    const [result, invalids] = validator.validateObject(dataWithNulls, rulesWithNullable, false);
+    expect(result).toBe(true);
+    expect(invalids).toEqual([]);
+  });
+});
+
+// Test edge cases for better coverage
+describe('ValidatorService Edge Cases', () => {
+  it('isBoolean should handle 0 and 1 as boolean', () => {
+    expect(validator.isBoolean(0)).toBe(true);
+    expect(validator.isBoolean(1)).toBe(true);
+  });
+
+  it('isBoolean should handle null as boolean', () => {
+    expect(validator.isBoolean(null)).toBe(true);
+  });
+
+  it('isNumber should handle NaN correctly', () => {
+    expect(validator.isNumber(NaN)).toBe(false);
+  });
+
+  it('isRequired should handle empty objects correctly', () => {
+    expect(validator.isRequired({})).toBe(false);
+  });
+
+  it('isRequired should handle empty arrays correctly', () => {
+    expect(validator.isRequired([])).toBe(false);
+  });
+
+  it('isEmpty should handle objects without length property', () => {
+    expect(validator.isEmpty(undefined)).toBe(false);
+    expect(validator.isEmpty(null)).toBe(false);
+  });
+
+  it('isNotEmpty should handle data with length > 0', () => {
+    expect(validator.isNotEmpty('a')).toBe(true);
+    expect(validator.isNotEmpty([1])).toBe(true);
+  });
+
+  it('Should handle phoneNumber with minimum 10 digits requirement', () => {
+    expect(validator.isPhoneNumber('+123456789')).toBe(false); // 9 digits after +
+    expect(validator.isPhoneNumber('+1234567890')).toBe(true); // 10 digits after +
+  });
+
+  it('Should handle integer validation with float numbers', () => {
+    expect(validator.isInteger(3.14)).toBe(false);
+    expect(validator.isInteger(3.0)).toBe(true);
+  });
+
+  it('Should handle validation with multiple rules and one failure', () => {
+    const result = validator.validate('', ['string', 'required']);
+    expect(result).toBe(false);
+  });
+
+  it('Should handle validation with rule that has colon but no value', () => {
+    const result = validator.validate('test', 'min:');
+    expect(result).toBe(true); // NaN comparison should work
+  });
+});
 });
