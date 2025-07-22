@@ -105,6 +105,16 @@ describe('DdataMultipleSelectDialogComponent', () => {
     it('should initialize componentRendererService', () => {
       expect((component as any).componentRendererService).toBeDefined();
     });
+
+    it('should initialize subscription', () => {
+      expect((component as any).subscription).toBeDefined();
+      expect((component as any).subscription.closed).toBeFalse();
+    });
+
+    it('should initialize private properties', () => {
+      expect((component as any).componentRef).toBeUndefined();
+      expect((component as any).selectedModel).toBeUndefined();
+    });
   });
 
   describe('Input Properties', () => {
@@ -245,6 +255,26 @@ describe('DdataMultipleSelectDialogComponent', () => {
       expect(mockComponentRendererService.setSelectedModels).not.toHaveBeenCalled();
     });
 
+    it('should handle single mode with null selected model', () => {
+      component.mode = 'single';
+      component.model = { ...mockModel, tag_id: null };
+      component.field = 'tag_id';
+      
+      component.ngAfterViewInit();
+
+      expect(mockComponentRendererService.setSelectedModels).not.toHaveBeenCalled();
+    });
+
+    it('should handle single mode with falsy selected model', () => {
+      component.mode = 'single';
+      component.model = { ...mockModel, tag_id: undefined };
+      component.field = 'tag_id';
+      
+      component.ngAfterViewInit();
+
+      expect(mockComponentRendererService.setSelectedModels).not.toHaveBeenCalled();
+    });
+
     it('should handle multiple mode', () => {
       component.mode = 'multiple';
       component.field = 'id';
@@ -292,6 +322,20 @@ describe('DdataMultipleSelectDialogComponent', () => {
       mockComponentInstance.select.emit(null);
 
       expect((component as any).emitEvents).not.toHaveBeenCalled();
+    });
+
+    it('should not reset model fields in single mode', () => {
+      component.mode = 'single';
+      component.field = 'tag_id';
+      component.settings = mockSettings;
+      const originalModel = { ...mockModel };
+      
+      component.ngAfterViewInit();
+      const testModels = [{ id: 1, name: 'Test' }];
+      mockComponentInstance.select.emit(testModels);
+
+      // In single mode, model fields should not be reset
+      expect(component.model.id).toEqual(originalModel.id);
     });
   });
 
@@ -363,6 +407,18 @@ describe('DdataMultipleSelectDialogComponent', () => {
       const result = (component as any).getObjectFieldName();
       expect(result).toBe('parent_tag');
     });
+
+    it('should handle empty field name', () => {
+      component.field = '';
+      const result = (component as any).getObjectFieldName();
+      expect(result).toBe('');
+    });
+
+    it('should handle field ending with just _id', () => {
+      component.field = '_id';
+      const result = (component as any).getObjectFieldName();
+      expect(result).toBe('');
+    });
   });
 
   describe('setModel', () => {
@@ -429,6 +485,44 @@ describe('DdataMultipleSelectDialogComponent', () => {
 
     it('should handle undefined settings', () => {
       component.settings = undefined;
+      
+      expect(() => component.ngAfterViewInit()).not.toThrow();
+    });
+
+    it('should handle undefined componentRef in ngAfterViewInit', () => {
+      component.settings = mockSettings;
+      (component as any).componentRef = undefined;
+      
+      expect(() => component.ngAfterViewInit()).not.toThrow();
+      expect(mockComponentRendererService.setComponentRef).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should handle model without requested field in single mode', () => {
+      component.mode = 'single';
+      component.model = { otherField: 'value' };
+      component.field = 'missing_field_id';
+      component.settings = mockSettings;
+      
+      expect(() => component.ngAfterViewInit()).not.toThrow();
+    });
+
+    it('should handle model without requested field in multiple mode', () => {
+      component.mode = 'multiple';
+      component.model = { otherField: 'value' };
+      component.field = 'missing_field';
+      component.settings = mockSettings;
+      
+      expect(() => component.ngAfterViewInit()).not.toThrow();
+      expect(mockComponentRendererService.setSelectedModels).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should handle settings without listOptions', () => {
+      component.mode = 'multiple';
+      component.field = 'id';
+      component.settings = {
+        listComponent: jasmine.createSpy('MockListComponent'),
+        createEditComponent: jasmine.createSpy('MockCreateEditComponent')
+      };
       
       expect(() => component.ngAfterViewInit()).not.toThrow();
     });
