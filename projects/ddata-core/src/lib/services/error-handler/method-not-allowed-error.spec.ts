@@ -184,48 +184,76 @@ describe('MethodNotAllowedError', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle originalError without error property', () => {
+    it('should throw when originalError lacks error property', () => {
       const originalError = {} as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).not.toThrow();
+      }).toThrow();
     });
 
-    it('should handle originalError with null error property', () => {
+    it('should throw when originalError has null error property', () => {
       const originalError = {
         error: null
       } as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).not.toThrow();
+      }).toThrow();
     });
 
-    it('should handle originalError with undefined error property', () => {
+    it('should throw when originalError has undefined error property', () => {
       const originalError = {
         error: undefined
       } as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).not.toThrow();
+      }).toThrow();
     });
 
-    it('should handle null originalError', () => {
+    it('should throw when originalError is null', () => {
       const originalError = null as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).not.toThrow();
+      }).toThrow();
     });
 
-    it('should handle undefined originalError', () => {
+    it('should throw when originalError is undefined', () => {
       const originalError = undefined as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).not.toThrow();
+      }).toThrow();
+    });
+
+    it('should not call console.error or notificationService when constructor throws', () => {
+      const originalError = null as any;
+
+      try {
+        new MethodNotAllowedError(originalError, mockNotificationService);
+      } catch (error) {
+        // Expected to throw
+      }
+
+      expect(console.error).not.toHaveBeenCalled();
+      expect(mockNotificationService.add).not.toHaveBeenCalled();
+    });
+
+    it('should handle originalError.error without message property', () => {
+      const originalError = {
+        error: {}
+      };
+
+      new MethodNotAllowedError(originalError, mockNotificationService);
+
+      expect(console.error).toHaveBeenCalledWith('Method Not Allowed Error: ', undefined);
+      expect(mockNotificationService.add).toHaveBeenCalledWith(
+        'Hiba',
+        'A funkció nem érhető el.',
+        'danger' as NotificationType
+      );
     });
 
     it('should handle complex originalError structure', () => {
