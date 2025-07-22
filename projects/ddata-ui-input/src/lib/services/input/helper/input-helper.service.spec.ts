@@ -124,6 +124,7 @@ describe('InputHelperService', () => {
     } as any;
 
     service = TestBed.inject(InputHelperService);
+    // Create a fresh mock model for each test to avoid interference between tests
     mockModel = new MockModel();
   });
 
@@ -138,6 +139,12 @@ describe('InputHelperService', () => {
       
       expect(result).toBe(false);
       expect(consoleSpy).toHaveBeenCalledWith('Missing validation rule:nonExistentField from model: TestModel');
+    });
+
+    it('should throw error when model is null', () => {
+      expect(() => {
+        service.validateField(null as any, 'testField');
+      }).toThrow();
     });
 
     it('should return true when field is valid and not in validation errors', () => {
@@ -160,6 +167,16 @@ describe('InputHelperService', () => {
       expect(mockModel.validationErrors).toContain('testField');
     });
 
+    it('should return false and not add field to validation errors when validation fails and field is already in errors', () => {
+      spyOn(mockValidatorService, 'validate').and.returnValue(false);
+      mockModel.validationErrors = ['testField'];
+      
+      const result = service.validateField(mockModel, 'testField');
+      
+      expect(result).toBe(false);
+      expect(mockModel.validationErrors).toEqual(['testField']); // should not duplicate
+    });
+
     it('should return true and remove field from validation errors when field becomes valid', () => {
       spyOn(mockValidatorService, 'validate').and.returnValue(true);
       mockModel.validationErrors = ['testField'];
@@ -175,6 +192,16 @@ describe('InputHelperService', () => {
     it('should return empty string and log error when model is null', () => {
       const consoleSpy = spyOn(console, 'error');
       const result = service.getTitle(null as any, 'testField');
+      
+      expect(result).toBe('');
+      expect(consoleSpy).toHaveBeenCalledWith(`The model not contains the 'testField' field's title. You need to set in your model the fields.testField.title field.`);
+    });
+
+    it('should return empty string and log error when model.fields is null', () => {
+      const consoleSpy = spyOn(console, 'error');
+      const modelWithNullFields = { ...mockModel };
+      modelWithNullFields.fields = null as any;
+      const result = service.getTitle(modelWithNullFields, 'testField');
       
       expect(result).toBe('');
       expect(consoleSpy).toHaveBeenCalledWith(`The model not contains the 'testField' field's title. You need to set in your model the fields.testField.title field.`);
@@ -213,6 +240,16 @@ describe('InputHelperService', () => {
       expect(consoleSpy).toHaveBeenCalledWith(`The model not contains the 'testField' field's label. You need to set in your model the fields.testField.label field.`);
     });
 
+    it('should return empty string and log error when model.fields is null', () => {
+      const consoleSpy = spyOn(console, 'error');
+      const modelWithNullFields = { ...mockModel };
+      modelWithNullFields.fields = null as any;
+      const result = service.getLabel(modelWithNullFields, 'testField');
+      
+      expect(result).toBe('');
+      expect(consoleSpy).toHaveBeenCalledWith(`The model not contains the 'testField' field's label. You need to set in your model the fields.testField.label field.`);
+    });
+
     it('should return empty string and log error when model.fields[field] is missing', () => {
       const consoleSpy = spyOn(console, 'error');
       const result = service.getLabel(mockModel, 'nonExistentField');
@@ -246,6 +283,16 @@ describe('InputHelperService', () => {
       expect(consoleSpy).toHaveBeenCalledWith(`The model not contains the 'testField' field's placeholder. You need to set in your model the fields.testField.placeholder field.`);
     });
 
+    it('should return empty string and log error when model.fields is null', () => {
+      const consoleSpy = spyOn(console, 'error');
+      const modelWithNullFields = { ...mockModel };
+      modelWithNullFields.fields = null as any;
+      const result = service.getPlaceholder(modelWithNullFields, 'testField');
+      
+      expect(result).toBe('');
+      expect(consoleSpy).toHaveBeenCalledWith(`The model not contains the 'testField' field's placeholder. You need to set in your model the fields.testField.placeholder field.`);
+    });
+
     it('should return empty string and log error when model.fields[field] is missing', () => {
       const consoleSpy = spyOn(console, 'error');
       const result = service.getPlaceholder(mockModel, 'nonExistentField');
@@ -266,14 +313,23 @@ describe('InputHelperService', () => {
     it('should return the title when everything is valid (bug: returns title instead of placeholder)', () => {
       const result = service.getPlaceholder(mockModel, 'testField');
       
-      // Note: This tests the current implementation which returns title instead of placeholder
-      expect(result).toBe('Test Field Title');
+      // Note: This tests the current implementation which has a bug - it returns title instead of placeholder
+      // The correct implementation should return model.fields[field].placeholder instead of model.fields[field].title
+      expect(result).toBe('Test Field Title'); // Should be 'Test Field Placeholder' when bug is fixed
     });
   });
 
   describe('getPrepend', () => {
     it('should return empty string when model is null', () => {
       const result = service.getPrepend(null as any, 'testField');
+      
+      expect(result).toBe('');
+    });
+
+    it('should return empty string when model.fields is null', () => {
+      const modelWithNullFields = { ...mockModel };
+      modelWithNullFields.fields = null as any;
+      const result = service.getPrepend(modelWithNullFields, 'testField');
       
       expect(result).toBe('');
     });
@@ -301,6 +357,14 @@ describe('InputHelperService', () => {
   describe('getAppend', () => {
     it('should return empty string when model is null', () => {
       const result = service.getAppend(null as any, 'testField');
+      
+      expect(result).toBe('');
+    });
+
+    it('should return empty string when model.fields is null', () => {
+      const modelWithNullFields = { ...mockModel };
+      modelWithNullFields.fields = null as any;
+      const result = service.getAppend(modelWithNullFields, 'testField');
       
       expect(result).toBe('');
     });
@@ -336,6 +400,26 @@ describe('InputHelperService', () => {
       const result = service.isRequired(mockModel, 'optionalField');
       
       expect(result).toBe(false);
+    });
+
+    it('should throw error when field validation rules do not exist', () => {
+      expect(() => {
+        service.isRequired(mockModel, 'nonExistentField');
+      }).toThrow();
+    });
+
+    it('should throw error when model is null', () => {
+      expect(() => {
+        service.isRequired(null as any, 'testField');
+      }).toThrow();
+    });
+
+    it('should throw error when model.validationRules is null', () => {
+      const modelWithNullRules = { ...mockModel };
+      modelWithNullRules.validationRules = null as any;
+      expect(() => {
+        service.isRequired(modelWithNullRules, 'testField');
+      }).toThrow();
     });
   });
 
