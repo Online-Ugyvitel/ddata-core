@@ -22,7 +22,7 @@ describe('ValidatorService', () => {
   });
 });
 
-xdescribe('isNumber', () => {
+describe('isNumber', () => {
   it('Should be true if parameter is number', () => {
     const result = validator.isNumber(4);
     expect(result).toBe(true);
