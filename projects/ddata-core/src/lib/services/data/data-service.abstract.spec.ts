@@ -1,38 +1,8 @@
 import { DataServiceAbstract } from './data-service.abstract';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { Paginate } from '../../models/paginate/paginate.model';
-
-// Create a mock model class for testing
-class MockModel {
-  id: number;
-  name: string;
-  items: any[] = [];
-  tags: string[] = [];
-
-  constructor() {
-    this.id = 0;
-    this.name = '';
-    this.items = [];
-    this.tags = [];
-  }
-
-  init(data: any): MockModel {
-    if (data) {
-      this.id = data.id || 0;
-      this.name = data.name || '';
-      this.items = data.items || [];
-      this.tags = data.tags || [];
-    }
-    return this;
-  }
-}
-
-// Create a concrete implementation for testing
-class TestDataService extends DataServiceAbstract<MockModel> {
-  constructor(model: MockModel) {
-    super(model);
-  }
-}
+import { MockModel } from './mock-model';
+import { TestDataService } from './test-data-service';
 
 describe('DataServiceAbstract', () => {
   let service: TestDataService;
