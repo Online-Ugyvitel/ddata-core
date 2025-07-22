@@ -16,6 +16,8 @@ interface UserInterface {
     standalone: false
 })
 export class DdataUiUserThumbnailComponent implements OnInit {
+  private _user: UserInterface = { name: 'X', image: null };
+  
   @Input() set user(value: UserInterface) {
     if (!value) {
       value = {
@@ -24,9 +26,15 @@ export class DdataUiUserThumbnailComponent implements OnInit {
       };
     }
 
-    this.firstLetter = this.user.name.split('')[0].toUpperCase();
+    this._user = value;
+    this.firstLetter = value.name.split('')[0].toUpperCase();
     this.imageSrc = !!value.image && !!value.image.src ? value.image.src : '';
   }
+
+  get user(): UserInterface {
+    return this._user;
+  }
+
   firstLetter = 'X';
   imageSrc = '';
 
