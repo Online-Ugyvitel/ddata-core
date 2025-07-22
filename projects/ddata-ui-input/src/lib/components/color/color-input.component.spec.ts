@@ -83,6 +83,11 @@ describe('DdataInputColorComponent', () => {
       expect(component._model).toEqual(jasmine.any(BaseModel));
     });
 
+    it('should set _model to new BaseModel when value is undefined', () => {
+      component.model = undefined;
+      expect(component._model).toEqual(jasmine.any(BaseModel));
+    });
+
     it('should set _model and update field properties when model has fields', () => {
       const mockModel = new MockColorModel();
       component._field = 'color';
@@ -107,10 +112,66 @@ describe('DdataInputColorComponent', () => {
     it('should not set field properties when model has no fields for the field', () => {
       const mockModel = new BaseModel();
       component._field = 'nonexistentField';
+      const originalTitle = component._title;
+      const originalPlaceholder = component._placeholder;
+      const originalPrepend = component._prepend;
+      const originalAppend = component._append;
+      const originalLabel = component._label;
+      
       component.model = mockModel;
       
       expect(component._model).toBe(mockModel);
-      // Field properties should remain unchanged
+      expect(component._title).toBe(originalTitle);
+      expect(component._placeholder).toBe(originalPlaceholder);
+      expect(component._prepend).toBe(originalPrepend);
+      expect(component._append).toBe(originalAppend);
+      expect(component._label).toBe(originalLabel);
+    });
+
+    it('should not set _isRequired when model has no validation rules for the field', () => {
+      const mockModel = new BaseModel();
+      mockModel.fields = {
+        color: {
+          title: 'Color Title',
+          label: 'Color Label',
+          placeholder: 'Color Placeholder'
+        }
+      };
+      component._field = 'color';
+      const originalIsRequired = component._isRequired;
+      
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+      expect(component._isRequired).toBe(originalIsRequired);
+    });
+
+    it('should handle model with fields but no field for current _field', () => {
+      const mockModel = new BaseModel();
+      mockModel.fields = {
+        otherField: {
+          title: 'Other Title',
+          label: 'Other Label',
+          placeholder: 'Other Placeholder'
+        }
+      };
+      component._field = 'color';
+      
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+    });
+
+    it('should handle model with validation rules but no rule for current _field', () => {
+      const mockModel = new BaseModel();
+      mockModel.validationRules = {
+        otherField: ['required']
+      };
+      component._field = 'color';
+      
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
     });
   });
 
@@ -239,18 +300,38 @@ describe('DdataInputColorComponent', () => {
     });
   });
 
+  describe('Component initialization', () => {
+    it('should initialize all private properties with default values', () => {
+      expect(component._field).toBe('');
+      expect(component._title).toBe('');
+      expect(component._label).toBe('');
+      expect(component._placeholder).toBe('');
+      expect(component._prepend).toBe('');
+      expect(component._append).toBe('');
+      expect(component._isRequired).toBe(false);
+      expect(component._model).toEqual(jasmine.any(BaseModel));
+    });
+
+    it('should inject InputHelperService through constructor', () => {
+      expect(component.helperService).toBeDefined();
+      expect(component.helperService).toEqual(jasmine.any(InputHelperService));
+    });
+  });
+
   describe('Component properties', () => {
-    it('should initialize random property with a string', () => {
+    it('should initialize random property with a string from helperService.randChars()', () => {
       expect(component.random).toBeDefined();
       expect(typeof component.random).toBe('string');
       expect(component.random.length).toBe(50);
+      // Verify it matches the pattern expected from randChars
+      expect(component.random).toMatch(/^[A-Za-z0-9]+$/);
     });
 
     it('should initialize toggle property as false', () => {
       expect(component.toggle).toBe(false);
     });
 
-    it('should have validatorService instance', () => {
+    it('should have validatorService instance from DdataCoreModule', () => {
       expect(component.validatorService).toBeDefined();
       expect(component.validatorService).toEqual(jasmine.any(ValidatorService));
     });
@@ -346,6 +427,54 @@ describe('DdataInputColorComponent', () => {
       expect(component.toggle).toBe(false);
       component.toggle = true;
       expect(component.toggle).toBe(true);
+    });
+
+    it('should handle model where fields[_field] exists but is falsy', () => {
+      const mockModel = new BaseModel();
+      mockModel.fields = {
+        color: null as any
+      };
+      component._field = 'color';
+      
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+    });
+
+    it('should handle model where validationRules[_field] exists but is falsy', () => {
+      const mockModel = new BaseModel();
+      mockModel.validationRules = {
+        color: null as any
+      };
+      component._field = 'color';
+      
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+    });
+
+    it('should handle setting field to empty string', () => {
+      component._field = 'initial';
+      component.field = '';
+      expect(component._field).toBe('');
+    });
+
+    it('should handle setting append to empty string', () => {
+      component._append = 'initial';
+      component.append = '';
+      expect(component._append).toBe('');
+    });
+
+    it('should handle setting prepend to empty string', () => {
+      component._prepend = 'initial';
+      component.prepend = '';
+      expect(component._prepend).toBe('');
+    });
+
+    it('should handle setting labelText to empty string', () => {
+      component._label = 'initial';
+      component.labelText = '';
+      expect(component._label).toBe('');
     });
   });
 
