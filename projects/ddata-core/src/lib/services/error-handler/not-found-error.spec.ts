@@ -135,6 +135,40 @@ describe('NotFoundError', () => {
       );
     });
 
+    it('should handle originalError with numeric message', () => {
+      const originalError = {
+        error: {
+          message: 404
+        }
+      };
+
+      notFoundError = new NotFoundError(originalError, notificationService);
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Not Found Error: ', 404);
+      expect(notificationService.add).toHaveBeenCalledWith(
+        'Hiba',
+        'A keresett oldal nem található.',
+        'danger' as NotificationType
+      );
+    });
+
+    it('should handle originalError with boolean message', () => {
+      const originalError = {
+        error: {
+          message: false
+        }
+      };
+
+      notFoundError = new NotFoundError(originalError, notificationService);
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Not Found Error: ', false);
+      expect(notificationService.add).toHaveBeenCalledWith(
+        'Hiba',
+        'A keresett oldal nem található.',
+        'danger' as NotificationType
+      );
+    });
+
     it('should handle originalError without error property', () => {
       const originalError = {};
 
@@ -283,6 +317,69 @@ describe('NotFoundError', () => {
       expect(addCallArgs[1]).toBe('A keresett oldal nem található.');
       expect(addCallArgs[2]).toBe('danger');
       expect(typeof addCallArgs[2]).toBe('string');
+    });
+  });
+
+  describe('complete coverage verification', () => {
+    it('should execute all lines of code in constructor', () => {
+      const testMessage = 'Coverage verification message';
+      const originalError = {
+        error: {
+          message: testMessage
+        }
+      };
+
+      // Reset spies to ensure clean state
+      consoleErrorSpy.calls.reset();
+      notificationService.add.calls.reset();
+
+      // Create instance - this should execute every line in the constructor
+      notFoundError = new NotFoundError(originalError, notificationService);
+
+      // Verify every line was executed:
+      // 1. Class instantiation
+      expect(notFoundError).toBeTruthy();
+      
+      // 2. super(originalError) call - verified by checking inherited properties
+      expect(notFoundError.originalError).toBe(originalError);
+      
+      // 3. console.error call with exact parameters
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Not Found Error: ', testMessage);
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      
+      // 4. notificationService.add call with exact parameters
+      expect(notificationService.add).toHaveBeenCalledWith(
+        'Hiba', 
+        'A keresett oldal nem található.', 
+        'danger' as NotificationType
+      );
+      expect(notificationService.add).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle complex originalError structure correctly', () => {
+      const complexMessage = 'Complex error message with special chars: áéíóúüőű';
+      const originalError = {
+        error: {
+          message: complexMessage,
+          code: 404,
+          details: 'Additional error details',
+          timestamp: new Date().toISOString()
+        },
+        status: 404,
+        statusText: 'Not Found'
+      };
+
+      notFoundError = new NotFoundError(originalError, notificationService);
+
+      // Should correctly extract only the message part
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Not Found Error: ', complexMessage);
+      
+      // Should still call notification service with fixed Hungarian text
+      expect(notificationService.add).toHaveBeenCalledWith(
+        'Hiba',
+        'A keresett oldal nem található.',
+        'danger' as NotificationType
+      );
     });
   });
 });
