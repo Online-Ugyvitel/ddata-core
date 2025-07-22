@@ -2,15 +2,14 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { XlsButtonExportComponent } from './xls-button-export.component';
 
-xdescribe('XlsButtonExportComponent', () => {
+describe('XlsButtonExportComponent', () => {
   let component: XlsButtonExportComponent;
   let fixture: ComponentFixture<XlsButtonExportComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ XlsButtonExportComponent ]
-    })
-    .compileComponents();
+      declarations: [XlsButtonExportComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

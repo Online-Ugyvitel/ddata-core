@@ -5,7 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProxyService } from 'ddata-core';
 
 // module configuration
-import { ModuleConfiguration } from './models/module-configuration/module-configuration.interface';
+import { ModuleConfigurationInterface } from './models/module-configuration/module-configuration.interface';
 
 // models
 import { FileModel } from 'projects/ddata-ui-file/src/lib/models/file/file.model';
@@ -29,7 +29,7 @@ export class DdataUiModule {
     DdataUiModule.InjectorInstance = injector;
   }
 
-  static forRoot(config: ModuleConfiguration): ModuleWithProviders<any> {
+  static forRoot(config: ModuleConfigurationInterface): ModuleWithProviders<DdataUiModule> {
     return {
       ngModule: DdataUiModule,
       providers: [FileModel, { provide: 'config', useValue: config }]

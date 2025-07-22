@@ -1,3 +1,3 @@
-export interface ModuleConfiguration {
+export interface ModuleConfigurationInterface {
   lang: 'en' | 'hu';
 }

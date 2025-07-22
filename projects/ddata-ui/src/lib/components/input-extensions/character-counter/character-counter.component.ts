@@ -1,21 +1,22 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'dd-character-counter',
   templateUrl: './character-counter.component.html',
   styleUrls: ['./character-counter.component.css'],
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CharacterCounterComponent implements OnInit {
-  _currentLength = '';
+export class CharacterCounterComponent {
   @Input() maxLength: number;
+
+  currentLengthValue = '';
+
   @Input() set currentLength(value: string) {
     if (value !== undefined) {
-      this._currentLength = value;
+      this.currentLengthValue = value;
     }
   }
 
   constructor() {}
-
-  ngOnInit() {}
 }

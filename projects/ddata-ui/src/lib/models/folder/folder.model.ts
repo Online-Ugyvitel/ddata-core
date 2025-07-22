@@ -48,20 +48,22 @@ export class Folder
     title
   };
 
-  init(data: any): FolderInterface {
-    data = !!data ? data : {};
+  init(data: unknown): FolderInterface {
+    const safeData = !!data ? (data as Record<string, unknown>) : {};
 
-    this.id = data.id ? data.id : 0;
-    this.parent_id = data.parent_id ? data.parent_id : 0;
-    this.description = data.description ? data.description : '';
-    this.name = data.name ? data.name : '';
-    this.is_highlighted = data.is_highlighted ? true : false;
-    this.uri = data.uri ? data.uri : '';
+    this.id = safeData.id ? (safeData.id as ID) : (0 as ID);
+    this.parent_id = safeData.parent_id ? (safeData.parent_id as ID) : (0 as ID);
+    this.description = safeData.description
+      ? (safeData.description as Description)
+      : ('' as Description);
+    this.name = safeData.name ? (safeData.name as string) : '';
+    this.is_highlighted = safeData.is_highlighted ? true : false;
+    this.uri = safeData.uri ? (safeData.uri as URI) : ('' as URI);
 
     return this;
   }
 
-  prepareToSave() {
+  prepareToSave(): Record<string, unknown> {
     return {
       id: this.id ? this.id : 0,
       parent_id: this.parent_id ? this.parent_id : 0,

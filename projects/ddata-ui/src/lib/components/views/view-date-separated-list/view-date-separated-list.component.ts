@@ -1,28 +1,29 @@
 import {
   Component,
-  OnInit,
   Input,
   Output,
   EventEmitter,
   ElementRef,
   ViewChild,
   Renderer2,
-  AfterViewInit
+  AfterViewInit,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
 import { ViewDateSeparatedListInterface } from 'src/app/models/view/date/separated/list/view-date-separated-list.interface';
 import { ViewDateSeparatedList } from 'src/app/models/view/date/separated/list/view-date-spearated-list.interface';
 import * as moment from 'moment';
-import { Global } from 'src/app/models/global.model';
+import { Global } from '../../../models/global.model';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'dd-view-date-separated-list',
   templateUrl: './view-date-separated-list.component.html',
   styleUrls: ['./view-date-separated-list.component.scss'],
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ViewDateSeparatedListComponent implements OnInit, AfterViewInit {
+export class ViewDateSeparatedListComponent implements AfterViewInit {
   @Input() set data(data: BehaviorSubject<Array<CasefileInterface>>) {
     data.subscribe((models: Array<CasefileInterface>) => {
       this.originalData = models;
@@ -32,8 +33,8 @@ export class ViewDateSeparatedListComponent implements OnInit, AfterViewInit {
   }
 
   @Input() title = 'Dátum szerint csoportosított nézet';
-  @Output() openCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
-  @Output() deleteCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
+  @Output() readonly openCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
+  @Output() readonly deleteCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
   @ViewChild('listContainer') listContainer: ElementRef;
   dateSeparatedListData: Array<ViewDateSeparatedListInterface> = [];
   originalData: Array<CasefileInterface> = [];
@@ -47,13 +48,11 @@ export class ViewDateSeparatedListComponent implements OnInit, AfterViewInit {
     this.moment.locale('hu');
   }
 
-  ngOnInit() {}
-
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.setHeight();
   }
 
-  setHeight() {
+  setHeight(): void {
     if (!!this.listContainer) {
       const newHeight = document.documentElement.clientHeight - 189;
 
@@ -68,7 +67,7 @@ export class ViewDateSeparatedListComponent implements OnInit, AfterViewInit {
 
     data.forEach((item: CasefileInterface) => {
       let casefilesByDate = dateSeparatedListData.find(
-        (_dateGroup) => _dateGroup.name === this.setListItemName(item.deadline)
+        (dateGroup) => dateGroup.name === this.setListItemName(item.deadline)
       );
 
       if (!casefilesByDate) {
@@ -104,11 +103,11 @@ export class ViewDateSeparatedListComponent implements OnInit, AfterViewInit {
     return this.moment(deadline).fromNow();
   }
 
-  open(casefile: CasefileInterface) {
+  open(casefile: CasefileInterface): void {
     this.openCasefile.emit(this.findData(casefile));
   }
 
-  delete(casefile: CasefileInterface) {
+  delete(casefile: CasefileInterface): void {
     this.deleteCasefile.emit(this.findData(casefile));
   }
 

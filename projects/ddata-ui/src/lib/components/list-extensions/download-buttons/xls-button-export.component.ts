@@ -1,11 +1,12 @@
-import { Component, Input } from '@angular/core';
-import { BaseModel } from './../../../models/base-model/base-model.model';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { BaseModel } from 'ddata-core';
 
 @Component({
   selector: 'dd-xls-button-export',
   templateUrl: './xls-button-export.component.html',
   styleUrls: ['./xls-button-export.component.scss'],
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class XlsButtonExportComponent {
   @Input() model: BaseModel = new BaseModel();

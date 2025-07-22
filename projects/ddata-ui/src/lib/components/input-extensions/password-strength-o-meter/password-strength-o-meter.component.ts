@@ -1,12 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'dd-password-strength-o-meter',
   templateUrl: './password-strength-o-meter.component.html',
   styleUrls: ['./password-strength-o-meter.component.css'],
-  standalone: false
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PasswordStrengthOMeterComponent implements OnInit {
+export class PasswordStrengthOMeterComponent {
   // _level = 0;
   progress = 0;
   conditions = {
@@ -16,7 +17,9 @@ export class PasswordStrengthOMeterComponent implements OnInit {
     'bg-success': this.progress >= 70
   };
 
-  @Input() set password(value: string) {
+  @Input() set password(passwordValue: string) {
+    let value = passwordValue;
+
     if (!value) {
       // this._level = 0;
       value = '';
@@ -61,16 +64,16 @@ export class PasswordStrengthOMeterComponent implements OnInit {
     if (value.length > 12) {
       passwordLevel++;
     }
-    // is a shit password?
-    let is_shit = 0;
+    // is a weak password?
+    let isWeakPassword = 0;
 
     this.shitPasswordList.forEach((item) => {
       if (item === value.toLowerCase()) {
-        is_shit = 1;
+        isWeakPassword = 1;
       }
     });
 
-    if (is_shit === 0) {
+    if (isWeakPassword === 0) {
       passwordLevel++;
     } else {
       passwordLevel = 0;
@@ -124,6 +127,4 @@ export class PasswordStrengthOMeterComponent implements OnInit {
   ];
 
   constructor() {}
-
-  ngOnInit() {}
 }
