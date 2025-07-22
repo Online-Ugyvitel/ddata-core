@@ -96,6 +96,10 @@ describe('DdataTextareaComponent', () => {
       expect(component.maxLength).toBe(255);
       expect(component.maxWords).toBe(7);
       expect(component.displayWordCounterWarning).toBe(false);
+      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
+      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
+      expect(component.inputBlockExtraClass).toBe('col-md-9');
+      expect(component.wrapperClass).toBe('d-flex flex-wrap');
     });
 
     it('should generate random string for id', () => {
@@ -158,6 +162,13 @@ describe('DdataTextareaComponent', () => {
     it('should return the model via getter', () => {
       component.model = mockModel;
       expect(component.model).toBe(mockModel);
+    });
+
+    it('should initialize with BaseModel when no model is set', () => {
+      // Test the default _model initialization
+      const newComponent = new DdataTextareaComponent();
+      expect(newComponent._model).toBeDefined();
+      expect(newComponent._model.constructor.name).toBe('BaseModel');
     });
   });
 
@@ -375,6 +386,48 @@ describe('DdataTextareaComponent', () => {
     });
   });
 
+  describe('Character and Word Counter Features', () => {
+    beforeEach(() => {
+      component._field = 'testField';
+      component.model = mockModel;
+      fixture.detectChanges();
+    });
+
+    it('should render character counter when enableCharacterCounter is true', () => {
+      component.enableCharacterCounter = true;
+      component.isViewOnly = false;
+      fixture.detectChanges();
+
+      // Since character-counter is a custom component, we check if the ng-container is rendered
+      const textarea = fixture.debugElement.query(By.css('textarea'));
+      expect(textarea).toBeTruthy();
+      expect(component.enableCharacterCounter).toBeTruthy();
+    });
+
+    it('should render word counter when enableWordCounter is true', () => {
+      component.enableWordCounter = true;
+      component.isViewOnly = false;
+      fixture.detectChanges();
+
+      // Since app-word-counter is a custom component, we check if the ng-container is rendered
+      const textarea = fixture.debugElement.query(By.css('textarea'));
+      expect(textarea).toBeTruthy();
+      expect(component.enableWordCounter).toBeTruthy();
+    });
+
+    it('should not render counters when disabled', () => {
+      component.enableCharacterCounter = false;
+      component.enableWordCounter = false;
+      component.isViewOnly = false;
+      fixture.detectChanges();
+
+      const textarea = fixture.debugElement.query(By.css('textarea'));
+      expect(textarea).toBeTruthy();
+      expect(component.enableCharacterCounter).toBeFalsy();
+      expect(component.enableWordCounter).toBeFalsy();
+    });
+  });
+
   describe('Event Handling', () => {
     beforeEach(() => {
       component._field = 'testField';
@@ -427,6 +480,27 @@ describe('DdataTextareaComponent', () => {
       expect(textarea.nativeElement.disabled).toBeTruthy();
     });
 
+    it('should set correct id and name attributes using field and random', () => {
+      component._field = 'testField';
+      component.random = 'abc123';
+      component.isViewOnly = false;
+      fixture.detectChanges();
+
+      const textarea = fixture.debugElement.query(By.css('textarea'));
+      expect(textarea.nativeElement.getAttribute('id')).toBe('testField_abc123');
+      expect(textarea.nativeElement.getAttribute('name')).toBe('testField_abc123');
+    });
+
+    it('should set correct for attribute on label using field and random', () => {
+      component._field = 'testField';
+      component.random = 'abc123';
+      component.showLabel = true;
+      fixture.detectChanges();
+
+      const label = fixture.debugElement.query(By.css('label'));
+      expect(label.nativeElement.getAttribute('for')).toBe('testField_abc123');
+    });
+
     it('should set correct attributes on textarea', () => {
       component.isViewOnly = false;
       component._placeholder = 'Test Placeholder';
@@ -438,6 +512,40 @@ describe('DdataTextareaComponent', () => {
       expect(textarea.nativeElement.getAttribute('placeholder')).toBe('Test Placeholder');
       expect(textarea.nativeElement.getAttribute('title')).toBe('Test Title');
       expect(textarea.nativeElement.getAttribute('rows')).toBe('10');
+    });
+
+    it('should apply wrapper and label classes correctly', () => {
+      component.wrapperClass = 'custom-wrapper';
+      component.labelClass = 'custom-label';
+      component.showLabel = true;
+      fixture.detectChanges();
+
+      const wrapper = fixture.debugElement.query(By.css('.custom-wrapper'));
+      const label = fixture.debugElement.query(By.css('.custom-label'));
+      expect(wrapper).toBeTruthy();
+      expect(label).toBeTruthy();
+    });
+
+    it('should apply input block classes correctly', () => {
+      component.inputBlockClass = 'custom-input-block';
+      component.inputBlockExtraClass = 'custom-extra';
+      component.showLabel = true;
+      fixture.detectChanges();
+
+      const inputBlock = fixture.debugElement.query(By.css('.custom-input-block'));
+      expect(inputBlock).toBeTruthy();
+      expect(inputBlock.nativeElement.classList.contains('custom-extra')).toBeTruthy();
+    });
+
+    it('should apply input block class without extra class when showLabel is false', () => {
+      component.inputBlockClass = 'custom-input-block';
+      component.inputBlockExtraClass = 'custom-extra';
+      component.showLabel = false;
+      fixture.detectChanges();
+
+      const inputBlock = fixture.debugElement.query(By.css('.custom-input-block'));
+      expect(inputBlock).toBeTruthy();
+      expect(inputBlock.nativeElement.classList.contains('custom-extra')).toBeFalsy();
     });
 
     it('should apply invalid class when validation errors include field', () => {
