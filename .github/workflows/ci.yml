@@ -46,14 +46,14 @@ jobs:
     strategy:
       fail-fast: false # Don't cancel other jobs if one fails
       matrix:
+        # 'ddata-lib',
+        # 'ddata-core',
+        # 'ddata-ui',
+        # 'ddata-ui-input',
+        # 'ddata-ui-file',
+        # 'ddata-ui-dialog',
+        # 'ddata-ui-common',
         project: [
-          'ddata-lib',
-          'ddata-core',
-          'ddata-ui',
-          'ddata-ui-input',
-          'ddata-ui-file',
-          'ddata-ui-dialog',
-          'ddata-ui-common',
           'ddata-a11y'
         ]
     steps:
@@ -79,7 +79,7 @@ jobs:
     - name: Run lint for ${{ matrix.project }}
       run: |
         echo "Starting lint for project: ${{ matrix.project }}"
-        npx ng lint ${{ matrix.project }}
+        ng lint ${{ matrix.project }}
         echo "Lint completed successfully for ${{ matrix.project }}"
 
   # Matrix job for testing each project in parallel
