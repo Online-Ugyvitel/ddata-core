@@ -80,20 +80,7 @@ jobs:
     - name: Run lint for ${{ matrix.project }}
       run: |
         echo "Starting lint for project: ${{ matrix.project }}"
-        if [ "${{ matrix.project }}" = "ddata-lib" ]; then
-          # Main app uses Angular CLI lint
-          echo "Using Angular CLI lint..."
-          npx ng lint ${{ matrix.project }}
-        else
-          # Library projects use tslint directly
-          echo "Using TSLint for library project..."
-          if [ -f "projects/${{ matrix.project }}/tslint.json" ]; then
-            npx tslint -c projects/${{ matrix.project }}/tslint.json 'projects/${{ matrix.project }}/src/**/*.ts'
-          else
-            echo "ERROR: No lint configuration found for ${{ matrix.project }}"
-            exit 1
-          fi
-        fi
+        npx ng lint ${{ matrix.project }}
         echo "Lint completed successfully for ${{ matrix.project }}"
 
   # Matrix job for testing each project in parallel  
