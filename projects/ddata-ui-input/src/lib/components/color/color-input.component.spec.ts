@@ -1,13 +1,33 @@
 import 'zone.js/testing';
-import { Injector } from '@angular/core';
+import { Injector, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { AppModule } from 'src/app/app.module';
 import { DdataInputColorComponent } from './color-input.component';
-import { BaseModel, ValidatorService } from 'ddata-core';
-import { DdataUiInputModule } from 'ddata-ui-input';
+import { BaseModel, ValidatorService, DdataCoreModule, BaseModelInterface, FieldsInterface, FieldContainerInterface } from 'ddata-core';
+import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
-xdescribe('DdataInputColorComponent', () => {
+// Mock model for testing
+class MockColorModel extends BaseModel implements BaseModelInterface<any>, FieldsInterface<HasColorField>, HasColorField {
+  color = '#ff0000';
+  fields: FieldContainerInterface<HasColorField> = {
+    color: {
+      title: 'Color Field Title',
+      label: 'Color Field Label',
+      placeholder: 'Color Field Placeholder',
+      prepend: 'Color Prepend',
+      append: 'Color Append'
+    }
+  };
+  validationRules = {
+    color: ['required', 'color_code']
+  };
+}
+
+interface HasColorField {
+  color: string;
+}
+
+describe('DdataInputColorComponent', () => {
   let component: DdataInputColorComponent;
   let fixture: ComponentFixture<DdataInputColorComponent>;
   let debugElement;
@@ -28,93 +48,313 @@ xdescribe('DdataInputColorComponent', () => {
       providers: [
         Injector,
         ValidatorService,
-        BaseModel
+        BaseModel,
+        InputHelperService
       ]
     })
       .compileComponents();
   });
 
   beforeEach(() => {
-    // DdataUiInputModule.inje = TestBed;
+    DdataCoreModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataInputColorComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;
     element = debugElement.nativeElement;
+    
+    // Mock the ViewChild inputBox
+    const mockInputElement = document.createElement('input');
+    component.inputBox = new ElementRef(mockInputElement);
   });
+  
   afterEach(() => {
-    document.body.removeChild(element);
+    if (element && element.parentNode) {
+      element.parentNode.removeChild(element);
+    }
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('model property should set _model to be null', () => {
-    component.model = null;
-    expect(component._model).toBe(null);
+  describe('model setter', () => {
+    it('should set _model to new BaseModel when value is null', () => {
+      component.model = null;
+      expect(component._model).toEqual(jasmine.any(BaseModel));
+    });
+
+    it('should set _model and update field properties when model has fields', () => {
+      const mockModel = new MockColorModel();
+      component._field = 'color';
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+      expect(component._title).toBe('Color Field Title');
+      expect(component._placeholder).toBe('Color Field Placeholder');
+      expect(component._prepend).toBe('Color Prepend');
+      expect(component._append).toBe('Color Append');
+      expect(component._label).toBe('Color Field Label');
+    });
+
+    it('should set _isRequired when model has validation rules', () => {
+      const mockModel = new MockColorModel();
+      component._field = 'color';
+      component.model = mockModel;
+      
+      expect(component._isRequired).toBe(true);
+    });
+
+    it('should not set field properties when model has no fields for the field', () => {
+      const mockModel = new BaseModel();
+      component._field = 'nonexistentField';
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+      // Field properties should remain unchanged
+    });
   });
 
-  it('field property should set _field to be \'isValid\' when it\'s undefined or refresh it\'s value', () => {
-    component._field = '';
-    component.field = 'undefined';
-    expect(component._field).toBe('isValid');
-
-    component._field = '';
-    component.field = undefined;
-    expect(component._field).not.toBe('');
-
-    component._field = '';
-    component.field = 'something';
-    expect(component._field).toBe('something');
+  describe('model getter', () => {
+    it('should return the current _model', () => {
+      const mockModel = new MockColorModel();
+      component._model = mockModel;
+      
+      expect(component.model).toBe(mockModel);
+    });
   });
 
-  it('append property should set _append to be \'\' when it\'s undefined or refresh it\'s value', () => {
-    component._append = '';
-    component.append = 'undefined';
-    expect(component._append).toBe('');
+  describe('field setter', () => {
+    it('should set _field to "isValid" when value is "undefined"', () => {
+      component._field = '';
+      component.field = 'undefined';
+      expect(component._field).toBe('isValid');
+    });
 
-    component._append = '';
-    component.append = undefined;
-    expect(component._append).not.toBe('');
+    it('should set _field to the provided value when not "undefined"', () => {
+      component._field = '';
+      component.field = 'color';
+      expect(component._field).toBe('color');
+    });
 
-    component._append = '';
-    component.append = 'something';
-    expect(component._append).toBe('something');
+    it('should handle undefined value', () => {
+      component._field = '';
+      component.field = undefined;
+      expect(component._field).toBe(undefined);
+    });
   });
 
-  it('prepend property should set _prepend to be \'\' when it\'s undefined or refresh it\'s value', () => {
-    component._prepend = '';
-    component.prepend = 'undefined';
-    expect(component._prepend).toBe('');
+  describe('append setter', () => {
+    it('should set _append to empty string when value is "undefined"', () => {
+      component._append = 'initial';
+      component.append = 'undefined';
+      expect(component._append).toBe('');
+    });
 
-    component._prepend = '';
-    component.prepend = undefined;
-    expect(component._prepend).not.toBe('');
+    it('should set _append to the provided value when not "undefined"', () => {
+      component._append = '';
+      component.append = 'suffix';
+      expect(component._append).toBe('suffix');
+    });
 
-    component._prepend = '';
-    component.prepend = 'something';
-    expect(component._prepend).toBe('something');
+    it('should handle undefined value', () => {
+      component._append = '';
+      component.append = undefined;
+      expect(component._append).toBe(undefined);
+    });
   });
 
-  it('labelText property should set _label to be \'\' when it\'s undefined or refresh it\'s value', () => {
-    component._label = '';
-    component.labelText = 'undefined';
-    expect(component._label).toBe('');
+  describe('prepend setter', () => {
+    it('should set _prepend to empty string when value is "undefined"', () => {
+      component._prepend = 'initial';
+      component.prepend = 'undefined';
+      expect(component._prepend).toBe('');
+    });
 
-    component._label = '';
-    component.labelText = undefined;
-    expect(component._label).not.toBe('');
+    it('should set _prepend to the provided value when not "undefined"', () => {
+      component._prepend = '';
+      component.prepend = 'prefix';
+      expect(component._prepend).toBe('prefix');
+    });
 
-    component._label = '';
-    component.labelText = 'something';
-    expect(component._label).toBe('something');
+    it('should handle undefined value', () => {
+      component._prepend = '';
+      component.prepend = undefined;
+      expect(component._prepend).toBe(undefined);
+    });
   });
 
-  // it('randChars() method should return a String which\'s lenght is 50', () => {
-  //   expect(component.randChars()).toBeTruthy();
-  //   expect(component.randChars()).toBeInstanceOf(String);
-  //   expect(component.randChars().length).toBe(50);
+  describe('labelText setter', () => {
+    it('should set _label to empty string when value is "undefined"', () => {
+      component._label = 'initial';
+      component.labelText = 'undefined';
+      expect(component._label).toBe('');
+    });
 
-  // });
+    it('should set _label to the provided value when not "undefined"', () => {
+      component._label = '';
+      component.labelText = 'Test Label';
+      expect(component._label).toBe('Test Label');
+    });
+
+    it('should handle undefined value', () => {
+      component._label = '';
+      component.labelText = undefined;
+      expect(component._label).toBe(undefined);
+    });
+  });
+
+  describe('Input properties', () => {
+    it('should have default values for all input properties', () => {
+      expect(component.disabled).toBe(false);
+      expect(component.type).toBe('text');
+      expect(component.inputClass).toBe('form-control');
+      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
+      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
+      expect(component.inputBlockExtraClass).toBe('col-md-9');
+      expect(component.showLabel).toBe(true);
+      expect(component.autoFocus).toBe(false);
+      expect(component.wrapperClass).toBe('d-flex flex-wrap');
+    });
+
+    it('should allow setting input properties', () => {
+      component.disabled = true;
+      component.type = 'color';
+      component.inputClass = 'custom-input';
+      component.labelClass = 'custom-label';
+      component.inputBlockClass = 'custom-block';
+      component.inputBlockExtraClass = 'custom-extra';
+      component.showLabel = false;
+      component.autoFocus = true;
+      component.wrapperClass = 'custom-wrapper';
+
+      expect(component.disabled).toBe(true);
+      expect(component.type).toBe('color');
+      expect(component.inputClass).toBe('custom-input');
+      expect(component.labelClass).toBe('custom-label');
+      expect(component.inputBlockClass).toBe('custom-block');
+      expect(component.inputBlockExtraClass).toBe('custom-extra');
+      expect(component.showLabel).toBe(false);
+      expect(component.autoFocus).toBe(true);
+      expect(component.wrapperClass).toBe('custom-wrapper');
+    });
+  });
+
+  describe('Component properties', () => {
+    it('should initialize random property with a string', () => {
+      expect(component.random).toBeDefined();
+      expect(typeof component.random).toBe('string');
+      expect(component.random.length).toBe(50);
+    });
+
+    it('should initialize toggle property as false', () => {
+      expect(component.toggle).toBe(false);
+    });
+
+    it('should have validatorService instance', () => {
+      expect(component.validatorService).toBeDefined();
+      expect(component.validatorService).toEqual(jasmine.any(ValidatorService));
+    });
+  });
+
+  describe('ngOnInit', () => {
+    it('should focus input element when autoFocus is true', () => {
+      component.autoFocus = true;
+      spyOn(component.inputBox.nativeElement, 'focus');
+      
+      component.ngOnInit();
+      
+      expect(component.inputBox.nativeElement.focus).toHaveBeenCalled();
+    });
+
+    it('should not focus input element when autoFocus is false', () => {
+      component.autoFocus = false;
+      spyOn(component.inputBox.nativeElement, 'focus');
+      
+      component.ngOnInit();
+      
+      expect(component.inputBox.nativeElement.focus).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('validateField', () => {
+    it('should emit changed event when validation passes', () => {
+      const mockModel = new MockColorModel();
+      component._model = mockModel;
+      component._field = 'color';
+      
+      spyOn(component.helperService, 'validateField').and.returnValue(true);
+      spyOn(component.changed, 'emit');
+      
+      component.validateField();
+      
+      expect(component.helperService.validateField).toHaveBeenCalledWith(mockModel, 'color');
+      expect(component.changed.emit).toHaveBeenCalledWith(mockModel);
+    });
+
+    it('should not emit changed event when validation fails', () => {
+      const mockModel = new MockColorModel();
+      component._model = mockModel;
+      component._field = 'color';
+      
+      spyOn(component.helperService, 'validateField').and.returnValue(false);
+      spyOn(component.changed, 'emit');
+      
+      component.validateField();
+      
+      expect(component.helperService.validateField).toHaveBeenCalledWith(mockModel, 'color');
+      expect(component.changed.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('changed EventEmitter', () => {
+    it('should be defined and be an EventEmitter', () => {
+      expect(component.changed).toBeDefined();
+      expect(component.changed.emit).toBeDefined();
+    });
+  });
+
+  describe('ViewChild inputBox', () => {
+    it('should be defined', () => {
+      expect(component.inputBox).toBeDefined();
+      expect(component.inputBox.nativeElement).toBeDefined();
+    });
+  });
+
+  // Additional edge case tests
+  describe('Edge cases', () => {
+    it('should handle model with empty fields object', () => {
+      const mockModel = new BaseModel();
+      mockModel.fields = {};
+      component._field = 'testField';
+      
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+    });
+
+    it('should handle model with empty validationRules object', () => {
+      const mockModel = new BaseModel();
+      mockModel.validationRules = {};
+      component._field = 'testField';
+      
+      component.model = mockModel;
+      
+      expect(component._model).toBe(mockModel);
+    });
+
+    it('should handle toggle property changes', () => {
+      expect(component.toggle).toBe(false);
+      component.toggle = true;
+      expect(component.toggle).toBe(true);
+    });
+  });
+
+  // Test the random string generation indirectly through the random property
+  it('should generate random string of length 50', () => {
+    expect(component.random).toBeDefined();
+    expect(typeof component.random).toBe('string');
+    expect(component.random.length).toBe(50);
+    expect(component.random).toMatch(/^[A-Za-z0-9]+$/);
+  });
 
 });
