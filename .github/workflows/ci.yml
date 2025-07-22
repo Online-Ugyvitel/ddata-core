@@ -34,6 +34,7 @@ jobs:
         path: |
           node_modules
           dist
+          .eslintcache
         key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
         restore-keys: |
           ${{ runner.os }}-deps-build-
@@ -43,6 +44,7 @@ jobs:
   lint:
     needs: setup
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false # Don't cancel other jobs if one fails
       matrix:
@@ -71,18 +73,37 @@ jobs:
         path: |
           node_modules
           dist
+          .eslintcache
         key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
         restore-keys: |
           ${{ runner.os }}-deps-build-
           ${{ runner.os }}-deps-
 
     - name: Run lint for ${{ matrix.project }}
+      timeout-minutes: 10
       run: |
         echo "Starting lint for project: ${{ matrix.project }}"
+        echo "Current working directory: $(pwd)"
+        echo "Node.js version: $(node --version)"
+        echo "npm version: $(npm --version)"
+
         if [ "${{ matrix.project }}" = "ddata-lib" ]; then
-          npx eslint src/ --ext .ts,.html
+          echo "Linting ddata-lib project"
+          npm run lint
         else
-          npx eslint projects/${{ matrix.project }}/ --ext .ts,.html
+          echo "Linting project: ${{ matrix.project }}"
+          echo "Checking project directory: projects/${{ matrix.project }}"
+          if [ -d "projects/${{ matrix.project }}" ]; then
+            echo "Project directory exists, starting lint..."
+            # Try Angular CLI first
+            if ! timeout 300 npx ng lint ${{ matrix.project }} --cache --cache-location .eslintcache; then
+              echo "Angular CLI lint failed or timed out, trying direct ESLint..."
+              npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --cache --cache-location .eslintcache
+            fi
+          else
+            echo "ERROR: Project directory projects/${{ matrix.project }} not found!"
+            exit 1
+          fi
         fi
         echo "Lint completed successfully for ${{ matrix.project }}"
 
@@ -118,6 +139,7 @@ jobs:
         path: |
           node_modules
           dist
+          .eslintcache
         key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
         restore-keys: |
           ${{ runner.os }}-deps-build-
