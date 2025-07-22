@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { NotificationComponent } from './notification.component';
+import { DdataUiNotificationComponent } from './notification.component';
 
 
-xdescribe('NotificationComponent', () => {
-  let component: NotificationComponent;
-  let fixture: ComponentFixture<NotificationComponent>;
+xdescribe('DdataUiNotificationComponent', () => {
+  let component: DdataUiNotificationComponent;
+  let fixture: ComponentFixture<DdataUiNotificationComponent>;
 
   beforeAll(() => {
     TestBed.initTestEnvironment(
@@ -18,13 +18,13 @@ xdescribe('NotificationComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ NotificationComponent ]
+      declarations: [ DdataUiNotificationComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NotificationComponent);
+    fixture = TestBed.createComponent(DdataUiNotificationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DdataUiLoadingOverlayComponent } from './loading-overlay.component';
 
@@ -6,12 +6,12 @@ xdescribe('DdataUiLoadingOverlayComponent', () => {
   let component: DdataUiLoadingOverlayComponent;
   let fixture: ComponentFixture<DdataUiLoadingOverlayComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ DdataUiLoadingOverlayComponent ]
     })
     .compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(DdataUiLoadingOverlayComponent);
