@@ -45,6 +45,9 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      ACTIONS_RUNNER_DEBUG: true
+      ACTIONS_STEP_DEBUG: true
     strategy:
       fail-fast: false # Don't cancel other jobs if one fails
       matrix:
@@ -98,7 +101,7 @@ jobs:
             # Try Angular CLI first
             if ! timeout 300 npx ng lint ${{ matrix.project }} --cache --cache-location .eslintcache; then
               echo "Angular CLI lint failed or timed out, trying direct ESLint..."
-              npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --cache --cache-location .eslintcache
+              npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --debug
             fi
           else
             echo "ERROR: Project directory projects/${{ matrix.project }} not found!"
