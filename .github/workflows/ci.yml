@@ -48,6 +48,7 @@ jobs:
     env:
       ACTIONS_RUNNER_DEBUG: true
       ACTIONS_STEP_DEBUG: true
+      NODE_OPTIONS: --max_old_space_size=4096
     strategy:
       fail-fast: false # Don't cancel other jobs if one fails
       matrix:
