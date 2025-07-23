@@ -98,11 +98,7 @@ jobs:
           echo "Checking project directory: projects/${{ matrix.project }}"
           if [ -d "projects/${{ matrix.project }}" ]; then
             echo "Project directory exists, starting lint..."
-            # Try Angular CLI first
-            if ! timeout 300 npx ng lint ${{ matrix.project }} --cache --cache-location .eslintcache; then
-              echo "Angular CLI lint failed or timed out, trying direct ESLint..."
-              npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --debug
-            fi
+            npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --cache --cache-location .eslintcache --no-color --timing
           else
             echo "ERROR: Project directory projects/${{ matrix.project }} not found!"
             exit 1
