@@ -98,7 +98,7 @@ jobs:
           echo "Checking project directory: projects/${{ matrix.project }}"
           if [ -d "projects/${{ matrix.project }}" ]; then
             echo "Project directory exists, starting lint..."
-            npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --cache --cache-location .eslintcache --no-color
+            npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --cache --cache-location .eslintcache --no-color --debug
           else
             echo "ERROR: Project directory projects/${{ matrix.project }} not found!"
             exit 1
