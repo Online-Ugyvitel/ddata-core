@@ -52,14 +52,14 @@ jobs:
     strategy:
       fail-fast: false # Don't cancel other jobs if one fails
       matrix:
-        # 'ddata-lib',
-        # 'ddata-core',
-        # 'ddata-ui',
-        # 'ddata-ui-input',
-        # 'ddata-ui-file',
-        # 'ddata-ui-dialog',
-        # 'ddata-ui-common',
         project: [
+          'ddata-lib',
+          'ddata-core',
+          'ddata-ui',
+          'ddata-ui-input',
+          'ddata-ui-file',
+          'ddata-ui-dialog',
+          'ddata-ui-common',
           'ddata-a11y'
         ]
     steps:
@@ -90,20 +90,13 @@ jobs:
         echo "Current working directory: $(pwd)"
         echo "Node.js version: $(node --version)"
         echo "npm version: $(npm --version)"
-
+        
         if [ "${{ matrix.project }}" = "ddata-lib" ]; then
           echo "Linting ddata-lib project"
           npm run lint
         else
           echo "Linting project: ${{ matrix.project }}"
-          echo "Checking project directory: projects/${{ matrix.project }}"
-          if [ -d "projects/${{ matrix.project }}" ]; then
-            echo "Project directory exists, starting lint..."
-            npx eslint projects/${{ matrix.project }}/ --ext .ts,.html --cache --cache-location .eslintcache --no-color --debug
-          else
-            echo "ERROR: Project directory projects/${{ matrix.project }} not found!"
-            exit 1
-          fi
+          ng lint ${{ matrix.project }}
         fi
         echo "Lint completed successfully for ${{ matrix.project }}"
 
