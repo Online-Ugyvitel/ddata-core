@@ -83,6 +83,9 @@ jobs:
           ${{ runner.os }}-deps-build-
           ${{ runner.os }}-deps-
 
+    - name: Install Angular CLI
+      run: npm install -g @angular/cli
+
     - name: Run lint for ${{ matrix.project }}
       timeout-minutes: 10
       run: |
@@ -137,6 +140,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-deps-build-
           ${{ runner.os }}-deps-
+
+    - name: Install Angular CLI
+      run: npm install -g @angular/cli
 
     - name: Run tests for ${{ matrix.project }}
       run: |
