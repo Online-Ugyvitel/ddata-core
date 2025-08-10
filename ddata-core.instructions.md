@@ -805,6 +805,7 @@ userHelper.loadAll().subscribe(users => {
   // Data is fully loaded and processed
   // Errors are handled automatically
 });
+```
 
 ### SpinnerService
 
@@ -1115,29 +1116,6 @@ export class TaskListComponent implements OnInit {
 ```
 
 This example shows how DData Core eliminates hundreds of lines of boilerplate code while providing enterprise-grade features like offline support, optimistic updates, automatic validation, and intelligent caching.
-remoteService.save(user).subscribe((id: number) => {
-  user.id = id;
-});
-
-// Delete
-remoteService.delete(user).subscribe((result: number) => {
-  // HTTP status code
-});
-
-// Delete multiple
-remoteService.deleteMultiple([user1, user2]).subscribe(() => {
-  // Multiple delete complete
-});
-
-// File upload
-const files: Set<File> = new Set([file1, file2]);
-const uploadObservables = remoteService.sendFiles('/upload', userId, files, additionalData);
-uploadObservables.forEach(upload$ => {
-  upload$.subscribe((progress: FileUploadProcessInterface) => {
-    // Handle upload progress
-  });
-});
-```
 
 ### Proxy Service
 
