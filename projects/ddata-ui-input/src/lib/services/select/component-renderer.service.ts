@@ -76,7 +76,9 @@ export class ComponentRendererService {
 
     // Set model if it exists on the instance (not all components may have this property)
     if ('model' in this.componentRef.instance) {
-      (this.componentRef.instance as { model: unknown }).model = (dialogContent.data as {model: unknown}).model;
+      (this.componentRef.instance as { model: unknown }).model = (
+        dialogContent.data as { model: unknown }
+      ).model;
     }
 
     this.instance = this.componentRef.instance;
@@ -95,7 +97,7 @@ export class ComponentRendererService {
       return [];
     }
 
-    return (this.instance.selectedElements as BaseModelInterface<unknown>[]) || [];
+    return (this.instance.selectedElements as Array<BaseModelInterface<unknown>>) || [];
   }
 
   setSelectedModels(selectedModels: Array<unknown>): ComponentRendererService {
@@ -135,13 +137,18 @@ export class ComponentRendererService {
       return;
     }
 
-    this.instance.multipleSelectEnabled = (dialogContent.data as OptionsInterface).multipleSelectEnabled;
+    this.instance.multipleSelectEnabled = (
+      dialogContent.data as OptionsInterface
+    ).multipleSelectEnabled;
     this.instance.isSelectionList = (dialogContent.data as OptionsInterface).isSelectionList;
     this.instance.loadData = (dialogContent.data as OptionsInterface).loadData;
     this.instance.filter = (dialogContent.data as OptionsInterface).filter ?? {};
 
     // if there is preset models
-    if (!(dialogContent.data as OptionsInterface).loadData && !!(dialogContent.data as OptionsInterface).models) {
+    if (
+      !(dialogContent.data as OptionsInterface).loadData &&
+      !!(dialogContent.data as OptionsInterface).models
+    ) {
       // set preset models
       this.instance.models = (dialogContent.data as OptionsInterface).models;
 

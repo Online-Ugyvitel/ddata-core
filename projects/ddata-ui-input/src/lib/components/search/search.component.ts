@@ -113,7 +113,7 @@ export class DdataInputSearchComponent implements OnDestroy {
           map((result: PaginateInterface) => {
             this.setResult(result);
 
-            return result;
+            return result.data as Array<SearchResultInterface>;
           })
         )
       ),

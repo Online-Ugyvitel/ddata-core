@@ -1,4 +1,4 @@
-import { SearchResult } from './search-result.model';
+import { SearchResult } from './search-result-concrete.model';
 import { SearchResultInterface } from './search-result.interface';
 
 export class BaseSearchResult extends SearchResult implements SearchResultInterface {

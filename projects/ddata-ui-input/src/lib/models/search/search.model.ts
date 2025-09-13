@@ -12,7 +12,7 @@ export abstract class SearchAbstract extends SearchModelFunctions implements Sea
 
     super.init(searchData);
 
-    this.initAsStringWithDefaults(['searchText'], data);
+    this.initAsStringWithDefaults(['searchText'], searchData);
 
     return this;
   }

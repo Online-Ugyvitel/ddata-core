@@ -68,6 +68,10 @@ export class DdataMultipleSelectComponent {
     this.internalDialogSettings = value;
   }
 
+  get dialogSettings(): DialogContentWithOptionsInterface {
+    return this.internalDialogSettings;
+  }
+
   @Output() readonly selected: EventEmitter<unknown> = new EventEmitter<unknown>();
   @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter<unknown>();
 
