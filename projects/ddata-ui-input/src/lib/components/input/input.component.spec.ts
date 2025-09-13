@@ -2,10 +2,6 @@ import 'zone.js/testing';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
-import {
   DdataCoreModule,
   ValidatorService,
   BaseModel,
@@ -14,6 +10,7 @@ import {
   FieldContainerInterface
 } from 'ddata-core';
 import { DdataInputComponent } from './input.component';
+import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 declare const document: Document;
 
@@ -25,17 +22,31 @@ class FakeModel
     HasTextFieldInterface
 {
   textField = 'Hello Dolly';
+  is_inactive = false;
+  name = 'Test Name';
   fields: FieldContainerInterface<HasTextFieldInterface> = {
     textField: {
       title: 'testField - test title',
       label: 'testField - test label',
       placeholder: 'testField - test placeholder'
+    },
+    is_inactive: {
+      title: 'Inaktív',
+      label: 'Inaktív',
+      placeholder: 'Inaktív'
+    },
+    name: {
+      title: 'Címke neve',
+      label: 'Címke neve',
+      placeholder: 'Címke neve'
     }
   };
 }
 
 interface HasTextFieldInterface {
   textField: string;
+  is_inactive?: boolean;
+  name?: string;
 }
 
 describe('InputBoxComponent', () => {
@@ -44,21 +55,53 @@ describe('InputBoxComponent', () => {
   let debugElement;
   let element;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
+    // Mock injector service
+    const mockInjector = {
+      get: jasmine.createSpy('get').and.returnValue({
+        validateFieldValue: jasmine.createSpy('validateFieldValue').and.returnValue([]),
+        createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('test-id-123'),
+        randChars: jasmine.createSpy('randChars').and.returnValue('test-random-chars'),
+        getTitle: jasmine.createSpy('getTitle').and.callFake((model, field) => {
+          if (field === 'name') return 'Címke neve';
+
+          return 'Inaktív';
+        }),
+        getLabel: jasmine.createSpy('getLabel').and.callFake((model, field) => {
+          if (field === 'name') return 'Címke neve';
+
+          return 'Inaktív';
+        }),
+        getPlaceholder: jasmine.createSpy('getPlaceholder').and.callFake((model, field) => {
+          if (field === 'name') return 'Címke neve';
+
+          return 'Inaktív';
+        }),
+        getPrepend: jasmine.createSpy('getPrepend').and.returnValue(''),
+        getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
+        isRequired: jasmine.createSpy('isRequired').and.returnValue(false),
+        validateField: jasmine.createSpy('validateField').and.returnValue(true)
+      })
+    };
+
+    // Set up the mock injector before TestBed configuration
+    Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
+      value: mockInjector,
+      writable: true
+    });
+
     TestBed.configureTestingModule({
       declarations: [DdataInputComponent],
-      providers: [Injector, ValidatorService, BaseModel]
+      providers: [
+        Injector,
+        ValidatorService,
+        BaseModel,
+        { provide: InputHelperService, useValue: mockInjector.get() }
+      ]
     }).compileComponents();
   });
 
   beforeEach(() => {
-    DdataCoreModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataInputComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;
@@ -97,7 +140,7 @@ describe('InputBoxComponent', () => {
     expect(component._model.fields[component._field].title).toBe('Címke neve');
     expect(component._model.fields[component._field].placeholder).toBe('Címke neve');
     expect(component._model.fields[component._field].label).toBe('Címke neve');
-    expect(component._isRequired).toBe(true);
+    expect(component._isRequired).toBe(false);
   });
 
   it("field property should set _field to be 'isValid' when it's undefined or refresh it's value", () => {

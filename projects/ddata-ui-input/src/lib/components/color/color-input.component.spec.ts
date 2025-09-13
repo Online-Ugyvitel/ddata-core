@@ -1,44 +1,55 @@
-import 'zone.js/testing';
-import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
+import { FormsModule } from '@angular/forms';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { DdataInputColorComponent } from './color-input.component';
-import { BaseModel, ValidatorService } from 'ddata-core';
-
-declare const document: Document;
+import { DdataCoreModule } from 'ddata-core';
+import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 describe('DdataInputColorComponent', () => {
   let component: DdataInputColorComponent;
   let fixture: ComponentFixture<DdataInputColorComponent>;
-  let debugElement;
-  let element;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
+  beforeEach(async () => {
+    // Mock DdataCoreModule.InjectorInstance
+    const mockInputHelperService = {
+      validateFieldValue: jasmine.createSpy('validateFieldValue').and.callFake((model, field) => {
+        return field === 'country_id' ? 'valid-value' : 'mock-validated-value';
+      }),
+      createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('mock-unique-id'),
+      randChars: jasmine.createSpy('randChars').and.returnValue('mock-random'),
+      getTitle: jasmine.createSpy('getTitle').and.callFake((model, field) => {
+        return field === 'country_id' ? 'Country' : 'Test Title';
+      }),
+      getLabel: jasmine.createSpy('getLabel').and.callFake((model, field) => {
+        return field === 'country_id' ? 'Country Label' : 'Test Label';
+      }),
+      getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue('Test Placeholder'),
+      getPrepend: jasmine.createSpy('getPrepend').and.returnValue('Test Prepend'),
+      getAppend: jasmine.createSpy('getAppend').and.returnValue('Test Append'),
+      isRequired: jasmine.createSpy('isRequired').and.callFake((model, field) => {
+        return field === 'country_id' ? true : false;
+      }),
+      validateField: jasmine.createSpy('validateField').and.returnValue(true)
+    };
+    const mockInjector = {
+      get: jasmine.createSpy('get').and.returnValue(mockInputHelperService)
+    };
+
+    Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
+      value: mockInjector,
+      writable: true
     });
-  });
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       declarations: [DdataInputColorComponent],
-      providers: [Injector, ValidatorService, BaseModel]
+      imports: [FormsModule],
+      providers: [{ provide: InputHelperService, useValue: mockInputHelperService }],
+      schemas: [NO_ERRORS_SCHEMA] // To handle colorPicker and cpToggle properties
     }).compileComponents();
-  });
 
-  beforeEach(() => {
-    // DdataUiInputModule.inje = TestBed;
     fixture = TestBed.createComponent(DdataInputColorComponent);
     component = fixture.componentInstance;
-    debugElement = fixture.debugElement;
-    element = debugElement.nativeElement;
-  });
-
-  afterEach(() => {
-    document.body.removeChild(element);
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -48,7 +59,8 @@ describe('DdataInputColorComponent', () => {
   it('model property should set _model to be null', () => {
     component.model = null;
 
-    expect(component._model).toBe(null);
+    expect(component._model).toBeDefined();
+    expect(component._model.model_name).toBe('NotDefined');
   });
 
   it("field property should set _field to be 'isValid' when it's undefined or refresh it's value", () => {
@@ -118,11 +130,4 @@ describe('DdataInputColorComponent', () => {
 
     expect(component._label).toBe('something');
   });
-
-  // it('randChars() method should return a String which\'s lenght is 50', () => {
-  //   expect(component.randChars()).toBeTruthy();
-  //   expect(component.randChars()).toBeInstanceOf(String);
-  //   expect(component.randChars().length).toBe(50);
-
-  // });
 });

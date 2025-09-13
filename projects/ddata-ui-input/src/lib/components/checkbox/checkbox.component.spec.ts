@@ -1,10 +1,5 @@
-import 'zone.js/testing';
-import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DdataInputCheckboxComponent } from './checkbox.component';
 import { DdataCoreModule, BaseModel } from 'ddata-core';
 
@@ -12,32 +7,42 @@ describe('DdataInputCheckboxComponent', () => {
   let component: DdataInputCheckboxComponent;
   let fixture: ComponentFixture<DdataInputCheckboxComponent>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
+  beforeEach(async () => {
+    // Mock DdataCoreModule.InjectorInstance to prevent runtime errors
+    const mockInjector = {
+      get: jasmine.createSpy('get').and.returnValue({
+        randChars: jasmine.createSpy('randChars').and.returnValue('mock-random'),
+        getTitle: jasmine.createSpy('getTitle').and.returnValue('Test Title'),
+        getLabel: jasmine.createSpy('getLabel').and.returnValue('Test Label'),
+        getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue('Test Placeholder'),
+        getPrepend: jasmine.createSpy('getPrepend').and.returnValue('Test Prepend'),
+        getAppend: jasmine.createSpy('getAppend').and.returnValue('Test Append'),
+        isRequired: jasmine.createSpy('isRequired').and.returnValue(true),
+        validateField: jasmine.createSpy('validateField').and.returnValue(true)
+      })
+    };
+
+    // Set up the mock injector before TestBed configuration
+    Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
+      value: mockInjector,
+      writable: true
     });
-  });
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       declarations: [DdataInputCheckboxComponent],
-      providers: [Injector]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] // To handle fa-icon elements
     }).compileComponents();
-  });
 
-  beforeEach(() => {
-    DdataCoreModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataInputCheckboxComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should create', () => {
-    component = fixture.componentInstance;
-
     expect(component).toBeTruthy();
   });
 
-  it('ngOnInit() method should set iterable tobe not 0', () => {
-    component = fixture.componentInstance;
+  it('ngOnInit() method should set iterable to be not 0', () => {
     component.ngOnInit();
 
     expect(component.iterable).toBeGreaterThanOrEqual(0);
@@ -45,7 +50,6 @@ describe('DdataInputCheckboxComponent', () => {
   });
 
   it("model property should set model to be Instance if Basemodel when it's null or refresh it's value", () => {
-    component = fixture.componentInstance;
     component._model = null;
     component.model = null;
 
@@ -53,7 +57,6 @@ describe('DdataInputCheckboxComponent', () => {
   });
 
   it("field property should set field to be 'isValid' when it's undefined or refresh it's value", () => {
-    component = fixture.componentInstance;
     component._field = '';
     component.field = 'undefined';
 
@@ -73,19 +76,16 @@ describe('DdataInputCheckboxComponent', () => {
   });
 
   it('getIcon() method should return faCheckSquare or faSquare', () => {
-    component = fixture.componentInstance;
-
     expect(component.getIcon()).toBeTruthy();
-    expect(component.getIcon()).toEqual((component as unknown).faSquare);
+    expect(component.getIcon()).toEqual(component.iconOff);
 
     component.model.isValid = true;
 
     expect(component.getIcon()).toBeTruthy();
-    expect(component.getIcon()).toEqual((component as unknown).faCheckSquare);
+    expect(component.getIcon()).toEqual(component.iconOn);
   });
 
   it("clicked() method should change the isValid if it's not disabled", () => {
-    component = fixture.componentInstance;
     component.disabled = false;
     component.model.isValid = false;
     component.clicked();

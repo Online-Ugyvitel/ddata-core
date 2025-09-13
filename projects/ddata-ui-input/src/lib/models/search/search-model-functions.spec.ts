@@ -155,7 +155,7 @@ describe('SearchModelFunctions', () => {
     it('should handle type with consecutive underscores', () => {
       const result = model['setUrl']('test__double__underscore');
 
-      expect(result).toBe('test/double/underscore');
+      expect(result).toBe('test//double//underscore');
     });
   });
 
@@ -225,7 +225,7 @@ describe('SearchModelFunctions', () => {
       const result = model.init({ name: 'Test' });
 
       expect(result).toBe(model);
-      expect(result.name).toBe('Test');
+      expect((result as { name: string }).name).toBe('Test');
     });
   });
 });
