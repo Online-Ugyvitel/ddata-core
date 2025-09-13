@@ -64,7 +64,7 @@ export class DdataInputDateComponent implements OnInit {
   _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
   _moment = moment;
 
-  @Input() set moment(value: unknown) {
+  @Input() set moment(value: typeof moment) {
     let momentValue = value;
 
     if (!momentValue) {
