@@ -1,4 +1,4 @@
-<ng-container *ngIf="_mode === 'multiple'">
+<ng-container *ngIf="mode === 'multiple'">
   <multiple-select
     mode="multiple"
     [wrapperClass]="wrapperClass"
@@ -26,7 +26,7 @@
   ></multiple-select>
 </ng-container>
 
-<ng-container *ngIf="_mode === 'single'">
+<ng-container *ngIf="mode === 'single'">
   <multiple-select
     mode="single"
     [wrapperClass]="wrapperClass"
@@ -52,10 +52,10 @@
   ></multiple-select>
 </ng-container>
 
-<ng-container *ngIf="_mode === 'simple'">
+<ng-container *ngIf="mode === 'simple'">
   <simple-select
     [wrapperClass]="wrapperClass"
-    [isRequired]="_isRequired"
+    [isRequire]="_isRequired"
     [disabledAppearance]="disabledAppearance"
     [disabled]="disabled"
     [addEmptyOption]="addEmptyOption"
@@ -69,12 +69,15 @@
     [items]="_items"
     [text]="text"
     [valueField]="valueField"
+    [unselectedText]="unselectedText"
+    [inputBlockClass]="inputBlockClass"
+    [inputBlockExtraClass]="inputBlockExtraClass"
     (selected)="selectedEmit($event)"
     (selectModel)="selectModelEmit($event)"
   ></simple-select>
 </ng-container>
 
-<ng-container *ngIf="_mode === 'autocomplete'">
+<ng-container *ngIf="mode === 'autocomplete'">
   <autocomplete-select
     [wrapperClass]="wrapperClass"
     [isRequired]="_isRequired"

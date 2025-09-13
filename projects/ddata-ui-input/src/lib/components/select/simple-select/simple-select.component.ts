@@ -46,7 +46,9 @@ export class DdataSimpleSelectComponent {
   }
 
   selectItem(): void {
-    this.selectedModel = this.items.find((item) => item[this.field] === this.model[this.field]);
+    this.selectedModel = this.items.find(
+      (item) => item[this.valueField] === this.model[this.field]
+    );
 
     this.selected.emit(this.model[this.field]);
     this.selectModel.emit(this.selectedModel);

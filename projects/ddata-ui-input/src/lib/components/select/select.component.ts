@@ -49,6 +49,10 @@ export class DdataSelectComponent {
     this._mode = value ?? 'simple';
   }
 
+  get mode(): SelectType {
+    return this._mode;
+  }
+
   @Input() set model(value: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null) {
     if (!value) {
       return;
@@ -131,6 +135,8 @@ export class DdataSelectComponent {
 
   @Output() readonly selected: EventEmitter<unknown> = new EventEmitter();
   @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter();
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  @Output() readonly change: EventEmitter<unknown> = new EventEmitter();
 
   private readonly helperService: InputHelperServiceInterface =
     DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
@@ -144,10 +150,11 @@ export class DdataSelectComponent {
   private _items = [];
   private _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
   private _selectedModelName = '';
-  private _mode = 'simple';
+  private _mode: SelectType = 'simple';
 
   selectedEmit(value: unknown): void {
     this.selected.emit(value);
+    this.change.emit(value);
   }
 
   selectModelEmit(value: unknown): void {
