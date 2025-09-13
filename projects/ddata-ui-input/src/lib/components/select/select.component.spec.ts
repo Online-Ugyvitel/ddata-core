@@ -162,10 +162,10 @@ describe('DdataSelectComponent', () => {
   });
 
   describe('Model Property', () => {
-    it('should return early when null model is provided', () => {
+    it('should return null when null model is provided', () => {
       component.model = null;
 
-      expect(component.model).toBeInstanceOf(BaseModel);
+      expect(component.model).toBeNull();
     });
 
     it('should set model and extract field information', () => {

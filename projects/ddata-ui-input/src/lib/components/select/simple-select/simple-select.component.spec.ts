@@ -159,7 +159,16 @@ describe('DdataSimpleSelectComponent', () => {
     it('should handle null model gracefully', () => {
       component.model = null;
 
-      expect(() => component.selectItem()).toThrow();
+      expect(() => component.selectItem()).not.toThrow();
+
+      // Should not emit events when model is null
+      spyOn(component.selected, 'emit');
+      spyOn(component.selectModel, 'emit');
+
+      component.selectItem();
+
+      expect(component.selected.emit).not.toHaveBeenCalled();
+      expect(component.selectModel.emit).not.toHaveBeenCalled();
     });
 
     it('should handle empty items array', () => {
@@ -302,6 +311,21 @@ describe('DdataSimpleSelectComponent', () => {
 
       expect(component.selected.emit).toHaveBeenCalledWith(3);
       expect(component.selectModel.emit).toHaveBeenCalledWith(mockCountry3);
+    });
+  });
+
+  describe('Async Model Handling (User Issue Fix)', () => {
+    it('should not throw errors when selectItem is called with null model', () => {
+      component.model = null;
+      component.items = [{ id: 1, name: 'Test' }];
+
+      expect(() => component.selectItem()).not.toThrow();
+    });
+
+    it('should handle null model gracefully in template condition', () => {
+      component.model = null;
+
+      expect(component.model).toBeNull();
     });
   });
 });

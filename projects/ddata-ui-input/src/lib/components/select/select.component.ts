@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
-import { BaseModel, BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
+import { BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
 import { DialogContentWithOptionsInterface } from '../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
@@ -96,7 +96,7 @@ export class DdataSelectComponent {
     }
   }
 
-  get model(): BaseModelInterface<unknown> & FieldsInterface<unknown> {
+  get model(): (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null {
     return this._model;
   }
 
@@ -148,7 +148,7 @@ export class DdataSelectComponent {
   private _append = '';
   private _isRequired = false;
   private _items = [];
-  private _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
+  private _model: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null = null;
   private _selectedModelName = '';
   private _mode: SelectType = 'simple';
 

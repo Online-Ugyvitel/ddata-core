@@ -25,7 +25,7 @@ export class DdataSimpleSelectComponent {
   @Input() labelText = '';
   @Input() prepend = '';
   @Input() append = '';
-  @Input() model: BaseModelInterface<unknown> & FieldsInterface<unknown>;
+  @Input() model: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null = null;
   @Input() field = 'id';
   @Input() items: Array<unknown> = [];
   @Input() text = 'name';
@@ -46,6 +46,10 @@ export class DdataSimpleSelectComponent {
   }
 
   selectItem(): void {
+    if (!this.model) {
+      return;
+    }
+
     this.selectedModel = this.items.find(
       (item) => item[this.valueField] === this.model[this.field]
     );

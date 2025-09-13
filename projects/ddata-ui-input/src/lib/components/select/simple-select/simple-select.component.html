@@ -1,4 +1,4 @@
-<div [class]="wrapperClass">
+<div [class]="wrapperClass" *ngIf="model && model.fields">
   <!-- label -->
   <label [class]="labelClass" [for]="id" *ngIf="showLabel">
     {{ labelText }}:
@@ -16,7 +16,7 @@
     <select
       class="form-select"
       [(ngModel)]="model[field]"
-      [class.invalid]="model.validationErrors.includes(field)"
+      [class.invalid]="model.validationErrors?.includes(field)"
       [class.disable-appearance]="disabledAppearance"
       [disabled]="disabled"
       (change)="selectItem()"
