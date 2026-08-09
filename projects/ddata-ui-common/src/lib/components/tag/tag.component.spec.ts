@@ -1,10 +1,6 @@
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
-import { BaseModel } from 'ddata-core';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import 'zone.js/testing';
 import { DdataUiTagComponent } from './tag.component';
 
@@ -14,15 +10,10 @@ describe('DdataUiTagComponent', () => {
   let debugElement;
   let element;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DdataUiTagComponent],
+      imports: [FontAwesomeModule],
       providers: [Injector]
     }).compileComponents();
   });
@@ -34,15 +25,11 @@ describe('DdataUiTagComponent', () => {
     element = debugElement.nativeElement;
   });
 
-  afterEach(() => {
-    document.body.removeChild(element);
-  });
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it("class property should set _class to be the given value + ' tag'", () => {
+  it('class property should set _class to be the given value + \' tag\'', () => {
     component._class = '';
     component.class = 'Valami';
 
@@ -50,8 +37,7 @@ describe('DdataUiTagComponent', () => {
   });
 
   it("deleteTag() method should call the delete property's emit", () => {
-    const fakeModel = new BaseModel().init();
-
+    const fakeModel = { name: 'Test Tag' } as any;
     component.tag = fakeModel;
     const fakeSpy = spyOn(component.delete, 'emit');
 

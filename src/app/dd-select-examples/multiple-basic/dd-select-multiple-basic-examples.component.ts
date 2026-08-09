@@ -7,9 +7,9 @@ import { TagListComponent } from '../tag-list/tag-list.component';
 import { TagInterface } from '../tag.interface';
 
 @Component({
-  selector: 'app-dd-select-multiple-basic-examples',
+  selector: 'dd-select-multiple-basic-examples',
   templateUrl: './dd-select-multiple-basic-examples.component.html',
-  standalone: true,
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DdSelectMultipleBasicExamplesComponent {

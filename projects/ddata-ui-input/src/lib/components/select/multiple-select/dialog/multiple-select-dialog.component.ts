@@ -65,7 +65,7 @@ export class DdataMultipleSelectDialogComponent implements OnInit, AfterViewInit
   // close dialog on esc
   @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    event: KeyboardEvent
+    event: Event
   ): void {
     this.selectionFinished.emit();
   }

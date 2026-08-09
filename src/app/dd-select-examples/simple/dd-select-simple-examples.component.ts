@@ -5,9 +5,9 @@ import { CountryInterface } from '../country.interface';
 import { DdSelectExampleService } from '../dd-select-example.service';
 
 @Component({
-  selector: 'app-dd-select-simple-examples',
+  selector: 'dd-select-simple-examples',
   templateUrl: './dd-select-simple-examples.component.html',
-  standalone: true,
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DdSelectSimpleExamplesComponent {

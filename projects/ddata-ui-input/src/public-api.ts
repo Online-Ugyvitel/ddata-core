@@ -25,6 +25,10 @@ export * from './lib/components/input/input.component';
 export * from './lib/components/search/search.component';
 export * from './lib/components/select/select.component';
 export * from './lib/components/select/select.type';
+export * from './lib/components/select/simple-select/simple-select.component';
+export * from './lib/components/select/autocomplete-select/autocomplete-select.component';
+export * from './lib/components/select/multiple-select/multiple-select.component';
+export * from './lib/components/select/multiple-select/dialog/multiple-select-dialog.component';
 export * from './lib/components/textarea/textarea.component';
 export * from './lib/components/time/time-input.component';
 

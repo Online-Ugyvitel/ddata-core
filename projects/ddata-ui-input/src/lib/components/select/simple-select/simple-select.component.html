@@ -1,38 +1,51 @@
-<div [class]="wrapperClass" *ngIf="model && model.fields">
-  <!-- label -->
-  <label [class]="labelClass" [for]="id" *ngIf="showLabel">
-    {{ labelText }}:
+@if (model) {
+  <div [class]="wrapperClass">
+    <!-- label -->
+    @if (showLabel) {
+      <label [class]="labelClass" [for]="id">
+        {{ labelText }}:
+        @if (isRequired) {
+          <span aria-hidden="true"> *</span>
+        }
+      </label>
+    }
 
-    <span *ngIf="isRequire"> *</span>
-  </label>
+    <!-- select -->
+    <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
+      <!-- prepend -->
+      @if (!!prepend) {
+        <div class="input-group-prepend">
+          <div class="input-group-text">{{ prepend }}</div>
+        </div>
+      }
 
-  <!-- select -->
-  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <!-- prepend -->
-    <div class="input-group-prepend" *ngIf="!!prepend">
-      <div class="input-group-text">{{ prepend }}</div>
-    </div>
+      <select
+        class="form-select"
+        [id]="id"
+        [(ngModel)]="model[field]"
+        [class.invalid]="model.validationErrors?.includes(field)"
+        [class.disable-appearance]="disabledAppearance"
+        [disabled]="disabled"
+        [attr.aria-required]="isRequired"
+        (change)="selectItem()"
+      >
+        @if (addEmptyOption) {
+          <option data-default value="0">-- {{ unselectedText }} --</option>
+        }
 
-    <select
-      class="form-select"
-      [(ngModel)]="model[field]"
-      [class.invalid]="model.validationErrors?.includes(field)"
-      [class.disable-appearance]="disabledAppearance"
-      [disabled]="disabled"
-      (change)="selectItem()"
-    >
-      <option *ngIf="addEmptyOption" data-default value="0">-- {{ unselectedText }} --</option>
+        @for (item of items; track item[valueField]) {
+          <option [value]="item[valueField]" [selected]="item[valueField] === model[field]">
+            {{ item[text] }}
+          </option>
+        }
+      </select>
 
-      <ng-container *ngFor="let item of items">
-        <option [value]="item[valueField]" [selected]="item[valueField] === model[field]">
-          {{ item[text] }}
-        </option>
-      </ng-container>
-    </select>
-
-    <!-- append -->
-    <div class="input-group-append" *ngIf="!!append">
-      <div class="input-group-text">{{ append }}</div>
+      <!-- append -->
+      @if (!!append) {
+        <div class="input-group-append">
+          <div class="input-group-text">{{ append }}</div>
+        </div>
+      }
     </div>
   </div>
-</div>
+}

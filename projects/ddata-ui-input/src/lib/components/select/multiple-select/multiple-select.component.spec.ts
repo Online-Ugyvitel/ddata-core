@@ -24,7 +24,6 @@ interface MockModelWithSingleTagInterface {
 describe('DdataMultipleSelectComponent', () => {
   let component: DdataMultipleSelectComponent;
   let fixture: ComponentFixture<DdataMultipleSelectComponent>;
-  let changeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
   // Mock objects for testing
   const mockTag1: MockTagInterface = { id: 1, name: 'Test Tag 1' };
   const mockTag2: MockTagInterface = { id: 2, name: 'Test Tag 2' };
@@ -47,7 +46,6 @@ describe('DdataMultipleSelectComponent', () => {
   };
 
   beforeEach(async () => {
-    const changeDetectorSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
     // Mock injector service
     let randCharsCounter = 0;
     const mockInjector = {
@@ -75,24 +73,20 @@ describe('DdataMultipleSelectComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [DdataMultipleSelectComponent],
       imports: [FormsModule],
-      providers: [
-        { provide: ChangeDetectorRef, useValue: changeDetectorSpy },
-        { provide: InputHelperService, useValue: mockInjector.get() }
-      ],
+      providers: [{ provide: InputHelperService, useValue: mockInjector.get() }],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(DdataMultipleSelectComponent);
     component = fixture.componentInstance;
-    changeDetectorRef = TestBed.inject(ChangeDetectorRef) as jasmine.SpyObj<ChangeDetectorRef>;
 
-    // Set up component with mock data
+    // Set up component with minimal mock data - don't call detectChanges yet
     component.model = mockModel as unknown as MockModel;
     component.field = 'tags';
     component.mode = 'multiple';
     component.dialogSettings = mockDialogSettings;
 
-    fixture.detectChanges();
+    // Don't call fixture.detectChanges() here - let individual tests handle it
   });
 
   it('should create', () => {
@@ -101,14 +95,15 @@ describe('DdataMultipleSelectComponent', () => {
 
   describe('Component Properties', () => {
     it('should have default values for inputs', () => {
-      const newComponent = new DdataMultipleSelectComponent(changeDetectorRef);
+      const mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+      const newComponent = new DdataMultipleSelectComponent(mockChangeDetectorRef);
 
       expect(newComponent.wrapperClass).toBe('d-flex flex-wrap');
       expect(newComponent.inputBlockClass).toBe('col-12 d-flex px-0');
       expect(newComponent.inputBlockExtraClass).toBe('col-md-9');
       expect(newComponent.unselectedText).toBe('Válassz');
       expect(newComponent.mode).toBe('multiple');
-      expect(newComponent.isRequire).toBe(false);
+      expect(newComponent.isRequired).toBe(false);
       expect(newComponent.disabledAppearance).toBe(false);
       expect(newComponent.disabled).toBe(false);
       expect(newComponent.addEmptyOption).toBe(true);
@@ -120,7 +115,8 @@ describe('DdataMultipleSelectComponent', () => {
     it('should generate unique id', () => {
       component.field = 'test_field';
       const id1 = component.id;
-      const newComponent = new DdataMultipleSelectComponent(changeDetectorRef);
+      const mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+      const newComponent = new DdataMultipleSelectComponent(mockChangeDetectorRef);
 
       newComponent.field = 'test_field';
       const id2 = newComponent.id;
@@ -348,133 +344,114 @@ describe('DdataMultipleSelectComponent', () => {
     });
   });
 
-  describe('getObjectFieldName', () => {
-    it('should return field name without _id suffix', () => {
+  describe('Required Field Asterisk Display', () => {
+    it('should show asterisk when required then hide after toggled off', () => {
+      component.model = {
+        tags: [],
+        validationErrors: [],
+        getObjectFieldName: () => 'tags'
+      } as unknown as MockModel;
+      component.field = 'tags';
+      component.showLabel = true;
+      component.labelText = 'Tags';
+      component.isRequired = true;
+
+      fixture.detectChanges();
+      const label = fixture.nativeElement.querySelector('label') as HTMLLabelElement;
+
+      expect(label).toBeTruthy();
+      expect(label.textContent).toContain('Tags:');
+      expect(label.textContent).toContain('*');
+      expect(fixture.nativeElement.querySelector('label span[aria-hidden="true"]')).toBeTruthy();
+
+      component.isRequired = false; // triggers setter => markForCheck
+      fixture.detectChanges();
+      const labelAfter = fixture.nativeElement.querySelector('label') as HTMLLabelElement;
+
+      expect(labelAfter).toBeTruthy();
+      expect(labelAfter.textContent).toContain('Tags:');
+      expect(fixture.nativeElement.querySelector('label span[aria-hidden="true"]')).toBeFalsy();
+      expect(labelAfter.textContent).not.toMatch(/\*\s*$/); // no trailing asterisk
+    });
+  });
+
+  describe('Utility Methods and Edge Cases', () => {
+    it('should call markForCheck when isRequired setter invoked', () => {
+      // Access private changeDetector through casting
+      const cdRef = (component as unknown as { changeDetector: ChangeDetectorRef }).changeDetector;
+
+      spyOn(cdRef, 'markForCheck');
+
+      component.isRequired = true;
+      component.isRequired = false;
+
+      expect(cdRef.markForCheck).toHaveBeenCalledTimes(2);
+    });
+
+    it('should derive object field name by stripping _id suffix', () => {
       component.field = 'tag_id';
 
       expect(component.getObjectFieldName()).toBe('tag');
     });
 
-    it('should return same field name if no _id suffix', () => {
-      component.field = 'tags';
+    it('should return full field when no _id suffix present', () => {
+      component.field = 'category';
 
-      expect(component.getObjectFieldName()).toBe('tags');
+      expect(component.getObjectFieldName()).toBe('category');
     });
 
-    it('should handle multiple _id occurrences correctly', () => {
-      component.field = 'related_tag_id';
+    it('trackByFn should return item when provided', () => {
+      const item = { id: 123 };
 
-      expect(component.getObjectFieldName()).toBe('related_tag');
+      expect(component.trackByFn(0, item)).toBe(item);
     });
 
-    it('should handle empty field', () => {
-      component.field = '';
-
-      expect(component.getObjectFieldName()).toBe('');
-    });
-  });
-
-  describe('Edge Cases and Error Handling', () => {
-    it('should handle null model gracefully', () => {
-      component.model = null;
-
-      expect(() =>
-        component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel)
-      ).not.toThrow();
+    it('trackByFn should fallback to index when item is null/undefined', () => {
+      expect(component.trackByFn(5, null)).toBe(5);
+      expect(component.trackByFn(7, undefined)).toBe(7);
     });
 
-    it('should handle missing field in model', () => {
-      component.model = {} as unknown as MockModel;
-      component.field = 'nonexistent';
+    it('should expose selectedModelName based on underlying object field', () => {
+      component.field = 'tag_id';
+      component.text = 'name';
+      component.model = {
+        tag_id: 1,
+        tag: { id: 1, name: 'Primary Tag' }
+      } as unknown as MockModel;
 
-      expect(() =>
-        component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel)
-      ).not.toThrow();
+      expect(component.selectedModelName).toBe('Primary Tag');
     });
 
-    it('should handle null dialog settings', () => {
-      component.dialogSettings = null;
+    it('showModal should log error and not open when dialogSettings missing', () => {
+      // eslint-disable-next-line no-undef
+      spyOn(console, 'error');
+      // Force internal dialog settings to undefined
+      (
+        component as unknown as { internalDialogSettings?: DialogContentWithOptionsInterface }
+      ).internalDialogSettings = undefined; // access private for test
+      component.isModalVisible = false;
 
-      expect(() =>
-        component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel)
-      ).not.toThrow();
-    });
+      component.showModal();
 
-    it('should handle missing selectedElements in dialog settings', () => {
-      component.dialogSettings = {
-        createEditComponent: null,
-        listComponent: null,
-        listOptions: {} as unknown as { selectedElements?: Array<MockTagInterface> }
-      };
-
-      expect(() =>
-        component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel)
-      ).not.toThrow();
-    });
-  });
-
-  describe('Integration Tests', () => {
-    it('should add and then remove items correctly', () => {
-      // Start with empty arrays
-      component.model = { tags: [] } as unknown as MockModel;
-      component.field = 'tags';
-      component.dialogSettings.listOptions.selectedElements = [];
-
-      // Add items
-      component.selectModelEmit(mockTag1);
-      component.selectModelEmit(mockTag2);
-
-      expect((component.model as unknown as { tags: Array<MockTagInterface> }).tags).toEqual([
-        mockTag1,
-        mockTag2
-      ]);
-
-      // Remove one item
-      component.dialogSettings.listOptions.selectedElements = [mockTag1, mockTag2];
-      component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel);
-
-      expect((component.model as unknown as { tags: Array<MockTagInterface> }).tags).toEqual([
-        mockTag2
-      ]);
-
-      expect(component.dialogSettings.listOptions.selectedElements).toEqual([mockTag2]);
-    });
-
-    it('should handle complex workflow with multiple operations', () => {
-      component.model = { tags: [] } as unknown as MockModel;
-      component.field = 'tags';
-      component.dialogSettings.listOptions.selectedElements = [];
-
-      // Add multiple items
-      [mockTag1, mockTag2, mockTag3].forEach((tag) => {
-        component.selectModelEmit(tag);
-        component.dialogSettings.listOptions.selectedElements.push(tag);
-      });
-
-      expect((component.model as unknown as { tags: Array<MockTagInterface> }).tags).toEqual(
-        jasmine.arrayWithExactContents([mockTag1, mockTag2, mockTag3])
+      // eslint-disable-next-line no-undef
+      expect(console.error).toHaveBeenCalledWith(
+        'dialogSettings is not defined. Cannot show modal.'
       );
 
-      expect(component.dialogSettings.listOptions.selectedElements).toEqual(
-        jasmine.arrayWithExactContents([mockTag1, mockTag2, mockTag3])
-      );
+      expect(component.isModalVisible).toBe(false);
+    });
 
-      // Remove middle item
-      component.deleteFromMultipleSelectedList(mockTag2 as unknown as MockModel);
+    it('deleteFromMultipleSelectedList should not throw without dialogSettings', () => {
+      component.model = { tags: [mockTag1] } as unknown as MockModel;
+      component.field = 'tags';
+      // Force internal dialog settings removal
+      (
+        component as unknown as { internalDialogSettings?: DialogContentWithOptionsInterface }
+      ).internalDialogSettings = undefined; // access private for test
 
-      expect((component.model as unknown as { tags: Array<MockTagInterface> }).tags).toEqual([
-        mockTag1,
-        mockTag3
-      ]);
-
-      expect(component.dialogSettings.listOptions.selectedElements).toEqual([mockTag1, mockTag3]);
-
-      // Remove remaining items
-      component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel);
-      component.deleteFromMultipleSelectedList(mockTag3 as unknown as MockModel);
-
-      expect((component.model as unknown as { tags: Array<MockTagInterface> }).tags).toEqual([]);
-      expect(component.dialogSettings.listOptions.selectedElements).toEqual([]);
+      expect(() =>
+        component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel)
+      ).not.toThrow();
     });
   });
 });

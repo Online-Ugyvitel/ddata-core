@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'clearModel',
-  standalone: true
+  standalone: false
 })
 export class ClearModelPipe implements PipeTransform {
-  removeProperties(model: Record<string, unknown>): Record<string, unknown> {
+  removeProperties(model: any): any {
     const cleanedModel = { ...model };
 
     delete cleanedModel.api_endpoint;
@@ -18,12 +19,12 @@ export class ClearModelPipe implements PipeTransform {
     return cleanedModel;
   }
 
-  transform(model: Record<string, unknown>): Record<string, unknown> {
+  transform(model: any): any {
     const cleanedModel = this.removeProperties(model);
 
     Object.keys(cleanedModel).forEach((key) => {
       if (cleanedModel[key] instanceof Object && cleanedModel[key] !== null) {
-        cleanedModel[key] = this.removeProperties(cleanedModel[key] as Record<string, unknown>);
+        cleanedModel[key] = this.removeProperties(cleanedModel[key]);
       }
     });
 

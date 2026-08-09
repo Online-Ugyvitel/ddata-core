@@ -4,7 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DdataUiCommonModule } from 'ddata-ui-common';
 import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
-import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import {
+  MatTimepickerModule,
+  provideNativeDateTimeAdapter
+} from '@dhutaryan/ngx-mat-timepicker';
 
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { DdataInputCheckboxComponent } from './components/checkbox/checkbox.component';
@@ -19,6 +22,9 @@ import { DdataSelectComponent } from './components/select/select.component';
 import { DdataSimpleSelectComponent } from './components/select/simple-select/simple-select.component';
 import { DdataTextareaComponent } from './components/textarea/textarea.component';
 import { DdataInputTimeComponent } from './components/time/time-input.component';
+import { CharacterCounterComponent } from './components/character-counter/character-counter.component';
+import { WordCounterComponent } from './components/word-counter/word-counter.component';
+import { DescriptionPipe } from './pipes/description/description.pipe';
 
 @NgModule({
   declarations: [
@@ -33,17 +39,27 @@ import { DdataInputTimeComponent } from './components/time/time-input.component'
     DdataSimpleSelectComponent,
     DdataAutocompleteSelectComponent,
     DdataMultipleSelectComponent,
-    DdataMultipleSelectDialogComponent
+    DdataMultipleSelectDialogComponent,
+    CharacterCounterComponent,
+    WordCounterComponent,
+    DescriptionPipe
   ],
   imports: [
+    // Angular modules
+    CommonModule,
+    FormsModule,
+
+    // Third-party modules
+    FontAwesomeModule,
+    MatTimepickerModule,
+    NgbDatepickerModule,
+
+    // Third-party standalone components (v20.0.0+)
     ColorPickerComponent,
     ColorPickerDirective,
-    CommonModule,
-    FontAwesomeModule,
-    FormsModule,
-    NgxMaterialTimepickerModule,
-    DdataUiCommonModule,
-    NgbDatepickerModule
+
+    // Internal modules
+    DdataUiCommonModule
   ],
   exports: [
     DdataInputCheckboxComponent,
@@ -53,7 +69,13 @@ import { DdataInputTimeComponent } from './components/time/time-input.component'
     DdataInputSearchComponent,
     DdataInputTimeComponent,
     DdataSelectComponent,
-    DdataTextareaComponent
-  ]
+    DdataTextareaComponent,
+    DdataSimpleSelectComponent,
+    DdataAutocompleteSelectComponent,
+    DdataMultipleSelectComponent,
+    DdataMultipleSelectDialogComponent,
+    DescriptionPipe
+  ],
+  providers: [provideNativeDateTimeAdapter()]
 })
 export class DdataUiInputModule {}

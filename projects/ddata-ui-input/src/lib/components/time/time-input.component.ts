@@ -54,6 +54,7 @@ export class DdataInputTimeComponent implements AfterViewInit {
   _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
 
   random: string = this.helperService.randChars();
+  timeValue: Date | null = null;
 
   @Input() set model(value: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null) {
     // prevent undefined
@@ -91,6 +92,8 @@ export class DdataInputTimeComponent implements AfterViewInit {
     if (!!this._model && !!this._model.validationRules[this._field]) {
       this._isRequired = this.helperService.isRequired(this._model, this._field);
     }
+
+    this.timeValue = this.parseTime(this._model[this._field]);
   }
 
   get model(): BaseModelInterface<unknown> & FieldsInterface<unknown> {
@@ -105,6 +108,7 @@ export class DdataInputTimeComponent implements AfterViewInit {
     }
 
     this._field = fieldValue;
+    this.timeValue = this.parseTime(this._model[this._field]);
   }
 
   @Input() set append(value: string) {
@@ -153,9 +157,26 @@ export class DdataInputTimeComponent implements AfterViewInit {
     }
   }
 
-  setTime(time: string): void {
-    this._model[this._field] = time;
+  setTime(time: Date | null | string): void {
+    this.timeValue = typeof time === 'string' ? this.parseTime(time) : time;
+    this._model[this._field] = typeof time === 'string' ? time : time ? this.formatTime(time) : '';
 
     this.validateField();
+  }
+
+  private parseTime(value: unknown): Date | null {
+    if (typeof value !== 'string' || !/^\d{1,2}:\d{2}$/.test(value)) {
+      return null;
+    }
+
+    const [hours, minutes] = value.split(':').map(Number);
+    const result = new Date();
+    result.setHours(hours, minutes, 0, 0);
+
+    return Number.isNaN(result.getTime()) ? null : result;
+  }
+
+  private formatTime(value: Date): string {
+    return `${String(value.getHours()).padStart(2, '0')}:${String(value.getMinutes()).padStart(2, '0')}`;
   }
 }

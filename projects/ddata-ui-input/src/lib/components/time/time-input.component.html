@@ -11,11 +11,10 @@
 
     <ng-container *ngIf="!isViewOnly">
       <input
-        [ngxTimepicker]="timepicker"
-        [format]="format"
+        [matTimepicker]="timepicker"
+        [(ngModel)]="timeValue"
         [class.invalid]="model.validationErrors.includes(_field)"
         [class]="inputClass"
-        [(ngModel)]="_model[_field]"
         [id]="_field + '_' + random"
         [attr.name]="_field + '_' + random"
         [placeholder]="_placeholder"
@@ -23,6 +22,7 @@
         [disabled]="disabled"
         [type]="type"
         [autocomplete]="random"
+        (timeChange)="setTime($event.value)"
         (keyup)="validateField()"
         #inputBox
       />
@@ -45,4 +45,4 @@
   </div>
 </div>
 
-<ngx-material-timepicker #timepicker (timeSet)="setTime($event)"></ngx-material-timepicker>
+<mat-timepicker #timepicker [format]="format === 12 ? '12h' : '24h'"></mat-timepicker>

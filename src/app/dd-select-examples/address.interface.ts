@@ -1,4 +1,4 @@
-import { BaseModelInterface, ID } from '../../../projects/ddata-core/src/public-api';
+import { BaseModelInterface, FieldsInterface, ID } from 'ddata-core';
 import { CountryInterface } from './country.interface';
 import { TagInterface } from './tag.interface';
 
@@ -13,7 +13,8 @@ export interface AddressUIFieldsInterface {
 
 export interface AddressInterface
   extends AddressUIFieldsInterface,
-    BaseModelInterface<AddressInterface> {
+    BaseModelInterface<AddressInterface>,
+    FieldsInterface<AddressUIFieldsInterface> {
   id: ID;
   country: CountryInterface;
   tag: TagInterface; // for single select demo

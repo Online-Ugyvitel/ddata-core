@@ -70,7 +70,7 @@ describe('DdataSimpleSelectComponent', () => {
       expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
       expect(component.inputBlockExtraClass).toBe('col-md-9');
       expect(component.unselectedText).toBe('Válassz');
-      expect(component.isRequire).toBe(false);
+      expect(component.isRequired).toBe(false);
       expect(component.disabledAppearance).toBe(false);
       expect(component.disabled).toBe(false);
       expect(component.addEmptyOption).toBe(true);
@@ -254,12 +254,12 @@ describe('DdataSimpleSelectComponent', () => {
     });
 
     it('should allow behavior configuration', () => {
-      component.isRequire = true;
+      component.isRequired = true;
       component.disabledAppearance = true;
       component.disabled = true;
       component.addEmptyOption = false;
 
-      expect(component.isRequire).toBe(true);
+      expect(component.isRequired).toBe(true);
       expect(component.disabledAppearance).toBe(true);
       expect(component.disabled).toBe(true);
       expect(component.addEmptyOption).toBe(false);
@@ -326,6 +326,54 @@ describe('DdataSimpleSelectComponent', () => {
       component.model = null;
 
       expect(component.model).toBeNull();
+    });
+  });
+
+  describe('Required Field Asterisk Display', () => {
+    it('should render the component and label when model is provided', () => {
+      // Ensure we have a proper model setup
+      component.model = {
+        country_id: 2,
+        validationErrors: []
+      } as unknown as MockModel;
+      component.showLabel = true;
+      component.labelText = 'Country';
+
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement;
+      const labelElement = compiled.querySelector('label');
+
+      expect(labelElement).toBeTruthy();
+      expect(labelElement?.textContent).toContain('Country');
+    });
+
+    it('should show asterisk (*) when field is required', () => {
+      // Ensure we have a proper model setup
+      component.model = {
+        country_id: 2,
+        validationErrors: []
+      } as unknown as MockModel;
+      component.isRequired = true;
+      component.showLabel = true;
+      component.labelText = 'Country';
+
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement;
+      const labelElement = compiled.querySelector('label');
+
+      expect(labelElement).toBeTruthy();
+      // Check for any span containing asterisk
+      const allSpans = compiled.querySelectorAll('span');
+      let hasAsterisk = false;
+
+      for (const span of allSpans) {
+        if (span.textContent?.includes('*')) {
+          hasAsterisk = true;
+          break;
+        }
+      }
+
+      expect(hasAsterisk).toBe(true);
     });
   });
 });
