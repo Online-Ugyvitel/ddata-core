@@ -5,7 +5,7 @@
 ## Package Information
 
 - **Package Name**: `ddata-core`
-- **Version**: `0.3.16`
+- **Version**: `0.3.17`
 - **Description**: DData Core module, models & services
 - **Keywords**: angular, localstorage, remote storage, proxy, service, data service
 - **Repository**: https://github.com/netdjw/ddata-core
