@@ -1,6 +1,6 @@
 {
   "name": "ddata-ui",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "peerDependencies": {
     "@angular/common": ">=22.1.1 <23",
     "@angular/core": ">=22.1.1 <23"
