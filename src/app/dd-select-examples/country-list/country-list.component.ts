@@ -5,9 +5,9 @@ import { Country } from '../country.model';
 import { DdSelectExampleService } from '../dd-select-example.service';
 
 @Component({
-  selector: 'app-country-list',
+  selector: 'dd-country-list',
   templateUrl: './country-list.component.html',
-  standalone: true,
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CountryListComponent extends SelectableListComponent<CountryInterface> {
@@ -25,22 +25,29 @@ export class CountryListComponent extends SelectableListComponent<CountryInterfa
 
   selected(model: CountryInterface): void {
     if (!this.multipleSelectEnabled) {
-      this._selectedElements.clear();
+      // Clear all selections
+      this.selectedElements = [];
 
       this.models
         .filter((_) => _.id !== model.id)
         .forEach((_) => {
           _.is_selected = false;
-          this._selectedElements.delete(_);
         });
     }
 
     model.is_selected = !model.is_selected;
 
     if (model.is_selected) {
-      this._selectedElements.add(model);
+      // Add to selection
+      const currentSelection = this.selectedElements;
+
+      currentSelection.push(model);
+      this.selectedElements = currentSelection;
     } else {
-      this._selectedElements.delete(model);
+      // Remove from selection
+      const currentSelection = this.selectedElements.filter((_) => _.id !== model.id);
+
+      this.selectedElements = currentSelection;
     }
 
     this.changeDetector.detectChanges();

@@ -24,16 +24,16 @@
         #inputBox
       />
       <ng-container *ngIf="enableCharacterCounter">
-        <dd-character-counter
+        <character-counter
           [currentLength]="model[_field]?.length || 0"
           [maxLength]="maxLength"
-        ></dd-character-counter>
+        ></character-counter>
       </ng-container>
       <ng-container *ngIf="enableWordCounter">
         <dd-word-counter
           [currentLength]="model[_field]"
           [maxLength]="maxWords"
-          (maxLentghReached)="showWordCounterWarning = $event"
+          (maxLengthReached)="displayWordCounterWarning = $event"
         ></dd-word-counter>
       </ng-container>
     </ng-container>

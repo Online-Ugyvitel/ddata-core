@@ -1,70 +1,83 @@
 <!-- eslint-disable @angular-eslint/template/cyclomatic-complexity -->
 <div [class]="wrapperClass">
   <!-- label -->
-  <label [class]="labelClass" [for]="id" *ngIf="showLabel">
-    {{ labelText }}:
-
-    <span *ngIf="isRequire"> *</span>
-  </label>
+  @if (showLabel) {
+    <label [class]="labelClass" [for]="id">
+      {{ labelText }}:
+      @if (isRequired) {
+        <span aria-hidden="true"> *</span>
+      }
+    </label>
+  }
 
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
     <!-- prepend -->
-    <div class="input-group-prepend" *ngIf="!!prepend">
-      <div class="input-group-text">{{ prepend }}</div>
-    </div>
+    @if (!!prepend) {
+      <div class="input-group-prepend">
+        <div class="input-group-text">{{ prepend }}</div>
+      </div>
+    }
 
     <!-- select -->
     <div
       class="form-control multiple-select text-muted"
       [ngClass]="{ disabled: disabled }"
-      (click)="showModal()"
+      [attr.aria-required]="isRequired"
+      [attr.aria-expanded]="false"
+      [attr.aria-haspopup]="true"
+      role="combobox"
+      [attr.tabindex]="disabled ? -1 : 0"
+      (click)="!disabled && showModal()"
     >
       <!-- if there isn't any selected items -->
-      <ng-container *ngIf="!model[field] || model[field].length === 0; else hasSelectedItems">
+      @if (!model[field] || model[field].length === 0) {
         {{ '-- ' + unselectedText + ' --' }}
-      </ng-container>
-
-      <ng-template #hasSelectedItems>
+      } @else {
         <!-- multiple select mode -->
-        <ng-container *ngIf="mode === 'multiple'">
+        @if (mode === 'multiple') {
           {{ model[field].length + ' elem kiválasztva' }}
-        </ng-container>
+        }
 
         <!-- single select mode -->
-        <ng-container *ngIf="mode === 'single'">
+        @if (mode === 'single') {
           {{ selectedModelName }}
-        </ng-container>
-      </ng-template>
+        }
+      }
     </div>
 
     <!-- append -->
-    <div class="input-group-append" *ngIf="!!append">
-      <div class="input-group-text">{{ append }}</div>
-    </div>
+    @if (!!append) {
+      <div class="input-group-append">
+        <div class="input-group-text">{{ append }}</div>
+      </div>
+    }
   </div>
 </div>
-<!-- multiple select - selected items -->
-<ng-container *ngIf="mode === 'multiple' && !disableShowSelectedItems">
-  <div *ngIf="model[field].length > 0" class="d-flex justify-content-end">
-    <div
-      [class]="selectedElementsBlockClass"
-      [ngClass]="showLabel ? selectedElementsBlockExtraClass : ''"
-    >
-      <ng-container *ngFor="let element of model[field]; trackBy: trackByFn">
-        <dd-tag
-          [tag]="element"
-          [class]="'d-inline-block pl-2 mb-1 bg-light me-2'"
-          [showIcon]="showIcon"
-          (delete)="deleteFromMultipleSelectedList(element)"
-        ></dd-tag>
-      </ng-container>
-    </div>
-  </div>
-</ng-container>
 
-<ng-container *ngIf="isModalVisible">
-  <multiple-select-dialog
-    [settings]="_dialogSettings"
+<!-- multiple select - selected items -->
+@if (mode === 'multiple' && !disableShowSelectedItems) {
+  @if (model[field].length > 0) {
+    <div class="d-flex justify-content-end">
+      <div
+        [class]="selectedElementsBlockClass"
+        [ngClass]="showLabel ? selectedElementsBlockExtraClass : ''"
+      >
+        @for (element of model[field]; track trackByFn($index, element)) {
+          <dd-tag
+            [tag]="element"
+            [class]="'d-inline-block pl-2 mb-1 bg-light me-2'"
+            [showIcon]="showIcon"
+            (delete)="deleteFromMultipleSelectedList(element)"
+          ></dd-tag>
+        }
+      </div>
+    </div>
+  }
+}
+
+@if (isModalVisible) {
+  <dd-multiple-select-dialog
+    [settings]="dialogSettings"
     [method]="'list'"
     [mode]="mode"
     [model]="model"
@@ -75,5 +88,5 @@
     (selectionFinished)="hideModal()"
     (selected)="selectedEmit($event)"
     (selectModel)="selectModelEmit($event)"
-  ></multiple-select-dialog>
-</ng-container>
+  ></dd-multiple-select-dialog>
+}

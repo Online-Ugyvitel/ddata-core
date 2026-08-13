@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ChangeDetectionStrategy,
+  signal
+} from '@angular/core';
 import { BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
 import { DialogContentWithOptionsInterface } from '../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
@@ -18,7 +26,7 @@ export class DdataSelectComponent {
    */
   @Input() set fakeSingleSelect(value: boolean) {
     if (value === true) {
-      this._mode = 'single';
+      this.mode$.set('single');
     }
   }
 
@@ -26,7 +34,7 @@ export class DdataSelectComponent {
    * @deprecated use `mode` input attribute
    */
   get fakeSingleSelect(): boolean {
-    return this._mode === 'single';
+    return this.mode$() === 'single';
   }
 
   /**
@@ -34,7 +42,7 @@ export class DdataSelectComponent {
    */
   @Input() set multipleSelect(value: boolean) {
     if (value === true) {
-      this._mode = 'multiple';
+      this.mode$.set('multiple');
     }
   }
 
@@ -42,76 +50,145 @@ export class DdataSelectComponent {
    * @deprecated use `mode` input attribute
    */
   get multipleSelect(): boolean {
-    return this._mode === 'multiple';
+    return this.mode$() === 'multiple';
   }
 
   @Input() set mode(value: SelectType) {
-    this._mode = value ?? 'simple';
+    this.mode$.set(value ?? 'simple');
   }
 
   get mode(): SelectType {
-    return this._mode;
+    return this.mode$();
   }
 
-  @Input() set model(value: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null) {
+  @Input() set model(value: (BaseModelInterface<any> & FieldsInterface<any>) | null) {
     if (!value) {
       return;
     }
 
-    this._model = value;
+    this.model$.set(value);
+    // Type guard to check if it's a full model with fields
+    const hasFields = (obj: any): obj is BaseModelInterface<any> & FieldsInterface<any> => {
+      return obj && typeof obj === 'object' && 'fields' in obj && 'model_name' in obj;
+    };
+
+    // Try to set labels, prepend, append, and other field-derived properties for all modes
+    if (hasFields(value) && value.fields && value.fields[this.field$()]) {
+      this.title$.set(this.helperService.getTitle(value, this.field$()));
+      this.prepend$.set(this.helperService.getPrepend(value, this.field$()));
+      this.append$.set(this.helperService.getAppend(value, this.field$()));
+      this.label$.set(this.helperService.getLabel(value, this.field$()));
+
+      if (value.validationRules && value.validationRules[this.field$()]) {
+        this.isRequired$.set(this.helperService.isRequired(value, this.field$()));
+      }
+    }
+
+    // For simple mode, we don't require the full fields structure
+    if (this.mode$() === 'simple') {
+      return;
+    }
+
+    if (!hasFields(value)) {
+      console.warn(
+        'Model is missing fields or model_name properties required for non-simple modes'
+      );
+
+      return;
+    }
+    const fullModel = value;
 
     // if model's 'fields' is not defined or null
-    if (!this._model.fields) {
-      console.error(`Your ${this._model.model_name}'s 'fields' field is`, this._model.fields);
+    if (!fullModel.fields) {
+      console.error(`Your ${fullModel.model_name}'s 'fields' field is`, fullModel.fields);
 
       return;
     }
 
     // if model's used field is not defined or null
-    if (!this._model.fields[this._field]) {
+    if (!fullModel.fields[this.field$()]) {
       console.error(
-        `The ${this._model.model_name}'s ${this._field} field is `,
-        this._model.fields[this._field]
+        `The ${fullModel.model_name}'s ${this.field$()} field is `,
+        fullModel.fields[this.field$()]
       );
 
       return;
     }
 
-    // set texts (title, label, append, prepend) if model & fields attribute is defined too
-    if (!!this._model && !!this._model.fields[this._field]) {
-      this._title = this.helperService.getTitle(this._model, this._field);
-      this._prepend = this.helperService.getPrepend(this._model, this._field);
-      this._append = this.helperService.getAppend(this._model, this._field);
-      this._label = this.helperService.getLabel(this._model, this._field);
-    }
-
-    // model is set & has validation rules for field
-    if (!!this._model && !!this._model.validationRules[this._field]) {
-      this._isRequired = this.helperService.isRequired(this._model, this._field);
-    }
-
     // add 'name' property as default value on fake single select mode if model is set
-    if (!!this._model && this.fakeSingleSelect) {
-      this._selectedModelName = (this._model as { name?: string }).name ?? '';
+    if (!!fullModel && this.fakeSingleSelect) {
+      this.selectedModelName$.set((fullModel as { name?: string }).name ?? '');
     }
   }
 
-  get model(): (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null {
-    return this._model;
+  get model(): (BaseModelInterface<any> & FieldsInterface<any>) | null {
+    return this.model$() as BaseModelInterface<any> & FieldsInterface<any>;
   }
 
   @Input() set field(value: string) {
     const fieldValue = value === 'undefined' ? 'id' : value;
 
-    this._field = fieldValue;
+    this.field$.set(fieldValue);
+    // Recalculate meta information (label, prepend, append, required) if model already present
+    const currentModel = this.model$();
+    
+    if (currentModel) {
+      try {
+        if (currentModel.fields && currentModel.fields[fieldValue]) {
+          this.title$.set(this.helperService.getTitle(currentModel, fieldValue));
+          this.prepend$.set(this.helperService.getPrepend(currentModel, fieldValue));
+          this.append$.set(this.helperService.getAppend(currentModel, fieldValue));
+          this.label$.set(this.helperService.getLabel(currentModel, fieldValue));
+        }
+
+        if (currentModel.validationRules) {
+          const hasRule = !!currentModel.validationRules[fieldValue];
+
+          this.isRequired$.set(
+            hasRule ? this.helperService.isRequired(currentModel, fieldValue) : false
+          );
+        }
+      } catch {
+        // swallow – non-blocking recalculation
+      }
+    }
   }
 
-  @Input() set items(value: Array<unknown> | null) {
+  get field(): string {
+    return this.field$();
+  }
+
+  @Input() set items(value: Array<any> | null) {
     if (!value) {
       return;
     }
 
-    this._items = value;
+    this.items$.set(value);
+  }
+
+  get items(): Array<any> {
+    return this.items$();
+  }
+
+  // Public API getters for external access
+  get label(): string {
+    return this.label$();
+  }
+
+  get prepend(): string {
+    return this.prepend$();
+  }
+
+  get append(): string {
+    return this.append$();
+  }
+
+  get isRequired(): boolean {
+    return this.isRequired$();
+  }
+
+  get selectedModelName(): string {
+    return this.selectedModelName$();
   }
 
   @Input() wrapperClass = 'd-flex flex-wrap';
@@ -133,31 +210,31 @@ export class DdataSelectComponent {
   @Input() selectedElementsBlockClass = 'col-12 d-flex flex-wrap px-0';
   @Input() selectedElementsBlockExtraClass = 'col-md-9 d-flex flex-wrap';
 
-  @Output() readonly selected: EventEmitter<unknown> = new EventEmitter();
-  @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter();
+  @Output() readonly selected: EventEmitter<any> = new EventEmitter();
+  @Output() readonly selectModel: EventEmitter<any> = new EventEmitter();
   // eslint-disable-next-line @angular-eslint/no-output-native
-  @Output() readonly change: EventEmitter<unknown> = new EventEmitter();
+  @Output() readonly change: EventEmitter<any> = new EventEmitter();
 
   private readonly helperService: InputHelperServiceInterface =
     DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
 
-  private _field = '';
-  private _title = '';
-  private _label = '';
-  private _prepend = '';
-  private _append = '';
-  private _isRequired = false;
-  private _items = [];
-  private _model: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null = null;
-  private _selectedModelName = '';
-  private _mode: SelectType = 'simple';
+  protected readonly field$ = signal('id');
+  protected readonly title$ = signal('');
+  protected readonly label$ = signal('');
+  protected readonly prepend$ = signal('');
+  protected readonly append$ = signal('');
+  protected readonly isRequired$ = signal(false);
+  protected readonly items$ = signal<Array<any>>([]);
+  protected readonly model$ = signal<any | null>(null);
+  protected readonly selectedModelName$ = signal('');
+  protected readonly mode$ = signal<SelectType>('simple');
 
-  selectedEmit(value: unknown): void {
+  selectedEmit(value: any): void {
     this.selected.emit(value);
     this.change.emit(value);
   }
 
-  selectModelEmit(value: unknown): void {
+  selectModelEmit(value: any): void {
     this.selectModel.emit(value);
   }
 }

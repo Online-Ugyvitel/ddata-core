@@ -2,7 +2,6 @@
 import {
   ChangeDetectorRef,
   Component,
-  ComponentFactoryResolver,
   EventEmitter,
   Input,
   Output,
@@ -63,7 +62,6 @@ export class DdataUiModalDialogComponent {
   };
 
   constructor(
-    private readonly componentFactoryResolver: ComponentFactoryResolver,
     private readonly changeDetector: ChangeDetectorRef
   ) {}
 
@@ -89,19 +87,15 @@ export class DdataUiModalDialogComponent {
     if (!this.dialogContent) {
       return;
     }
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
-      this.dialogContent.component
-    );
-
     this.dialogHost.clear();
 
-    this.componentRef = this.dialogHost.createComponent(componentFactory);
+    this.componentRef = this.dialogHost.createComponent(this.dialogContent.component);
 
     if (!!this.dialogContent.data.model) {
-      // tslint:disable-next-line: max-line-length
+      // Assign provided model (could be plain object in tests) with relaxed casting
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this.componentRef.instance as BaseCreateEditComponent<BaseModelInterface<any>>).model =
-        this.dialogContent.data.model;
+        (this.dialogContent.data.model as any);
     }
 
     (this.componentRef.instance as DialogContentInterface).data = this.dialogContent.data;
@@ -116,24 +110,24 @@ export class DdataUiModalDialogComponent {
     if (!!this.dialogContent.data) {
       (this.componentRef.instance as DialogContentInterface).isModal = true;
       (this.componentRef.instance as DialogContentInterface).multipleSelectEnabled =
-        this.dialogContent.data.multipleSelectEnabled;
+        (this.dialogContent.data.multipleSelectEnabled as any);
       (this.componentRef.instance as DialogContentInterface).isSelectionList =
-        this.dialogContent.data.isSelectionList;
+        (this.dialogContent.data.isSelectionList as any);
       (this.componentRef.instance as DialogContentInterface).loadData =
-        this.dialogContent.data.loadData;
+        (this.dialogContent.data.loadData as any);
       (this.componentRef.instance as DialogContentInterface).filter =
-        this.dialogContent.data.filter ?? {};
+        (this.dialogContent.data.filter as any) ?? {};
 
       // if the list component has preloaded datas
       if (!this.dialogContent.data.loadData && !!this.dialogContent.data.models) {
         (this.componentRef.instance as DialogContentInterface).models =
-          this.dialogContent.data.models;
+          (this.dialogContent.data.models as any);
       }
 
       // if there are previously selected elements
       if (!!this.dialogContent.data.selectedElements) {
         (this.componentRef.instance as DialogContentInterface).selectedElements = [
-          ...this.dialogContent.data.selectedElements
+          ...(this.dialogContent.data.selectedElements as any[])
         ];
       }
 
@@ -145,13 +139,8 @@ export class DdataUiModalDialogComponent {
       // if component has select observable we need to handle it's events
       this.componentSubscription = (this.componentRef.instance as DialogContentInterface).select
         .pipe(
-          map((models: Array<BaseModelWithoutTypeDefinitionInterface>) => {
-            // always return an array, even if there is only one selected item
-            models.forEach((model: BaseModelWithoutTypeDefinitionInterface) => {
-              // do emit with all selected elements
-              this.success.emit(model);
-            });
-
+          map((model: BaseModelWithoutTypeDefinitionInterface) => {
+            this.success.emit(model);
             this.close();
           })
         )

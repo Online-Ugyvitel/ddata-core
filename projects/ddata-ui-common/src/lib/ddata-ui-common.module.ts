@@ -26,6 +26,7 @@ import { DdataUiUserThumbnailComponent } from './components/user-profile-thumbna
     DdataUiNoDataComponent,
     DdataUiNotificationComponent,
     DdataUiLoadingOverlayComponent,
+    DdataUiPaginateComponent,
     DdataUiProgressbarComponent,
     DdataUiTagComponent,
     DdataUiUserThumbnailComponent

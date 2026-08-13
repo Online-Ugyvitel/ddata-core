@@ -1,19 +1,19 @@
-<ng-container *ngIf="mode === 'multiple'">
-  <multiple-select
+@if (mode$() === 'multiple') {
+  <dd-multiple-select
     mode="multiple"
     [wrapperClass]="wrapperClass"
-    [isRequire]="_isRequired"
+    [isRequired]="isRequired$()"
     [disabledAppearance]="disabledAppearance"
     [disabled]="disabled"
     [addEmptyOption]="addEmptyOption"
     [labelClass]="labelClass"
     [showLabel]="showLabel"
-    [labelText]="_label"
-    [prepend]="_prepend"
-    [append]="_append"
-    [model]="_model"
-    [field]="_field"
-    [items]="_items"
+    [labelText]="label$()"
+    [prepend]="prepend$()"
+    [append]="append$()"
+    [model]="model$()"
+    [field]="field$()"
+    [items]="items$()"
     [dialogSettings]="dialogSettings"
     [text]="text"
     [valueField]="valueField"
@@ -23,25 +23,25 @@
     [showIcon]="showIcon"
     (selected)="selectedEmit($event)"
     (selectModel)="selectModelEmit($event)"
-  ></multiple-select>
-</ng-container>
+  ></dd-multiple-select>
+}
 
-<ng-container *ngIf="mode === 'single'">
-  <multiple-select
+@if (mode$() === 'single') {
+  <dd-multiple-select
     mode="single"
     [wrapperClass]="wrapperClass"
-    [isRequire]="_isRequired"
+    [isRequired]="isRequired$()"
     [disabledAppearance]="disabledAppearance"
     [disabled]="disabled"
     [addEmptyOption]="addEmptyOption"
     [labelClass]="labelClass"
     [showLabel]="showLabel"
-    [labelText]="_label"
-    [prepend]="_prepend"
-    [append]="_append"
-    [model]="_model"
-    [field]="_field"
-    [items]="_items"
+    [labelText]="label$()"
+    [prepend]="prepend$()"
+    [append]="append$()"
+    [model]="model$()"
+    [field]="field$()"
+    [items]="items$()"
     [dialogSettings]="dialogSettings"
     [text]="text"
     [valueField]="valueField"
@@ -49,24 +49,24 @@
     [showIcon]="showIcon"
     (selected)="selectedEmit($event)"
     (selectModel)="selectModelEmit($event)"
-  ></multiple-select>
-</ng-container>
+  ></dd-multiple-select>
+}
 
-<ng-container *ngIf="mode === 'simple'">
-  <simple-select
+@if (mode$() === 'simple') {
+  <dd-simple-select
     [wrapperClass]="wrapperClass"
-    [isRequire]="_isRequired"
+    [isRequired]="isRequired$()"
     [disabledAppearance]="disabledAppearance"
     [disabled]="disabled"
     [addEmptyOption]="addEmptyOption"
     [labelClass]="labelClass"
     [showLabel]="showLabel"
-    [labelText]="_label"
-    [prepend]="_prepend"
-    [append]="_append"
-    [model]="_model"
-    [field]="_field"
-    [items]="_items"
+    [labelText]="label$()"
+    [prepend]="prepend$()"
+    [append]="append$()"
+    [model]="model$()"
+    [field]="field$()"
+    [items]="items$()"
     [text]="text"
     [valueField]="valueField"
     [unselectedText]="unselectedText"
@@ -74,27 +74,27 @@
     [inputBlockExtraClass]="inputBlockExtraClass"
     (selected)="selectedEmit($event)"
     (selectModel)="selectModelEmit($event)"
-  ></simple-select>
-</ng-container>
+  ></dd-simple-select>
+}
 
-<ng-container *ngIf="mode === 'autocomplete'">
-  <autocomplete-select
+@if (mode$() === 'autocomplete') {
+  <dd-autocomplete-select
     [wrapperClass]="wrapperClass"
-    [isRequired]="_isRequired"
+    [isRequired]="isRequired$()"
     [disabledAppearance]="disabledAppearance"
     [disabled]="disabled"
     [addEmptyOption]="addEmptyOption"
     [labelClass]="labelClass"
     [showLabel]="showLabel"
-    [labelText]="_label"
-    [prepend]="_prepend"
-    [append]="_append"
-    [model]="_model"
-    [field]="_field"
-    [items]="_items"
+    [labelText]="label$()"
+    [prepend]="prepend$()"
+    [append]="append$()"
+    [model]="model$()"
+    [field]="field$()"
+    [items]="items$()"
     [text]="text"
     [valueField]="valueField"
     (selected)="selectedEmit($event)"
     (selectModel)="selectModelEmit($event)"
-  ></autocomplete-select>
-</ng-container>
+  ></dd-autocomplete-select>
+}

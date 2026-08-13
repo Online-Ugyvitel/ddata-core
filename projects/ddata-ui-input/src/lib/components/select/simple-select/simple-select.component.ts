@@ -16,7 +16,7 @@ export class DdataSimpleSelectComponent {
   @Input() inputBlockClass = 'col-12 d-flex px-0';
   @Input() inputBlockExtraClass = 'col-md-9';
   @Input() unselectedText = 'Válassz';
-  @Input() isRequire = false;
+  @Input() isRequired = false;
   @Input() disabledAppearance = false;
   @Input() disabled = false;
   @Input() addEmptyOption = true;

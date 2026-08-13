@@ -3,6 +3,23 @@
 ## Overview
 This document contains key learnings and best practices for testing components in the `ddata-ui-input` project, based on extensive debugging and fixing of test suite issues. **Updated with proven patterns that fixed 184+ failing tests.**
 
+## ESLint Configuration for Test Files
+
+### File Length Limits
+Test files (*.spec.ts) have increased line limits to accommodate comprehensive test coverage:
+
+- **Regular files**: 500 lines (unchanged)
+- **Test files**: 10000 lines (increased from 500)
+
+This change was made in `.eslintrc.json` to support thorough testing without artificial constraints. Test files often require:
+- Extensive mock setups
+- Multiple test scenarios per component
+- Detailed setup for complex components
+- Comprehensive accessibility testing
+- Integration test coverage
+
+**Do NOT remove tests to meet line length constraints.** Instead, ensure test quality and coverage are prioritized.
+
 ## ✅ Proven Solution Pattern (WORKS CONSISTENTLY)
 
 ### The Ultimate DdataCoreModule Mock Pattern

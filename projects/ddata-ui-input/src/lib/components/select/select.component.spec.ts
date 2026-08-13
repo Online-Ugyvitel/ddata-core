@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/dot-notation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DdataSelectComponent } from './select.component';
-import { BaseModel, DdataCoreModule } from 'ddata-core';
+import { DdataCoreModule } from 'ddata-core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SelectType } from './select.type';
 
@@ -55,10 +55,19 @@ describe('DdataSelectComponent', () => {
           getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
           isRequired: jasmine.createSpy('isRequired').and.callFake((model, field) => {
             try {
-              if (field === 'country_id' && model?.validationRules?.country_id?.required) {
-                return model.validationRules.country_id.required;
+              if (!model?.validationRules || !model.validationRules[field]) {
+                return false;
               }
-
+              const validationRule = model.validationRules[field];
+              if (Array.isArray(validationRule)) {
+                return validationRule.includes('required');
+              }
+              if (typeof validationRule === 'object' && !!validationRule.required) {
+                return true;
+              }
+              if (typeof validationRule === 'string') {
+                return validationRule === 'required';
+              }
               return false;
             } catch {
               return false;
@@ -101,7 +110,7 @@ describe('DdataSelectComponent', () => {
     });
 
     it('should initialize with default mode as simple', () => {
-      expect(component['_mode']).toBe('simple');
+      expect(component.mode).toBe('simple');
     });
   });
 
@@ -109,27 +118,13 @@ describe('DdataSelectComponent', () => {
     it('should set mode to single when fakeSingleSelect is true', () => {
       component.fakeSingleSelect = true;
 
-      expect(component['_mode']).toBe('single');
-      expect(component.fakeSingleSelect).toBe(true);
-    });
-
-    it('should return true when mode is single for fakeSingleSelect getter', () => {
-      component.mode = 'single';
-
-      expect(component.fakeSingleSelect).toBe(true);
+      expect(component.mode).toBe('single');
     });
 
     it('should set mode to multiple when multipleSelect is true', () => {
       component.multipleSelect = true;
 
-      expect(component['_mode']).toBe('multiple');
-      expect(component.multipleSelect).toBe(true);
-    });
-
-    it('should return true when mode is multiple for multipleSelect getter', () => {
-      component.mode = 'multiple';
-
-      expect(component.multipleSelect).toBe(true);
+      expect(component.mode).toBe('multiple');
     });
   });
 
@@ -137,27 +132,27 @@ describe('DdataSelectComponent', () => {
     it('should set mode correctly', () => {
       component.mode = 'single';
 
-      expect(component['_mode']).toBe('single');
+      expect(component.mode).toBe('single');
 
       component.mode = 'multiple';
 
-      expect(component['_mode']).toBe('multiple');
+      expect(component.mode).toBe('multiple');
 
       component.mode = 'simple';
 
-      expect(component['_mode']).toBe('simple');
+      expect(component.mode).toBe('simple');
     });
 
     it('should default to simple mode when null is provided', () => {
       component.mode = null as any as SelectType;
 
-      expect(component['_mode']).toBe('simple');
+      expect(component.mode).toBe('simple');
     });
 
     it('should default to simple mode when undefined is provided', () => {
       component.mode = undefined as any as SelectType;
 
-      expect(component['_mode']).toBe('simple');
+      expect(component.mode).toBe('simple');
     });
   });
 
@@ -173,8 +168,8 @@ describe('DdataSelectComponent', () => {
       component.model = mockModel as any;
 
       expect(component.model).toEqual(mockModel as any);
-      expect(component['_title']).toBeDefined();
-      expect(component['_label']).toBeDefined();
+      expect(component.label).toBeDefined();
+      expect(component.prepend).toBeDefined();
     });
 
     it('should handle model without fields', () => {
@@ -182,6 +177,8 @@ describe('DdataSelectComponent', () => {
       spyOn(console, 'error');
       const modelWithoutFields = { ...mockModel, fields: null };
 
+      // Set mode to non-simple to trigger field validation
+      component.mode = 'single';
       component.model = modelWithoutFields as any;
 
       // eslint-disable-next-line no-undef
@@ -199,8 +196,9 @@ describe('DdataSelectComponent', () => {
         fields: {}
       };
 
+      // Set mode to non-simple to trigger field validation
+      component.mode = 'single';
       component.field = 'missing_field';
-
       component.model = modelWithMissingField as any;
 
       // eslint-disable-next-line no-undef
@@ -214,7 +212,7 @@ describe('DdataSelectComponent', () => {
       component.field = 'country_id';
       component.model = mockModel as any;
 
-      expect(component['_isRequired']).toBe(true);
+      expect(component.isRequired).toBe(true);
     });
 
     it('should set selected model name for fake single select mode', () => {
@@ -224,14 +222,14 @@ describe('DdataSelectComponent', () => {
       component.fakeSingleSelect = true;
       component.model = modelWithName as any;
 
-      expect(component['_selectedModelName']).toBe('Test Name');
+      expect(component.selectedModelName).toBe('Test Name');
     });
 
     it('should handle model without name for fake single select', () => {
       component.fakeSingleSelect = true;
       component.model = mockModel as any;
 
-      expect(component['_selectedModelName']).toBe('');
+      expect(component.selectedModelName).toBe('');
     });
   });
 
@@ -239,13 +237,13 @@ describe('DdataSelectComponent', () => {
     it('should set field correctly', () => {
       component.field = 'test_field';
 
-      expect(component['_field']).toBe('test_field');
+      expect(component.field).toBe('test_field');
     });
 
     it('should default to id when undefined is provided', () => {
       component.field = 'undefined';
 
-      expect(component['_field']).toBe('id');
+      expect(component.field).toBe('id');
     });
   });
 
@@ -253,26 +251,28 @@ describe('DdataSelectComponent', () => {
     it('should set items when provided', () => {
       component.items = mockCountries;
 
-      expect(component['_items']).toBe(mockCountries);
+      expect(component.items).toBe(mockCountries);
     });
 
     it('should return early when null items are provided', () => {
-      const originalItems = component['_items'];
+      const originalItems = component.items;
 
       component.items = null;
 
-      expect(component['_items']).toBe(originalItems);
+      expect(component.items).toBe(originalItems);
     });
   });
 
   describe('Event Emission', () => {
     it('should emit selected event', () => {
       spyOn(component.selected, 'emit');
+      spyOn(component.change, 'emit');
       const testValue = { test: 'data' };
 
       component.selectedEmit(testValue);
 
       expect(component.selected.emit).toHaveBeenCalledWith(testValue);
+      expect(component.change.emit).toHaveBeenCalledWith(testValue);
     });
 
     it('should emit selectModel event', () => {
@@ -282,6 +282,66 @@ describe('DdataSelectComponent', () => {
       component.selectModelEmit(testValue);
 
       expect(component.selectModel.emit).toHaveBeenCalledWith(testValue);
+    });
+  });
+
+  describe('Change Event Specifics', () => {
+    it('selectedEmit should emit both selected and change outputs', () => {
+      spyOn(component.selected, 'emit');
+      spyOn(component.change, 'emit');
+      const value = 42;
+
+      component.selectedEmit(value);
+
+      expect(component.selected.emit).toHaveBeenCalledWith(value);
+      expect(component.change.emit).toHaveBeenCalledWith(value);
+    });
+
+    it('selectModelEmit should not emit change output', () => {
+      spyOn(component.selectModel, 'emit');
+      spyOn(component.change, 'emit');
+      const modelValue = { id: 1 };
+
+      component.selectModelEmit(modelValue);
+
+      expect(component.selectModel.emit).toHaveBeenCalledWith(modelValue);
+      expect(component.change.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Deprecated Flag Toggling After Initialization', () => {
+    it('should toggle fakeSingleSelect and multipleSelect sequentially', () => {
+      // starts simple
+      expect(component.mode).toBe('simple');
+
+      component.fakeSingleSelect = true;
+
+      expect(component.mode).toBe('single');
+      expect(component.fakeSingleSelect).toBeTrue();
+
+      component.multipleSelect = true; // overrides mode
+
+      expect(component.mode).toBe('multiple');
+      expect(component.multipleSelect).toBeTrue();
+    });
+
+    it('should preserve model-derived properties after deprecated flag changes', () => {
+      const fullModel = {
+        country_id: 1,
+        fields: { country_id: { label: 'Country', title: 'Select a country' } },
+        validationRules: { country_id: { required: true } },
+        model_name: 'Address'
+      } as any;
+
+      component.field = 'country_id';
+      component.model = fullModel;
+      const originalLabel = component.label;
+
+      component.fakeSingleSelect = true;
+      component.multipleSelect = true; // switch again
+
+      expect(component.label).toBe(originalLabel);
+      expect(component.isRequired).toBeTrue();
     });
   });
 
@@ -368,24 +428,24 @@ describe('DdataSelectComponent', () => {
 
     it('should handle mode changes during runtime', () => {
       // Start as simple
-      expect(component['_mode']).toBe('simple');
+      expect(component.mode).toBe('simple');
 
       // Change to single
       component.mode = 'single';
 
-      expect(component['_mode']).toBe('single');
+      expect(component.mode).toBe('single');
       expect(component.fakeSingleSelect).toBe(true);
 
       // Change to multiple
       component.mode = 'multiple';
 
-      expect(component['_mode']).toBe('multiple');
+      expect(component.mode).toBe('multiple');
       expect(component.multipleSelect).toBe(true);
 
       // Change back to simple
       component.mode = 'simple';
 
-      expect(component['_mode']).toBe('simple');
+      expect(component.mode).toBe('simple');
       expect(component.fakeSingleSelect).toBe(false);
       expect(component.multipleSelect).toBe(false);
     });
@@ -408,7 +468,7 @@ describe('DdataSelectComponent', () => {
 
       component.field = 'country_id';
 
-      expect(() => (component.model = modelWithoutValidation as any)).toThrow();
+      expect(() => (component.model = modelWithoutValidation as any)).not.toThrow();
     });
 
     it('should handle model with empty validation rules', () => {
@@ -428,14 +488,132 @@ describe('DdataSelectComponent', () => {
       modes.forEach((mode) => {
         component.mode = mode as any;
 
-        expect(component['_mode']).toBe(mode);
+        expect(component.mode).toBe(mode);
       });
     });
 
     it('should handle invalid mode values gracefully', () => {
       (component as any).mode = 'invalid_mode';
 
-      expect(component['_mode']).toBe('invalid_mode');
+      expect(component.mode).toBe('invalid_mode');
+    });
+  });
+
+  describe('Required Field Detection', () => {
+    it('should detect required status from model validation rules', () => {
+      const modelWithRequired = {
+        country_id: 1,
+        fields: {
+          country_id: {
+            label: 'Country',
+            title: 'Select a country'
+          }
+        },
+        validationRules: {
+          country_id: ['required', 'integer']
+        },
+        model_name: 'Address'
+      } as any;
+
+      // Set field first, then model to trigger the setter logic properly
+      component.field = 'country_id';
+      fixture.detectChanges();
+
+      component.model = modelWithRequired;
+      fixture.detectChanges();
+
+      expect(component.isRequired).toBe(true);
+    });
+
+    it('should detect non-required status when validation rules do not include required', () => {
+      const modelWithoutRequired = {
+        country_id: 1,
+        fields: {
+          country_id: {
+            label: 'Country',
+            title: 'Select a country'
+          }
+        },
+        validationRules: {
+          country_id: ['integer']
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = modelWithoutRequired;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(false);
+    });
+
+    it('should handle missing validation rules gracefully', () => {
+      const modelWithoutValidationRules = {
+        country_id: 1,
+        fields: {
+          country_id: {
+            label: 'Country',
+            title: 'Select a country'
+          }
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = modelWithoutValidationRules;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(false);
+    });
+
+    it('should recalculate isRequired when field is changed after model set', () => {
+      const model = {
+        country_id: 1,
+        lang_id: 2,
+        fields: {
+          country_id: { label: 'Country', title: 'Country title' },
+          lang_id: { label: 'Nyelv', title: 'Language' }
+        },
+        validationRules: {
+          country_id: ['integer'],
+          lang_id: ['required', 'integer']
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = model;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(false, 'country_id should not be required');
+
+      component.field = 'lang_id';
+
+      expect(component.isRequired).toBe(true, 'lang_id should be required after field change');
+    });
+
+    it('should reset isRequired to false when switching to field without validation rule', () => {
+      const model = {
+        country_id: 1,
+        foo_id: 9,
+        fields: {
+          country_id: { label: 'Country', title: 'Country title' },
+          foo_id: { label: 'Foo', title: 'Foo title' }
+        },
+        validationRules: {
+          country_id: ['required']
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = model;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(true, 'country_id should be required');
+
+      component.field = 'foo_id';
+
+      expect(component.isRequired).toBe(
+        false,
+        'foo_id has no validation rule so required must reset'
+      );
     });
   });
 });

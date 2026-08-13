@@ -110,8 +110,8 @@ describe('FileModel', () => {
       expect(result).toBe(model);
       
       // Should set default values
-      expect(result.id).toBe(0);
-      expect(result.folder_id).toBe(0);
+  expect(result.id as any).toBe(0);
+  expect(result.folder_id as any).toBe(0);
       expect(result.name).toBe('');
       expect(result.file_name_and_path).toBe('');
       expect(result.file_name_slug).toBe('');
@@ -125,8 +125,8 @@ describe('FileModel', () => {
       const result = model.init(null);
       
       expect(result).toBeInstanceOf(FileModel);
-      expect(result.id).toBe(0);
-      expect(result.folder_id).toBe(0);
+  expect(result.id as any).toBe(0);
+  expect(result.folder_id as any).toBe(0);
       expect(result.name).toBe('');
       expect(result.file_name_and_path).toBe('');
       expect(result.file_name_slug).toBe('');
@@ -140,8 +140,8 @@ describe('FileModel', () => {
       const result = model.init({});
       
       expect(result).toBeInstanceOf(FileModel);
-      expect(result.id).toBe(0);
-      expect(result.folder_id).toBe(0);
+  expect(result.id as any).toBe(0);
+  expect(result.folder_id as any).toBe(0);
       expect(result.name).toBe('');
       expect(result.file_name_and_path).toBe('');
       expect(result.file_name_slug).toBe('');
@@ -166,8 +166,8 @@ describe('FileModel', () => {
       const result = model.init(testData);
       
       expect(result).toBeInstanceOf(FileModel);
-      expect(result.id).toBe(42);
-      expect(result.folder_id).toBe(10);
+  expect(result.id as any).toBe(42);
+  expect(result.folder_id as any).toBe(10);
       expect(result.name).toBe('test-file.jpg');
       expect(result.file_name_and_path).toBe('/uploads/test-file.jpg');
       expect(result.file_name_slug).toBe('test-file-jpg');
@@ -186,7 +186,7 @@ describe('FileModel', () => {
 
       const result = model.init(testData);
       
-      expect(result.id).toBe(5);
+  expect(result.id as any).toBe(5);
       expect(result.name).toBe('partial-file.txt');
       expect(result.mimetype).toBe('text/plain');
       expect(result.folder_id).toBe(0); // Default value
@@ -379,7 +379,7 @@ describe('FileModel', () => {
       }).not.toThrow();
 
       // Values should still be set (truthy check behavior)
-      expect(model.id).toBe('not-a-number');
+  expect(model.id as any).toBe('not-a-number');
       expect(model.size).toBe('also-not-a-number');
       expect(model.is_primary).toBe(true); // Truthy string becomes true
     });
@@ -412,8 +412,8 @@ describe('FileModel', () => {
       const result = model.init(testData);
       
       // Verify all properties are set correctly
-      expect(result.id).toEqual(testData.id);
-      expect(result.folder_id).toEqual(testData.folder_id);
+  expect(result.id as any).toEqual(testData.id);
+  expect(result.folder_id as any).toEqual(testData.folder_id);
       expect(result.name).toBe(testData.name);
       expect(result.file_name_and_path).toBe(testData.file_name_and_path);
       expect(result.file_name_slug).toBe(testData.file_name_slug);

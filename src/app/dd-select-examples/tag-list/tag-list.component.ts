@@ -5,9 +5,9 @@ import { DdSelectExampleService } from '../dd-select-example.service';
 import { Tag } from '../tag.model';
 
 @Component({
-  selector: 'app-tag-list',
+  selector: 'tag-list',
   templateUrl: './tag-list.component.html',
-  standalone: true,
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagListComponent extends SelectableListComponent<TagInterface> implements OnInit {

@@ -5,6 +5,7 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 import { FileModel } from '../../models/file/file.model';
+import { FileModelInterface } from '../../models/file/file-model.interface';
 import { DdataUiFileListComponent } from './file-list.component';
 
 describe('DdataUiFileListComponent', () => {
@@ -37,8 +38,8 @@ describe('DdataUiFileListComponent', () => {
   it('delete should delete a file', () => {
     component = new DdataUiFileListComponent();
     component.model.files = [
-      new FileModel().init({ name: 'test' }),
-      new FileModel().init({ name: 'test2' })
+      new FileModel().init({ name: 'test' } as unknown as Partial<FileModelInterface>),
+      new FileModel().init({ name: 'test2' } as unknown as Partial<FileModelInterface>)
     ];
     component.delete(component.model.files[0]);
 
@@ -47,7 +48,10 @@ describe('DdataUiFileListComponent', () => {
 
   it('fileuploadSuccess() should update model', () => {
     component = new DdataUiFileListComponent();
-    const files = [new FileModel().init({ name: 'test' }), new FileModel().init({ name: 'test2' })];
+    const files = [
+      new FileModel().init({ name: 'test' } as unknown as Partial<FileModelInterface>),
+      new FileModel().init({ name: 'test2' } as unknown as Partial<FileModelInterface>)
+    ];
 
     component.fileuploadSuccess(files);
 
@@ -71,10 +75,18 @@ describe('DdataUiFileListComponent', () => {
   it('setPrimaryImage() should set slug of a file', () => {
     component = new DdataUiFileListComponent();
     component.model.files = [
-      new FileModel().init({ name: 'test', file_name_slug: 'a' }),
-      new FileModel().init({ name: 'test2', file_name_slug: 'b' })
+      new FileModel().init({
+        name: 'test',
+        file_name_slug: 'a'
+      } as unknown as Partial<FileModelInterface>),
+      new FileModel().init({
+        name: 'test2',
+        file_name_slug: 'b'
+      } as unknown as Partial<FileModelInterface>)
     ];
-    component.setPrimaryImage(new FileModel().init({ file_name_slug: 'b' }));
+    component.setPrimaryImage(
+      new FileModel().init({ file_name_slug: 'b' } as unknown as Partial<FileModelInterface>)
+    );
 
     expect(component.model.files[1].is_primary).toBeTrue();
   });
