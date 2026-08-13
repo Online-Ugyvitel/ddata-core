@@ -19,6 +19,7 @@ export * from './lib/services/input/helper/input-helper-service.interface';
 export * from './lib/services/input/helper/input-helper.service';
 
 export * from './lib/components/checkbox/checkbox.component';
+export * from './lib/components/character-counter/character-counter.component';
 export * from './lib/components/color/color-input.component';
 export * from './lib/components/date/date-input.component';
 export * from './lib/components/input/input.component';

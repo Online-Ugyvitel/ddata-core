@@ -1,6 +1,9 @@
 {
-  "name": "ddata-ui-input",
-  "version": "1.0.13",
+  "name": "@netdjw/ddata-ui-input",
+  "version": "1.0.14",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "description": "DData UI Input module, components, models & services",
   "author": {
     "name": "Balázs Winkler",
@@ -29,8 +32,8 @@
     "@fortawesome/angular-fontawesome": ">=0.7.0",
     "@fortawesome/fontawesome-svg-core": ">=1.2.30",
     "@fortawesome/free-solid-svg-icons": ">=5.14.0",
-    "ddata-core": "^0.3.8",
-    "ddata-ui-common": "^0.1.17",
+    "@netdjw/ddata-core": "^0.3.17",
+    "@netdjw/ddata-ui-common": "^0.1.20",
     "moment": "^2.27.0",
     "ngx-color-picker": "^20.0.0",
     "@dhutaryan/ngx-mat-timepicker": "^21.0.0",

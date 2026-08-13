@@ -74,6 +74,7 @@ import { DescriptionPipe } from './pipes/description/description.pipe';
     DdataAutocompleteSelectComponent,
     DdataMultipleSelectComponent,
     DdataMultipleSelectDialogComponent,
+    CharacterCounterComponent,
     DescriptionPipe
   ],
   providers: [provideNativeDateTimeAdapter()]
