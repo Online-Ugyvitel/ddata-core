@@ -261,8 +261,10 @@ describe('DdataTextareaComponent counters', () => {
   it('should show the word counter warning above maxWords', () => {
     fixture.componentRef.setInput('enableWordCounter', true);
     fixture.componentRef.setInput('maxWords', 2);
+    fixture.componentRef.setInput('wordCounterWarningMessage', 'Too many words');
     fixture.detectChanges();
 
     expect(component.displayWordCounterWarning).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Too many words');
   });
 });

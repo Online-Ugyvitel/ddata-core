@@ -11,6 +11,7 @@ import {
 import { BaseModelInterface, FieldsInterface, BaseModel, DdataCoreModule } from 'ddata-core';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
+import { WordCounterComponent } from '../word-counter/word-counter.component';
 
 @Component({
   selector: 'dd-input',
@@ -159,6 +160,19 @@ export class DdataInputComponent implements AfterViewInit {
     if (isValid) {
       this.changed.emit(this._model);
     }
+  }
+
+  // Derived from the value during this component's own change detection: the counter's
+  // maxLengthReached event fires while its child view is checked, which is too late for
+  // an OnPush parent template and would show the warning one change detection late.
+  get isWordLimitExceeded(): boolean {
+    const value = (this._model as unknown as Record<string, unknown>)[this._field];
+
+    return (
+      this.enableWordCounter &&
+      this.maxWords > 0 &&
+      WordCounterComponent.countWords(value) > this.maxWords
+    );
   }
 
   setWordCounterWarning(value: boolean): void {

@@ -279,5 +279,16 @@ describe('DdataInputComponent counters', () => {
 
     expect(counter.textContent?.trim()).toBe('3 / 2');
     expect(component.displayWordCounterWarning).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Too many words');
+  });
+
+  it('should not show the word counter warning within maxWords', () => {
+    fixture.componentRef.setInput('enableWordCounter', true);
+    fixture.componentRef.setInput('maxWords', 3);
+    fixture.componentRef.setInput('wordCounterWarningMessage', 'Too many words');
+    fixture.detectChanges();
+
+    expect(component.isWordLimitExceeded).toBe(false);
+    expect(fixture.nativeElement.textContent).not.toContain('Too many words');
   });
 });
