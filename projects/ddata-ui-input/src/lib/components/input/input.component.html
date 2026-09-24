@@ -25,7 +25,7 @@
       />
       <ng-container *ngIf="enableCharacterCounter">
         <character-counter
-          [currentLength]="model[_field]?.length || 0"
+          [currentLength]="model[_field]"
           [maxLength]="maxLength"
         ></character-counter>
       </ng-container>
@@ -33,7 +33,7 @@
         <dd-word-counter
           [currentLength]="model[_field]"
           [maxLength]="maxWords"
-          (maxLengthReached)="displayWordCounterWarning = $event"
+          (maxLengthReached)="setWordCounterWarning($event)"
         ></dd-word-counter>
       </ng-container>
     </ng-container>
