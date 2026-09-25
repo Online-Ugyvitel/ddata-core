@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { DdataTextareaComponent } from './textarea.component';
 import { BaseModel, DdataCoreModule, BaseModelInterface, FieldsInterface } from 'ddata-core';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
+import { CharacterCounterComponent } from '../character-counter/character-counter.component';
+import { WordCounterComponent } from '../word-counter/word-counter.component';
 
 describe('DdataTextareaComponent', () => {
   let component: DdataTextareaComponent;
@@ -198,5 +200,71 @@ describe('DdataTextareaComponent', () => {
       jasmine.any(BaseModel),
       'fake'
     );
+  });
+});
+
+describe('DdataTextareaComponent counters', () => {
+  let fixture: ComponentFixture<DdataTextareaComponent>;
+  let component: DdataTextareaComponent;
+
+  beforeEach(async () => {
+    const mockHelper = {
+      randChars: jasmine.createSpy('randChars').and.returnValue('rnd'),
+      getTitle: jasmine.createSpy('getTitle').and.returnValue(''),
+      getLabel: jasmine.createSpy('getLabel').and.returnValue(''),
+      getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue(''),
+      getPrepend: jasmine.createSpy('getPrepend').and.returnValue(''),
+      getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
+      isRequired: jasmine.createSpy('isRequired').and.returnValue(false),
+      validateField: jasmine.createSpy('validateField').and.returnValue(true)
+    };
+
+    Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
+      value: { get: jasmine.createSpy('get').and.returnValue(mockHelper) },
+      writable: true
+    });
+
+    await TestBed.configureTestingModule({
+      declarations: [DdataTextareaComponent, CharacterCounterComponent, WordCounterComponent],
+      imports: [FormsModule],
+      providers: [{ provide: InputHelperService, useValue: mockHelper }]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(DdataTextareaComponent);
+    component = fixture.componentInstance;
+
+    const model = new BaseModel() as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+
+    (model as unknown as Record<string, string>)['description'] = 'one, two, three';
+    model.fields = {};
+    model.validationRules = {};
+    component.field = 'description';
+    component.model = model;
+  });
+
+  it('should render the counters outside of the textarea element', () => {
+    fixture.componentRef.setInput('enableCharacterCounter', true);
+    fixture.componentRef.setInput('enableWordCounter', true);
+    fixture.componentRef.setInput('maxLength', 50);
+    fixture.componentRef.setInput('maxWords', 5);
+    fixture.detectChanges();
+
+    const characterCounter: HTMLElement = fixture.nativeElement.querySelector('character-counter');
+    const wordCounter: HTMLElement = fixture.nativeElement.querySelector('dd-word-counter');
+
+    expect(characterCounter.closest('textarea')).toBeNull();
+    expect(characterCounter.textContent?.trim()).toBe('15 / 50');
+    expect(wordCounter.textContent?.trim()).toBe('3 / 5');
+    expect(component.displayWordCounterWarning).toBe(false);
+  });
+
+  it('should show the word counter warning above maxWords', () => {
+    fixture.componentRef.setInput('enableWordCounter', true);
+    fixture.componentRef.setInput('maxWords', 2);
+    fixture.componentRef.setInput('wordCounterWarningMessage', 'Too many words');
+    fixture.detectChanges();
+
+    expect(component.displayWordCounterWarning).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Too many words');
   });
 });
