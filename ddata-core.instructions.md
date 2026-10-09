@@ -4,7 +4,7 @@
 
 ## Package Information
 
-- **Package Name**: `ddata-core`
+- **Package Name**: `@netdjw/ddata-core`
 - **Version**: `0.3.17`
 - **Description**: DData Core module, models & services
 - **Keywords**: angular, localstorage, remote storage, proxy, service, data service
@@ -13,7 +13,7 @@
 ## Installation
 
 ```bash
-npm install ddata-core --save
+npm install @netdjw/ddata-core --save
 ```
 
 ## Module Configuration
@@ -21,7 +21,7 @@ npm install ddata-core --save
 ### Basic Setup
 
 ```typescript
-import { DdataCoreModule } from 'ddata-core';
+import { DdataCoreModule } from '@netdjw/ddata-core';
 
 @NgModule({
   imports: [
@@ -200,7 +200,7 @@ Every model extending BaseModel must define these properties:
 ### Complete Model Example
 
 ```typescript
-import { BaseModel, ID, ISODate, FieldContainerInterface, ValidationRuleInterface } from 'ddata-core';
+import { BaseModel, ID, ISODate, FieldContainerInterface, ValidationRuleInterface } from '@netdjw/ddata-core';
 
 export interface UserUIFieldsInterface {
   name: string;
@@ -358,7 +358,7 @@ Available validation rules: `string`, `boolean`, `number`, `integer`, `required`
 For paginated data management (Laravel-style pagination).
 
 ```typescript
-import { PaginateInterface, Paginate } from 'ddata-core';
+import { PaginateInterface, Paginate } from '@netdjw/ddata-core';
 
 const paginate: PaginateInterface = {
   current_page: 1,
@@ -379,7 +379,7 @@ const paginateModel = new Paginate(userModel);
 For components that need selection capabilities.
 
 ```typescript
-import { SelectableInterface } from 'ddata-core';
+import { SelectableInterface } from '@netdjw/ddata-core';
 
 export class SelectableUser implements SelectableInterface {
   selected: boolean = false;
@@ -390,7 +390,7 @@ export class SelectableUser implements SelectableInterface {
 ### File Upload Interface
 
 ```typescript
-import { FileUploadProcessInterface } from 'ddata-core';
+import { FileUploadProcessInterface } from '@netdjw/ddata-core';
 
 const uploadProcess: FileUploadProcessInterface = {
   remoteFileDatas: null, // Will contain response data when complete
@@ -439,7 +439,7 @@ Direct localStorage access doesn't provide reactive updates or change notificati
 - Gracefully handles storage quota exceeded scenarios
 
 ```typescript
-import { StorageService } from 'ddata-core';
+import { StorageService } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -506,7 +506,7 @@ const name = user?.name || ''; // Safe access
 - Automatically handles malformed JSON data
 
 ```typescript
-import { LocalDataService } from 'ddata-core';
+import { LocalDataService } from '@netdjw/ddata-core';
 
 export class UserLocalService extends LocalDataService<User> {
   constructor() {
@@ -571,7 +571,7 @@ RemoteDataService provides automatic model conversion, standardized error handli
 - `delete()`: DELETE to `{apiUrl}/{model.api_endpoint}/{id}`
 
 ```typescript
-import { RemoteDataService } from 'ddata-core';
+import { RemoteDataService } from '@netdjw/ddata-core';
 
 export class UserRemoteService extends RemoteDataService<User> {
   constructor(http: HttpClient) {
@@ -671,7 +671,7 @@ export class SystemLog extends BaseModel {
 **Complete ProxyService Example:**
 
 ```typescript
-import { ProxyService } from 'ddata-core';
+import { ProxyService } from '@netdjw/ddata-core';
 
 // Create typed proxy service
 export class UserProxyService extends ProxyService<User> {
@@ -788,7 +788,7 @@ HelperService provides the highest level of abstraction, combining ProxyService 
 - Observable emissions for reactive UI updates
 
 ```typescript
-import { HelperService } from 'ddata-core';
+import { HelperService } from '@netdjw/ddata-core';
 
 export class UserHelperService extends HelperService<User> {
   constructor(proxy: ProxyService<User>, spinner: SpinnerService, router: Router) {
@@ -825,7 +825,7 @@ SpinnerService provides centralized loading state management with modal overlay 
 - Supports custom messages and themes
 
 ```typescript
-import { SpinnerService } from 'ddata-core';
+import { SpinnerService } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -858,7 +858,7 @@ export class MyService {
 Provides standardized user notifications with different severity levels, automatic dismissal, and consistent styling across the application.
 
 ```typescript
-import { NotificationService } from 'ddata-core';
+import { NotificationService } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -895,7 +895,7 @@ Provides comprehensive validation with 60+ built-in rules, custom rule support, 
 - **Arrays**: `array`, `lang`
 
 ```typescript
-import { ValidatorService } from 'ddata-core';
+import { ValidatorService } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -926,7 +926,7 @@ export class MyService {
 Provides consistent sorting across the application with support for complex sorting scenarios, locale-aware sorting, and custom sort functions.
 
 ```typescript
-import { SorterService } from 'ddata-core';
+import { SorterService } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -1122,7 +1122,7 @@ This example shows how DData Core eliminates hundreds of lines of boilerplate co
 Unified service that switches between local and remote storage based on model configuration.
 
 ```typescript
-import { ProxyService } from 'ddata-core';
+import { ProxyService } from '@netdjw/ddata-core';
 
 const proxy = new ProxyService<User>(new User());
 
@@ -1150,7 +1150,7 @@ proxy.searchWithoutPaginate(filterData).subscribe((results: Array<User>) => {
 Comprehensive validation service with built-in rules.
 
 ```typescript
-import { ValidatorService } from 'ddata-core';
+import { ValidatorService } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -1183,7 +1183,7 @@ export class MyService {
 Toast-style notification management.
 
 ```typescript
-import { NotificationService, NotificationType } from 'ddata-core';
+import { NotificationService, NotificationType } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -1217,7 +1217,7 @@ export class MyService {
 Loading state management.
 
 ```typescript
-import { SpinnerService } from 'ddata-core';
+import { SpinnerService } from '@netdjw/ddata-core';
 
 @Injectable()
 export class MyService {
@@ -1248,7 +1248,7 @@ export class MyService {
 High-level operations combining multiple services.
 
 ```typescript
-import { HelperService } from 'ddata-core';
+import { HelperService } from '@netdjw/ddata-core';
 
 const helper = new HelperService<User>(new User());
 
@@ -1288,7 +1288,7 @@ helper.search(filterData, pageNumber).subscribe(results => {
 Array sorting utility.
 
 ```typescript
-import { SorterService } from 'ddata-core';
+import { SorterService } from '@netdjw/ddata-core';
 
 const sorter = new SorterService<User>();
 
@@ -1306,7 +1306,7 @@ const sortedUsersDesc = sorter.sortByDesc(users, 'name');
 Abstract component for list views with pagination, selection, and CRUD operations.
 
 ```typescript
-import { BaseListComponent } from 'ddata-core';
+import { BaseListComponent } from '@netdjw/ddata-core';
 
 @Component({
   selector: 'user-list',
@@ -1343,7 +1343,7 @@ export class UserListComponent extends BaseListComponent<User> {
 Abstract component for create/edit forms.
 
 ```typescript
-import { BaseCreateEditComponent } from 'ddata-core';
+import { BaseCreateEditComponent } from '@netdjw/ddata-core';
 
 @Component({
   selector: 'user-form',
@@ -1371,7 +1371,7 @@ export class UserFormComponent extends BaseCreateEditComponent<User> {
 Enhanced list component with multi-selection capabilities.
 
 ```typescript
-import { SelectableListComponent, SelectableInterface } from 'ddata-core';
+import { SelectableListComponent, SelectableInterface } from '@netdjw/ddata-core';
 
 interface SelectableUser extends User, SelectableInterface {
   selected: boolean;
@@ -1409,7 +1409,7 @@ import {
   UnprocessableEntityError,
   InternalServerError,
   ValidationError
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 
 // Custom error handling
 try {
@@ -1427,7 +1427,7 @@ try {
 ### Validation Error
 
 ```typescript
-import { ValidationError, ValidationErrorSettingsInterface } from 'ddata-core';
+import { ValidationError, ValidationErrorSettingsInterface } from '@netdjw/ddata-core';
 
 const settings: ValidationErrorSettingsInterface = {
   message: 'Validation failed',
@@ -1442,7 +1442,7 @@ throw new ValidationError(settings);
 ### Base Data Types
 
 ```typescript
-import { ID, ISODate, NotificationType } from 'ddata-core';
+import { ID, ISODate, NotificationType } from '@netdjw/ddata-core';
 
 // ID: number type for unique identifiers
 const userId: ID = 42;
@@ -1465,7 +1465,7 @@ import {
   ProxyService, 
   HelperService,
   PaginateInterface 
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 
 // 1. Define Model
 export class User extends BaseModel {
