@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { DdataCoreModule, SpinnerService, SpinnerServiceInterface } from 'ddata-core';
+import { DdataCoreModule, SpinnerService, SpinnerServiceInterface } from '@netdjw/ddata-core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 
 @Component({

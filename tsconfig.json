@@ -18,7 +18,7 @@
       "dom"
     ],
     "paths": {
-      "ddata-core": [
+      "@netdjw/ddata-core": [
         "dist/ddata-core/ddata-core",
         "dist/ddata-core"
       ],
@@ -26,23 +26,23 @@
         "dist/ddata-ui/ddata-ui",
         "dist/ddata-ui"
       ],
-      "ddata-ui-input": [
+      "@netdjw/ddata-ui-input": [
         "dist/ddata-ui-input/ddata-ui-input",
         "dist/ddata-ui-input"
       ],
-      "ddata-ui-file": [
+      "@netdjw/ddata-ui-file": [
         "dist/ddata-ui-file/ddata-ui-file",
         "dist/ddata-ui-file"
       ],
-      "ddata-ui-dialog": [
+      "@netdjw/ddata-ui-dialog": [
         "dist/ddata-ui-dialog/ddata-ui-dialog",
         "dist/ddata-ui-dialog"
       ],
-      "ddata-ui-common": [
+      "@netdjw/ddata-ui-common": [
         "dist/ddata-ui-common/ddata-ui-common",
         "dist/ddata-ui-common"
       ],
-      "ddata-a11y": [
+      "@netdjw/ddata-a11y": [
         "dist/ddata-a11y/ddata-a11y",
         "dist/ddata-a11y"
       ]

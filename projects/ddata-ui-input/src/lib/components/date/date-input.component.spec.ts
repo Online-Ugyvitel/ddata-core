@@ -14,7 +14,7 @@ import {
   ID,
   ISODate,
   ValidatorService
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import * as moment from 'moment';
 import { DdataUiInputModule } from '../../ddata-ui-input.module';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';

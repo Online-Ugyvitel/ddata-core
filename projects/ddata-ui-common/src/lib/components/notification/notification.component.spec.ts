@@ -1,6 +1,6 @@
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NotificationInterface, NotificationService } from 'ddata-core';
+import { NotificationInterface, NotificationService } from '@netdjw/ddata-core';
 import { of, Subject } from 'rxjs';
 import { DdataUiNotificationComponent } from './notification.component';
 

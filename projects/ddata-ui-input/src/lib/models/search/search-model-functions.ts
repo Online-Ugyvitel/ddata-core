@@ -1,6 +1,6 @@
 // tslint:disable: variable-name
 import { faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { BaseModel, ID } from 'ddata-core';
+import { BaseModel, ID } from '@netdjw/ddata-core';
 import { IconSetInterface } from '../icon-set/icon-set.interface';
 
 export class SearchModelFunctions extends BaseModel {

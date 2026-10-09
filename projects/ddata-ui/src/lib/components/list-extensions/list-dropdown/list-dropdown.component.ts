@@ -20,7 +20,7 @@ import { CertificationScrappingProtocol } from 'src/app/models/certification/scr
 import { CertificationTypeInterface } from 'src/app/models/certification/type/certification-type.interface';
 import { CompanyInterface } from 'src/app/models/company/company.interface';
 import { CompanyShopInterface } from 'src/app/models/company/shop/company-shop.interface';
-import { DialogContentItem } from 'ddata-ui-dialog';
+import { DialogContentItem } from '@netdjw/ddata-ui-dialog';
 import { Global } from '../../../models/global.model';
 import { ListDropdownItemInterface } from 'src/app/models/list-dropdown-item/list-dropdown-item.interface';
 import { CertificationCommercialStockUploadCreateEditComponent } from 'src/app/modules/sales/components/commercial/stock/upload/certification-commercial-stock-upload-create-edit/certification-commercial-stock-upload-create-edit.component';

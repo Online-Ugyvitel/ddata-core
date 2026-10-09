@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { DdataUiCommonModule } from 'ddata-ui-common';
+import { DdataUiCommonModule } from '@netdjw/ddata-ui-common';
 import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
 import { MatTimepickerModule, provideNativeDateTimeAdapter } from '@dhutaryan/ngx-mat-timepicker';
 

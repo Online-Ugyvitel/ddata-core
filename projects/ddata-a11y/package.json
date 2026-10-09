@@ -1,6 +1,9 @@
 {
-  "name": "ddata-a11y",
+  "name": "@netdjw/ddata-a11y",
   "version": "0.0.3",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "peerDependencies": {
     "@angular/common": ">=22.1.1 <23",
     "@angular/core": ">=22.1.1 <23"

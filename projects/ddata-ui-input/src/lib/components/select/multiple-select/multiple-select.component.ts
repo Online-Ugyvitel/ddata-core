@@ -6,7 +6,7 @@ import {
   Input,
   Output
 } from '@angular/core';
-import { BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
+import { BaseModelInterface, DdataCoreModule, FieldsInterface } from '@netdjw/ddata-core';
 import { DialogContentWithOptionsInterface } from '../../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';

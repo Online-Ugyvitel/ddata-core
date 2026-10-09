@@ -17,8 +17,8 @@ import {
   BaseModel,
   BaseModelInterface,
   BaseModelWithoutTypeDefinitionInterface
-} from 'ddata-core';
-import { DdataUiNoDataComponent } from 'ddata-ui-common';
+} from '@netdjw/ddata-core';
+import { DdataUiNoDataComponent } from '@netdjw/ddata-ui-common';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';

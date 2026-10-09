@@ -1,4 +1,4 @@
-import { BaseModelInterface, FieldsInterface, ID } from 'ddata-core';
+import { BaseModelInterface, FieldsInterface, ID } from '@netdjw/ddata-core';
 import { CountryInterface } from './country.interface';
 import { TagInterface } from './tag.interface';
 

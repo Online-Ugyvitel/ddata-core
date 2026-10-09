@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { DdataCoreModule } from 'ddata-core';
-import { DdataUiCommonModule } from 'ddata-ui-common';
+import { DdataCoreModule } from '@netdjw/ddata-core';
+import { DdataUiCommonModule } from '@netdjw/ddata-ui-common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { DdataUiConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';

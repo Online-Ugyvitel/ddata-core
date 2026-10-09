@@ -1,6 +1,9 @@
 {
-  "name": "ddata-core",
+  "name": "@netdjw/ddata-core",
   "version": "0.3.17",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "description": "DData Core module, models & services",
   "author": {
     "name": "Balázs Winkler",

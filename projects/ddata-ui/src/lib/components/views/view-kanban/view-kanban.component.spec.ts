@@ -5,7 +5,7 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 import { AppModule } from 'src/app/app.module';
-import { ColorHexaCode, ID } from 'ddata-core';
+import { ColorHexaCode, ID } from '@netdjw/ddata-core';
 import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
 import { KanbanStatusInterface } from 'src/app/models/kanban/status/kanban-status.interface';
 import { KanbanStatus } from 'src/app/models/kanban/status/kanban-status.model';

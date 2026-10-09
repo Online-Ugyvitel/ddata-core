@@ -4,7 +4,7 @@ DData Core module, models & services
 
 ## Install
 
-`npm install ddata-core --save`
+`npm install @netdjw/ddata-core --save`
 
 ## Why?
 

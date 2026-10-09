@@ -7,7 +7,7 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 import { AppModule } from 'src/app/app.module';
 import { MultilanguageNameComponent } from './multilanguage-name.component';
-import { BaseModel, ID } from 'ddata-core';
+import { BaseModel, ID } from '@netdjw/ddata-core';
 import { LangService } from 'src/app/services/lang/lang.service';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { Name, MultilanguageNameInterface } from 'src/app/models/name/name.model';

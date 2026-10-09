@@ -4,7 +4,7 @@ DData UI Input module, components, models & services
 
 ## Install
 
-`npm install ddata-ui-input --save`
+`npm install @netdjw/ddata-ui-input --save`
 
 ## Why?
 
@@ -13,7 +13,7 @@ and time input, select fields, textareas. And of course if you use input, you ne
 
 This package gives you a really easy way to create inputs with validation and some basic UI features.
 
-If you are familiar with `ddata-core` package you have models, like this:
+If you are familiar with `@netdjw/ddata-core` package you have models, like this:
 
 ```typescript
 export class Post extends BaseModel implements PostInterface {

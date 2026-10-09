@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppModule } from 'src/app/app.module';
-import { ID, ISODate } from 'ddata-core';
+import { ID, ISODate } from '@netdjw/ddata-core';
 import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
 import { ViewDateSeparatedList } from 'src/app/models/view/date/separated/list/view-date-spearated-list.interface';
 

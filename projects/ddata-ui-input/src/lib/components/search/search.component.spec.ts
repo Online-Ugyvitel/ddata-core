@@ -9,7 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DdataInputSearchComponent } from './search.component';
-import { ProxyFactoryService, DdataCoreModule, Paginate, SpinnerService } from 'ddata-core';
+import { ProxyFactoryService, DdataCoreModule, Paginate, SpinnerService } from '@netdjw/ddata-core';
 import { SearchResult } from '../../models/search/result/search-result.model';
 import { BaseSearch } from '../../models/search/base-search.model';
 import { BaseSearchResult } from '../../models/search/result/base-search-result.model';

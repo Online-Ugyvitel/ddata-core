@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PaginateInterface } from 'ddata-core';
+import { PaginateInterface } from '@netdjw/ddata-core';
 import { firstValueFrom } from 'rxjs';
 import { DdataUiPaginateComponent } from './paginate.component';
 

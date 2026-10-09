@@ -12,7 +12,7 @@ Find out the right foreground color programatically for any background color wha
 Usage:
 
 ```typescript
-import { A11yColor } from 'ddata-a11y';
+import { A11yColor } from '@netdjw/ddata-a11y';
 
 const backgroundColor = 'bada55';
 const textColor = new A11yColor()
@@ -25,7 +25,7 @@ const textColor = new A11yColor()
 Find out the contrast ration for color pairs:
 
 ```typescript
-import { A11yColor } from 'ddata-a11y';
+import { A11yColor } from '@netdjw/ddata-a11y';
 
 const backgroundColor = 'c0ffee';
 const textColor = 'facade';
@@ -39,7 +39,7 @@ const contrastRatio = new A11yColor()
 Calculates contrast ratio between two hex strings.
 
 ```typescript
-import { A11yColor } from 'ddata-a11y';
+import { A11yColor } from '@netdjw/ddata-a11y';
 
 const color1 = '4cc355';
 const color2 = 'fa113d';

@@ -175,8 +175,8 @@ const buildScope = ({ dir, prefix }) => {
 
   configs.push({
     files: tsFiles,
-    // the sibling ddata-* packages resolve to dist/, which only exists after they are built
-    rules: { 'import/no-unresolved': ['error', { ignore: ['^ddata-'] }] },
+    // the sibling @netdjw/ddata-* packages resolve to dist/, which only exists after they are built
+    rules: { 'import/no-unresolved': ['error', { ignore: ['^@netdjw/ddata-'] }] },
   });
 
   if (dir === 'projects/ddata-ui-file') {

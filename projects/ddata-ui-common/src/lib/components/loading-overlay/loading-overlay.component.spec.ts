@@ -7,7 +7,7 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 import { BehaviorSubject, of, Subscription } from 'rxjs';
 import { DdataUiLoadingOverlayComponent } from './loading-overlay.component';
-import { DdataCoreModule, SpinnerServiceInterface } from 'ddata-core';
+import { DdataCoreModule, SpinnerServiceInterface } from '@netdjw/ddata-core';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { DdataUiCommonModule } from '../../ddata-ui-common.module';
 

@@ -54,11 +54,11 @@ In basic situation the `preapreToSave()` method will provide this JSON object to
 
 ### Service
 
-The `service` MUST be an instance of `ProxyServiceInterface<SearchInterface>`, which means you need to have a `Search` model what based on `SearchInterface`. The `ProxyServiceInterface` is defined in `ddata-core` library.
+The `service` MUST be an instance of `ProxyServiceInterface<SearchInterface>`, which means you need to have a `Search` model what based on `SearchInterface`. The `ProxyServiceInterface` is defined in `@netdjw/ddata-core` library.
 
 This service will handle your requests and results with backend.
 
-Results MUST be coming as a `PaginateInterface`, which is defined in `ddata-core` library.
+Results MUST be coming as a `PaginateInterface`, which is defined in `@netdjw/ddata-core` library.
 
 The `PaginateInterface` MUST contains a `data` filed with the results. The result MUST be an instance of `SearchResultInterface`.
 

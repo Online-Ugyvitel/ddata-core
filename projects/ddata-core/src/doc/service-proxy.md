@@ -12,7 +12,7 @@ These methods always use HTTP, even when the model uses local storage.
 POST and PUT serialize `data` as JSON. All three methods return an observable of the unmodified response.
 Pass a leading slash in `uri` when separating path segments, as with the existing methods.
 
-The optional `RequestHeaders` type, exported by `ddata-core`, accepts either Angular `HttpHeaders`
+The optional `RequestHeaders` type, exported by `@netdjw/ddata-core`, accepts either Angular `HttpHeaders`
 or an object whose values are strings or arrays of strings. Custom headers are merged over the default
 headers for that request only; matching header names are overridden case-insensitively. Unspecified
 defaults, including authentication, remain in place. Neither the supplied headers nor subsequent

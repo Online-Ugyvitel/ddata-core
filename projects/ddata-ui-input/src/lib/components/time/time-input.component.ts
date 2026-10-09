@@ -8,7 +8,12 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { FieldsInterface, DdataCoreModule, BaseModelInterface, BaseModel } from 'ddata-core';
+import {
+  FieldsInterface,
+  DdataCoreModule,
+  BaseModelInterface,
+  BaseModel
+} from '@netdjw/ddata-core';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 

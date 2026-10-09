@@ -1,7 +1,7 @@
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { Injector } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ProxyFactoryService } from 'ddata-core';
+import { ProxyFactoryService } from '@netdjw/ddata-core';
 import { DdataUiFileModule } from '../../ddata-ui-file.module';
 import { FileAndFolderHelperService } from '../../services/file/file-and-folder-helper.service';
 import { DdataUiFileUploadComponent } from './file-upload.component';

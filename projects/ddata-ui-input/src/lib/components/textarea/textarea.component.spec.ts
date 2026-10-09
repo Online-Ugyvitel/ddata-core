@@ -3,7 +3,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { BaseModel, DdataCoreModule } from 'ddata-core';
+import { BaseModel, DdataCoreModule } from '@netdjw/ddata-core';
 import { DdataTextareaComponent } from './textarea.component';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 // Components are OnPush by default in Angular 22, so direct property changes need an explicit dirty mark.

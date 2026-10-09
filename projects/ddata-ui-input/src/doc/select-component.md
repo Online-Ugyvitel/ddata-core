@@ -25,7 +25,7 @@ A select UI form element with advanced options.
 In component ts file:
 
 ```typescript
-import { DialogContentWithOptionsInterface } from 'ddata-ui-input';
+import { DialogContentWithOptionsInterface } from '@netdjw/ddata-ui-input';
 
 @Component({
   selector: 'app-my-custom-create-edit',

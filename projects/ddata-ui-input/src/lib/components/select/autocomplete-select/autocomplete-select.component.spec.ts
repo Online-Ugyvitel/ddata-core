@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { BaseModel, DdataCoreModule } from 'ddata-core';
+import { BaseModel, DdataCoreModule } from '@netdjw/ddata-core';
 import { DdataAutocompleteSelectComponent } from './autocomplete-select.component';
 
 declare const document: Document;

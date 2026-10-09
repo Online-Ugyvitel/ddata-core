@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { BaseModel, BaseModelInterface } from 'ddata-core';
+import { BaseModel, BaseModelInterface } from '@netdjw/ddata-core';
 import { Global } from '../../../models/global.model';
 
 @Component({

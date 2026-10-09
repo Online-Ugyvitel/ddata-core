@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DdataSelectComponent } from './select.component';
-import { DdataCoreModule } from 'ddata-core';
+import { DdataCoreModule } from '@netdjw/ddata-core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SelectType } from './select.type';
 

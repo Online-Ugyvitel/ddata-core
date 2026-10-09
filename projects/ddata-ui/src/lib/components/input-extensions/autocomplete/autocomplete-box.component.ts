@@ -12,7 +12,7 @@ import {
 import { faSpinner } from '@fortawesome/pro-solid-svg-icons';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
-import { BaseModel, ProxyServiceInterface, ValidatorService } from 'ddata-core';
+import { BaseModel, ProxyServiceInterface, ValidatorService } from '@netdjw/ddata-core';
 import { AppModule } from 'src/app/app.module';
 
 @Component({

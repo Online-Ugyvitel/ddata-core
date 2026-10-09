@@ -1,4 +1,4 @@
-import { BaseModelInterface, FieldsInterface } from 'ddata-core';
+import { BaseModelInterface, FieldsInterface } from '@netdjw/ddata-core';
 
 export interface InputHelperServiceInterface {
   validateField(

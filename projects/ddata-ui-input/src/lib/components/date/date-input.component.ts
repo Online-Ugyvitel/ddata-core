@@ -11,7 +11,12 @@ import {
 } from '@angular/core';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
-import { BaseModel, BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
+import {
+  BaseModel,
+  BaseModelInterface,
+  DdataCoreModule,
+  FieldsInterface
+} from '@netdjw/ddata-core';
 import * as moment from 'moment';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';

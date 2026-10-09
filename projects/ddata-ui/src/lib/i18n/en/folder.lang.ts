@@ -1,4 +1,4 @@
-import { FieldInterface } from 'ddata-core';
+import { FieldInterface } from '@netdjw/ddata-core';
 
 export const parent_id: FieldInterface = {
   label: 'Parent',

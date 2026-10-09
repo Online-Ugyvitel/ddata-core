@@ -1,14 +1,17 @@
 {
-  "name": "ddata-ui-dialog",
+  "name": "@netdjw/ddata-ui-dialog",
   "version": "0.1.21",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "peerDependencies": {
     "@angular/common": ">=22.1.1 <23",
     "@angular/core": ">=22.1.1 <23",
     "@fortawesome/angular-fontawesome": ">=0.7.0",
     "@fortawesome/fontawesome-svg-core": ">=1.2.30",
     "@fortawesome/free-solid-svg-icons": ">=5.14.0",
-    "ddata-core": "^0.3.8",
-    "ddata-ui-common": "^0.1.16"
+    "@netdjw/ddata-core": "^0.3.8",
+    "@netdjw/ddata-ui-common": "^0.1.16"
   },
   "dependencies": {
     "tslib": "^2.0.0"

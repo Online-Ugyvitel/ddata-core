@@ -1,5 +1,5 @@
 import { CertificationInterface } from './../../models/certification/certification.interface';
-import { DialogContentItem } from 'ddata-ui-dialog';
+import { DialogContentItem } from '@netdjw/ddata-ui-dialog';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -7,7 +7,7 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 import { AppModule } from 'src/app/app.module';
-import { ID } from 'ddata-core';
+import { ID } from '@netdjw/ddata-core';
 import { Company } from './../../models/company/company.model';
 import { ListDropdownComponent } from './list-dropdown.component';
 import { CertificationCommercialTakebackOneCreateEditComponent } from 'src/app/modules/sales/components/commercial/takeback/one/certification-commercial-takeback-one-create-edit/certification-commercial-takeback-one.component';

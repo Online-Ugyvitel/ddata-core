@@ -4,7 +4,7 @@ import {
   FieldsInterface,
   ID,
   URI
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 
 export interface FolderUIFieldsInterface {
   parent_id: ID;

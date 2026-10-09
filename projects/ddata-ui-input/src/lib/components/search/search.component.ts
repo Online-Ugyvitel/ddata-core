@@ -18,7 +18,7 @@ import {
   ProxyServiceInterface,
   SpinnerService,
   SpinnerServiceInterface
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import { BehaviorSubject, EMPTY, fromEvent, Observable } from 'rxjs';
 import {
   debounceTime,

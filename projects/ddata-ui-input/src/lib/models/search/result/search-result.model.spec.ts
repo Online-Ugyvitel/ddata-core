@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
-import { ID } from 'ddata-core';
+import { ID } from '@netdjw/ddata-core';
 import { BaseSearchResult } from './base-search-result.model';
 import { SearchResult } from './search-result-concrete.model';
 import { SearchResultInterface } from './search-result.interface';
