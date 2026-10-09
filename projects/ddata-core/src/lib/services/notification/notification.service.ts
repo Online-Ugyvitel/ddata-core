@@ -34,6 +34,10 @@ export class NotificationService implements NotificationServiceInterface {
   }
 
   delete(index: number): void {
+    if (index < 0 || index >= this.notifications.length) {
+      return;
+    }
+
     this.notifications.splice(index, 1);
     this.notificationSub.next(this.notifications);
   }
