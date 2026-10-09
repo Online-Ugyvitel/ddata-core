@@ -1,20 +1,21 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { BaseModel, BaseModelInterface } from 'src/app/models/base-model/base-model.model';
-import { Global } from 'src/app/models/global.model';
+import { BaseModel, BaseModelInterface } from 'ddata-core';
+import { Global } from '../../../models/global.model';
 
 @Component({
-    selector: 'app-list-buttons',
-    templateUrl: './list-buttons.component.html',
-    styleUrls: ['./list-buttons.component.scss'],
-    standalone: false
+  selector: 'dd-list-buttons',
+  templateUrl: './list-buttons.component.html',
+  styleUrls: ['./list-buttons.component.scss'],
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListButtonsComponent implements OnInit {
+export class ListButtonsComponent {
   /**
-   * `BaseModelInterface<any>` - Need to specify a model to set the `api_endpoint`. Default is a `new BaseModel()`.
+   * `BaseModelInterface<unknown>` - Need to specify a model to set the `api_endpoint`. Default is a `new BaseModel()`.
    */
-  @Input() model: BaseModelInterface<any> = new BaseModel();
+  @Input() model: BaseModelInterface<unknown> = new BaseModel();
 
   /**
    * `boolean` - Define this is a list where the user can select elements. Default `false`.
@@ -52,50 +53,47 @@ export class ListButtonsComponent implements OnInit {
   @Input() createButtonNavigateToUrl = true;
 
   /**
-   * `SelectionModel` where you specify the selection of the list. Default `new SelectionModel<BaseModelInterface<any>>`
+   * `SelectionModel` where you specify the selection of the list. Default `new SelectionModel<BaseModelInterface<unknown>>`
    * as empty array.
    */
   // tslint:disable-next-line: max-line-length
-  @Input() selection: SelectionModel<BaseModelInterface<any>> = new SelectionModel<BaseModelInterface<any>>(this.multipleSelectEnabled, []);
+  @Input() selection: SelectionModel<BaseModelInterface<unknown>> = new SelectionModel<
+    BaseModelInterface<unknown>
+  >(this.multipleSelectEnabled, []);
 
   /**
-   * `EventEmitter<any>` emitting when user click on "Add new" button & `createButtonNavigateToUrl` is false.
+   * `EventEmitter<void>` emitting when user click on "Add new" button & `createButtonNavigateToUrl` is false.
    */
-  @Output() addNew: EventEmitter<any> = new EventEmitter();
+  @Output() readonly addNew: EventEmitter<void> = new EventEmitter();
 
   /**
-   * `EventEmitter<any>` emitting when user click on "Get selected" button.
+   * `EventEmitter<void>` emitting when user click on "Get selected" button.
    */
-  @Output() emitSelected: EventEmitter<any> = new EventEmitter();
+  @Output() readonly emitSelected: EventEmitter<void> = new EventEmitter();
 
   /**
-   * `EventEmitter<any>` emitting when user click on "Delete selected" button.
+   * `EventEmitter<void>` emitting when user click on "Delete selected" button.
    */
-  @Output() deleteSelected: EventEmitter<any> = new EventEmitter();
+  @Output() readonly deleteSelected: EventEmitter<void> = new EventEmitter();
   icon = new Global().icon;
 
-  constructor(
-    private router: Router,
-  ) { }
+  constructor(private readonly router: Router) {}
 
-  ngOnInit(): void {
-  }
-
-  select() {
+  select(): void {
     this.emitSelected.emit();
   }
 
-  create() {
+  create(): void {
     if (this.createButtonNavigateToUrl) {
-      this.router.navigateByUrl(this.model.api_endpoint + '/create');
+      this.router.navigateByUrl(`${this.model.api_endpoint}/create`);
+
       return;
     }
 
     this.addNew.emit();
   }
 
-  delete() {
+  delete(): void {
     this.deleteSelected.emit();
   }
-
 }

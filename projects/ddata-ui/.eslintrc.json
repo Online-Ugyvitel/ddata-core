@@ -1,0 +1,23 @@
+{
+  "extends": "../../.eslintrc.json",
+  "rules": {
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.spec.ts",
+          "**/test.ts"
+        ],
+        "peerDependencies": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/test.ts", "**/*.spec.ts"],
+      "rules": {
+        "import/no-extraneous-dependencies": "off"
+      }
+    }
+  ]
+}

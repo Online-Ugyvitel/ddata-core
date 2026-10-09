@@ -5,7 +5,7 @@ import { MockHelperService } from './mock-helper.service';
 
 // Mock HelperFactoryService
 export class MockHelperFactoryService extends HelperFactoryService<TestModelInterface> {
-  get(newable: new() => TestModelInterface): HelperServiceInterface<TestModelInterface> {
+  get(newable: new () => TestModelInterface): HelperServiceInterface<TestModelInterface> {
     return new MockHelperService();
   }
 }
