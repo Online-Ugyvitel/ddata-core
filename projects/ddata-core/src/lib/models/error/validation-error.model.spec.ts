@@ -2,7 +2,6 @@ import { ValidationError, ValidationErrorInterface } from './validation-error.mo
 import { ValidationErrorSettingsInterface } from './validation-error-settings.model';
 
 describe('ValidationError', () => {
-
   describe('Model Creation', () => {
     it('should create an instance with valid settings', () => {
       const settings: ValidationErrorSettingsInterface = {
@@ -10,7 +9,7 @@ describe('ValidationError', () => {
         invalids: ['field1', 'field2']
       };
       const error = new ValidationError(settings);
-      
+
       expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
     });
@@ -18,7 +17,7 @@ describe('ValidationError', () => {
     it('should create an instance with empty settings object', () => {
       const settings: ValidationErrorSettingsInterface = {};
       const error = new ValidationError(settings);
-      
+
       expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
     });
@@ -26,7 +25,7 @@ describe('ValidationError', () => {
     it('should handle settings object with undefined message', () => {
       const settings: ValidationErrorSettingsInterface = { message: undefined };
       const error = new ValidationError(settings);
-      
+
       expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
     });
@@ -34,7 +33,7 @@ describe('ValidationError', () => {
     it('should handle settings object with defined message', () => {
       const settings: ValidationErrorSettingsInterface = { message: 'Test message' };
       const error = new ValidationError(settings);
-      
+
       expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
       expect(error.message).toBe('Test message');
@@ -126,7 +125,7 @@ describe('ValidationError', () => {
     });
 
     it('should have invalids array containing only strings', () => {
-      error.invalids.forEach(invalid => {
+      error.invalids.forEach((invalid) => {
         expect(typeof invalid).toBe('string');
       });
     });
@@ -144,21 +143,25 @@ describe('ValidationError', () => {
   describe('Default Values', () => {
     it('should have correct default name', () => {
       const error = new ValidationError({});
+
       expect(error.name).toBe('ValidationError');
     });
 
     it('should have correct default status', () => {
       const error = new ValidationError({});
+
       expect(error.status).toBe(480);
     });
 
     it('should have empty array as default invalids', () => {
       const error = new ValidationError({});
+
       expect(error.invalids).toEqual([]);
     });
 
     it('should have default originalError structure', () => {
       const error = new ValidationError({});
+
       expect(error.originalError).toEqual({
         status: 480,
         error: {
@@ -182,9 +185,9 @@ describe('ValidationError', () => {
       // The readonly modifier in TypeScript only provides compile-time protection
       // At runtime, we can verify the property exists and has the expected value
       expect(error.name).toBe('ValidationError');
-      
       // At runtime, the properties are actually writable (readonly is only TypeScript)
       const descriptor = Object.getOwnPropertyDescriptor(error, 'name');
+
       if (descriptor) {
         expect(descriptor.writable).toBe(true);
       }
@@ -194,9 +197,9 @@ describe('ValidationError', () => {
       // The readonly modifier in TypeScript only provides compile-time protection
       // At runtime, we can verify the property exists and has the expected value
       expect(error.status).toBe(480);
-      
       // At runtime, the properties are actually writable (readonly is only TypeScript)
       const descriptor = Object.getOwnPropertyDescriptor(error, 'status');
+
       if (descriptor) {
         expect(descriptor.writable).toBe(true);
       }
@@ -207,43 +210,51 @@ describe('ValidationError', () => {
     it('should use provided message', () => {
       const testMessage = 'Custom error message';
       const error = new ValidationError({ message: testMessage });
+
       expect(error.message).toBe(testMessage);
     });
 
     it('should use provided invalids', () => {
       const testInvalids = ['field1', 'field2', 'field3'];
       const error = new ValidationError({ invalids: testInvalids });
+
       expect(error.invalids).toEqual(testInvalids);
     });
 
     it('should handle empty message in settings', () => {
       const error = new ValidationError({ message: '' });
+
       expect(error.message).toBe('');
     });
 
     it('should handle null invalids in settings', () => {
-      const error = new ValidationError({ invalids: null as any });
+      const error = new ValidationError({ invalids: null });
+
       expect(error.invalids).toEqual([]);
     });
 
     it('should handle undefined message in settings', () => {
       const error = new ValidationError({ message: undefined });
+
       // When undefined is passed, it falls back to this.message from Error, which is empty string
       expect(error.message).toBe('');
     });
 
     it('should handle undefined invalids in settings', () => {
       const error = new ValidationError({ invalids: undefined });
+
       expect(error.invalids).toEqual([]);
     });
 
     it('should handle false values for message and invalids', () => {
       const error = new ValidationError({ message: false as any, invalids: false as any });
+
       expect(error.invalids).toEqual([]);
     });
 
     it('should handle falsy but not boolean values for invalids', () => {
       const error = new ValidationError({ invalids: 0 as any });
+
       expect(error.invalids).toEqual([]);
     });
   });
@@ -252,7 +263,7 @@ describe('ValidationError', () => {
     it('should sync invalids to originalError.error.invalids', () => {
       const testInvalids = ['field1', 'field2'];
       const error = new ValidationError({ invalids: testInvalids });
-      
+
       expect(error.originalError.error.invalids).toEqual(testInvalids);
     });
 
@@ -261,7 +272,7 @@ describe('ValidationError', () => {
         message: 'Test message',
         invalids: ['field1']
       });
-      
+
       expect(error.originalError.status).toBeDefined();
       expect(error.originalError.error).toBeDefined();
       expect(error.originalError.error.name).toBeDefined();
@@ -277,7 +288,7 @@ describe('ValidationError', () => {
         message: testMessage,
         invalids: testInvalids
       });
-      
+
       expect(error.originalError.status).toBe(480);
       expect(error.originalError.error.name).toBe('ValidationError');
       expect(error.originalError.error.message).toBe(testMessage);
@@ -290,14 +301,14 @@ describe('ValidationError', () => {
     it('should call super constructor with message', () => {
       const testMessage = 'Test error message';
       const error = new ValidationError({ message: testMessage });
-      
+
       // The Error constructor sets the message
       expect(error.message).toBe(testMessage);
     });
 
     it('should inherit Error properties', () => {
       const error = new ValidationError({ message: 'Test' });
-      
+
       expect(error.name).toBeDefined();
       expect(error.message).toBeDefined();
       expect(error.stack).toBeDefined();
@@ -305,11 +316,11 @@ describe('ValidationError', () => {
 
     it('should be throwable like a standard Error', () => {
       const error = new ValidationError({ message: 'Test error' });
-      
+
       expect(() => {
         throw error;
       }).toThrowError(Error);
-      
+
       expect(() => {
         throw error;
       }).toThrowError(ValidationError);
@@ -323,8 +334,8 @@ describe('ValidationError', () => {
         invalids: ['field1'],
         extraProperty: 'should be ignored'
       } as any;
-      
       const error = new ValidationError(settings);
+
       expect(error.message).toBe('Test message');
       expect(error.invalids).toEqual(['field1']);
     });
@@ -334,8 +345,8 @@ describe('ValidationError', () => {
         message: false,
         invalids: false
       } as any;
-      
       const error = new ValidationError(settings);
+
       // Based on the !! check in constructor, false is falsy so defaults are used
       expect(error.invalids).toEqual([]);
     });
@@ -345,8 +356,8 @@ describe('ValidationError', () => {
         message: 123,
         invalids: 456
       } as any;
-      
       const error = new ValidationError(settings);
+
       // Based on the !! check in constructor, truthy numbers are used
       expect(error.message as any).toBe(123);
       expect(error.invalids as any).toBe(456);
@@ -357,8 +368,8 @@ describe('ValidationError', () => {
         message: 0,
         invalids: 0
       } as any;
-      
       const error = new ValidationError(settings);
+
       // Based on the !! check in constructor, 0 is falsy so defaults are used
       expect(error.invalids).toEqual([]);
     });

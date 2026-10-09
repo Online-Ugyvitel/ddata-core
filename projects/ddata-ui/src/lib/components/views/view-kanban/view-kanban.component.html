@@ -2,18 +2,23 @@
   <div class="kanban-title">
     <h3>{{ title }}</h3>
   </div>
-  <div class="kanban-status-container" #kanbanStatusContainer *ngIf="kanbanData.statuses.length > 0">
-    <div class="kanban-status" *ngFor="let status of kanbanData.statuses"
+  <div
+    class="kanban-status-container"
+    #kanbanStatusContainer
+    *ngIf="kanbanData.statuses.length > 0"
+  >
+    <div
+      class="kanban-status"
+      *ngFor="let status of kanbanData.statuses"
       (dragover)="dragover(status)"
-      [ngClass]="{'drag-over': status.is_drag_over}">
-      <header [ngStyle]="{'background-color': status.color}">
+      [ngClass]="{ 'drag-over': status.is_drag_over }"
+    >
+      <header [ngStyle]="{ 'background-color': status.color }">
         <h6>
           {{ status.name }}
         </h6>
         <div class="row small">
-          <div class="col">
-            {{ status.casefiles.length }} db ügy
-          </div>
+          <div class="col">{{ status.casefiles.length }} db ügy</div>
           <div class="col text-right">
             {{ getEstimatedTimes(status) }}
           </div>
@@ -21,13 +26,15 @@
       </header>
 
       <main>
-        <div class="card"
+        <div
+          class="card"
           *ngFor="let casefile of status.casefiles"
-          [ngStyle]="{'border-top-color': casefile.priority.color}"
+          [ngStyle]="{ 'border-top-color': casefile.priority.color }"
           draggable="true"
           (dragstart)="dragstart(casefile, status)"
           (dragend)="dragend()"
-          (dragover)="dragoverCasefile(casefile)">
+          (dragover)="dragoverCasefile(casefile)"
+        >
           <header class="card-title" (click)="open(casefile)">
             {{ casefile.name }}
           </header>
@@ -43,13 +50,13 @@
               <app-user-profile-thumbnail [user]="casefile.owner"></app-user-profile-thumbnail>
             </div>
             <div class="card-responsible-user pr-2">
-              <app-user-profile-thumbnail [user]="casefile.responsible_user"></app-user-profile-thumbnail>
+              <app-user-profile-thumbnail
+                [user]="casefile.responsible_user"
+              ></app-user-profile-thumbnail>
             </div>
           </footer>
-
         </div>
       </main>
-
     </div>
   </div>
 
