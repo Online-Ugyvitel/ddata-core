@@ -10,7 +10,7 @@ describe('ForbiddenError', () => {
   beforeEach(() => {
     // Create a spy object for NotificationService
     mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
-    
+
     // Spy on console.error
     consoleErrorSpy = spyOn(console, 'error');
   });
@@ -26,7 +26,6 @@ describe('ForbiddenError', () => {
       const originalError = {
         error: { message: 'Test error message' }
       };
-
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
       expect(forbiddenError).toBeTruthy();
@@ -38,7 +37,6 @@ describe('ForbiddenError', () => {
       const originalError = {
         error: { message: 'Test error message' }
       };
-
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
       // Check that the originalError is passed to the parent class
@@ -57,6 +55,7 @@ describe('ForbiddenError', () => {
         'Test error message',
         originalError
       );
+
       expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -72,12 +71,13 @@ describe('ForbiddenError', () => {
         'Nincs engedélyed ezt a műveletet végrehajtani.',
         'danger' as NotificationType
       );
+
       expect(mockNotificationService.add).toHaveBeenCalledTimes(1);
     });
 
     it('should handle originalError without error.message', () => {
       const originalError = {
-        error: { }
+        error: {}
       };
 
       new ForbiddenError(originalError, mockNotificationService);
@@ -87,6 +87,7 @@ describe('ForbiddenError', () => {
         undefined,
         originalError
       );
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         'Nincs engedélyed ezt a műveletet végrehajtani.',
@@ -104,6 +105,7 @@ describe('ForbiddenError', () => {
         undefined,
         originalError
       );
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         'Nincs engedélyed ezt a műveletet végrehajtani.',
@@ -121,6 +123,7 @@ describe('ForbiddenError', () => {
         undefined,
         originalError
       );
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         'Nincs engedélyed ezt a műveletet végrehajtani.',
@@ -138,6 +141,7 @@ describe('ForbiddenError', () => {
         undefined,
         originalError
       );
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         'Nincs engedélyed ezt a műveletet végrehajtani.',
@@ -151,7 +155,6 @@ describe('ForbiddenError', () => {
       const originalError = {
         error: { message: 'Test error message' }
       };
-
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
       expect(forbiddenError instanceof DdataCoreError).toBe(true);
@@ -159,14 +162,11 @@ describe('ForbiddenError', () => {
 
     it('should have msg property from parent class', () => {
       const originalError = {
-        error: { 
+        error: {
           message: 'Test error message',
-          trace: [
-            { file: 'app/Http/Controllers/TestController.php', line: 123 }
-          ]
+          trace: [{ file: 'app/Http/Controllers/TestController.php', line: 123 }]
         }
       };
-
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
       expect(forbiddenError.msg).toBeDefined();
@@ -176,7 +176,7 @@ describe('ForbiddenError', () => {
 
     it('should handle parent class logic for trace processing', () => {
       const originalError = {
-        error: { 
+        error: {
           message: 'Test error message',
           trace: [
             { file: 'app/Http/Controllers/TestController.php', line: 123 },
@@ -185,7 +185,6 @@ describe('ForbiddenError', () => {
           ]
         }
       };
-
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
       // Should include controller files but not framework files
@@ -196,12 +195,11 @@ describe('ForbiddenError', () => {
 
     it('should handle empty trace array in parent class', () => {
       const originalError = {
-        error: { 
+        error: {
           message: 'Test error message',
           trace: []
         }
       };
-
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
       expect(forbiddenError.msg).toBe('');
@@ -209,7 +207,7 @@ describe('ForbiddenError', () => {
 
     it('should handle trace entries missing file or line', () => {
       const originalError = {
-        error: { 
+        error: {
           message: 'Test error message',
           trace: [
             { file: 'app/Http/Controllers/TestController.php' }, // missing line
@@ -218,7 +216,6 @@ describe('ForbiddenError', () => {
           ]
         }
       };
-
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
       expect(forbiddenError.msg).toBe('app/Http/Controllers/ValidController.php:456');
