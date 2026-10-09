@@ -24,6 +24,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   afterEach(() => {
     if (fixture && fixture.debugElement) {
       const nativeElement = fixture.debugElement.nativeElement;
+
       if (nativeElement && nativeElement.parentNode) {
         nativeElement.parentNode.removeChild(nativeElement);
       }
@@ -58,6 +59,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should accept custom model input', () => {
     const customModel: SelectableInterface = new Selectable();
+
     customModel.is_selected = true;
 
     component.model = customModel;
@@ -69,8 +71,9 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should emit model when chooseSelect is called', () => {
     const testModel: SelectableInterface = new Selectable();
+
     testModel.is_selected = true;
-    
+
     spyOn(component.choosed, 'emit');
 
     component.chooseSelect(testModel);
@@ -81,7 +84,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should emit component model when chooseSelect is called with component model', () => {
     component.model.is_selected = true;
-    
+
     spyOn(component.choosed, 'emit');
 
     component.chooseSelect(component.model);
@@ -92,8 +95,9 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should emit different model when chooseSelect is called with different model', () => {
     const differentModel: SelectableInterface = new Selectable();
+
     differentModel.is_selected = true;
-    
+
     spyOn(component.choosed, 'emit');
 
     component.chooseSelect(differentModel);
@@ -104,14 +108,14 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should render a button element', () => {
     const buttonElement = fixture.debugElement.query(By.css('button'));
-    
+
     expect(buttonElement).toBeTruthy();
     expect(buttonElement.nativeElement.tagName.toLowerCase()).toBe('button');
   });
 
   it('should have correct button classes', () => {
     const buttonElement = fixture.debugElement.query(By.css('button'));
-    
+
     expect(buttonElement.nativeElement.className).toContain('mr-1');
     expect(buttonElement.nativeElement.className).toContain('btn');
     expect(buttonElement.nativeElement.className).toContain('btn-primary');
@@ -119,14 +123,14 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should have button type set to "button"', () => {
     const buttonElement = fixture.debugElement.query(By.css('button'));
-    
+
     expect(buttonElement.nativeElement.type).toBe('button');
   });
 
   it('should call chooseSelect with component model when button is clicked', () => {
     spyOn(component, 'chooseSelect');
-    
     const buttonElement = fixture.debugElement.query(By.css('button'));
+
     buttonElement.nativeElement.click();
 
     expect(component.chooseSelect).toHaveBeenCalledWith(component.model);
@@ -135,8 +139,8 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should emit choosed event when button is clicked', () => {
     spyOn(component.choosed, 'emit');
-    
     const buttonElement = fixture.debugElement.query(By.css('button'));
+
     buttonElement.nativeElement.click();
 
     expect(component.choosed.emit).toHaveBeenCalledWith(component.model);
@@ -144,13 +148,14 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
   it('should emit correct model when button is clicked with custom model', () => {
     const customModel: SelectableInterface = new Selectable();
+
     customModel.is_selected = true;
     component.model = customModel;
     fixture.detectChanges();
-    
+
     spyOn(component.choosed, 'emit');
-    
     const buttonElement = fixture.debugElement.query(By.css('button'));
+
     buttonElement.nativeElement.click();
 
     expect(component.choosed.emit).toHaveBeenCalledWith(customModel);
@@ -164,28 +169,30 @@ describe('DdataSelectableListElementButtonComponent', () => {
         <dd-selectable-list-element-button>
           <span class="test-content">Test Content</span>
         </dd-selectable-list-element-button>
-      `
+      `,
+      standalone: false
     })
     class TestHostComponent {}
 
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       declarations: [DdataSelectableListElementButtonComponent, TestHostComponent]
     });
-
     const hostFixture = TestBed.createComponent(TestHostComponent);
-    hostFixture.detectChanges();
 
+    hostFixture.detectChanges();
     const projectedContent = hostFixture.debugElement.query(By.css('.test-content'));
+
     expect(projectedContent).toBeTruthy();
     expect(projectedContent.nativeElement.textContent.trim()).toBe('Test Content');
   });
 
   it('should handle null model gracefully', () => {
-    component.model = null as any;
-    
+    component.model = null;
+
     spyOn(component.choosed, 'emit');
 
-    component.chooseSelect(null as any);
+    component.chooseSelect(null);
 
     expect(component.choosed.emit).toHaveBeenCalledWith(null);
   });
@@ -193,17 +200,17 @@ describe('DdataSelectableListElementButtonComponent', () => {
   it('should handle undefined model gracefully', () => {
     spyOn(component.choosed, 'emit');
 
-    component.chooseSelect(undefined as any);
+    component.chooseSelect(undefined);
 
     expect(component.choosed.emit).toHaveBeenCalledWith(undefined);
   });
 
   it('should maintain button accessibility', () => {
     const buttonElement = fixture.debugElement.query(By.css('button'));
-    
+
     // Button should be focusable
     expect(buttonElement.nativeElement.tabIndex).not.toBe(-1);
-    
+
     // Button should have proper type
     expect(buttonElement.nativeElement.type).toBe('button');
   });
@@ -211,6 +218,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   it('should work with multiple instances', () => {
     const model1: SelectableInterface = new Selectable();
     const model2: SelectableInterface = new Selectable();
+
     model1.is_selected = false;
     model2.is_selected = true;
 
@@ -218,6 +226,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
     component.model = model1;
     spyOn(component.choosed, 'emit');
     component.chooseSelect(model1);
+
     expect(component.choosed.emit).toHaveBeenCalledWith(model1);
 
     // Reset spy
@@ -226,21 +235,23 @@ describe('DdataSelectableListElementButtonComponent', () => {
     // Test second instance
     component.model = model2;
     component.chooseSelect(model2);
+
     expect(component.choosed.emit).toHaveBeenCalledWith(model2);
   });
 
   it('should emit the exact same object reference that was passed to chooseSelect', () => {
     const testModel: SelectableInterface = new Selectable();
+
     testModel.is_selected = true;
-    
+
     spyOn(component.choosed, 'emit');
 
     component.chooseSelect(testModel);
 
     expect(component.choosed.emit).toHaveBeenCalledWith(testModel);
-    
     // Verify it's the exact same object reference
     const emittedValue = (component.choosed.emit as jasmine.Spy).calls.mostRecent().args[0];
+
     expect(emittedValue).toBe(testModel);
   });
 });

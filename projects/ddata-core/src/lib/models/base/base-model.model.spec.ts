@@ -16,16 +16,14 @@ describe('BaseModel', () => {
 
     TestBed.configureTestingModule({
       imports: [],
-      providers: [
-        { provide: ValidatorService, useValue: mockValidatorService }
-      ]
+      providers: [{ provide: ValidatorService, useValue: mockValidatorService }]
     });
-
     // Mock the DdataCoreModule.InjectorInstance
     const injector = TestBed.inject(ValidatorService);
+
     DdataCoreModule.InjectorInstance = {
       get: jasmine.createSpy('get').and.returnValue(mockValidatorService)
-    } as any;
+    };
 
     model = new BaseModel();
   });
@@ -45,6 +43,7 @@ describe('BaseModel', () => {
     it('should have id property with correct type', () => {
       // Test that the id property can be set and accessed
       model.id = 123 as ID;
+
       expect(model.id).toBe(123 as ID);
       expect(typeof model.id).toBe('number');
     });
@@ -214,7 +213,9 @@ describe('BaseModel', () => {
 
   describe('prepareToSave method', () => {
     it('should throw error with correct message', () => {
-      expect(() => model.prepareToSave()).toThrowError('prepareToSave() function is not implemented');
+      expect(() => model.prepareToSave()).toThrowError(
+        'prepareToSave() function is not implemented'
+      );
     });
   });
 
@@ -222,12 +223,12 @@ describe('BaseModel', () => {
     it('should call ValidatorService.validateObject with correct parameters', () => {
       // Setup mock to return valid result
       mockValidatorService.validateObject.and.returnValue([true, []]);
-      
+
       // Mock prepareToSave to avoid error
       spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
-      
+
       model.validate();
-      
+
       expect(mockValidatorService.validateObject).toHaveBeenCalledWith(
         { id: 1 },
         model.validationRules,
@@ -238,11 +239,12 @@ describe('BaseModel', () => {
 
     it('should set isValid and validationErrors from ValidatorService result', () => {
       const mockErrors = ['field1', 'field2'];
+
       mockValidatorService.validateObject.and.returnValue([false, mockErrors]);
       spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
-      
+
       model.validate();
-      
+
       expect(model.isValid).toBe(false);
       expect(model.validationErrors).toEqual(mockErrors);
     });
@@ -250,9 +252,9 @@ describe('BaseModel', () => {
     it('should use preparedData parameter when provided', () => {
       mockValidatorService.validateObject.and.returnValue([true, []]);
       const preparedData = { id: 123, name: 'test' };
-      
+
       model.validate(preparedData);
-      
+
       expect(mockValidatorService.validateObject).toHaveBeenCalledWith(
         preparedData,
         model.validationRules,
@@ -263,11 +265,15 @@ describe('BaseModel', () => {
 
     it('should handle ValidationError thrown by ValidatorService', () => {
       const errorInvalids = ['error1', 'error2'];
-      const validationError = new ValidationError({ message: 'Test error', invalids: errorInvalids });
+      const validationError = new ValidationError({
+        message: 'Test error',
+        invalids: errorInvalids
+      });
+
       mockValidatorService.validateObject.and.throwError(validationError);
       spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
       spyOn(model, 'getValidatedErrorFields').and.returnValue(['Error 1', 'Error 2']);
-      
+
       expect(() => model.validate()).toThrowError(ValidationError);
       expect(model.validationErrors).toEqual(errorInvalids);
       expect(model.isValid).toBe(false);
@@ -275,9 +281,10 @@ describe('BaseModel', () => {
 
     it('should rethrow non-ValidationError errors', () => {
       const genericError = new Error('Generic error');
+
       mockValidatorService.validateObject.and.throwError(genericError);
       spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
-      
+
       expect(() => model.validate()).toThrowError('Generic error');
     });
   });
@@ -293,6 +300,7 @@ describe('BaseModel', () => {
     it('should return labels for existing fields', () => {
       model.validationErrors = ['field1', 'field2'];
       const result = model.getValidatedErrorFields();
+
       expect(result).toEqual(['Field One', 'Field Two']);
     });
 
@@ -300,6 +308,7 @@ describe('BaseModel', () => {
       model.validationErrors = ['field1', 'nonexistent'];
       spyOn(console, 'error'); // Suppress console error for test
       const result = model.getValidatedErrorFields();
+
       expect(result).toEqual(['Field One', 'nonexistent']);
     });
 
@@ -307,6 +316,7 @@ describe('BaseModel', () => {
       model.validationErrors = ['nonexistent'];
       spyOn(console, 'error');
       model.getValidatedErrorFields();
+
       expect(console.error).toHaveBeenCalledWith(
         'nonexistent nevű mező nem található ezen a model-en: NotDefined',
         model
@@ -316,6 +326,7 @@ describe('BaseModel', () => {
     it('should return empty array when no validation errors', () => {
       model.validationErrors = [];
       const result = model.getValidatedErrorFields();
+
       expect(result).toEqual([]);
     });
   });
@@ -324,40 +335,47 @@ describe('BaseModel', () => {
     it('should return date as ISO string with 0 days offset', () => {
       const testDate = new Date('2023-05-15T12:00:00Z');
       const result = model.setDate(testDate, 0);
+
       expect(result).toBe('2023-05-15');
     });
 
     it('should add days correctly', () => {
       const testDate = new Date('2023-05-15T12:00:00Z');
       const result = model.setDate(testDate, 5);
+
       expect(result).toBe('2023-05-20');
     });
 
     it('should subtract days correctly', () => {
       const testDate = new Date('2023-05-15T12:00:00Z');
       const result = model.setDate(testDate, -5);
+
       expect(result).toBe('2023-05-10');
     });
 
     it('should handle month boundary correctly', () => {
       const testDate = new Date('2023-05-31T12:00:00Z');
       const result = model.setDate(testDate, 1);
+
       expect(result).toBe('2023-06-01');
     });
 
     it('should use default days parameter of 0', () => {
       const testDate = new Date('2023-05-15T12:00:00Z');
       const result = model.setDate(testDate);
+
       expect(result).toBe('2023-05-15');
     });
   });
 
   describe('getCurrentISODate method', () => {
     it('should return current date in ISO format', () => {
-      const beforeCall = new Date().toISOString().split('T')[0];
+      const beforeIsoString = new Date().toISOString();
+      const beforeCall = beforeIsoString.split('T')[0];
       const result = model.getCurrentISODate();
-      const afterCall = new Date().toISOString().split('T')[0];
-      
+      const afterIsoString = new Date().toISOString();
+      const afterCall = afterIsoString.split('T')[0];
+
       // Result should be between before and after call (same day)
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect([beforeCall, afterCall]).toContain(result);
@@ -368,12 +386,14 @@ describe('BaseModel', () => {
     it('should convert Date to ISO date string', () => {
       const testDate = new Date('2023-05-15T14:30:25.123Z');
       const result = model.toISODate(testDate);
+
       expect(result).toBe('2023-05-15');
     });
 
     it('should handle different dates correctly', () => {
       const testDate = new Date('2022-12-31T23:59:59Z');
       const result = model.toISODate(testDate);
+
       expect(result).toBe('2022-12-31');
     });
   });
@@ -382,12 +402,14 @@ describe('BaseModel', () => {
     it('should return date and time in YYYY-MM-DD hh:mm:ss format', () => {
       const testDate = new Date('2023-05-15T14:30:25Z');
       const result = model.toISODatetime(testDate);
+
       expect(result).toBe('2023-05-15 14:30:25');
     });
 
     it('should handle edge cases with zeros', () => {
       const testDate = new Date('2023-01-01T00:00:00Z');
       const result = model.toISODatetime(testDate);
+
       expect(result).toBe('2023-01-01 00:00:00');
     });
   });
@@ -396,18 +418,21 @@ describe('BaseModel', () => {
     it('should return time in hh:mm:ss format', () => {
       const testDate = new Date('2023-05-15T14:30:25Z');
       const result = model.toISOTime(testDate);
+
       expect(result).toBe('14:30:25');
     });
 
     it('should pad single digits with zeros', () => {
       const testDate = new Date('2023-05-15T09:05:03Z');
       const result = model.toISOTime(testDate);
+
       expect(result).toBe('09:05:03');
     });
 
     it('should handle midnight correctly', () => {
       const testDate = new Date('2023-05-15T00:00:00Z');
       const result = model.toISOTime(testDate);
+
       expect(result).toBe('00:00:00');
     });
   });
@@ -426,17 +451,20 @@ describe('BaseModel', () => {
     it('should return user ID from localStorage', () => {
       localStorage.setItem('current_user_id', '123');
       const result = model.getCurrentUserId();
+
       expect(result).toBe(123 as ID);
     });
 
     it('should return NaN when localStorage value is not a number', () => {
       localStorage.setItem('current_user_id', 'not-a-number');
       const result = model.getCurrentUserId();
+
       expect(isNaN(result as any)).toBe(true);
     });
 
     it('should return 0 when localStorage item does not exist', () => {
       const result = model.getCurrentUserId();
+
       expect(result).toBe(0 as ID);
     });
   });
@@ -444,6 +472,7 @@ describe('BaseModel', () => {
   describe('getDefaultDevizaId method', () => {
     it('should return 45', () => {
       const result = model.getDefaultDevizaId();
+
       expect(result).toBe(45 as ID);
     });
   });
@@ -452,35 +481,41 @@ describe('BaseModel', () => {
     it('should add business days going up', () => {
       // Starting from Monday 2023-05-15, adding 1 business day should give Tuesday
       const result = model.calculateDateWithoutWeekend('2023-05-15', 1, 'up');
+
       expect(result).toBe('2023-05-16');
     });
 
     it('should subtract business days going down', () => {
       // Starting from Tuesday 2023-05-16, subtracting 1 business day should give Monday
       const result = model.calculateDateWithoutWeekend('2023-05-16', 1, 'down');
+
       expect(result).toBe('2023-05-15');
     });
 
     it('should skip weekends when adding days', () => {
       // Starting from Friday 2023-05-19, adding 1 business day should skip weekend and give Monday
       const result = model.calculateDateWithoutWeekend('2023-05-19', 1, 'up');
+
       expect(result).toBe('2023-05-22');
     });
 
     it('should skip weekends when subtracting days', () => {
       // Starting from Monday 2023-05-22, subtracting 1 business day should skip weekend and give Friday
       const result = model.calculateDateWithoutWeekend('2023-05-22', 1, 'down');
+
       expect(result).toBe('2023-05-19');
     });
 
     it('should return original date when days is 0', () => {
       const result = model.calculateDateWithoutWeekend('2023-05-15', 0, 'up');
+
       expect(result).toBe('2023-05-15');
     });
 
     it('should handle multiple days correctly', () => {
       // Starting from Monday 2023-05-15, adding 5 business days should give Monday next week
       const result = model.calculateDateWithoutWeekend('2023-05-15', 5, 'up');
+
       expect(result).toBe('2023-05-22');
     });
   });
@@ -489,21 +524,20 @@ describe('BaseModel', () => {
     it('should convert fields to string values using model properties', () => {
       model['field1'] = 'existing';
       model['field2'] = 'another';
-      
       const fields = { field1: 123, field2: true, field3: 'test' };
       const result = model.prepareFieldsToSaveAsString(fields);
-      
+
       expect(result).toEqual({
-        field1: 'existing',  // Uses model property
-        field2: 'another',   // Uses model property
-        field3: 'test'       // Uses field value since model property doesn't exist
+        field1: 'existing', // Uses model property
+        field2: 'another', // Uses model property
+        field3: 'test' // Uses field value since model property doesn't exist
       });
     });
 
     it('should use String conversion when model property is not set', () => {
       const fields = { field1: 123, field2: true, field3: null };
       const result = model.prepareFieldsToSaveAsString(fields);
-      
+
       expect(result).toEqual({
         field1: '123',
         field2: 'true',
@@ -513,6 +547,7 @@ describe('BaseModel', () => {
 
     it('should handle empty fields object', () => {
       const result = model.prepareFieldsToSaveAsString({});
+
       expect(result).toEqual({});
     });
   });
@@ -521,21 +556,20 @@ describe('BaseModel', () => {
     it('should convert fields to number values using model properties', () => {
       model['field1'] = 100;
       model['field2'] = 200;
-      
       const fields = { field1: '123', field2: true, field3: '456' };
       const result = model.prepareFieldsToSaveAsNumber(fields);
-      
+
       expect(result).toEqual({
-        field1: 100,  // Uses model property
-        field2: 200,  // Uses model property
-        field3: 456   // Uses field value since model property doesn't exist
+        field1: 100, // Uses model property
+        field2: 200, // Uses model property
+        field3: 456 // Uses field value since model property doesn't exist
       });
     });
 
     it('should use Number conversion when model property is not set', () => {
       const fields = { field1: '123', field2: true, field3: 'invalid' };
       const result = model.prepareFieldsToSaveAsNumber(fields);
-      
+
       expect(result).toEqual({
         field1: 123,
         field2: 1,
@@ -545,6 +579,7 @@ describe('BaseModel', () => {
 
     it('should handle empty fields object', () => {
       const result = model.prepareFieldsToSaveAsNumber({});
+
       expect(result).toEqual({});
     });
   });
@@ -553,21 +588,20 @@ describe('BaseModel', () => {
     it('should convert fields to boolean values using model properties', () => {
       model['field1'] = true;
       model['field2'] = false;
-      
       const fields = { field1: 0, field2: 'test', field3: 1 };
       const result = model.prepareFieldsToSaveAsBoolean(fields);
-      
+
       expect(result).toEqual({
-        field1: true,   // Uses model property
-        field2: false,  // Uses model property
-        field3: true    // Uses field value since model property doesn't exist
+        field1: true, // Uses model property
+        field2: false, // Uses model property
+        field3: true // Uses field value since model property doesn't exist
       });
     });
 
     it('should use Boolean conversion when model property is not set', () => {
       const fields = { field1: 1, field2: 0, field3: 'test', field4: null };
       const result = model.prepareFieldsToSaveAsBoolean(fields);
-      
+
       expect(result).toEqual({
         field1: true,
         field2: false,
@@ -578,6 +612,7 @@ describe('BaseModel', () => {
 
     it('should handle empty fields object', () => {
       const result = model.prepareFieldsToSaveAsBoolean({});
+
       expect(result).toEqual({});
     });
   });
@@ -587,9 +622,9 @@ describe('BaseModel', () => {
       const mockModel = { init: jasmine.createSpy('init').and.returnValue('initialized') };
       const fields = { field1: mockModel };
       const data = { field1: { id: 1 } };
-      
+
       model.initModelOrNull(fields, data);
-      
+
       expect(mockModel.init).toHaveBeenCalledWith({ id: 1 });
       expect(model['field1']).toBe('initialized');
     });
@@ -597,9 +632,9 @@ describe('BaseModel', () => {
     it('should set field to null when init method is not available', () => {
       const fields = { field1: null };
       const data = { field1: { id: 1 } };
-      
+
       model.initModelOrNull(fields, data);
-      
+
       expect(model['field1']).toBe(null);
     });
 
@@ -607,10 +642,11 @@ describe('BaseModel', () => {
       const mockModel = { init: jasmine.createSpy('init').and.returnValue('initialized') };
       const fields = { field1: mockModel };
       const data = {};
-      
+
       model.initModelOrNull(fields, data);
-      
-      expect(mockModel.init).toHaveBeenCalledWith(undefined);
+
+      expect(mockModel.init).not.toHaveBeenCalled();
+      expect(model['field1']).toBeNull();
     });
   });
 
@@ -619,9 +655,9 @@ describe('BaseModel', () => {
       spyOn(model, 'fieldAsBoolean');
       const fields = { field1: true, field2: false };
       const data = { field1: false, field2: true };
-      
+
       model.initAsBoolean(fields, data);
-      
+
       expect(model.fieldAsBoolean).toHaveBeenCalledWith('field1', true, data);
       expect(model.fieldAsBoolean).toHaveBeenCalledWith('field2', false, data);
     });
@@ -632,9 +668,9 @@ describe('BaseModel', () => {
       spyOn(model, 'fieldAsBoolean');
       const fields = ['field1', 'field2'];
       const data = { field1: true };
-      
+
       model.initAsBooleanWithDefaults(fields, data);
-      
+
       expect(model.fieldAsBoolean).toHaveBeenCalledWith('field1', false, data);
       expect(model.fieldAsBoolean).toHaveBeenCalledWith('field2', false, data);
     });
@@ -643,25 +679,33 @@ describe('BaseModel', () => {
   describe('fieldAsBoolean method', () => {
     it('should set field to data value when data value is boolean', () => {
       const data = { field1: true };
+
       model.fieldAsBoolean('field1', false, data);
+
       expect(model['field1']).toBe(true);
     });
 
     it('should set field to default when data value is not boolean', () => {
       const data = { field1: 'not boolean' };
+
       model.fieldAsBoolean('field1', true, data);
+
       expect(model['field1']).toBe(true);
     });
 
     it('should set field to default when data value is undefined', () => {
       const data = {};
+
       model.fieldAsBoolean('field1', true, data);
+
       expect(model['field1']).toBe(true);
     });
 
     it('should set field to default when data value is null', () => {
       const data = { field1: null };
+
       model.fieldAsBoolean('field1', true, data);
+
       expect(model['field1']).toBe(true);
     });
   });
@@ -671,9 +715,9 @@ describe('BaseModel', () => {
       spyOn(model, 'fieldAsString');
       const fields = { field1: 'default1', field2: 'default2' };
       const data = { field1: 'value1', field2: 'value2' };
-      
+
       model.initAsString(fields, data);
-      
+
       expect(model.fieldAsString).toHaveBeenCalledWith('field1', 'default1', data);
       expect(model.fieldAsString).toHaveBeenCalledWith('field2', 'default2', data);
     });
@@ -684,9 +728,9 @@ describe('BaseModel', () => {
       spyOn(model, 'fieldAsString');
       const fields = ['field1', 'field2'];
       const data = { field1: 'value1' };
-      
+
       model.initAsStringWithDefaults(fields, data);
-      
+
       expect(model.fieldAsString).toHaveBeenCalledWith('field1', '', data);
       expect(model.fieldAsString).toHaveBeenCalledWith('field2', '', data);
     });
@@ -695,25 +739,33 @@ describe('BaseModel', () => {
   describe('fieldAsString method', () => {
     it('should set field to string value of data when available', () => {
       const data = { field1: 123 };
+
       model.fieldAsString('field1', 'default', data);
+
       expect(model['field1']).toBe('123');
     });
 
     it('should set field to default when data field is null', () => {
       const data = { field1: null };
+
       model.fieldAsString('field1', 'default', data);
+
       expect(model['field1']).toBe('default');
     });
 
     it('should set field to default when data field is undefined', () => {
       const data = {};
+
       model.fieldAsString('field1', 'default', data);
+
       expect(model['field1']).toBe('default');
     });
 
     it('should handle objects with toString method', () => {
       const data = { field1: { toString: () => 'object string' } };
+
       model.fieldAsString('field1', 'default', data);
+
       expect(model['field1']).toBe('object string');
     });
   });
@@ -723,9 +775,9 @@ describe('BaseModel', () => {
       spyOn(model, 'fieldAsNumber');
       const fields = { field1: 10, field2: 20 };
       const data = { field1: 100, field2: 200 };
-      
+
       model.initAsNumber(fields, data);
-      
+
       expect(model.fieldAsNumber).toHaveBeenCalledWith('field1', 10, data);
       expect(model.fieldAsNumber).toHaveBeenCalledWith('field2', 20, data);
     });
@@ -736,9 +788,9 @@ describe('BaseModel', () => {
       spyOn(model, 'fieldAsNumber');
       const fields = ['field1', 'field2'];
       const data = { field1: 100 };
-      
+
       model.initAsNumberWithDefaults(fields, data);
-      
+
       expect(model.fieldAsNumber).toHaveBeenCalledWith('field1', 0, data);
       expect(model.fieldAsNumber).toHaveBeenCalledWith('field2', 0, data);
     });
@@ -747,31 +799,41 @@ describe('BaseModel', () => {
   describe('fieldAsNumber method', () => {
     it('should set field to number value when data is truthy', () => {
       const data = { field1: '123' };
+
       model.fieldAsNumber('field1', 0, data);
+
       expect(model['field1']).toBe(123);
     });
 
-    it('should set field to default when data field is falsy', () => {
+    it('should keep a zero value from the data instead of the default', () => {
       const data = { field1: 0 };
+
       model.fieldAsNumber('field1', 999, data);
-      expect(model['field1']).toBe(999);
+
+      expect(model['field1']).toBe(0);
     });
 
     it('should set field to default when data field is undefined', () => {
       const data = {};
+
       model.fieldAsNumber('field1', 999, data);
+
       expect(model['field1']).toBe(999);
     });
 
     it('should set field to default when data field is null', () => {
       const data = { field1: null };
+
       model.fieldAsNumber('field1', 999, data);
+
       expect(model['field1']).toBe(999);
     });
 
     it('should convert string numbers correctly', () => {
       const data = { field1: '456.78' };
+
       model.fieldAsNumber('field1', 0, data);
+
       expect(model['field1']).toBe(456.78);
     });
   });
@@ -779,17 +841,18 @@ describe('BaseModel', () => {
   describe('getCurrentTime method', () => {
     it('should return current time in h:m format', () => {
       const result = model.getCurrentTime();
+
       expect(result).toMatch(/^\d{1,2}:\d{1,2}$/);
     });
 
     it('should return valid time format', () => {
       const result = model.getCurrentTime();
       const parts = result.split(':');
+
       expect(parts.length).toBe(2);
-      
       const hours = parseInt(parts[0], 10);
       const minutes = parseInt(parts[1], 10);
-      
+
       expect(hours).toBeGreaterThanOrEqual(0);
       expect(hours).toBeLessThanOrEqual(23);
       expect(minutes).toBeGreaterThanOrEqual(0);

@@ -1,9 +1,12 @@
 import { Type } from '@angular/core';
 
-export class DialogContentItem {
-  constructor(public component: Type<any>, public data: any) {}
+export interface DialogContentDataInterface {
+  [key: string]: unknown;
 }
 
-export class DialogContentWithOptions {
-  constructor(public component: Type<any>, public options: any) {}
+export class DialogContentItem {
+  constructor(
+    public component: Type<unknown>,
+    public data: DialogContentDataInterface
+  ) {}
 }
