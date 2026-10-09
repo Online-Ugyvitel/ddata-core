@@ -322,21 +322,21 @@ Instead of implementing these patterns repeatedly:
 ddata-ui-input is the **presentation layer** that sits on top of ddata-core's **data management layer**:
 
 ```
-┌───────────────────────────────────────┐
+┌─────────────────────────────────────────┐
 │           ddata-ui-input                │  ← Presentation Layer
 │  ┌─────────────┐ ┌─────────────┐       │
 │  │ dd-input    │ │ dd-select   │ ...   │
 │  │ dd-textarea │ │ dd-checkbox │       │
 │  └─────────────┘ └─────────────┘       │
-└─────────────────┬────────────────────────┘
+└─────────────────┬───────────────────────────┘
                   │ uses
-┌─────────────────┴────────────────────────┐
+┌─────────────────┴───────────────────────────┐
 │              ddata-core                 │  ← Data Management Layer
 │  ┌─────────────┐ ┌─────────────┐       │
 │  │ BaseModel   │ │ Validation  │       │
 │  │ ProxyService│ │ LocalStorage│       │
 │  └─────────────┘ └─────────────┘       │
-└───────────────────────────────────────┘
+└─────────────────────────────────────────┘
 ```
 
 ### **Model-Driven Architecture**
