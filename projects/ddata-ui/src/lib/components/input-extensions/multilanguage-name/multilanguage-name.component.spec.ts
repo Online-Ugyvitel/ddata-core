@@ -91,7 +91,7 @@ describe('MultilanguageNameComponent', () => {
     expect(component.model.names[1].lang_id).toBe(1); // Kitörölte középről a megadott elemet.
     expect(component.model.names[2].lang_id).toBe(1);
 
-    // Ha tovább törölnének, akkor még ha nem is talál pontos találatot, az utolsó elemet törölni fogja.
+    // Ha tovább törölnék, akkor még ha nem is talál pontos találatot, az utolsó elemet törölni fogja.
 
     // component.deleteName((forDelete as Name));
     // expect(component.model.names.length).toBe(7);
