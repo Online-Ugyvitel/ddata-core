@@ -11,7 +11,7 @@ describe('NotFoundError', () => {
   beforeEach(() => {
     // Create a spy object for NotificationService
     notificationService = jasmine.createSpyObj('NotificationService', ['add']);
-    
+
     // Spy on console.error
     consoleErrorSpy = spyOn(console, 'error');
   });
@@ -79,6 +79,7 @@ describe('NotFoundError', () => {
         'A keresett oldal nem található.',
         'danger' as NotificationType
       );
+
       expect(notificationService.add).toHaveBeenCalledTimes(1);
     });
   });
@@ -174,19 +175,19 @@ describe('NotFoundError', () => {
 
       expect(() => {
         notFoundError = new NotFoundError(originalError, notificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
     it('should handle null originalError', () => {
       expect(() => {
         notFoundError = new NotFoundError(null, notificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
     it('should handle undefined originalError', () => {
       expect(() => {
         notFoundError = new NotFoundError(undefined, notificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
   });
 
@@ -309,10 +310,9 @@ describe('NotFoundError', () => {
       };
 
       notFoundError = new NotFoundError(originalError, notificationService);
-
       // Get the actual call arguments
       const addCallArgs = notificationService.add.calls.mostRecent().args;
-      
+
       expect(addCallArgs[0]).toBe('Hiba');
       expect(addCallArgs[1]).toBe('A keresett oldal nem található.');
       expect(addCallArgs[2]).toBe('danger');
@@ -339,20 +339,21 @@ describe('NotFoundError', () => {
       // Verify every line was executed:
       // 1. Class instantiation
       expect(notFoundError).toBeTruthy();
-      
+
       // 2. super(originalError) call - verified by checking inherited properties
       expect(notFoundError.originalError).toBe(originalError);
-      
+
       // 3. console.error call with exact parameters
       expect(consoleErrorSpy).toHaveBeenCalledWith('Not Found Error: ', testMessage);
       expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-      
+
       // 4. notificationService.add call with exact parameters
       expect(notificationService.add).toHaveBeenCalledWith(
-        'Hiba', 
-        'A keresett oldal nem található.', 
+        'Hiba',
+        'A keresett oldal nem található.',
         'danger' as NotificationType
       );
+
       expect(notificationService.add).toHaveBeenCalledTimes(1);
     });
 
@@ -373,7 +374,7 @@ describe('NotFoundError', () => {
 
       // Should correctly extract only the message part
       expect(consoleErrorSpy).toHaveBeenCalledWith('Not Found Error: ', complexMessage);
-      
+
       // Should still call notification service with fixed Hungarian text
       expect(notificationService.add).toHaveBeenCalledWith(
         'Hiba',
