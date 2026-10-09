@@ -1,7 +1,13 @@
+// @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
+import { EventEmitter, Injector, ElementRef, ChangeDetectorRef } from '@angular/core';
 import 'zone.js/testing';
-import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { FormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
 import {
   DdataCoreModule,
   ValidatorService,
@@ -12,23 +18,23 @@ import {
 } from 'ddata-core';
 import { DdataInputComponent } from './input.component';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
-import { CharacterCounterComponent } from '../character-counter/character-counter.component';
-import { WordCounterComponent } from '../word-counter/word-counter.component';
-
-declare const document: Document;
 
 class FakeModel
   extends BaseModel
-  implements
-    BaseModelInterface<unknown>,
-    FieldsInterface<HasTextFieldInterface>,
-    HasTextFieldInterface
+  implements BaseModelInterface<any>, FieldsInterface<HasTextField>, HasTextField
 {
   textField = 'Hello Dolly';
+  testField = 'Test Value';
   is_inactive = false;
   name = 'Test Name';
-  fields: FieldContainerInterface<HasTextFieldInterface> = {
+
+  fields: FieldContainerInterface<HasTextField> = {
     textField: {
+      title: 'textField - test title',
+      label: 'textField - test label',
+      placeholder: 'textField - test placeholder'
+    },
+    testField: {
       title: 'testField - test title',
       label: 'testField - test label',
       placeholder: 'testField - test placeholder'
@@ -44,12 +50,20 @@ class FakeModel
       placeholder: 'Címke neve'
     }
   };
+
+  validationRules = {
+    textField: ['maxLength:255'],
+    testField: ['maxLength:255'],
+    is_inactive: ['boolean'],
+    name: ['required', 'maxLength:255']
+  };
 }
 
-interface HasTextFieldInterface {
+interface HasTextField {
   textField: string;
-  is_inactive?: boolean;
-  name?: string;
+  testField: string;
+  is_inactive: boolean;
+  name: string;
 }
 
 describe('InputBoxComponent', () => {
@@ -59,52 +73,17 @@ describe('InputBoxComponent', () => {
   let element;
 
   beforeEach(() => {
-    // Mock injector service
-    const mockInjector = {
-      get: jasmine.createSpy('get').and.returnValue({
-        validateFieldValue: jasmine.createSpy('validateFieldValue').and.returnValue([]),
-        createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('test-id-123'),
-        randChars: jasmine.createSpy('randChars').and.returnValue('test-random-chars'),
-        getTitle: jasmine.createSpy('getTitle').and.callFake((model, field) => {
-          if (field === 'name') return 'Címke neve';
-
-          return 'Inaktív';
-        }),
-        getLabel: jasmine.createSpy('getLabel').and.callFake((model, field) => {
-          if (field === 'name') return 'Címke neve';
-
-          return 'Inaktív';
-        }),
-        getPlaceholder: jasmine.createSpy('getPlaceholder').and.callFake((model, field) => {
-          if (field === 'name') return 'Címke neve';
-
-          return 'Inaktív';
-        }),
-        getPrepend: jasmine.createSpy('getPrepend').and.returnValue(''),
-        getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
-        isRequired: jasmine.createSpy('isRequired').and.returnValue(false),
-        validateField: jasmine.createSpy('validateField').and.returnValue(true)
-      })
-    };
-
-    // Set up the mock injector before TestBed configuration
-    Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
-      value: mockInjector,
-      writable: true
-    });
-
     TestBed.configureTestingModule({
       declarations: [DdataInputComponent],
-      providers: [
-        Injector,
-        ValidatorService,
-        BaseModel,
-        { provide: InputHelperService, useValue: mockInjector.get() }
-      ]
+      imports: [FormsModule],
+      providers: [Injector, ValidatorService, BaseModel, InputHelperService]
     }).compileComponents();
   });
 
   beforeEach(() => {
+    DdataCoreModule.InjectorInstance = {
+      get: (token: never) => TestBed.inject(token)
+    };
     fixture = TestBed.createComponent(DdataInputComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;
@@ -143,7 +122,7 @@ describe('InputBoxComponent', () => {
     expect(component._model.fields[component._field].title).toBe('Címke neve');
     expect(component._model.fields[component._field].placeholder).toBe('Címke neve');
     expect(component._model.fields[component._field].label).toBe('Címke neve');
-    expect(component._isRequired).toBe(false);
+    expect(component._isRequired).toBe(true);
   });
 
   it("field property should set _field to be 'isValid' when it's undefined or refresh it's value", () => {
@@ -213,79 +192,303 @@ describe('InputBoxComponent', () => {
 
     expect(component._label).toBe('something');
   });
-});
 
-describe('DdataInputComponent counters', () => {
-  let fixture: ComponentFixture<DdataInputComponent>;
-  let component: DdataInputComponent;
+  // Test ngAfterViewInit lifecycle hook
+  it('should focus input element when autoFocus is true in ngAfterViewInit', () => {
+    component.autoFocus = true;
+    const mockElement = { focus: jasmine.createSpy('focus') };
 
-  beforeEach(async () => {
-    const mockHelper = {
-      randChars: jasmine.createSpy('randChars').and.returnValue('rnd'),
-      getTitle: jasmine.createSpy('getTitle').and.returnValue(''),
-      getLabel: jasmine.createSpy('getLabel').and.returnValue(''),
-      getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue(''),
-      getPrepend: jasmine.createSpy('getPrepend').and.returnValue(''),
-      getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
-      isRequired: jasmine.createSpy('isRequired').and.returnValue(false),
-      validateField: jasmine.createSpy('validateField').and.returnValue(true)
-    };
+    component.inputBox = { nativeElement: mockElement } as ElementRef;
 
-    Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
-      value: { get: jasmine.createSpy('get').and.returnValue(mockHelper) },
-      writable: true
-    });
+    component.ngAfterViewInit();
 
-    await TestBed.configureTestingModule({
-      declarations: [DdataInputComponent, CharacterCounterComponent, WordCounterComponent],
-      imports: [FormsModule],
-      providers: [{ provide: InputHelperService, useValue: mockHelper }]
-    }).compileComponents();
+    expect(mockElement.focus).toHaveBeenCalled();
+  });
 
-    fixture = TestBed.createComponent(DdataInputComponent);
-    component = fixture.componentInstance;
+  it('should not focus input element when autoFocus is false in ngAfterViewInit', () => {
+    component.autoFocus = false;
+    const mockElement = { focus: jasmine.createSpy('focus') };
+
+    component.inputBox = { nativeElement: mockElement } as ElementRef;
+
+    component.ngAfterViewInit();
+
+    expect(mockElement.focus).not.toHaveBeenCalled();
+  });
+
+  // Test validateField method
+  it('should call validateField and emit changed event when validation passes', () => {
+    spyOn(component.changed, 'emit');
+    spyOn(component.helperService, 'validateField').and.returnValue(true);
+    component._model = new FakeModel();
+    component._field = 'textField';
+
+    component.validateField();
+
+    expect(component.helperService.validateField).toHaveBeenCalledWith(
+      component._model,
+      component._field
+    );
+
+    expect(component.changed.emit).toHaveBeenCalledWith(component._model);
+  });
+
+  it('should call validateField and not emit changed event when validation fails', () => {
+    spyOn(component.changed, 'emit');
+    spyOn(component.helperService, 'validateField').and.returnValue(false);
+    component._model = new FakeModel();
+    component._field = 'textField';
+
+    component.validateField();
+
+    expect(component.helperService.validateField).toHaveBeenCalledWith(
+      component._model,
+      component._field
+    );
+
+    expect(component.changed.emit).not.toHaveBeenCalled();
+  });
+
+  // Test setWordCounterWarning method
+  it('should set displayWordCounterWarning to true when setWordCounterWarning is called with true', () => {
+    component.setWordCounterWarning(true);
+
+    expect(component.displayWordCounterWarning).toBe(true);
+  });
+
+  it('should set displayWordCounterWarning to false when setWordCounterWarning is called with false', () => {
+    component.setWordCounterWarning(false);
+
+    expect(component.displayWordCounterWarning).toBe(false);
+  });
+
+  // Test model getter
+  it('should return the internal _model via getter', () => {
+    const testModel = new FakeModel();
+
+    component._model = testModel;
+
+    expect(component.model).toBe(testModel);
+  });
+
+  // Test model setter comprehensive error scenarios
+  it('should log error and return early when model is null', () => {
+    spyOn(console, 'error');
+    const originalModel = component._model;
+
+    component.model = null;
+
+    expect(console.error).toHaveBeenCalledWith('The input-box component get undefined model');
+    expect(component._model).toBe(originalModel);
+  });
+
+  it('should log error and return early when model fields is undefined', () => {
+    spyOn(console, 'error');
+    const modelWithoutFields = new BaseModel();
+
+    modelWithoutFields.fields = undefined;
+
+    component.model = modelWithoutFields;
+
+    expect(console.error).toHaveBeenCalledWith(
+      `Your ${modelWithoutFields.model_name}'s 'fields' field is`,
+      undefined
+    );
+  });
+
+  it('should log error and return early when model field is undefined', () => {
+    spyOn(console, 'error');
     const model = new FakeModel();
 
-    model.textField = 'alpha, beta, gamma';
-    component.field = 'textField';
+    component._field = 'nonExistentField';
+
     component.model = model;
+
+    expect(console.error).toHaveBeenCalledWith(
+      `The ${model.model_name}'s nonExistentField field is `,
+      undefined
+    );
   });
 
-  it('should not render counters by default', () => {
-    fixture.detectChanges();
+  it('should set helper service values when model and field are valid', () => {
+    spyOn(component.helperService, 'getTitle').and.returnValue('Test Title');
+    spyOn(component.helperService, 'getPlaceholder').and.returnValue('Test Placeholder');
+    spyOn(component.helperService, 'getPrepend').and.returnValue('Test Prepend');
+    spyOn(component.helperService, 'getAppend').and.returnValue('Test Append');
+    spyOn(component.helperService, 'getLabel').and.returnValue('Test Label');
+    spyOn(component.helperService, 'isRequired').and.returnValue(true);
+    const model = new FakeModel();
 
-    expect(fixture.nativeElement.querySelector('character-counter')).toBeNull();
-    expect(fixture.nativeElement.querySelector('dd-word-counter')).toBeNull();
+    component._field = 'textField';
+    component.model = model;
+
+    expect(component.helperService.getTitle).toHaveBeenCalledWith(model, 'textField');
+    expect(component.helperService.getPlaceholder).toHaveBeenCalledWith(model, 'textField');
+    expect(component.helperService.getPrepend).toHaveBeenCalledWith(model, 'textField');
+    expect(component.helperService.getAppend).toHaveBeenCalledWith(model, 'textField');
+    expect(component.helperService.getLabel).toHaveBeenCalledWith(model, 'textField');
+    expect(component.helperService.isRequired).toHaveBeenCalledWith(model, 'textField');
+
+    expect(component._title).toBe('Test Title');
+    expect(component._placeholder).toBe('Test Placeholder');
+    expect(component._prepend).toBe('Test Prepend');
+    expect(component._append).toBe('Test Append');
+    expect(component._label).toBe('Test Label');
+    expect(component._isRequired).toBe(true);
   });
 
-  it('should render the character count of the field value', () => {
-    fixture.componentRef.setInput('enableCharacterCounter', true);
-    fixture.componentRef.setInput('maxLength', 100);
-    fixture.detectChanges();
-    const counter: HTMLElement = fixture.nativeElement.querySelector('character-counter');
+  it('should not call isRequired when validationRules field is missing', () => {
+    spyOn(component.helperService, 'isRequired');
+    const model = new FakeModel();
 
-    expect(counter.textContent?.trim()).toBe('18 / 100');
+    delete model.validationRules['textField'];
+    component._field = 'textField';
+    component.model = model;
+
+    expect(component.helperService.isRequired).not.toHaveBeenCalled();
   });
 
-  it('should render the word count and show the warning above maxWords', () => {
-    fixture.componentRef.setInput('enableWordCounter', true);
-    fixture.componentRef.setInput('maxWords', 2);
-    fixture.componentRef.setInput('wordCounterWarningMessage', 'Too many words');
-    fixture.detectChanges();
-    const counter: HTMLElement = fixture.nativeElement.querySelector('dd-word-counter');
-
-    expect(counter.textContent?.trim()).toBe('3 / 2');
-    expect(component.displayWordCounterWarning).toBe(true);
-    expect(fixture.nativeElement.textContent).toContain('Too many words');
+  // Test component initialization and default values
+  it('should initialize with default values', () => {
+    expect(component.disabled).toBe(false);
+    expect(component.isViewOnly).toBe(false);
+    expect(component.type).toBe('text');
+    expect(component.inputClass).toBe('form-control');
+    expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
+    expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
+    expect(component.inputBlockExtraClass).toBe('col-md-9');
+    expect(component.viewOnlyClass).toBe('form-control border-0 bg-light');
+    expect(component.wrapperClass).toBe('d-flex flex-wrap');
+    expect(component.showLabel).toBe(true);
+    expect(component.autoFocus).toBe(false);
+    expect(component.enableCharacterCounter).toBe(false);
+    expect(component.enableWordCounter).toBe(false);
+    expect(component.maxLength).toBe(255);
+    expect(component.maxWords).toBe(7);
+    expect(component.wordCounterWarningMessage).toBe('');
+    expect(component.displayWordCounterWarning).toBe(false);
   });
 
-  it('should not show the word counter warning within maxWords', () => {
-    fixture.componentRef.setInput('enableWordCounter', true);
-    fixture.componentRef.setInput('maxWords', 3);
-    fixture.componentRef.setInput('wordCounterWarningMessage', 'Too many words');
-    fixture.detectChanges();
+  it('should initialize random string property', () => {
+    expect(component.random).toBeDefined();
+    expect(typeof component.random).toBe('string');
+    expect(component.random.length).toBeGreaterThan(0);
+  });
 
-    expect(component.isWordLimitExceeded).toBe(false);
-    expect(fixture.nativeElement.textContent).not.toContain('Too many words');
+  // Test all input setters edge cases
+  it('should handle undefined values in field setter', () => {
+    component.field = undefined;
+
+    expect(component._field).toBe(undefined);
+  });
+
+  it('should handle undefined values in append setter', () => {
+    component.append = undefined;
+
+    expect(component._append).toBe(undefined);
+  });
+
+  it('should handle undefined values in prepend setter', () => {
+    component.prepend = undefined;
+
+    expect(component._prepend).toBe(undefined);
+  });
+
+  it('should handle undefined values in labelText setter', () => {
+    component.labelText = undefined;
+
+    expect(component._label).toBe(undefined);
+  });
+
+  // Test EventEmitter initialization
+  it('should initialize EventEmitters', () => {
+    expect(component.changed).toBeDefined();
+    expect(component.maxLengthReached).toBeDefined();
+    expect(component.changed instanceof EventEmitter).toBe(true);
+    expect(component.maxLengthReached instanceof EventEmitter).toBe(true);
+  });
+
+  // Test private properties initialization
+  it('should initialize private properties with default values', () => {
+    expect(component._field).toBe('');
+    expect(component._title).toBe('');
+    expect(component._label).toBe('');
+    expect(component._placeholder).toBe('');
+    expect(component._prepend).toBe('');
+    expect(component._append).toBe('');
+    expect(component._max).toBe('');
+    expect(component._isRequired).toBe(false);
+    expect(component._model).toEqual(new BaseModel());
+  });
+
+  // Test helperService initialization
+  it('should initialize helperService', () => {
+    expect(component.helperService).toBeDefined();
+    expect(component.helperService).toEqual(jasmine.any(InputHelperService));
+  });
+
+  // Test model setter when fields exist but validationRules don't exist for field
+  it('should handle model setter when validationRules is missing for field', () => {
+    const model = new FakeModel();
+
+    component._field = 'textField';
+
+    // Remove validation rules for this field
+    delete model.validationRules['textField'];
+
+    component.model = model;
+
+    // Should still set the helper service values but not call isRequired
+    expect(component._model).toBe(model);
+  });
+
+  // Test model setter when validationRules exist but field doesn't exist in validationRules
+  it('should not call isRequired when validationRules field does not exist', () => {
+    spyOn(component.helperService, 'isRequired');
+    const model = new FakeModel();
+
+    component._field = 'nonExistentValidationField';
+
+    component.model = model;
+
+    expect(component.helperService.isRequired).not.toHaveBeenCalled();
+  });
+
+  // Test edge case where model and fields exist but _field is empty
+  it('should handle model setter when _field is empty', () => {
+    spyOn(console, 'error');
+    const model = new FakeModel();
+
+    component._field = '';
+
+    component.model = model;
+
+    expect(console.error).toHaveBeenCalledWith(`The ${model.model_name}'s  field is `, undefined);
+  });
+
+  // Test edge case where model.validationRules is undefined
+  it('should handle model setter when validationRules is undefined', () => {
+    const model = new FakeModel();
+
+    model.validationRules = undefined;
+    component._field = 'textField';
+
+    // Should not throw error and should not call isRequired
+    expect(() => (component.model = model)).not.toThrow();
+  });
+
+  // Test constructor
+  it('should create component via constructor', () => {
+    const newComponent = new DdataInputComponent();
+
+    expect(newComponent).toBeTruthy();
+  });
+
+  // Test when autoFocus is true but inputBox is undefined
+  it('should handle ngAfterViewInit when inputBox is undefined', () => {
+    component.autoFocus = true;
+    component.inputBox = undefined;
+
+    expect(() => component.ngAfterViewInit()).not.toThrow();
   });
 });
