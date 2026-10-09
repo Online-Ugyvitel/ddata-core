@@ -94,7 +94,7 @@ export class DdataTextareaComponent implements AfterViewInit {
       this._label = this.helperService.getLabel(this._model, this._field);
     }
 
-    if (!!this._model && !!this._model.validationRules[this._field]) {
+    if (!!this._model && !!this._model.validationRules?.[this._field]) {
       this._isRequired = this.helperService.isRequired(this._model, this._field);
     }
   }
@@ -147,7 +147,7 @@ export class DdataTextareaComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.autoFocus) {
-      this.inputBox.nativeElement.focus();
+      this.inputBox?.nativeElement.focus();
     }
   }
 
