@@ -375,7 +375,7 @@ When applying the proven pattern to remaining tests:
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { YourComponent } from './your.component';
-import { BaseModel, DdataCoreModule } from 'ddata-core';
+import { BaseModel, DdataCoreModule } from '@netdjw/ddata-core';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 describe('YourComponent', () => {
