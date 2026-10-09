@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EventEmitter } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BaseModelInterface } from '../../models/base/base-model.model';
@@ -8,13 +9,13 @@ export interface BaseListComponentInterface<T extends BaseModelInterface<T>> {
   isModal: boolean;
   isEmbed: boolean;
   loadData: boolean;
-  models: T[];
+  models: Array<T>;
   filter: any;
   data: any;
 
   editModel: EventEmitter<T>;
   deleteModel: EventEmitter<T>;
-  deleteMultipleModels: EventEmitter<T[]>;
+  deleteMultipleModels: EventEmitter<Array<T>>;
   saveModel: EventEmitter<T>;
 
   model: T;
@@ -57,7 +58,7 @@ export interface BaseListComponentInterface<T extends BaseModelInterface<T>> {
    *
    * @param models instances of model
    */
-  deleteMultiple(models: T[]): void;
+  deleteMultiple(models: Array<T>): void;
 
   /**
    * Change the page and looad datas. If you set `filter` options the request will be a "search" (POST request),
