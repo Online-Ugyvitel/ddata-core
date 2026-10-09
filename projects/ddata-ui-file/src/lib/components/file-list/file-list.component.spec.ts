@@ -5,17 +5,12 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 import { FileModel } from '../../models/file/file.model';
+import { FileModelInterface } from '../../models/file/file-model.interface';
 import { DdataUiFileListComponent } from './file-list.component';
 
 describe('DdataUiFileListComponent', () => {
   let component: DdataUiFileListComponent;
   let fixture: ComponentFixture<DdataUiFileListComponent>;
-
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -71,8 +66,14 @@ describe('DdataUiFileListComponent', () => {
   it('setPrimaryImage() should set slug of a file', () => {
     component = new DdataUiFileListComponent();
     component.model.files = [
-      new FileModel().init({ name: 'test', file_name_slug: 'a' }),
-      new FileModel().init({ name: 'test2', file_name_slug: 'b' })
+      new FileModel().init({
+        name: 'test',
+        file_name_slug: 'a'
+      }),
+      new FileModel().init({
+        name: 'test2',
+        file_name_slug: 'b'
+      })
     ];
     component.setPrimaryImage(new FileModel().init({ file_name_slug: 'b' }));
 

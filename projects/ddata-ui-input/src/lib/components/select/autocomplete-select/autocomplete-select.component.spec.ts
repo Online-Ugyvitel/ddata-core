@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, max-lines */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { BaseModel, DdataCoreModule } from 'ddata-core';
@@ -148,11 +147,8 @@ describe('DdataAutocompleteSelectComponent', () => {
     });
 
     it('should fallback to random ID when helper service is not available', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (component as any).helperService = null;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       (component as any).random = null;
       // Mock DdataCoreModule.InjectorInstance to return null for this test
       const originalMock = DdataCoreModule.InjectorInstance;
@@ -590,7 +586,7 @@ describe('DdataAutocompleteSelectComponent', () => {
 
   describe('Edge Cases and Error Handling', () => {
     it('should handle null items array', () => {
-      component.items = null as any;
+      component.items = null;
 
       expect(() => component.ngOnInit()).toThrow();
     });
@@ -602,14 +598,14 @@ describe('DdataAutocompleteSelectComponent', () => {
     });
 
     it('should handle items with missing text field', () => {
-      component.items = [{ id: 1 }] as any;
+      component.items = [{ id: 1 }];
       component.inputValue = 'test';
 
       expect(() => (component as any).filterItems()).toThrow();
     });
 
     it('should handle null text field values', () => {
-      component.items = [{ id: 1, name: null }] as any;
+      component.items = [{ id: 1, name: null }];
       component.inputValue = 'test';
 
       expect(() => (component as any).filterItems()).toThrow();

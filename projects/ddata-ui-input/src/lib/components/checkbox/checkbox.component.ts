@@ -64,6 +64,10 @@ export class DdataInputCheckboxComponent implements OnInit {
     }
 
     this._field = actualValue;
+
+    if (!!this._model?.fields?.[actualValue]) {
+      this._label = this._model.fields[actualValue].label ?? '';
+    }
   }
 
   get field(): string {

@@ -7,9 +7,9 @@ import { DdSelectExampleService } from '../dd-select-example.service';
 import { TagListComponent } from '../tag-list/tag-list.component';
 
 @Component({
-  selector: 'app-dd-select-single-examples',
+  selector: 'dd-select-single-examples',
   templateUrl: './dd-select-single-examples.component.html',
-  standalone: true,
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DdSelectSingleExamplesComponent {

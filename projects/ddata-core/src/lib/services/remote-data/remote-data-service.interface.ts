@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { FileUploadProcessInterface } from '../../models/file/file-upload-process.interface';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { DataServiceAbstractInterface } from '../data/data-service-abstract.interface';
+import { RequestHeaders } from './request-headers.type';
 
 export interface RemoteDataServiceInterface<T> extends DataServiceAbstractInterface<T> {
   setupHeaders(): void;
@@ -13,12 +14,13 @@ export interface RemoteDataServiceInterface<T> extends DataServiceAbstractInterf
   getAllWithoutPaginate(): Observable<Array<T>>;
   getPage(pageNumber: number, uniqueUrl?: string): Observable<PaginateInterface>;
   getOne(id: number): Observable<T>;
-  getUri(uri: string): Observable<T>;
+  getUri(uri: string, headers?: RequestHeaders): Observable<T>;
 
   save(data: T): Observable<number | boolean>;
 
   //  deepcode ignore no-any: we can't predict what type of data will be returned
-  postUri(resource: any, uri: string): Observable<any>;
+  postUri(resource: any, uri: string, headers?: RequestHeaders): Observable<any>;
+  putUri(resource: any, uri: string, headers?: RequestHeaders): Observable<any>;
 
   delete(model: T): Observable<number>;
   deleteMultiple(models: Array<T>): Observable<{}>;

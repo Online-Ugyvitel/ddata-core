@@ -24,16 +24,16 @@
         #inputBox
       />
       <ng-container *ngIf="enableCharacterCounter">
-        <dd-character-counter
-          [currentLength]="model[_field]?.length || 0"
+        <character-counter
+          [currentLength]="model[_field]"
           [maxLength]="maxLength"
-        ></dd-character-counter>
+        ></character-counter>
       </ng-container>
       <ng-container *ngIf="enableWordCounter">
         <dd-word-counter
           [currentLength]="model[_field]"
           [maxLength]="maxWords"
-          (maxLentghReached)="showWordCounterWarning = $event"
+          (maxLengthReached)="setWordCounterWarning($event)"
         ></dd-word-counter>
       </ng-container>
     </ng-container>
@@ -52,7 +52,7 @@
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-  <div *ngIf="displayWordCounterWarning && wordCounterWarningMessage !== ''" class="d-flex pb-2">
+  <div *ngIf="isWordLimitExceeded && wordCounterWarningMessage !== ''" class="d-flex pb-2">
     <div class="col-12 col-md-7 offset-md-3 bg-warning p-2 rounded">
       {{ wordCounterWarningMessage }}
     </div>

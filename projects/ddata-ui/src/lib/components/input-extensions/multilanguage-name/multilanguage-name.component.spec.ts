@@ -24,12 +24,6 @@ describe('MultilanguageNameComponent', () => {
   let debugElement;
   let element;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [MultilanguageNameComponent],
@@ -60,11 +54,11 @@ describe('MultilanguageNameComponent', () => {
     component.addName();
 
     expect(component.model.names.length).toBe(1);
-    expect(component.model.names[0].lang_id).toBe(1 as ID);
+    expect(component.model.names[0].lang_id).toBe(1);
     component.addName();
 
     expect(component.model.names.length).toBe(2);
-    expect(component.model.names[1].lang_id).toBe(1 as ID);
+    expect(component.model.names[1].lang_id).toBe(1);
   });
 
   it('deleteName() method should delete the Name Object from the Class', () => {
@@ -87,15 +81,15 @@ describe('MultilanguageNameComponent', () => {
     component.model.names.push(forDelete); // Azért így van, mert így középen lesz ez az elem.
     component.addName();
 
-    expect(component.model.names[2].lang_id).toBe(13 as ID);
+    expect(component.model.names[2].lang_id).toBe(13);
     expect(component.model.names.length).toBe(4);
 
     component.deleteName(forDelete as Name);
 
     expect(component.model.names.length).toBe(3);
-    expect(component.model.names[0].lang_id).toBe(1 as ID);
-    expect(component.model.names[1].lang_id).toBe(1 as ID); // Kitörölte középről a megadott elemet.
-    expect(component.model.names[2].lang_id).toBe(1 as ID);
+    expect(component.model.names[0].lang_id).toBe(1);
+    expect(component.model.names[1].lang_id).toBe(1); // Kitörölte középről a megadott elemet.
+    expect(component.model.names[2].lang_id).toBe(1);
 
     // Ha tovább törölnék, akkor még ha nem is talál pontos találatot, az utolsó elemet törölni fogja.
 

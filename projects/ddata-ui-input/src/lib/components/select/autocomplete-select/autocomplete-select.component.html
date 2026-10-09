@@ -1,16 +1,22 @@
 <div [class]="wrapperClass">
   <!-- label -->
-  <label [class]="labelClass" [for]="id" *ngIf="showLabel">
-    {{ labelText }}:
-    <span *ngIf="isRequired"> *</span>
-  </label>
+  @if (showLabel) {
+    <label [class]="labelClass" [for]="id">
+      {{ labelText }}:
+      @if (isRequired) {
+        <span aria-hidden="true"> *</span>
+      }
+    </label>
+  }
 
   <!-- combobox container -->
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
     <!-- prepend -->
-    <div class="input-group-prepend" *ngIf="!!prepend">
-      <div class="input-group-text">{{ prepend }}</div>
-    </div>
+    @if (!!prepend) {
+      <div class="input-group-prepend">
+        <div class="input-group-text">{{ prepend }}</div>
+      </div>
+    }
 
     <!-- combobox input -->
     <div class="autocomplete-combobox">
@@ -36,39 +42,39 @@
       />
 
       <!-- dropdown listbox -->
-      <div
-        *ngIf="isOpen"
-        class="autocomplete-dropdown"
-        [id]="listboxId"
-        role="listbox"
-        [attr.aria-label]="labelText + ' options'"
-      >
+      @if (isOpen) {
         <div
-          *ngIf="filteredItems.length === 0"
-          class="autocomplete-option no-results"
-          role="option"
+          class="autocomplete-dropdown"
+          [id]="listboxId"
+          role="listbox"
+          [attr.aria-label]="labelText + ' options'"
         >
-          Nincs találat
-        </div>
+          @if (filteredItems.length === 0) {
+            <div class="autocomplete-option no-results" role="option">Nincs találat</div>
+          }
 
-        <div
-          *ngFor="let item of filteredItems; let i = index"
-          class="autocomplete-option"
-          [class.selected]="selectedIndex === i"
-          [id]="getOptionId(i)"
-          role="option"
-          [attr.aria-selected]="selectedIndex === i"
-          (click)="selectItem(item, i)"
-          (mouseenter)="selectedIndex = i"
-        >
-          {{ item[text] }}
+          @for (item of filteredItems; track item[valueField]; let i = $index) {
+            <div
+              class="autocomplete-option"
+              [class.selected]="selectedIndex === i"
+              [id]="getOptionId(i)"
+              role="option"
+              [attr.aria-selected]="selectedIndex === i"
+              (click)="selectItem(item, i)"
+              (mouseenter)="selectedIndex = i"
+            >
+              {{ item[text] }}
+            </div>
+          }
         </div>
-      </div>
+      }
     </div>
 
     <!-- append -->
-    <div class="input-group-append" *ngIf="!!append">
-      <div class="input-group-text">{{ append }}</div>
-    </div>
+    @if (!!append) {
+      <div class="input-group-append">
+        <div class="input-group-text">{{ append }}</div>
+      </div>
+    }
   </div>
 </div>

@@ -39,7 +39,7 @@ describe('filesize.pipe', () => {
     });
 
     it('should default to 0 decimals when decimals is null', () => {
-      expect(pipe.transform(1048576, 'mb', null as unknown as number)).toBe(1);
+      expect(pipe.transform(1048576, 'mb', null)).toBe(1);
     });
 
     it('should default to 0 decimals when decimals is 0', () => {

@@ -19,12 +19,17 @@ export * from './lib/services/input/helper/input-helper-service.interface';
 export * from './lib/services/input/helper/input-helper.service';
 
 export * from './lib/components/checkbox/checkbox.component';
+export * from './lib/components/character-counter/character-counter.component';
 export * from './lib/components/color/color-input.component';
 export * from './lib/components/date/date-input.component';
 export * from './lib/components/input/input.component';
 export * from './lib/components/search/search.component';
 export * from './lib/components/select/select.component';
 export * from './lib/components/select/select.type';
+export * from './lib/components/select/simple-select/simple-select.component';
+export * from './lib/components/select/autocomplete-select/autocomplete-select.component';
+export * from './lib/components/select/multiple-select/multiple-select.component';
+export * from './lib/components/select/multiple-select/dialog/multiple-select-dialog.component';
 export * from './lib/components/textarea/textarea.component';
 export * from './lib/components/time/time-input.component';
 
