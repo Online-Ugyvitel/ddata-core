@@ -418,6 +418,26 @@ describe('DdataMultipleSelectComponent', () => {
       expect(component.selectedModelName).toBe('Primary Tag');
     });
 
+    it('should resolve selectedModelName for a field without _id suffix', () => {
+      component.field = 'category';
+      component.text = 'name';
+      component.valueField = 'id';
+      component.items = [{ id: 3, name: 'Third' }];
+      component.model = { category: 3 } as unknown as MockModel;
+
+      expect(component.selectedModelName).toBe('Third');
+    });
+
+    it('should keep the plain value for a field without _id suffix on single select', () => {
+      component.mode = 'single';
+      component.field = 'category';
+      component.model = { category: 0 } as unknown as MockModel;
+
+      component.selectModelEmit({ id: 3, name: 'Third' });
+
+      expect(component.model['category']).toBe(3);
+    });
+
     it('showModal should log error and not open when dialogSettings missing', () => {
       spyOn(console, 'error');
       // Force internal dialog settings to undefined
