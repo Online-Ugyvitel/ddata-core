@@ -19,18 +19,19 @@ describe('SorterService', () => {
   describe('sortBy', () => {
     it('should return empty array when input is not an array', () => {
       const result = service.sortBy(null as any, 'name');
-      expect(result).toEqual([]);
 
+      expect(result).toEqual([]);
       const result2 = service.sortBy(undefined as any, 'name');
+
       expect(result).toEqual([]);
-
       const result3 = service.sortBy('not an array' as any, 'name');
+
       expect(result3).toEqual([]);
-
       const result4 = service.sortBy(123 as any, 'name');
-      expect(result4).toEqual([]);
 
+      expect(result4).toEqual([]);
       const result5 = service.sortBy({} as any, 'name');
+
       expect(result5).toEqual([]);
     });
 
@@ -40,7 +41,6 @@ describe('SorterService', () => {
         { name: 'Alice', age: 30 },
         { name: 'Bob', age: 20 }
       ];
-
       const result = service.sortBy(objects, 'name');
 
       expect(result).toEqual([
@@ -48,6 +48,7 @@ describe('SorterService', () => {
         { name: 'Bob', age: 20 },
         { name: 'Charlie', age: 25 }
       ]);
+
       expect(result).toBe(objects); // Should modify original array
     });
 
@@ -57,7 +58,6 @@ describe('SorterService', () => {
         { name: 'Alice', age: 30 },
         { name: 'Bob', age: 20 }
       ];
-
       const result = service.sortBy(objects, 'age');
 
       expect(result).toEqual([
@@ -74,7 +74,6 @@ describe('SorterService', () => {
         { id: '1', name: 'Item 1' },
         { id: '20', name: 'Item 20' }
       ];
-
       const result = service.sortBy(objects, 'id');
 
       expect(result).toEqual([
@@ -90,7 +89,6 @@ describe('SorterService', () => {
         { name: 'Charlie', value: 'C' },
         { name: 'Alice', value: 'A' }
       ];
-
       const result = service.sortBy(objects, 'name');
 
       expect(result).toEqual([
@@ -129,7 +127,6 @@ describe('SorterService', () => {
         { value: true },
         { value: 'another string' }
       ];
-
       const result = service.sortBy(objects, 'value');
 
       // All values will be converted to string via toString() for comparison
@@ -142,7 +139,7 @@ describe('SorterService', () => {
     });
 
     it('should handle empty array', () => {
-      const objects: any[] = [];
+      const objects: Array<any> = [];
       const result = service.sortBy(objects, 'name');
 
       expect(result).toEqual([]);
@@ -158,11 +155,7 @@ describe('SorterService', () => {
     });
 
     it('should throw error when comparing objects with missing property', () => {
-      const objects = [
-        { name: 'Charlie' },
-        { name: 'Alice', age: 30 },
-        { name: 'Bob' }
-      ];
+      const objects = [{ name: 'Charlie' }, { name: 'Alice', age: 30 }, { name: 'Bob' }];
 
       // The current implementation will throw when one object has undefined for the key
       // because it calls toString() on undefined without checking
@@ -170,21 +163,12 @@ describe('SorterService', () => {
     });
 
     it('should handle objects where all have the same missing property', () => {
-      const objects = [
-        { name: 'Charlie' },
-        { name: 'Alice' },
-        { name: 'Bob' }
-      ];
-
+      const objects = [{ name: 'Charlie' }, { name: 'Alice' }, { name: 'Bob' }];
       // When all objects are missing the same property, !!undefined is false for all
       // so the comparison function returns 0, preserving original order
       const result = service.sortBy(objects, 'age');
 
-      expect(result).toEqual([
-        { name: 'Charlie' },
-        { name: 'Alice' },
-        { name: 'Bob' }
-      ]);
+      expect(result).toEqual([{ name: 'Charlie' }, { name: 'Alice' }, { name: 'Bob' }]);
     });
 
     it('should handle objects with same property values', () => {
@@ -193,7 +177,6 @@ describe('SorterService', () => {
         { name: 'Bob', group: 'A' },
         { name: 'Charlie', group: 'A' }
       ];
-
       const result = service.sortBy(objects, 'group');
 
       // Order should remain stable for equal values
@@ -212,7 +195,6 @@ describe('SorterService', () => {
         { name: 'Alice', age: 30 },
         { name: 'Bob', age: 20 }
       ];
-
       const result = service.sortByDesc(objects, 'name');
 
       expect(result).toEqual([
@@ -228,7 +210,6 @@ describe('SorterService', () => {
         { name: 'Alice', age: 30 },
         { name: 'Bob', age: 20 }
       ];
-
       const result = service.sortByDesc(objects, 'age');
 
       expect(result).toEqual([
@@ -240,17 +221,18 @@ describe('SorterService', () => {
 
     it('should return empty array when input is not an array', () => {
       const result = service.sortByDesc(null as any, 'name');
+
       expect(result).toEqual([]);
-
       const result2 = service.sortByDesc(undefined as any, 'name');
-      expect(result2).toEqual([]);
 
+      expect(result2).toEqual([]);
       const result3 = service.sortByDesc('not an array' as any, 'name');
+
       expect(result3).toEqual([]);
     });
 
     it('should handle empty array', () => {
-      const objects: any[] = [];
+      const objects: Array<any> = [];
       const result = service.sortByDesc(objects, 'name');
 
       expect(result).toEqual([]);
@@ -281,7 +263,6 @@ describe('SorterService', () => {
         { id: '1', name: 'Item 1' },
         { id: '20', name: 'Item 20' }
       ];
-
       const result = service.sortByDesc(objects, 'id');
 
       expect(result).toEqual([
@@ -300,11 +281,9 @@ describe('SorterService', () => {
         { name: 'Alice', age: 30 },
         { name: 'Bob', age: 20 }
       ];
-
       // Make copies to avoid mutation affecting the test
       const objects1 = JSON.parse(JSON.stringify(objects));
       const objects2 = JSON.parse(JSON.stringify(objects));
-
       const ascending = service.sortBy(objects1, 'name');
       const descending = service.sortByDesc(objects2, 'name');
 
@@ -318,10 +297,10 @@ describe('SorterService', () => {
         { user: { profile: { displayName: 'Alice' } }, score: 92 },
         { user: { profile: { displayName: 'Bob' } }, score: 78 }
       ];
-
       // Note: This won't work as expected because the service looks for direct properties
       // But we test it to ensure it doesn't crash
       const result = service.sortBy(objects, 'user');
+
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
     });
