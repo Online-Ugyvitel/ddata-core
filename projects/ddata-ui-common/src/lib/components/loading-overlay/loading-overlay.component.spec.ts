@@ -1,25 +1,31 @@
-import 'zone.js/testing';
-import { Injector } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { BehaviorSubject, of, Subscription } from 'rxjs';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+
 import { DdataUiLoadingOverlayComponent } from './loading-overlay.component';
 import { SpinnerServiceInterface } from 'ddata-core';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { DdataUiCommonModule } from '../../ddata-ui-common.module';
+import { of } from 'rxjs';
 
 describe('DdataUiLoadingOverlayComponent', () => {
   let component: DdataUiLoadingOverlayComponent;
   let fixture: ComponentFixture<DdataUiLoadingOverlayComponent>;
-  let mockSpinnerService: jasmine.SpyObj<SpinnerServiceInterface>;
+  let mockSpinnerService: SpinnerServiceInterface;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-    });
-  });
+  beforeEach(waitForAsync(() => {
+    // Mock SpinnerService
+    mockSpinnerService = {
+      spinner$: { subscribe: jasmine.createSpy('subscribe') },
+      loadingInProgress$: { subscribe: jasmine.createSpy('subscribe') },
+      watch: jasmine.createSpy('watch').and.returnValue(of(false)),
+      on: jasmine.createSpy('on'),
+      off: jasmine.createSpy('off'),
+      getStatus: jasmine.createSpy('getStatus')
+    } as unknown as SpinnerServiceInterface;
+
+    TestBed.configureTestingModule({
+      declarations: [DdataUiLoadingOverlayComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] // Allow fa-icon element
+    }).compileComponents();
+  }));
 
   beforeEach(async () => {
     // Create mock spinner service
@@ -36,9 +42,11 @@ describe('DdataUiLoadingOverlayComponent', () => {
     DdataUiCommonModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(DdataUiLoadingOverlayComponent);
     component = fixture.componentInstance;
-    
-    // Set up the mock spinner service
+
+    // Mock the spinnerService input to avoid InjectorInstance issues
     component.spinnerService = mockSpinnerService;
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {
