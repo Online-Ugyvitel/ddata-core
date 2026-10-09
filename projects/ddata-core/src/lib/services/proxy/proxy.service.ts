@@ -15,6 +15,7 @@ import { NotificationServiceInterface } from '../notification/notification-servi
 import { NotificationService } from '../notification/notification.service';
 import { RemoteDataServiceInterface } from '../remote-data/remote-data-service.interface';
 import { RemoteDataService } from '../remote-data/remote-data.service';
+import { RequestHeaders } from '../remote-data/request-headers.type';
 
 // @dynamic
 @Injectable({
@@ -95,12 +96,16 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     }
   }
 
-  getUri(uri: string): Observable<any> {
-    return this.remoteStorageService.getUri(uri).pipe(map((result: any) => result));
+  getUri(uri: string, headers?: RequestHeaders): Observable<any> {
+    return this.remoteStorageService.getUri(uri, headers).pipe(map((result: any) => result));
   }
 
-  postUri(data: any, uri: string): Observable<any> {
-    return this.remoteStorageService.postUri(data, uri).pipe(map((result: any) => result));
+  postUri(data: any, uri: string, headers?: RequestHeaders): Observable<any> {
+    return this.remoteStorageService.postUri(data, uri, headers).pipe(map((result: any) => result));
+  }
+
+  putUri(data: any, uri: string, headers?: RequestHeaders): Observable<any> {
+    return this.remoteStorageService.putUri(data, uri, headers).pipe(map((result: any) => result));
   }
 
   findById(id: number): Observable<T> {
@@ -195,11 +200,10 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
             this.localStorageService.delete(model);
           }
         }),
-        switchMap(
-          (): Observable<PaginateInterface> =>
-            this.remoteStorageService
-              .getAll()
-              .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
+        switchMap((): Observable<PaginateInterface> =>
+          this.remoteStorageService
+            .getAll()
+            .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
         )
       );
     } else {
@@ -226,7 +230,11 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
 
     models.forEach((model: T) => {
       if (model.id === 0) {
-        modelsToShow.splice(modelsToShow.indexOf(model), 1);
+        const index = modelsToShow.indexOf(model);
+
+        if (index > -1) {
+          modelsToShow.splice(index, 1);
+        }
 
         return of(paginate);
       }
@@ -241,11 +249,10 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
             });
           }
         }),
-        switchMap(
-          (): Observable<PaginateInterface> =>
-            this.remoteStorageService
-              .getAll()
-              .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
+        switchMap((): Observable<PaginateInterface> =>
+          this.remoteStorageService
+            .getAll()
+            .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
         )
       );
     } else {
@@ -253,7 +260,11 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
         map((result: boolean) => {
           if (result) {
             models.forEach((model: T) => {
-              modelsToShow.splice(modelsToShow.indexOf(model), 1);
+              const index = modelsToShow.indexOf(model);
+
+              if (index > -1) {
+                modelsToShow.splice(index, 1);
+              }
             });
           }
 

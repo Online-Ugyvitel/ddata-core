@@ -9,8 +9,6 @@ export interface CountryUIFieldsInterface {
 }
 
 export interface CountryInterface
-  extends CountryUIFieldsInterface,
-    BaseModelInterface<CountryInterface>,
-    SelectableInterface {
+  extends CountryUIFieldsInterface, BaseModelInterface<CountryInterface>, SelectableInterface {
   id: ID;
 }

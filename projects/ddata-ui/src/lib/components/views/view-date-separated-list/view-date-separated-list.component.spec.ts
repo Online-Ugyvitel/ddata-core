@@ -18,12 +18,6 @@ describe('ViewDateSeparatedListComponent', () => {
   let component: ViewDateSeparatedListComponent;
   let fixture: ComponentFixture<ViewDateSeparatedListComponent>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ViewDateSeparatedListComponent],
@@ -61,10 +55,10 @@ describe('ViewDateSeparatedListComponent', () => {
     const fakedata: Array<CasefileInterface> = [
       {
         deadline: '2020' as ISODate
-      } as unknown as CasefileInterface,
+      },
       {
         deadline: '2021' as ISODate
-      } as unknown as CasefileInterface
+      }
     ];
 
     component = fixture.componentInstance;
@@ -88,11 +82,11 @@ describe('ViewDateSeparatedListComponent', () => {
       {
         name: '',
         date: '2020-12-1' as ISODate
-      } as unknown as ViewDateSeparatedList,
+      },
       {
         name: '',
         date: '2020-12-3' as ISODate
-      } as unknown as ViewDateSeparatedList
+      }
     ];
 
     component = fixture.componentInstance;
