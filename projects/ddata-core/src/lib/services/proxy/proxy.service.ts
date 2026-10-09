@@ -230,7 +230,11 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
 
     models.forEach((model: T) => {
       if (model.id === 0) {
-        modelsToShow.splice(modelsToShow.indexOf(model), 1);
+        const index = modelsToShow.indexOf(model);
+
+        if (index > -1) {
+          modelsToShow.splice(index, 1);
+        }
 
         return of(paginate);
       }
@@ -256,7 +260,11 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
         map((result: boolean) => {
           if (result) {
             models.forEach((model: T) => {
-              modelsToShow.splice(modelsToShow.indexOf(model), 1);
+              const index = modelsToShow.indexOf(model);
+
+              if (index > -1) {
+                modelsToShow.splice(index, 1);
+              }
             });
           }
 
