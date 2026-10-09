@@ -1,4 +1,3 @@
-
 export interface DialogUIFieldsInterface {
   ok_button_text: string;
   cancel_button_text: string;
