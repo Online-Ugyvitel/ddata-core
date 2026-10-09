@@ -190,6 +190,6 @@ export class ListDropdownComponent {
 //   16, 'Díjbekérő' 'prepayment-request'
 //   17, 'Szétgyártási bizonylat' 'product-explode-note'
 //   18, 'Összeszerelési bizonylat' 'product-implode-note'
-//   19, 'Visszwáru vevőtől' 'returned-from-customer'
-//   20, 'Visszwáru a gyártónak' 'returned-to-producer'
+//   19, 'Visszbáru vevőtől' 'returned-from-customer'
+//   20, 'Visszbáru a gyártónak' 'returned-to-producer'
 //   21, 'Selejtezési jegyzőkönyv' 'scrapping-protocol'
