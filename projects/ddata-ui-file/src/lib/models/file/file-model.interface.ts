@@ -9,7 +9,7 @@ import {
   BaseModelWithoutTypeDefinitionInterface,
   FieldsInterface,
   MimeType
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 
 export interface FileModelUIFieldsInterface {
   file_name_and_path: FileNameWithPath;

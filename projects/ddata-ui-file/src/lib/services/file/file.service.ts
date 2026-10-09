@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FileModel } from '../../models/file/file.model';
 import { FileModelInterface } from '../../models/file/file-model.interface';
-import { ProxyService } from 'ddata-core';
+import { ProxyService } from '@netdjw/ddata-core';
 
 @Injectable({
   providedIn: 'root'

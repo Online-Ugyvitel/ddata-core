@@ -11,7 +11,7 @@ import {
   ID,
   MimeType,
   ValidationRuleInterface
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import { FileModelInterface, FileModelUIFieldsInterface } from './file-model.interface';
 // import { Folder } from 'projects/ddata-ui/src/lib/models/folder/folder.model';
 
