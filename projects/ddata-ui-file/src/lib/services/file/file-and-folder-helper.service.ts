@@ -1,7 +1,18 @@
 // tslint:disable: max-line-length
 import { Injectable } from '@angular/core';
-import { faFile, faFileAlt, faFileArchive, faFileAudio, faFileExcel, faFileImage, faFilePdf, faFileUpload, faFileVideo,
-  faFileWord, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import {
+  faFile,
+  faFileAlt,
+  faFileArchive,
+  faFileAudio,
+  faFileExcel,
+  faFileImage,
+  faFilePdf,
+  faFileUpload,
+  faFileVideo,
+  faFileWord,
+  IconDefinition
+} from '@fortawesome/free-solid-svg-icons';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +30,10 @@ export class FileAndFolderHelperService {
     audio: faFileAudio,
     video: faFileVideo,
     image: faFileImage,
-    unknown: faFile,
+    unknown: faFile
   };
 
-  constructor() { }
+  constructor() {}
 
   setFileType(typeString: string): IconDefinition {
     let icon = this.icon.file;
@@ -33,11 +44,11 @@ export class FileAndFolderHelperService {
       icon = this.icon.pdf;
     } else if (typeString === 'application/x-msdownload') {
       icon = this.icon.exe;
-    } else if (typeString  === 'application/x-zip-compressed') {
+    } else if (typeString === 'application/x-zip-compressed') {
       icon = this.icon.archive;
-    } else if (typeString  === 'application/zip') {
+    } else if (typeString === 'application/zip') {
       icon = this.icon.archive;
-    } else if (typeString  === 'application/x-rar') {
+    } else if (typeString === 'application/x-rar') {
       icon = this.icon.archive;
     } else if (typeString === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
       icon = this.icon.excel;
@@ -47,17 +58,19 @@ export class FileAndFolderHelperService {
       icon = this.icon.document;
     } else if (typeString === 'text/rtf') {
       icon = this.icon.document;
-    } else if (typeString === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    } else if (
+      typeString === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ) {
       icon = this.icon.document;
     } else if (typeString === 'application/vnd.oasis.opendocument.text') {
       icon = this.icon.document;
     } else if (typeString === 'application/vnd.oasis.opendocument.spreadsheet') {
       icon = this.icon.spreadsheet;
-    } else if (typeString.match('^audio\/') ) {
+    } else if (typeString.match('^audio/')) {
       icon = this.icon.audio;
-    } else if (typeString.match('^video\/') ) {
+    } else if (typeString.match('^video/')) {
       icon = this.icon.video;
-    } else if (typeString.match('^image\/') ) {
+    } else if (typeString.match('^image/')) {
       icon = this.icon.image;
     } else {
       icon = this.icon.unknown;

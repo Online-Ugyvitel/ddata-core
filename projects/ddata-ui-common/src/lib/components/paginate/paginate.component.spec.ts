@@ -1,65 +1,30 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { PaginateInterface } from 'ddata-core';
-import { Subject } from 'rxjs';
+
 import { DdataUiPaginateComponent } from './paginate.component';
 
 describe('DdataUiPaginateComponent', () => {
   let component: DdataUiPaginateComponent;
   let fixture: ComponentFixture<DdataUiPaginateComponent>;
-  let paginateSubject: Subject<PaginateInterface>;
 
-  // Mock paginate data for testing
-  const mockPaginateData: PaginateInterface = {
-    current_page: 2,
-    per_page: 10,
-    from: 11,
-    to: 20,
-    total: 100,
-    last_page: 10,
-    data: []
-  };
-
-  const mockSinglePageData: PaginateInterface = {
-    current_page: 1,
-    per_page: 10,
-    from: 1,
-    to: 5,
-    total: 5,
-    last_page: 1,
-    data: []
-  };
-
-  const mockFirstPageData: PaginateInterface = {
-    current_page: 1,
-    per_page: 10,
-    from: 1,
-    to: 10,
-    total: 100,
-    last_page: 10,
-    data: []
-  };
-
-  const mockLastPageData: PaginateInterface = {
-    current_page: 10,
-    per_page: 10,
-    from: 91,
-    to: 100,
-    total: 100,
-    last_page: 10,
-    data: []
-  };
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
       declarations: [DdataUiPaginateComponent]
     }).compileComponents();
+  }));
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(DdataUiPaginateComponent);
     component = fixture.componentInstance;
-    paginateSubject = new Subject<PaginateInterface>();
-    
-    // Set up component with paginate Subject
-    component.paginate = paginateSubject;
+    component.paginate = {
+      current_page: 1,
+      last_page: 5,
+      total: 100,
+      per_page: 20,
+      data: []
+    } as unknown as PaginateInterface;
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {

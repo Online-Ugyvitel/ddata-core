@@ -6,14 +6,14 @@ export interface SelectableListComponentInterface<T> {
   multipleSelectEnabled: boolean;
   isSelectionList: boolean;
   loadData: boolean;
-  selectedElements: T[];
+  selectedElements: Array<T>;
 
-  removeSelection: EventEmitter<T[]>;
-  setSelection: EventEmitter<T[]>;
-  emitSelected: EventEmitter<T[]>;
+  removeSelection: EventEmitter<Array<T>>;
+  setSelection: EventEmitter<Array<T>>;
+  emitSelected: EventEmitter<Array<T>>;
 
   datasArrived: Observable<number>;
-  select: Observable<T[]>;
+  select: Observable<Array<T>>;
 
   toggleSelect(model: T): void;
   chooseSelect(): void;
