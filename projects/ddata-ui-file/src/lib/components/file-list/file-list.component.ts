@@ -1,6 +1,6 @@
 import { Component, Inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { DialogContentItem } from 'ddata-ui-input';
+import { DialogContentItem } from '@netdjw/ddata-ui-input';
 import { fileText } from '../../i18n/file.lang';
 import { FileModelInterface } from '../../models/file/file-model.interface';
 import { Global } from '../../models/global.model';

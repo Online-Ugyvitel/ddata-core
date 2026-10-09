@@ -16,7 +16,7 @@ import {
   faUpload,
   IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
-import { SpinnerService, SpinnerServiceInterface } from 'ddata-core';
+import { SpinnerService, SpinnerServiceInterface } from '@netdjw/ddata-core';
 import { forkJoin } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { DdataUiFileModule } from '../../ddata-ui-file.module';
