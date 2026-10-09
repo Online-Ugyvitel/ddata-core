@@ -13,7 +13,7 @@ import { InputHelperServiceInterface } from '../../../services/input/helper/inpu
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
 import { SelectType } from '../select.type';
 
-export interface SelectedItemTemplateContext {
+export interface SelectedItemTemplateContextInterface {
   $implicit: unknown;
   remove: () => void;
 }
@@ -36,7 +36,7 @@ export class DdataMultipleSelectComponent {
    * Custom template to render each selected item in multiple mode instead of the default tag.
    * Context: `$implicit` is the selected item, `remove` is a function that removes it.
    */
-  @Input() selectedItemTemplate: TemplateRef<SelectedItemTemplateContext> | null = null;
+  @Input() selectedItemTemplate: TemplateRef<SelectedItemTemplateContextInterface> | null = null;
 
   // behavior
   @Input() mode: SelectType = 'multiple';
@@ -180,7 +180,7 @@ export class DdataMultipleSelectComponent {
     return this.field.split('_id')[0];
   }
 
-  getSelectedItemContext(item: BaseModelInterface<unknown>): SelectedItemTemplateContext {
+  getSelectedItemContext(item: BaseModelInterface<unknown>): SelectedItemTemplateContextInterface {
     return { $implicit: item, remove: () => this.deleteFromMultipleSelectedList(item) };
   }
 

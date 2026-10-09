@@ -423,7 +423,6 @@ describe('DdataMultipleSelectComponent', () => {
 
       component.field = 'tags';
       component.model = { tags: [item] } as unknown as MockModel;
-
       const context = component.getSelectedItemContext(item as never);
 
       expect(context.$implicit).toBe(item);

@@ -12,7 +12,7 @@ import { BaseModelInterface, DdataCoreModule, FieldsInterface } from '@netdjw/dd
 import { DialogContentWithOptionsInterface } from '../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
-import { SelectedItemTemplateContext } from './multiple-select/multiple-select.component';
+import { SelectedItemTemplateContextInterface } from './multiple-select/multiple-select.component';
 import { SelectType } from './select.type';
 
 @Component({
@@ -210,7 +210,7 @@ export class DdataSelectComponent {
    * Custom template for rendering the selected items in multiple mode (instead of tags).
    * Context: `$implicit` is the selected item, `remove` removes it from the selection.
    */
-  @Input() selectedItemTemplate: TemplateRef<SelectedItemTemplateContext> | null = null;
+  @Input() selectedItemTemplate: TemplateRef<SelectedItemTemplateContextInterface> | null = null;
 
   // selected items
   @Input() disableShowSelectedItems = false;
