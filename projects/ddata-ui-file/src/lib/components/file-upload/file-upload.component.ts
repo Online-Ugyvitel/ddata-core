@@ -16,7 +16,7 @@ import {
   faUpload,
   IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
-import { ID, SpinnerService, SpinnerServiceInterface } from 'ddata-core';
+import { SpinnerService, SpinnerServiceInterface } from 'ddata-core';
 import { forkJoin } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { DdataUiFileModule } from '../../ddata-ui-file.module';
@@ -51,7 +51,7 @@ export class DdataUiFileUploadComponent {
 
   // tslint:disable-next-line: variable-name
   _inputData: Record<string, unknown> = {
-    folder_id: 1 as ID
+    folder_id: 1
   };
 
   i18n = fileText[this.config.lang];

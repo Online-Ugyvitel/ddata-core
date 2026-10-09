@@ -294,6 +294,11 @@ export class ValidatorService {
   }
 
   isNumber(data: any): boolean {
+    // numeric strings (e.g. values of input fields) are numbers, other strings are not
+    if (typeof data === 'string') {
+      return data.trim() !== '' && !Number.isNaN(Number(data));
+    }
+
     return !Number.isNaN(data);
   }
 

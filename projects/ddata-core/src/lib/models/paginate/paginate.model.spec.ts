@@ -11,6 +11,7 @@ class MockModel {
       this.id = data.id || 0;
       this.name = data.name || '';
     }
+
     return this;
   }
 }
@@ -25,12 +26,14 @@ describe('Paginate', () => {
   describe('Model Creation', () => {
     it('should be created with valid type parameter', () => {
       const paginate = new Paginate(mockType);
+
       expect(paginate).toBeTruthy();
       expect(paginate).toBeInstanceOf(Paginate);
     });
 
     it('should create empty instance when created without type parameter', () => {
       const paginate = new Paginate(null);
+
       expect(paginate).toBeInstanceOf(Paginate);
       expect(paginate.current_page).toBeUndefined();
       expect(paginate.per_page).toBeUndefined();
@@ -39,6 +42,7 @@ describe('Paginate', () => {
 
     it('should create empty instance when created with undefined type parameter', () => {
       const paginate = new Paginate(undefined);
+
       expect(paginate).toBeInstanceOf(Paginate);
       expect(paginate.current_page).toBeUndefined();
       expect(paginate.per_page).toBeUndefined();
@@ -47,6 +51,7 @@ describe('Paginate', () => {
 
     it('should create empty instance when created with falsy type parameter', () => {
       const paginate = new Paginate('');
+
       expect(paginate).toBeInstanceOf(Paginate);
       expect(paginate.current_page).toBeUndefined();
       expect(paginate.per_page).toBeUndefined();
@@ -57,11 +62,13 @@ describe('Paginate', () => {
   describe('Type Verification', () => {
     it('should be an instance of Paginate class', () => {
       const paginate = new Paginate(mockType);
+
       expect(paginate).toBeInstanceOf(Paginate);
     });
 
     it('should implement PaginateInterface', () => {
       const paginate = new Paginate(mockType);
+
       expect(paginate).toEqual(jasmine.any(Object));
       // Verify it has all interface properties
       expect(paginate.hasOwnProperty('current_page')).toBe(true);
@@ -172,6 +179,7 @@ describe('Paginate', () => {
 
     it('should set default values when empty data object is provided', () => {
       const paginate = new Paginate(mockType, {});
+
       expect(paginate.current_page).toBe(1);
       expect(paginate.per_page).toBe(1);
       expect(paginate.from).toBe(1);
@@ -192,7 +200,6 @@ describe('Paginate', () => {
         total: 100,
         last_page: 10
       };
-
       const paginate = new Paginate(mockType, testData);
 
       expect(paginate.current_page).toBe(3);
@@ -212,7 +219,6 @@ describe('Paginate', () => {
         total: '',
         last_page: NaN
       };
-
       const paginate = new Paginate(mockType, testData);
 
       expect(paginate.current_page).toBe(1);
@@ -228,7 +234,6 @@ describe('Paginate', () => {
         current_page: 5,
         total: 50
       };
-
       const paginate = new Paginate(mockType, testData);
 
       expect(paginate.current_page).toBe(5);
@@ -243,12 +248,14 @@ describe('Paginate', () => {
   describe('Data Array Handling', () => {
     it('should initialize empty data array when no data.data is provided', () => {
       const paginate = new Paginate(mockType);
+
       expect(paginate.data).toEqual([]);
     });
 
     it('should initialize empty data array when data.data is falsy', () => {
       const testData = { data: null };
       const paginate = new Paginate(mockType, testData);
+
       expect(paginate.data).toEqual([]);
     });
 
@@ -259,7 +266,6 @@ describe('Paginate', () => {
           { id: 2, name: 'Item 2' }
         ]
       };
-
       const paginate = new Paginate(mockType, testData);
 
       expect(paginate.data.length).toBe(2);
@@ -274,6 +280,7 @@ describe('Paginate', () => {
     it('should handle empty data array correctly', () => {
       const testData = { data: [] };
       const paginate = new Paginate(mockType, testData);
+
       expect(paginate.data).toEqual([]);
     });
 
@@ -281,11 +288,9 @@ describe('Paginate', () => {
       const mockTypeWithSpy = jasmine.createSpy('MockType').and.returnValue({
         init: jasmine.createSpy('init').and.returnValue({ id: 0, name: '' })
       });
-
       const testData = {
         data: [{ id: 1, name: 'Test' }]
       };
-
       const paginate = new Paginate(mockTypeWithSpy, testData);
 
       expect(mockTypeWithSpy).toHaveBeenCalled();
@@ -296,6 +301,7 @@ describe('Paginate', () => {
   describe('Edge Cases', () => {
     it('should handle null data parameter gracefully', () => {
       const paginate = new Paginate(mockType, null);
+
       expect(paginate.current_page).toBe(1);
       expect(paginate.per_page).toBe(1);
       expect(paginate.from).toBe(1);
@@ -307,6 +313,7 @@ describe('Paginate', () => {
 
     it('should handle undefined data parameter gracefully', () => {
       const paginate = new Paginate(mockType, undefined);
+
       expect(paginate.current_page).toBe(1);
       expect(paginate.data).toEqual([]);
     });
@@ -327,7 +334,6 @@ describe('Paginate', () => {
           { id: 10, name: 'Item 10' }
         ]
       };
-
       const paginate = new Paginate(mockType, testData);
 
       expect(paginate.current_page).toBe(2);
@@ -349,7 +355,6 @@ describe('Paginate', () => {
           {} // missing both
         ]
       };
-
       const paginate = new Paginate(mockType, testData);
 
       expect(paginate.data.length).toBe(3);
@@ -373,7 +378,6 @@ describe('Paginate', () => {
         last_page: 10,
         data: [{ id: 31, name: 'Test Item' }]
       };
-
       const paginate = new Paginate(mockType, testData);
 
       // Verify types remain consistent
@@ -398,11 +402,12 @@ describe('Paginate', () => {
 
     it('should preserve data array type as any[]', () => {
       const paginate = new Paginate(mockType);
+
       expect(Array.isArray(paginate.data)).toBe(true);
-      
       // Should be able to contain instances of the provided type
       const testData = { data: [{ id: 1, name: 'Test' }] };
       const paginateWithData = new Paginate(mockType, testData);
+
       expect(paginateWithData.data[0]).toBeInstanceOf(MockModel);
     });
   });

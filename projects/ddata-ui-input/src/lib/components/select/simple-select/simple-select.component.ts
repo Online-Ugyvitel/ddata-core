@@ -16,7 +16,7 @@ export class DdataSimpleSelectComponent {
   @Input() inputBlockClass = 'col-12 d-flex px-0';
   @Input() inputBlockExtraClass = 'col-md-9';
   @Input() unselectedText = 'Válassz';
-  @Input() isRequire = false;
+  @Input() isRequired = false;
   @Input() disabledAppearance = false;
   @Input() disabled = false;
   @Input() addEmptyOption = true;
@@ -25,7 +25,7 @@ export class DdataSimpleSelectComponent {
   @Input() labelText = '';
   @Input() prepend = '';
   @Input() append = '';
-  @Input() model: BaseModelInterface<unknown> & FieldsInterface<unknown>;
+  @Input() model: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null = null;
   @Input() field = 'id';
   @Input() items: Array<unknown> = [];
   @Input() text = 'name';
@@ -46,7 +46,13 @@ export class DdataSimpleSelectComponent {
   }
 
   selectItem(): void {
-    this.selectedModel = this.items.find((item) => item[this.field] === this.model[this.field]);
+    if (!this.model) {
+      return;
+    }
+
+    this.selectedModel = this.items.find(
+      (item) => item[this.valueField] === this.model[this.field]
+    );
 
     this.selected.emit(this.model[this.field]);
     this.selectModel.emit(this.selectedModel);

@@ -279,7 +279,7 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     const result = {};
 
     Object.keys(fields).forEach((field: string) => {
-      result[field] = this[field] ?? String(fields[field]) ?? '';
+      result[field] = this[field] ?? String(fields[field]);
     });
 
     return result;
@@ -289,7 +289,7 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     const result = {};
 
     Object.keys(fields).forEach((field: string) => {
-      result[field] = this[field] ?? Number(fields[field]) ?? 0;
+      result[field] = this[field] ?? Number(fields[field]);
     });
 
     return result;
@@ -299,7 +299,7 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     const result = {};
 
     Object.keys(fields).forEach((field: string) => {
-      result[field] = this[field] ?? Boolean(fields[field]) ?? false;
+      result[field] = this[field] ?? Boolean(fields[field]);
     });
 
     return result;
@@ -307,7 +307,7 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
 
   initModelOrNull(fields: Partial<ModelWithId>, data: unknown): void {
     Object.keys(fields).forEach((field: string) => {
-      this[field] = fields[field]?.init(data[field]) ?? null;
+      this[field] = data && data[field] ? (fields[field]?.init(data[field]) ?? null) : null;
     });
   }
 
@@ -325,7 +325,7 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
 
   fieldAsBoolean(field: string, defaultValue: boolean, data: unknown): void {
     this[field] =
-      data[field] !== undefined && data[field] !== null && typeof data[field] === 'boolean'
+      data && data[field] !== undefined && data[field] !== null && typeof data[field] === 'boolean'
         ? data[field]
         : defaultValue;
   }
@@ -343,7 +343,10 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
   }
 
   fieldAsString(field: string, defaultValue: string, data: unknown): void {
-    this[field] = data[field]?.toString() ?? defaultValue ?? '';
+    this[field] =
+      data && data[field] !== undefined && data[field] !== null
+        ? data[field].toString()
+        : (defaultValue ?? '');
   }
 
   initAsNumber(fields: Partial<ModelWithId>, data: unknown): void {
@@ -359,7 +362,10 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
   }
 
   fieldAsNumber(field: string, defaultValue: number, data: unknown): void {
-    this[field] = !!data[field] ? Number(data[field]) : defaultValue;
+    this[field] =
+      data && data[field] !== undefined && data[field] !== null
+        ? Number(data[field])
+        : defaultValue;
   }
 
   getCurrentTime(): string {

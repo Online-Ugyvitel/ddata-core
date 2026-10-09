@@ -11,8 +11,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
   standalone: false
 })
 export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
-  @Input() spinnerService: SpinnerServiceInterface =
-    DdataCoreModule.InjectorInstance.get<SpinnerService>(SpinnerService);
+  @Input() spinnerService: SpinnerServiceInterface;
 
   subscriptions: Subscription = new Subscription();
   spinner$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -30,7 +29,15 @@ export class DdataUiLoadingOverlayComponent implements OnInit, OnDestroy {
     spinner: faSpinner
   };
 
-  constructor() {}
+  constructor() {
+    if (!this.spinnerService && DdataCoreModule.InjectorInstance) {
+      try {
+        this.spinnerService = DdataCoreModule.InjectorInstance.get(SpinnerService);
+      } catch {
+        // ignore if injector not ready; tests can supply mock via @Input()
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.subscriptions.add(

@@ -5,9 +5,9 @@ on:
     branches: [ master, main ]
 
 jobs:
-  # Job to install dependencies and build core - this provides artifacts for other jobs
-  setup:
+  test-and-lint:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -15,7 +15,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22.12.0'
+        node-version: '24'
         # Disable npm cache to avoid authentication issues
         # cache: 'npm'
 
@@ -26,144 +26,40 @@ jobs:
         npm config set registry https://registry.npmjs.org/
         npm config delete //registry.npmjs.org/:_authToken || true
         npm whoami || echo "Not logged in to npm (this is expected)"
-        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts --no-optional
+        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
 
-    - name: Cache node modules and built artifacts
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-          dist
-          .eslintcache
-        key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
-        restore-keys: |
-          ${{ runner.os }}-deps-build-
-          ${{ runner.os }}-deps-
-
-  # Matrix job for linting each project in parallel
-  lint:
-    needs: setup
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      ACTIONS_RUNNER_DEBUG: true
-      ACTIONS_STEP_DEBUG: true
-      NODE_OPTIONS: --max_old_space_size=4096
-    strategy:
-      fail-fast: false # Don't cancel other jobs if one fails
-      matrix:
-        project: [
-          'ddata-lib',
-          'ddata-core',
-          'ddata-ui',
-          'ddata-ui-input',
-          'ddata-ui-file',
-          'ddata-ui-dialog',
-          'ddata-ui-common',
-          'ddata-a11y'
-        ]
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.12.0'
-
-    - name: Restore cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-          dist
-          .eslintcache
-        key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
-        restore-keys: |
-          ${{ runner.os }}-deps-build-
-          ${{ runner.os }}-deps-
-
-    - name: Install Angular CLI
-      run: npm install -g @angular/cli
-
-    - name: Run lint for ${{ matrix.project }}
-      timeout-minutes: 10
+    # The packages import each other through their built output, so they are built in dependency order.
+    - name: Build packages
       run: |
-        echo "Starting lint for project: ${{ matrix.project }}"
-        echo "Current working directory: $(pwd)"
-        echo "Node.js version: $(node --version)"
-        echo "npm version: $(npm --version)"
-        
-        if [ "${{ matrix.project }}" = "ddata-lib" ]; then
-          echo "Linting ddata-lib project"
-          npm run lint
-        else
-          echo "Linting project: ${{ matrix.project }}"
-          ng lint ${{ matrix.project }}
-        fi
-        echo "Lint completed successfully for ${{ matrix.project }}"
+        npm run build:core
+        npm run build:a11y
+        npm run build:ui-common
+        npm run build:ui-dialog
+        npm run build:ui-input
+        npm run build:ui-file
 
-  # Matrix job for testing each project in parallel
-  test:
-    needs: setup
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false # Don't cancel other jobs if one fails
-      matrix:
-        project: [
-          'ddata-lib',
-          'ddata-core',
-          'ddata-ui',
-          'ddata-ui-input',
-          'ddata-ui-file',
-          'ddata-ui-dialog',
-          'ddata-ui-common',
-          'ddata-a11y'
-        ]
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: Lint
+      run: npm run lint
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.12.0'
+    - name: Test main app
+      run: npm run test
 
-    - name: Restore cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-          dist
-          .eslintcache
-        key: ${{ runner.os }}-deps-build-${{ hashFiles('package.json', 'package-lock.json', 'angular.json') }}
-        restore-keys: |
-          ${{ runner.os }}-deps-build-
-          ${{ runner.os }}-deps-
+    # ddata-ui is not tested yet: it still imports files of the consuming application
+    # and private FontAwesome Pro packages that are not available in CI.
+    - name: Test ddata-core
+      run: npx ng test ddata-core --no-watch --browsers=ChromeHeadless
 
-    - name: Install Angular CLI
-      run: npm install -g @angular/cli
+    - name: Test ddata-ui-input
+      run: npx ng test ddata-ui-input --no-watch --browsers=ChromeHeadless
 
-    - name: Run tests for ${{ matrix.project }}
-      run: |
-        echo "Starting tests for project: ${{ matrix.project }}"
-        npx ng test ${{ matrix.project }} --no-watch --browsers=ChromeHeadless
-        echo "Tests completed for ${{ matrix.project }}"
-      continue-on-error: true
+    - name: Test ddata-ui-file
+      run: npx ng test ddata-ui-file --no-watch --browsers=ChromeHeadless
 
-  # Summary job that depends on all lint and test jobs
-  ci-summary:
-    needs: [lint, test]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-    - name: Check all jobs status
-      run: |
-        echo "Lint jobs status: ${{ needs.lint.result }}"
-        echo "Test jobs status: ${{ needs.test.result }}"
-        if [ "${{ needs.lint.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ]; then
-          echo "Some jobs failed. Check individual job logs for details."
-          exit 1
-        else
-          echo "All CI checks passed successfully!"
-        fi
+    - name: Test ddata-ui-dialog
+      run: npx ng test ddata-ui-dialog --no-watch --browsers=ChromeHeadless
+
+    - name: Test ddata-ui-common
+      run: npx ng test ddata-ui-common --no-watch --browsers=ChromeHeadless
+
+    - name: Test ddata-a11y
+      run: npx ng test ddata-a11y --no-watch --browsers=ChromeHeadless
