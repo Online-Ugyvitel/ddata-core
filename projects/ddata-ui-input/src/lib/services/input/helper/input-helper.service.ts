@@ -4,7 +4,7 @@ import {
   FieldsInterface,
   ValidatorService,
   ValidatorServiceInterface
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import { InputHelperServiceInterface } from './input-helper-service.interface';
 
 export class InputHelperService implements InputHelperServiceInterface {

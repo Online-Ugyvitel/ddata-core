@@ -14,7 +14,7 @@ import {
   DdataCoreModule,
   ValidatorService,
   ValidatorServiceInterface
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import { InputHelperService } from './input-helper.service';
 
 // Mock model interface for testing

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { DdataSimpleSelectComponent } from './simple-select.component';
-import { DdataCoreModule, BaseModelInterface, FieldsInterface } from 'ddata-core';
+import { DdataCoreModule, BaseModelInterface, FieldsInterface } from '@netdjw/ddata-core';
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
 
 type MockModel = BaseModelInterface<unknown> & FieldsInterface<unknown>;

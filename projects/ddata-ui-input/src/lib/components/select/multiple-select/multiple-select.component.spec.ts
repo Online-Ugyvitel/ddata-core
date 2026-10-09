@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DdataMultipleSelectComponent } from './multiple-select.component';
 import { DialogContentWithOptionsInterface } from '../../../models/dialog/content/dialog-content.interface';
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
-import { DdataCoreModule, BaseModelInterface, FieldsInterface } from 'ddata-core';
+import { DdataCoreModule, BaseModelInterface, FieldsInterface } from '@netdjw/ddata-core';
 
 type MockModel = BaseModelInterface<unknown> & FieldsInterface<unknown>;
 
