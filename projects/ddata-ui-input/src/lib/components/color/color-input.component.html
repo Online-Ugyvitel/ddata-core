@@ -5,9 +5,13 @@
   </label>
 
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div class="input-color-container" [style.background]="model[_field]" (click)="toggle=!toggle"></div>
+    <div
+      class="input-color-container"
+      [style.background]="model[_field]"
+      (click)="toggle = !toggle"
+    ></div>
 
-    <div class="input-group-prepend" *ngIf=" _prepend != '' ">
+    <div class="input-group-prepend" *ngIf="_prepend !== ''">
       <div class="input-group-text">{{ _prepend }}</div>
     </div>
 
@@ -28,11 +32,11 @@
       cpAlphaChannel="disabled"
       cpFallbackColor="#c0c0c0"
       (keyup)="validateField()"
-      #inputBox>
+      #inputBox
+    />
 
-    <div class="input-group-append" *ngIf="_append != ''">
+    <div class="input-group-append" *ngIf="_append !== ''">
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-
 </div>

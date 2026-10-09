@@ -5,29 +5,27 @@
   </label>
 
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-
-    <div class="input-group-prepend" *ngIf=" _prepend != '' ">
+    <div class="input-group-prepend" *ngIf="_prepend !== ''">
       <div class="input-group-text">{{ _prepend }}</div>
     </div>
 
     <ng-container *ngIf="!isViewOnly">
-
-        <input
-          [class.invalid]="model.validationErrors.includes(_field)"
-          [class]="inputClass"
-          [disabled]="disabled"
-          [id]="_field + '_' + random"
-          [name]="_field + '_' + random"
-          [placeholder]="_placeholder"
-          [title]="_title"
-          [value]="model[_field]"
-          (dateSelect)="change($event)"
-          type="text"
-          ngbDatepicker
-          #d="ngbDatepicker"
-          (click)="d.toggle()"
-          (change)="typeChange($event)">
-
+      <input
+        [class.invalid]="model.validationErrors.includes(_field)"
+        [class]="inputClass"
+        [disabled]="disabled"
+        [id]="_field + '_' + random"
+        [name]="_field + '_' + random"
+        [placeholder]="_placeholder"
+        [title]="_title"
+        [value]="model[_field]"
+        (dateSelect)="change($event)"
+        type="text"
+        ngbDatepicker
+        #d="ngbDatepicker"
+        (click)="d.toggle()"
+        (change)="typeChange($event)"
+      />
     </ng-container>
 
     <ng-container *ngIf="isViewOnly">
@@ -38,9 +36,8 @@
       <fa-icon [icon]="icon.calendar"></fa-icon>
     </label>
 
-    <div class="input-group-append" *ngIf="_append != ''">
+    <div class="input-group-append" *ngIf="_append !== ''">
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-
 </div>
