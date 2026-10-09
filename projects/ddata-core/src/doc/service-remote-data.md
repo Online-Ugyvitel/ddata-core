@@ -217,11 +217,11 @@ HTTP errors propagate to the subscriber, as with `getUri` and `postUri`.
 
 ### Headers for custom URI requests
 
-All three methods accept an optional `RequestHeaders` parameter, exported by `ddata-core`:
+All three methods accept an optional `RequestHeaders` parameter, exported by `@netdjw/ddata-core`:
 
 ```typescript
 import { HttpHeaders } from '@angular/common/http';
-import { RequestHeaders } from 'ddata-core';
+import { RequestHeaders } from '@netdjw/ddata-core';
 
 const headers: RequestHeaders = new HttpHeaders({
   'X-Request-Id': 'request-42',
