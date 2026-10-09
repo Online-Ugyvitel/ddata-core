@@ -2,8 +2,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChangeDetectorRef, ViewContainerRef, Component, EventEmitter } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { BaseModel } from 'ddata-core';
-import { DdataUiNoDataComponent } from 'ddata-ui-common';
+import { BaseModel } from '@netdjw/ddata-core';
+import { DdataUiNoDataComponent } from '@netdjw/ddata-ui-common';
 
 import { DdataUiModalDialogComponent } from './modal-dialog.component';
 import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';

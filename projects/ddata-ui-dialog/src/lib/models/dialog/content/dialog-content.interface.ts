@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { Type } from '@angular/core';
-import { BaseModelWithoutTypeDefinitionInterface } from 'ddata-core';
+import { BaseModelWithoutTypeDefinitionInterface } from '@netdjw/ddata-core';
 
 interface DialogOptionsInterface {
   saveModel?: Observable<BaseModelWithoutTypeDefinitionInterface>;
