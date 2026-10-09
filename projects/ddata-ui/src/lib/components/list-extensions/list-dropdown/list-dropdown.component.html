@@ -4,26 +4,48 @@
 <mat-menu #menu="matMenu">
   <!-- ha a szerkesztés külön navigációval történik -->
   <ng-container *ngIf="!!editLink.length">
-    <button mat-menu-item
-      class="btn btn-light" type="button" [routerLink]="editLink"
-      title="Módosítás">
+    <button
+      mat-menu-item
+      class="btn btn-light"
+      type="button"
+      [routerLink]="editLink"
+      title="Módosítás"
+    >
       <!-- <fa-icon [icon]="icon.pencil"></fa-icon> -->
       <span> Szerkesztés</span>
     </button>
   </ng-container>
   <ng-container *ngIf="showDelete">
-    <button mat-menu-item class="btn btn-light" type="button" (click)="customDropdownEvent.emit('delete')" title="Törlés">
+    <button
+      mat-menu-item
+      class="btn btn-light"
+      type="button"
+      (click)="customDropdownEvent.emit('delete')"
+      title="Törlés"
+    >
       <!-- <fa-icon [icon]="icon.trash"></fa-icon> -->
       <span> Törlés</span>
     </button>
   </ng-container>
 
   <ng-container *ngFor="let item of customDropdownItems">
-    <button *ngIf="!!item.link" mat-menu-item class="btn btn-light" type="button" [routerLink]="item.link">
+    <button
+      *ngIf="!!item.link"
+      mat-menu-item
+      class="btn btn-light"
+      type="button"
+      [routerLink]="item.link"
+    >
       <!-- <fa-icon *ngIf="!!item.icon" [icon]="icon[item.icon]"></fa-icon> -->
       <span> {{ item.name }}</span>
     </button>
-    <button *ngIf="!!item.eventMsg" mat-menu-item class="btn btn-light" type="button" (click)="customDropdownEvent.emit(item.eventMsg)">
+    <button
+      *ngIf="!!item.eventMsg"
+      mat-menu-item
+      class="btn btn-light"
+      type="button"
+      (click)="customDropdownEvent.emit(item.eventMsg)"
+    >
       <!-- <fa-icon *ngIf="!!item.icon" [icon]="icon[item.icon]"></fa-icon> -->
       <span> {{ item.name }}</span>
     </button>
@@ -34,8 +56,13 @@
   </ng-container>
 
   <ng-container *ngFor="let type of certificationTypes">
-    <button mat-menu-item class="btn btn-light" type="button" (click)="createCertificate(type.id)"
-      *ngIf="isShowElement(type.id)">
+    <button
+      mat-menu-item
+      class="btn btn-light"
+      type="button"
+      (click)="createCertificate(type.id)"
+      *ngIf="isShowElement(type.id)"
+    >
       <!-- <fa-icon *ngIf="!!type.icon" [icon]="icon[type.icon]"></fa-icon> -->
       {{ type.name }}
     </button>

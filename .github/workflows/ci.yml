@@ -15,7 +15,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22.12.0'
+        node-version: '24'
         # Disable npm cache to avoid authentication issues
         # cache: 'npm'
 
@@ -26,16 +26,40 @@ jobs:
         npm config set registry https://registry.npmjs.org/
         npm config delete //registry.npmjs.org/:_authToken || true
         npm whoami || echo "Not logged in to npm (this is expected)"
-        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts --no-optional
-        npm run build:core
+        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
 
-    - name: Run lint
+    # The packages import each other through their built output, so they are built in dependency order.
+    - name: Build packages
+      run: |
+        npm run build:core
+        npm run build:a11y
+        npm run build:ui-common
+        npm run build:ui-dialog
+        npm run build:ui-input
+        npm run build:ui-file
+
+    - name: Lint
       run: npm run lint
 
-    - name: Run tests
+    - name: Test main app
       run: npm run test
-      continue-on-error: true
 
-    - name: Test results summary
-      if: always()
-      run: echo "CI pipeline completed. Check individual steps for details."
+    # ddata-ui is not tested yet: it still imports files of the consuming application
+    # and private FontAwesome Pro packages that are not available in CI.
+    - name: Test ddata-core
+      run: npx ng test ddata-core --no-watch --browsers=ChromeHeadless
+
+    - name: Test ddata-ui-input
+      run: npx ng test ddata-ui-input --no-watch --browsers=ChromeHeadless
+
+    - name: Test ddata-ui-file
+      run: npx ng test ddata-ui-file --no-watch --browsers=ChromeHeadless
+
+    - name: Test ddata-ui-dialog
+      run: npx ng test ddata-ui-dialog --no-watch --browsers=ChromeHeadless
+
+    - name: Test ddata-ui-common
+      run: npx ng test ddata-ui-common --no-watch --browsers=ChromeHeadless
+
+    - name: Test ddata-a11y
+      run: npx ng test ddata-a11y --no-watch --browsers=ChromeHeadless
