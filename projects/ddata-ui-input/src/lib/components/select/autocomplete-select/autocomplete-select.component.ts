@@ -1,89 +1,69 @@
-import { Component, EventEmitter, Input, Output, ViewChild, ElementRef, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  ElementRef,
+  HostListener,
+  OnInit,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
 import { InputHelperServiceInterface } from '../../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
 
 @Component({
-  selector: 'autocomplete-select',
+  selector: 'dd-autocomplete-select',
   templateUrl: './autocomplete-select.component.html',
-  styleUrls: ['./autocomplete-select.component.scss']
+  styleUrls: ['./autocomplete-select.component.scss'],
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DdataAutocompleteSelectComponent implements OnInit {
-  private helperService: InputHelperServiceInterface;
-  private random: string;
-  private selectedModel: any;
-
-  // Internal state
-  @ViewChild('inputBox') inputBox: ElementRef;
-  isOpen = false;
-  filteredItems: any[] = [];
-  selectedIndex = -1;
-  inputValue = '';
-
-  // look & feel
+  // All @Input and @Output properties first
   @Input() wrapperClass = 'd-flex flex-wrap';
   @Input() inputBlockClass = 'col-12 d-flex px-0';
   @Input() inputBlockExtraClass = 'col-md-9';
   @Input() unselectedText = 'Válassz vagy írj...';
-
-  // behavior
   @Input() isRequired = false;
   @Input() disabledAppearance = false;
   @Input() disabled = false;
   @Input() addEmptyOption = true;
-
-  // label
   @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
   @Input() showLabel = true;
   @Input() labelText = '';
-
-  // additional texts
   @Input() prepend = '';
   @Input() append = '';
-
-  // data
-  @Input() model: BaseModelInterface<any> & FieldsInterface<any>;
+  @Input() model: BaseModelInterface<unknown> & FieldsInterface<unknown>;
   @Input() field = 'id';
-  @Input() items: any[] = [];
+  @Input() items: Array<unknown> = [];
   @Input() text = 'name';
   @Input() valueField = 'id';
 
-  @Output() selected: EventEmitter<any> = new EventEmitter();
-  @Output() selectModel: EventEmitter<any> = new EventEmitter();
+  @Output() readonly selected: EventEmitter<unknown> = new EventEmitter();
+  @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter();
+
+  @ViewChild('inputBox') inputBox: ElementRef;
+
+  // Private and internal fields after @Input/@Output
+  private helperService: InputHelperServiceInterface;
+  private random: string;
+  private selectedModel: unknown;
+
+  // Internal state
+  isOpen = false;
+  filteredItems: Array<unknown> = [];
+  selectedIndex = -1;
+  inputValue = '';
+
+  constructor(private readonly elementRef: ElementRef) {}
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event): void {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.closeDropdown();
     }
-  }
-
-  constructor(private elementRef: ElementRef) {}
-
-  private getHelperService(): InputHelperServiceInterface {
-    if (!this.helperService) {
-      this.helperService = DdataCoreModule.InjectorInstance?.get<InputHelperServiceInterface>(InputHelperService);
-    }
-    return this.helperService;
-  }
-
-  get id(): string {
-    if (!this.random) {
-      this.random = this.getHelperService()?.randChars() || 'autocomplete-' + Math.random().toString(36).substr(2, 9);
-    }
-    return `${this.field}_${this.random}`;
-  }
-
-  get listboxId(): string {
-    return `${this.id}_listbox`;
-  }
-
-  get selectedItemText(): string {
-    if (!this.model[this.field]) {
-      return '';
-    }
-    const selectedItem = this.items.find(item => item[this.valueField] === this.model[this.field]);
-    return selectedItem ? selectedItem[this.text] : '';
   }
 
   ngOnInit(): void {
@@ -97,6 +77,7 @@ export class DdataAutocompleteSelectComponent implements OnInit {
 
   onInput(event: Event): void {
     const target = event.target as HTMLInputElement;
+
     this.inputValue = target.value;
     this.filterItems();
     this.openDropdown();
@@ -125,17 +106,80 @@ export class DdataAutocompleteSelectComponent implements OnInit {
       case 'Tab':
         this.closeDropdown();
         break;
+      default:
+        // Handle other key presses if needed
+        break;
     }
+  }
+
+  selectItem(item: unknown, index?: number): void {
+    this.selectedModel = item;
+    this.model[this.field] = item[this.valueField];
+    this.inputValue = item[this.text];
+
+    if (typeof index === 'number') {
+      this.selectedIndex = index;
+    }
+
+    this.closeDropdown();
+
+    this.selected.emit(this.model[this.field]);
+    this.selectModel.emit(this.selectedModel);
+  }
+
+  getOptionId(index: number): string {
+    return `${this.listboxId}_option_${index}`;
+  }
+
+  getActiveDescendant(): string | null {
+    return this.isOpen && this.selectedIndex >= 0 ? this.getOptionId(this.selectedIndex) : null;
+  }
+
+  private getHelperService(): InputHelperServiceInterface {
+    if (!this.helperService) {
+      this.helperService =
+        DdataCoreModule.InjectorInstance?.get<InputHelperServiceInterface>(InputHelperService);
+    }
+
+    return this.helperService;
+  }
+
+  get id(): string {
+    if (!this.random) {
+      const helperRandom = this.getHelperService()?.randChars();
+      const randomBase = Math.random().toString(36);
+      const fallbackRandom = randomBase.substr(2, 9);
+
+      this.random = helperRandom || `autocomplete-${fallbackRandom}`;
+    }
+
+    return `${this.field}_${this.random}`;
+  }
+
+  get listboxId(): string {
+    return `${this.id}_listbox`;
+  }
+
+  get selectedItemText(): string {
+    if (!this.model[this.field]) {
+      return '';
+    }
+    const selectedItem = this.items.find(
+      (item) => item[this.valueField] === this.model[this.field]
+    );
+
+    return selectedItem ? selectedItem[this.text] : '';
   }
 
   private filterItems(): void {
     if (!this.inputValue.trim()) {
       this.filteredItems = [...this.items];
+
       return;
     }
-
     const searchText = this.inputValue.toLowerCase();
-    this.filteredItems = this.items.filter(item =>
+
+    this.filteredItems = this.items.filter((item) =>
       item[this.text].toLowerCase().includes(searchText)
     );
   }
@@ -154,6 +198,7 @@ export class DdataAutocompleteSelectComponent implements OnInit {
   private navigateDown(): void {
     if (!this.isOpen) {
       this.openDropdown();
+
       return;
     }
 
@@ -168,32 +213,9 @@ export class DdataAutocompleteSelectComponent implements OnInit {
     }
   }
 
-  selectItem(item: any, index?: number): void {
-    this.selectedModel = item;
-    this.model[this.field] = item[this.valueField];
-    this.inputValue = item[this.text];
-
-    if (typeof index === 'number') {
-      this.selectedIndex = index;
-    }
-
-    this.closeDropdown();
-
-    this.selected.emit(this.model[this.field]);
-    this.selectModel.emit(this.selectedModel);
-  }
-
   private selectCurrentItem(): void {
     if (this.isOpen && this.selectedIndex >= 0 && this.selectedIndex < this.filteredItems.length) {
       this.selectItem(this.filteredItems[this.selectedIndex], this.selectedIndex);
     }
-  }
-
-  getOptionId(index: number): string {
-    return `${this.listboxId}_option_${index}`;
-  }
-
-  getActiveDescendant(): string | null {
-    return this.isOpen && this.selectedIndex >= 0 ? this.getOptionId(this.selectedIndex) : null;
   }
 }

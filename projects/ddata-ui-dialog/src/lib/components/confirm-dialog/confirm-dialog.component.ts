@@ -1,15 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { faExclamationTriangle, faInfoCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { DialogType } from '../../models/dialog/dialog.interface';
 
-declare var $: any;
 @Component({
-    selector: 'dd-confirm-dialog',
-    templateUrl: './confirm-dialog.component.html',
-    styleUrls: ['./confirm-dialog.component.scss'],
-    standalone: false
+  selector: 'dd-confirm-dialog',
+  templateUrl: './confirm-dialog.component.html',
+  styleUrls: ['./confirm-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
-export class DdataUiConfirmDialogComponent implements OnInit {
+export class DdataUiConfirmDialogComponent {
   @Input() title = '';
   @Input() content = '';
   @Input() type: DialogType = 'message';
@@ -19,21 +19,16 @@ export class DdataUiConfirmDialogComponent implements OnInit {
   @Input() cancelButtonText = 'Cancel';
   @Input() closeButtonText = 'Close';
 
-  @Output() confirm: EventEmitter<any> = new EventEmitter();
-  @Output() pressed: EventEmitter<boolean> = new EventEmitter();
+  @Output() readonly confirm: EventEmitter<void> = new EventEmitter();
+  @Output() readonly pressed: EventEmitter<boolean> = new EventEmitter();
 
   confirmed = false;
 
   icon = {
     close: faTimes,
     info: faInfoCircle,
-    alert: faExclamationTriangle,
+    alert: faExclamationTriangle
   };
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
 
   cancel(): void {
     this.showDialog = false;

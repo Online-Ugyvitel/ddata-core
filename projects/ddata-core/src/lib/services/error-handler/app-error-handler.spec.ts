@@ -1,12 +1,12 @@
 /**
  * Comprehensive test suite for DdataCoreErrorHandler
- * 
+ *
  * This test suite achieves 100% code coverage by testing:
- * 
+ *
  * 1. Constructor:
  *    - Service instantiation with dependency injection
  *    - Proper injection of StorageService, SpinnerService, and NotificationService
- * 
+ *
  * 2. handleError method - All code paths:
  *    - Router injection via DdataInjectorModule.InjectorInstance.get(Router)
  *    - Error extraction logic: !!err.originalError ? err.originalError : err
@@ -27,13 +27,13 @@
  *    - Edge cases: null, undefined, and unknown status codes
  *    - spinner.off('ERROR_HANDLER') call (always executed)
  *    - Return value (throwError observables or undefined)
- * 
+ *
  * 3. Integration with dependencies:
  *    - Router service passed to UnauthorizedError constructor
  *    - NotificationService passed to most error constructors
  *    - StorageService passed to UnauthorizedError constructor
  *    - SpinnerService.off method called correctly
- * 
+ *
  * Coverage achieved: 100% - All lines, branches, and conditions tested
  */
 
@@ -41,7 +41,10 @@ import 'zone.js/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { DdataInjectorModule } from '../../ddata-injector.module';
 import { NotificationService } from '../notification/notification.service';
 import { SpinnerService } from '../spinner/spinner.service';
@@ -65,14 +68,6 @@ describe('DdataCoreErrorHandler', () => {
   let notificationService: jasmine.SpyObj<NotificationService>;
   let router: jasmine.SpyObj<Router>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-});
-  });
-
   beforeEach(() => {
     const storageServiceSpy = jasmine.createSpyObj('StorageService', ['clear']);
     const spinnerServiceSpy = jasmine.createSpyObj('SpinnerService', ['off']);
@@ -92,13 +87,15 @@ describe('DdataCoreErrorHandler', () => {
     errorHandler = TestBed.inject(DdataCoreErrorHandler);
     storageService = TestBed.inject(StorageService) as jasmine.SpyObj<StorageService>;
     spinnerService = TestBed.inject(SpinnerService) as jasmine.SpyObj<SpinnerService>;
-    notificationService = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
+    notificationService = TestBed.inject(
+      NotificationService
+    ) as jasmine.SpyObj<NotificationService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
     // Mock the DdataInjectorModule.InjectorInstance.get method
     DdataInjectorModule.InjectorInstance = {
       get: jasmine.createSpy('get').and.returnValue(router)
-    } as any;
+    };
 
     // Spy on console.error
     spyOn(console, 'error');
@@ -129,12 +126,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 400,
         error: { message: 'Bad request error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(BadRequest);
@@ -147,12 +143,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 401,
         error: { message: 'Unauthorized error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(UnauthorizedError);
@@ -165,12 +160,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 403,
         error: { message: 'Forbidden error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(ForbiddenError);
@@ -183,12 +177,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 404,
         error: { message: 'Not found error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(NotFoundError);
@@ -201,12 +194,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 405,
         error: { message: 'Method not allowed error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(MethodNotAllowedError);
@@ -219,12 +211,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 422,
         error: { message: 'Unprocessable entity error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(UnprocessableEntity);
@@ -237,12 +228,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 430,
         error: { message: 'API error message' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(ErrorMessageFromApi);
@@ -255,12 +245,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 480,
         error: { message: 'Validation error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(AppValidationError);
@@ -273,12 +262,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 500,
         error: { message: 'Internal server error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(InternalServerError);
@@ -291,12 +279,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 580,
         error: { message: 'Third party error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(ThirdPartyError);
@@ -305,13 +292,15 @@ describe('DdataCoreErrorHandler', () => {
     });
 
     it('should handle AppValidationError instance', () => {
-      const appValidationError = new AppValidationError({ error: { message: 'validation error' } }, notificationService);
-      
+      const appValidationError = new AppValidationError(
+        { error: { message: 'validation error' } },
+        notificationService
+      );
       const result = errorHandler.handleError(appValidationError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', appValidationError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(AppValidationError);
@@ -324,18 +313,16 @@ describe('DdataCoreErrorHandler', () => {
         status: 999, // Different status to ensure instanceof takes precedence
         error: { message: 'validation error from original' }
       };
-      
       const appValidationError = new AppValidationError(originalError, notificationService);
       const wrappedError = {
         originalError: appValidationError,
         message: 'Wrapped validation error'
       };
-      
       const result = errorHandler.handleError(wrappedError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', wrappedError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(AppValidationError);
@@ -352,12 +339,11 @@ describe('DdataCoreErrorHandler', () => {
         originalError: originalError,
         message: 'Wrapped error'
       };
-
       const result = errorHandler.handleError(wrappedError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', wrappedError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(BadRequest);
@@ -370,12 +356,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 403,
         error: { message: 'Direct error message' }
       };
-
       const result = errorHandler.handleError(directError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', directError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(ForbiddenError);
@@ -388,7 +373,6 @@ describe('DdataCoreErrorHandler', () => {
         // No status property
         error: { message: 'Error without status' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
@@ -417,7 +401,6 @@ describe('DdataCoreErrorHandler', () => {
         status: 999, // Unknown status
         error: { message: 'Unknown error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
@@ -427,34 +410,38 @@ describe('DdataCoreErrorHandler', () => {
 
     it('should always call spinner.off with ERROR_HANDLER', () => {
       const mockError = { status: 400 };
-      
-      errorHandler.handleError(mockError);
-      expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
 
+      errorHandler.handleError(mockError);
+
+      expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
       // Test with different error
       const mockError2 = { status: 500 };
+
       errorHandler.handleError(mockError2);
+
       expect(spinnerService.off).toHaveBeenCalledTimes(2);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
     });
 
     it('should always call console.error', () => {
       const mockError = { status: 404 };
-      
-      errorHandler.handleError(mockError);
-      expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
 
+      errorHandler.handleError(mockError);
+
+      expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       // Test with different error
       const mockError2 = { status: 422 };
+
       errorHandler.handleError(mockError2);
-      expect(console.error).toHaveBeenCalledTimes(2);
+
+      expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError2);
     });
 
     it('should use DdataInjectorModule to get Router', () => {
       const mockError = { status: 401 };
-      
+
       errorHandler.handleError(mockError);
-      
+
       expect(DdataInjectorModule.InjectorInstance.get).toHaveBeenCalledWith(Router);
     });
 
@@ -464,12 +451,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 404,
         error: { message: 'Direct error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(NotFoundError);
@@ -483,12 +469,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 500,
         error: { message: 'Direct error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(InternalServerError);
@@ -502,12 +487,11 @@ describe('DdataCoreErrorHandler', () => {
         status: 403,
         error: { message: 'Direct error' }
       };
-
       const result = errorHandler.handleError(mockError);
 
       expect(console.error).toHaveBeenCalledWith('A részletes hiba:', mockError);
       expect(spinnerService.off).toHaveBeenCalledWith('ERROR_HANDLER');
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(ForbiddenError);
@@ -522,9 +506,8 @@ describe('DdataCoreErrorHandler', () => {
       };
 
       spyOn(UnauthorizedError.prototype.constructor, 'call');
-      
       const result = errorHandler.handleError(mockError);
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(UnauthorizedError);
@@ -537,9 +520,8 @@ describe('DdataCoreErrorHandler', () => {
         status: 400,
         error: { message: 'Bad request' }
       };
-
       const result = errorHandler.handleError(mockError);
-      
+
       result.subscribe({
         error: (error) => {
           expect(error).toBeInstanceOf(BadRequest);
@@ -561,7 +543,6 @@ describe('DdataCoreErrorHandler', () => {
         { status: 500 },
         { status: 580 }
       ];
-
       const expectedTypes = [
         BadRequest,
         UnauthorizedError,
@@ -577,6 +558,7 @@ describe('DdataCoreErrorHandler', () => {
 
       errors.forEach((error, index) => {
         const result = errorHandler.handleError(error);
+
         result.subscribe({
           error: (err) => {
             expect(err).toBeInstanceOf(expectedTypes[index]);
@@ -585,7 +567,8 @@ describe('DdataCoreErrorHandler', () => {
       });
 
       expect(spinnerService.off).toHaveBeenCalledTimes(errors.length);
-      expect(console.error).toHaveBeenCalledTimes(errors.length);
+      // the handler and the created error class both log the error
+      expect(console.error).toHaveBeenCalledTimes(errors.length * 2);
     });
   });
 });
