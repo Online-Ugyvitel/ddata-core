@@ -10,7 +10,7 @@ describe('InternalServerError', () => {
   beforeEach(() => {
     // Create a spy object for NotificationService
     mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
-    
+
     // Spy on console.error
     consoleErrorSpy = spyOn(console, 'error');
   });
@@ -22,7 +22,6 @@ describe('InternalServerError', () => {
           message: 'Test error message'
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       expect(error).toBeTruthy();
@@ -35,7 +34,6 @@ describe('InternalServerError', () => {
           message: 'Test error message'
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       expect(error).toBeInstanceOf(DdataCoreError);
@@ -47,7 +45,6 @@ describe('InternalServerError', () => {
           message: 'Test error message'
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       // Verify that properties from DdataCoreError are available
@@ -82,6 +79,7 @@ describe('InternalServerError', () => {
         'Szerver hiba történt',
         'danger' as NotificationType
       );
+
       expect(mockNotificationService.add).toHaveBeenCalledTimes(1);
     });
   });
@@ -99,7 +97,6 @@ describe('InternalServerError', () => {
           ]
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       // Check that inherited properties are available
@@ -119,7 +116,6 @@ describe('InternalServerError', () => {
           ]
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       // The DdataCoreError constructor should process the trace
@@ -320,7 +316,6 @@ describe('InternalServerError', () => {
       testCases.forEach((message, index) => {
         consoleErrorSpy.calls.reset();
         mockNotificationService.add.calls.reset();
-
         const originalError = {
           error: {
             message: message
@@ -332,7 +327,7 @@ describe('InternalServerError', () => {
         expect(consoleErrorSpy).toHaveBeenCalledWith('Internal Server Error: ', message);
         expect(mockNotificationService.add).toHaveBeenCalledWith(
           'Hiba',
-          'Szerver hiba történt', 
+          'Szerver hiba történt',
           'danger' as NotificationType
         );
       });
@@ -348,8 +343,8 @@ describe('InternalServerError', () => {
       };
 
       new InternalServerError(originalError, mockNotificationService);
-
       const callArgs = mockNotificationService.add.calls.mostRecent().args;
+
       expect(callArgs[2]).toBe('danger');
       expect(typeof callArgs[2]).toBe('string');
     });
@@ -403,7 +398,6 @@ describe('InternalServerError', () => {
           message: 'Test error message'
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       // InternalServerError -> DdataCoreError -> (potentially Error if DdataCoreError extends Error)
@@ -417,7 +411,6 @@ describe('InternalServerError', () => {
           message: 'Test error message'
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       expect(error.constructor).toBe(InternalServerError);
@@ -429,7 +422,6 @@ describe('InternalServerError', () => {
           message: 'Test error message'
         }
       };
-
       const error = new InternalServerError(originalError, mockNotificationService);
 
       expect(Object.getPrototypeOf(error)).toBe(InternalServerError.prototype);
