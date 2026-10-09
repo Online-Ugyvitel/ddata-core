@@ -31,7 +31,8 @@ export class LocalDataService<T extends BaseModelInterface<T>>
     super(model);
     this.localStorageItemName = this.convertTitleCaseToSnakeCase(pluralize(model.model_name));
     this.allFromLocal();
-    this.copyOfModel = { ...model };
+    // the prototype is kept, otherwise the copy loses the methods of the model (e.g. init)
+    this.copyOfModel = Object.assign(Object.create(Object.getPrototypeOf(model)), model);
   }
 
   private convertTitleCaseToSnakeCase(str: string): string {
@@ -46,7 +47,13 @@ export class LocalDataService<T extends BaseModelInterface<T>>
    * Get all items from localStorage as T[]
    */
   allFromLocal(): Array<T> {
-    const data = JSON.parse(localStorage.getItem(this.localStorageItemName)) || [];
+    let data: Array<T> = [];
+
+    try {
+      data = JSON.parse(localStorage.getItem(this.localStorageItemName)) || [];
+    } catch {
+      // damaged localStorage content is handled as an empty database
+    }
 
     this.db = this.hydrateArray(data);
 
@@ -67,7 +74,10 @@ export class LocalDataService<T extends BaseModelInterface<T>>
     }
     const index = this.db.indexOf(model);
 
-    this.db.splice(index, 1);
+    if (index > -1) {
+      this.db.splice(index, 1);
+    }
+
     this.updateLocalstorage(this.db);
 
     return true;
