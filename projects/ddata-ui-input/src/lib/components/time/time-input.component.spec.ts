@@ -1,11 +1,13 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
-import { Injector, ChangeDetectorRef } from '@angular/core';
+import { Injector, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { DdataCoreModule, BaseModel } from 'ddata-core';
 import { DdataInputTimeComponent } from './time-input.component';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
-import { ElementRef } from '@angular/core';
 
 describe('DdataInputTimeComponent', () => {
   let component: DdataInputTimeComponent;
@@ -14,33 +16,36 @@ describe('DdataInputTimeComponent', () => {
   let element: any;
   let helperServiceSpy: jasmine.SpyObj<InputHelperService>;
 
-  beforeEach((() => {
+  beforeEach(() => {
     const spy = jasmine.createSpyObj('InputHelperService', [
-      'validateField', 'getTitle', 'getLabel', 'getPlaceholder', 
-      'getPrepend', 'getAppend', 'isRequired', 'randChars'
+      'validateField',
+      'getTitle',
+      'getLabel',
+      'getPlaceholder',
+      'getPrepend',
+      'getAppend',
+      'isRequired',
+      'randChars'
     ]);
 
     TestBed.configureTestingModule({
-      declarations: [ DdataInputTimeComponent ],
-      providers: [
-        { provide: InputHelperService, useValue: spy }
-      ]
-    })
-    .compileComponents();
+      declarations: [DdataInputTimeComponent],
+      providers: [{ provide: InputHelperService, useValue: spy }]
+    }).compileComponents();
 
     helperServiceSpy = TestBed.inject(InputHelperService) as jasmine.SpyObj<InputHelperService>;
-  }));
+  });
 
   beforeEach(() => {
     DdataCoreModule.InjectorInstance = {
       get: (token: never) => TestBed.inject(token)
-    } as unknown as Injector;
+    };
     helperServiceSpy.randChars.and.returnValue('random123');
     fixture = TestBed.createComponent(DdataInputTimeComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;
     element = debugElement.nativeElement;
-    
+
     // Setup default spy returns
     helperServiceSpy.getTitle.and.returnValue('Test Title');
     helperServiceSpy.getLabel.and.returnValue('Test Label');
@@ -90,33 +95,45 @@ describe('DdataInputTimeComponent', () => {
       it('should handle null/undefined model', () => {
         spyOn(console, 'error');
         component.model = null;
+
         expect(console.error).toHaveBeenCalledWith('The input-box component get undefined model');
       });
 
       it('should handle model without fields', () => {
         spyOn(console, 'error');
         const invalidModel = new BaseModel();
+
         invalidModel.fields = null;
         component.model = invalidModel;
-        expect(console.error).toHaveBeenCalledWith(`Your ${invalidModel.model_name}'s 'fields' field is`, null);
+
+        expect(console.error).toHaveBeenCalledWith(
+          `Your ${invalidModel.model_name}'s 'fields' field is`,
+          null
+        );
       });
 
       it('should handle model without specific field', () => {
         spyOn(console, 'error');
         const model = new BaseModel();
+
         component._field = 'nonexistent';
         component.model = model;
-        expect(console.error).toHaveBeenCalledWith(`The ${model.model_name}'s nonexistent field is `, undefined);
+
+        expect(console.error).toHaveBeenCalledWith(
+          `The ${model.model_name}'s nonexistent field is `,
+          undefined
+        );
       });
 
       it('should set model properties when valid model and field exist', () => {
         const model = new BaseModel();
+
         model.fields = { testField: { title: 'Test', label: 'Label' } };
         model.validationRules = { testField: ['required'] };
         component._field = 'testField';
-        
+
         component.model = model;
-        
+
         expect(component._model).toBe(model);
         expect(helperServiceSpy.getTitle).toHaveBeenCalledWith(model, 'testField');
         expect(helperServiceSpy.getPlaceholder).toHaveBeenCalledWith(model, 'testField');
@@ -128,7 +145,9 @@ describe('DdataInputTimeComponent', () => {
 
       it('should get model correctly', () => {
         const model = new BaseModel();
+
         component._model = model;
+
         expect(component.model).toBe(model);
       });
     });
@@ -136,11 +155,13 @@ describe('DdataInputTimeComponent', () => {
     describe('field setter', () => {
       it('should set field value', () => {
         component.field = 'testField';
+
         expect(component._field).toBe('testField');
       });
 
       it('should handle undefined field by setting to isValid', () => {
         component.field = 'undefined';
+
         expect(component._field).toBe('isValid');
       });
     });
@@ -148,11 +169,13 @@ describe('DdataInputTimeComponent', () => {
     describe('append setter', () => {
       it('should set append value', () => {
         component.append = 'appendText';
+
         expect(component._append).toBe('appendText');
       });
 
       it('should handle undefined append by setting to empty string', () => {
         component.append = 'undefined';
+
         expect(component._append).toBe('');
       });
     });
@@ -160,11 +183,13 @@ describe('DdataInputTimeComponent', () => {
     describe('prepend setter', () => {
       it('should set prepend value', () => {
         component.prepend = 'prependText';
+
         expect(component._prepend).toBe('prependText');
       });
 
       it('should handle undefined prepend by setting to empty string', () => {
         component.prepend = 'undefined';
+
         expect(component._prepend).toBe('');
       });
     });
@@ -172,11 +197,13 @@ describe('DdataInputTimeComponent', () => {
     describe('labelText setter', () => {
       it('should set label value', () => {
         component.labelText = 'labelText';
+
         expect(component._label).toBe('labelText');
       });
 
       it('should handle undefined labelText by setting to empty string', () => {
         component.labelText = 'undefined';
+
         expect(component._label).toBe('');
       });
     });
@@ -187,27 +214,29 @@ describe('DdataInputTimeComponent', () => {
       it('should focus input when autoFocus is true', () => {
         component.autoFocus = true;
         const mockElement = { focus: jasmine.createSpy('focus') };
+
         component.inputBox = { nativeElement: mockElement } as ElementRef;
-        
+
         component.ngAfterViewInit();
-        
+
         expect(mockElement.focus).toHaveBeenCalled();
       });
 
       it('should not focus input when autoFocus is false', () => {
         component.autoFocus = false;
         const mockElement = { focus: jasmine.createSpy('focus') };
+
         component.inputBox = { nativeElement: mockElement } as ElementRef;
-        
+
         component.ngAfterViewInit();
-        
+
         expect(mockElement.focus).not.toHaveBeenCalled();
       });
 
       it('should handle missing inputBox reference', () => {
         component.autoFocus = true;
         component.inputBox = undefined;
-        
+
         expect(() => component.ngAfterViewInit()).not.toThrow();
       });
     });
@@ -218,11 +247,12 @@ describe('DdataInputTimeComponent', () => {
       spyOn(component.changed, 'emit');
       helperServiceSpy.validateField.and.returnValue(true);
       const model = new BaseModel();
+
       component._model = model;
       component._field = 'testField';
-      
+
       component.validateField();
-      
+
       expect(helperServiceSpy.validateField).toHaveBeenCalledWith(model, 'testField');
       expect(component.changed.emit).toHaveBeenCalledWith(model);
     });
@@ -231,11 +261,12 @@ describe('DdataInputTimeComponent', () => {
       spyOn(component.changed, 'emit');
       helperServiceSpy.validateField.and.returnValue(false);
       const model = new BaseModel();
+
       component._model = model;
       component._field = 'testField';
-      
+
       component.validateField();
-      
+
       expect(helperServiceSpy.validateField).toHaveBeenCalledWith(model, 'testField');
       expect(component.changed.emit).not.toHaveBeenCalled();
     });
@@ -245,11 +276,12 @@ describe('DdataInputTimeComponent', () => {
     it('should set time value on model field and validate', () => {
       spyOn(component, 'validateField');
       const model = new BaseModel();
+
       component._model = model;
       component._field = 'timeField';
-      
+
       component.setTime('12:30');
-      
+
       expect(model['timeField']).toBe('12:30');
       expect(component.validateField).toHaveBeenCalled();
     });
@@ -257,11 +289,12 @@ describe('DdataInputTimeComponent', () => {
     it('should handle empty time string', () => {
       spyOn(component, 'validateField');
       const model = new BaseModel();
+
       component._model = model;
       component._field = 'timeField';
-      
+
       component.setTime('');
-      
+
       expect(model['timeField']).toBe('');
       expect(component.validateField).toHaveBeenCalled();
     });
@@ -269,11 +302,12 @@ describe('DdataInputTimeComponent', () => {
     it('should handle null time', () => {
       spyOn(component, 'validateField');
       const model = new BaseModel();
+
       component._model = model;
       component._field = 'timeField';
-      
+
       component.setTime(null);
-      
+
       expect(model['timeField']).toBe('');
       expect(component.validateField).toHaveBeenCalled();
     });
@@ -312,24 +346,25 @@ describe('DdataInputTimeComponent', () => {
   describe('Integration Tests', () => {
     it('should handle complete workflow with valid model', () => {
       const model = new BaseModel();
-      model.fields = { 
-        testTime: { 
-          title: 'Time Field', 
-          label: 'Select Time', 
+
+      model.fields = {
+        testTime: {
+          title: 'Time Field',
+          label: 'Select Time',
           placeholder: 'HH:MM',
           prepend: 'Time:',
           append: 'hrs'
-        } 
+        }
       };
       model.validationRules = { testTime: ['required'] };
       component.field = 'testTime';
-      
+
       spyOn(component.changed, 'emit');
       helperServiceSpy.validateField.and.returnValue(true);
-      
+
       component.model = model;
       component.setTime('14:30');
-      
+
       expect(component._title).toBe('Test Title');
       expect(component._label).toBe('Test Label');
       expect(component._placeholder).toBe('Test Placeholder');
@@ -342,33 +377,43 @@ describe('DdataInputTimeComponent', () => {
 
     it('should handle edge cases with model setter', () => {
       spyOn(console, 'error');
-      
+
       // Test null model
       component.model = null;
+
       expect(console.error).toHaveBeenCalledWith('The input-box component get undefined model');
-      
       // Test model without fields
       const modelWithoutFields = new BaseModel();
+
       modelWithoutFields.fields = null;
       component.model = modelWithoutFields;
-      expect(console.error).toHaveBeenCalledWith(`Your ${modelWithoutFields.model_name}'s 'fields' field is`, null);
-      
+
+      expect(console.error).toHaveBeenCalledWith(
+        `Your ${modelWithoutFields.model_name}'s 'fields' field is`,
+        null
+      );
       // Test model without specific field
       const modelWithFields = new BaseModel();
+
       modelWithFields.fields = {};
       component._field = 'missingField';
       component.model = modelWithFields;
-      expect(console.error).toHaveBeenCalledWith(`The ${modelWithFields.model_name}'s missingField field is `, undefined);
+
+      expect(console.error).toHaveBeenCalledWith(
+        `The ${modelWithFields.model_name}'s missingField field is `,
+        undefined
+      );
     });
 
     it('should handle model with fields but no validation rules for field', () => {
       const model = new BaseModel();
+
       model.fields = { testField: { title: 'Test' } };
       model.validationRules = {}; // No validation rules for testField
       component._field = 'testField';
-      
+
       component.model = model;
-      
+
       // Should call helper methods for field properties but not for validation
       expect(helperServiceSpy.getTitle).toHaveBeenCalledWith(model, 'testField');
       expect(helperServiceSpy.isRequired).not.toHaveBeenCalled();
@@ -377,23 +422,28 @@ describe('DdataInputTimeComponent', () => {
     it('should handle model with validation rules but no field definitions', () => {
       spyOn(console, 'error');
       const model = new BaseModel();
+
       model.fields = {}; // No fields defined
       model.validationRules = { testField: ['required'] };
       component._field = 'testField';
-      
+
       component.model = model;
-      
-      expect(console.error).toHaveBeenCalledWith(`The ${model.model_name}'s testField field is `, undefined);
+
+      expect(console.error).toHaveBeenCalledWith(
+        `The ${model.model_name}'s testField field is `,
+        undefined
+      );
     });
 
     it('should not call helper methods when model field does not exist', () => {
       spyOn(console, 'error');
       const model = new BaseModel();
+
       model.fields = {};
       component._field = 'nonExistentField';
-      
+
       component.model = model;
-      
+
       // Should not call helper methods when field doesn't exist
       expect(helperServiceSpy.getTitle).not.toHaveBeenCalled();
       expect(helperServiceSpy.getLabel).not.toHaveBeenCalled();
@@ -405,15 +455,19 @@ describe('DdataInputTimeComponent', () => {
     it('should handle undefined passed to various setters correctly', () => {
       // Test all undefined cases
       component.field = 'undefined';
+
       expect(component._field).toBe('isValid');
-      
+
       component.append = 'undefined';
+
       expect(component._append).toBe('');
-      
+
       component.prepend = 'undefined';
+
       expect(component._prepend).toBe('');
-      
+
       component.labelText = 'undefined';
+
       expect(component._label).toBe('');
     });
   });
@@ -422,11 +476,13 @@ describe('DdataInputTimeComponent', () => {
     it('should handle setTime with various data types', () => {
       spyOn(component, 'validateField');
       const model = new BaseModel();
+
       component._model = model;
       component._field = 'timeField';
-      
+
       // Test with undefined
-      component.setTime(undefined as any);
+      component.setTime(undefined);
+
       expect(model['timeField']).toBe('');
       expect(component.validateField).toHaveBeenCalled();
     });
@@ -434,17 +490,18 @@ describe('DdataInputTimeComponent', () => {
     it('should handle ngAfterViewInit when inputBox is null', () => {
       component.autoFocus = true;
       component.inputBox = null as any;
-      
+
       expect(() => component.ngAfterViewInit()).not.toThrow();
     });
 
     it('should handle model setter when model has null validationRules', () => {
       const model = new BaseModel();
+
       model.fields = { testField: { title: 'Test' } };
-      model.validationRules = null as any;
+      model.validationRules = null;
       component._field = 'testField';
-      
-      expect(() => component.model = model).not.toThrow();
+
+      expect(() => (component.model = model)).not.toThrow();
       expect(helperServiceSpy.isRequired).not.toHaveBeenCalled();
     });
 
@@ -456,7 +513,7 @@ describe('DdataInputTimeComponent', () => {
       expect(component.inputBlockExtraClass).toBe('col-md-9');
       expect(component.viewOnlyClass).toBe('form-control border-0 bg-light');
       expect(component.wrapperClass).toBe('d-flex flex-wrap');
-      
+
       // Test that changed event emitter is initialized
       expect(component.changed).toBeDefined();
       expect(component.changed.emit).toBeDefined();
