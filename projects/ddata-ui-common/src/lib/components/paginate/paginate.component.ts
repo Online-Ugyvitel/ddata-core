@@ -6,7 +6,7 @@ import {
   Output,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { PaginateInterface } from 'ddata-core';
+import { PaginateInterface } from '@netdjw/ddata-core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 

@@ -6,7 +6,7 @@ import {
   OnInit,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { NotificationInterface, NotificationService } from 'ddata-core';
+import { NotificationInterface, NotificationService } from '@netdjw/ddata-core';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 

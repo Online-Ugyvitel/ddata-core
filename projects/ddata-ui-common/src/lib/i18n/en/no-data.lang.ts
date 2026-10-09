@@ -1,6 +1,6 @@
 // tslint:disable: variable-name
 
-import { FieldInterface } from 'ddata-core';
+import { FieldInterface } from '@netdjw/ddata-core';
 
 export const article_vowel: FieldInterface = {
   label: 'The',
