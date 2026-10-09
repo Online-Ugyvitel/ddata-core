@@ -1,5 +1,6 @@
 import 'zone.js/testing';
-import { Injector } from '@angular/core';
+import { EventEmitter, Injector } from '@angular/core';
+import { of } from 'rxjs';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { BaseListComponent } from './base-list.component';
@@ -22,11 +23,11 @@ describe('BaseListComponent', () => {
   beforeEach(() => {
     mockHelperService = new MockHelperService();
     mockHelperFactoryService = new MockHelperFactoryService();
-
     // Mock DdataCoreModule.InjectorInstance completely
     const mockInjector = {
       get: jasmine.createSpy('get').and.returnValue(mockActivatedRoute)
     };
+
     (DdataCoreModule as any).InjectorInstance = mockInjector;
 
     TestBed.configureTestingModule({
@@ -44,16 +45,17 @@ describe('BaseListComponent', () => {
 
     fixture = TestBed.createComponent(TestListComponent);
     component = fixture.componentInstance;
-    
+
     // Prevent ngOnInit from calling load automatically
     spyOn(component, 'load').and.stub();
-    
+
     fixture.detectChanges();
   });
 
   afterEach(() => {
     if (fixture && fixture.debugElement) {
       const nativeElement = fixture.debugElement.nativeElement;
+
       if (nativeElement && nativeElement.parentNode) {
         nativeElement.parentNode.removeChild(nativeElement);
       }
@@ -79,16 +81,14 @@ describe('BaseListComponent', () => {
       expect(component.model).toBeInstanceOf(TestModel);
       expect(component.paginate).toBeDefined();
       expect(component.helperService).toBeInstanceOf(MockHelperService);
-      expect(component.activatedRoute).toBe(mockActivatedRoute);
+      expect(component.activatedRoute).toBe(mockActivatedRoute as unknown as ActivatedRoute);
     });
 
     it('should call load on ngOnInit', () => {
-      // Reset the spy to actually test ngOnInit
-      (component.load as jasmine.Spy).and.callThrough();
-      spyOn(component, 'load');
-      
+      (component.load as jasmine.Spy).calls.reset();
+
       component.ngOnInit();
-      
+
       expect(component.load).toHaveBeenCalled();
     });
   });
@@ -96,28 +96,35 @@ describe('BaseListComponent', () => {
   describe('Input Properties', () => {
     it('should set isModal input property', () => {
       component.isModal = true;
+
       expect(component.isModal).toBe(true);
     });
 
     it('should set isEmbed input property', () => {
       component.isEmbed = true;
+
       expect(component.isEmbed).toBe(true);
     });
 
     it('should set loadData input property', () => {
       component.loadData = false;
+
       expect(component.loadData).toBe(false);
     });
 
     it('should set models input property', () => {
       const testModels = [new TestModel().init({ id: 1, name: 'Test' })];
+
       component.models = testModels;
+
       expect(component.models).toEqual(testModels);
     });
 
     it('should set filter input property', () => {
       const testFilter = { name: 'test', status: 'active' };
+
       component.filter = testFilter;
+
       expect(component.filter).toEqual(testFilter);
     });
 
@@ -142,7 +149,6 @@ describe('BaseListComponent', () => {
     it('should not set properties from data input when data values are null or undefined', () => {
       const originalIsModal = component.isModal;
       const originalIsEmbed = component.isEmbed;
-      
       const testData = {
         isModal: null,
         isEmbed: undefined,
@@ -158,17 +164,17 @@ describe('BaseListComponent', () => {
 
     it('should handle null data input', () => {
       const originalIsModal = component.isModal;
-      
+
       component.data = null;
-      
+
       expect(component.isModal).toBe(originalIsModal);
     });
 
     it('should handle undefined data input', () => {
       const originalIsModal = component.isModal;
-      
+
       component.data = undefined;
-      
+
       expect(component.isModal).toBe(originalIsModal);
     });
   });
@@ -199,18 +205,18 @@ describe('BaseListComponent', () => {
     it('should not load data when loadData is false', () => {
       component.loadData = false;
       spyOn(component as any, 'setGetRequest');
-      
+
       component.load();
-      
+
       expect((component as any).setGetRequest).not.toHaveBeenCalled();
     });
 
     it('should load data when loadData is true', () => {
       component.loadData = true;
       spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
-      
+
       component.load();
-      
+
       expect((component as any).setGetRequest).toHaveBeenCalled();
       expect(component.paginate).toEqual(mockPaginateWithData);
       expect(component.models).toEqual(mockPaginateWithData.data);
@@ -221,9 +227,9 @@ describe('BaseListComponent', () => {
     it('should call helperService.getAll when filter is empty', () => {
       component.filter = {};
       spyOn(mockHelperService, 'getAll').and.returnValue(of(mockPaginateWithData));
-      
+
       (component as any).setGetRequest().subscribe();
-      
+
       expect(mockHelperService.getAll).toHaveBeenCalledWith(
         component.paginate,
         component.models,
@@ -234,33 +240,41 @@ describe('BaseListComponent', () => {
 
     it('should call helperService.search when filter has values', () => {
       const testFilter = { name: 'test' };
+
       component.filter = testFilter;
       spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
-      
+
       (component as any).setGetRequest().subscribe();
-      
-      expect(mockHelperService.search).toHaveBeenCalledWith(testFilter, component.currentPageNumber);
+
+      expect(mockHelperService.search).toHaveBeenCalledWith(
+        testFilter,
+        component.currentPageNumber
+      );
     });
   });
 
   describe('isEmptyObject method (private)', () => {
     it('should return true for empty object', () => {
       const result = (component as any).isEmptyObject({});
+
       expect(result).toBe(true);
     });
 
     it('should return false for object with properties', () => {
       const result = (component as any).isEmptyObject({ name: 'test' });
+
       expect(result).toBe(false);
     });
 
     it('should return false for non-object values', () => {
       const result = (component as any).isEmptyObject([]);
+
       expect(result).toBe(false);
     });
 
     it('should return false for object with nested properties', () => {
       const result = (component as any).isEmptyObject({ nested: { prop: 'value' } });
+
       expect(result).toBe(false);
     });
   });
@@ -269,10 +283,11 @@ describe('BaseListComponent', () => {
     it('should call helperService.booleanChange and subscribe', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
       const fieldName = 'isActive';
+
       spyOn(mockHelperService, 'booleanChange').and.returnValue(of(true));
-      
+
       component.toggleCheckbox(testModel, fieldName);
-      
+
       expect(mockHelperService.booleanChange).toHaveBeenCalledWith(testModel, fieldName);
     });
   });
@@ -280,10 +295,11 @@ describe('BaseListComponent', () => {
   describe('edit method', () => {
     it('should call helperService.edit with model and component reference', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
+
       spyOn(mockHelperService, 'edit');
-      
+
       component.edit(testModel);
-      
+
       expect(mockHelperService.edit).toHaveBeenCalledWith(testModel, component);
     });
   });
@@ -291,21 +307,23 @@ describe('BaseListComponent', () => {
   describe('delete method', () => {
     it('should splice model from models array when isEmbed is true', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
+
       component.models = [testModel];
       component.isEmbed = true;
-      
+
       component.delete(testModel);
-      
+
       expect(component.models).toEqual([]);
     });
 
     it('should call helperService.delete when isEmbed is false', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
+
       component.isEmbed = false;
       spyOn(mockHelperService, 'delete').and.returnValue(of(true));
-      
+
       component.delete(testModel);
-      
+
       expect(mockHelperService.delete).toHaveBeenCalledWith(testModel, component);
     });
 
@@ -313,11 +331,12 @@ describe('BaseListComponent', () => {
       const model1 = new TestModel().init({ id: 1, name: 'Test1' });
       const model2 = new TestModel().init({ id: 2, name: 'Test2' });
       const model3 = new TestModel().init({ id: 3, name: 'Test3' });
+
       component.models = [model1, model2, model3];
       component.isEmbed = true;
-      
+
       component.delete(model2);
-      
+
       expect(component.models).toEqual([model1, model3]);
     });
   });
@@ -328,10 +347,11 @@ describe('BaseListComponent', () => {
         new TestModel().init({ id: 1, name: 'Test1' }),
         new TestModel().init({ id: 2, name: 'Test2' })
       ];
+
       spyOn(mockHelperService, 'deleteMultiple').and.returnValue(of(true));
-      
+
       component.deleteMultiple(testModels);
-      
+
       expect(mockHelperService.deleteMultiple).toHaveBeenCalledWith(testModels, component);
     });
   });
@@ -339,28 +359,29 @@ describe('BaseListComponent', () => {
   describe('changePage method', () => {
     it('should update currentPageNumber and call setGetRequest', () => {
       const newPage = 3;
+
       spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
-      
+
       component.changePage(newPage);
-      
+
       expect(component.currentPageNumber).toBe(newPage);
       expect((component as any).setGetRequest).toHaveBeenCalled();
     });
 
     it('should handle changePage with zero page number', () => {
       spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
-      
+
       component.changePage(0);
-      
+
       expect(component.currentPageNumber).toBe(0);
       expect((component as any).setGetRequest).toHaveBeenCalled();
     });
 
     it('should handle changePage with negative page number', () => {
       spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
-      
+
       component.changePage(-1);
-      
+
       expect(component.currentPageNumber).toBe(-1);
       expect((component as any).setGetRequest).toHaveBeenCalled();
     });
@@ -368,12 +389,12 @@ describe('BaseListComponent', () => {
     it('should update paginate and models after changePage when observable resolves', () => {
       component.currentPageNumber = 1;
       component.filter = { name: 'test' };
-      
+
       // Setup the observable to return data
       spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
-      
+
       component.changePage(2);
-      
+
       // The subscribe in changePage should complete, but we need to trigger it
       // Since changePage calls setGetRequest().subscribe(), we need to verify the subscription behavior
       expect(component.currentPageNumber).toBe(2);
@@ -384,21 +405,27 @@ describe('BaseListComponent', () => {
   describe('save method', () => {
     it('should call helperService.save with correct parameters', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
+
       component.isModal = true;
       spyOn(mockHelperService, 'save').and.returnValue(of(true));
-      
+
       component.save(testModel);
-      
-      expect(mockHelperService.save).toHaveBeenCalledWith(testModel, component.isModal, component.saveModel);
+
+      expect(mockHelperService.save).toHaveBeenCalledWith(
+        testModel,
+        component.isModal,
+        component.saveModel
+      );
     });
 
     it('should call helperService.save with isModal false', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
+
       component.isModal = false;
       spyOn(mockHelperService, 'save').and.returnValue(of(true));
-      
+
       component.save(testModel);
-      
+
       expect(mockHelperService.save).toHaveBeenCalledWith(testModel, false, component.saveModel);
     });
   });
@@ -406,21 +433,23 @@ describe('BaseListComponent', () => {
   describe('Event Emissions', () => {
     it('should emit editModel when edit is called through helper service', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
+
       spyOn(component.editModel, 'emit');
-      
+
       // Simulate the helper service calling the edit method
       mockHelperService.edit(testModel, component);
-      
+
       expect(component.editModel.emit).toHaveBeenCalledWith(testModel);
     });
 
     it('should emit deleteModel when delete is called through helper service', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
+
       component.isEmbed = false;
       spyOn(component.deleteModel, 'emit');
-      
+
       component.delete(testModel);
-      
+
       expect(component.deleteModel.emit).toHaveBeenCalledWith(testModel);
     });
 
@@ -429,10 +458,11 @@ describe('BaseListComponent', () => {
         new TestModel().init({ id: 1, name: 'Test1' }),
         new TestModel().init({ id: 2, name: 'Test2' })
       ];
+
       spyOn(component.deleteMultipleModels, 'emit');
-      
+
       component.deleteMultiple(testModels);
-      
+
       expect(component.deleteMultipleModels.emit).toHaveBeenCalledWith(testModels);
     });
   });
@@ -443,9 +473,9 @@ describe('BaseListComponent', () => {
       component.loadData = true;
       component.filter = {};
       spyOn(mockHelperService, 'getAll').and.returnValue(of(mockPaginateWithData));
-      
+
       component.load();
-      
+
       expect(mockHelperService.getAll).toHaveBeenCalled();
       expect(component.paginate).toEqual(mockPaginateWithData);
       expect(component.models).toEqual(mockPaginateWithData.data);
@@ -456,9 +486,9 @@ describe('BaseListComponent', () => {
       component.loadData = true;
       component.filter = { name: 'test' };
       spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
-      
+
       component.load();
-      
+
       expect(mockHelperService.search).toHaveBeenCalledWith({ name: 'test' }, 0);
       expect(component.paginate).toEqual(mockPaginateWithData);
       expect(component.models).toEqual(mockPaginateWithData.data);
@@ -467,9 +497,9 @@ describe('BaseListComponent', () => {
     it('should handle page change and reload data with search when filter exists', () => {
       component.filter = { status: 'active' };
       spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
-      
+
       component.changePage(2);
-      
+
       expect(component.currentPageNumber).toBe(2);
       expect(mockHelperService.search).toHaveBeenCalledWith({ status: 'active' }, 2);
     });
@@ -477,9 +507,9 @@ describe('BaseListComponent', () => {
     it('should handle page change and reload data with getAll when filter is empty', () => {
       component.filter = {};
       spyOn(mockHelperService, 'getAll').and.returnValue(of(mockPaginateWithData));
-      
+
       component.changePage(3);
-      
+
       expect(component.currentPageNumber).toBe(3);
       expect(mockHelperService.getAll).toHaveBeenCalledWith(
         component.paginate,
@@ -494,11 +524,12 @@ describe('BaseListComponent', () => {
     it('should handle delete when model is not in models array', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
       const otherModel = new TestModel().init({ id: 2, name: 'Other' });
+
       component.models = [otherModel];
       component.isEmbed = true;
-      
+
       component.delete(testModel);
-      
+
       // Should not crash and models array should remain unchanged
       expect(component.models).toEqual([otherModel]);
     });
