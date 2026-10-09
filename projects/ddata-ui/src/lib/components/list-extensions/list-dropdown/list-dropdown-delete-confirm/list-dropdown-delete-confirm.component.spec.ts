@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ListDropdownDeleteConfirmComponent } from './list-dropdown-delete-confirm.component';
 
-xdescribe('ListDropdownDeleteConfirmComponent', () => {
+describe('ListDropdownDeleteConfirmComponent', () => {
   let component: ListDropdownDeleteConfirmComponent;
   let fixture: ComponentFixture<ListDropdownDeleteConfirmComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ListDropdownDeleteConfirmComponent ]
-    })
-    .compileComponents();
+      declarations: [ListDropdownDeleteConfirmComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
