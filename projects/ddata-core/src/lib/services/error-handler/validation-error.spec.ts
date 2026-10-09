@@ -10,7 +10,7 @@ describe('AppValidationError', () => {
   beforeEach(() => {
     // Create spy for NotificationService
     mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
-    
+
     // Spy on console.error
     consoleSpy = spyOn(console, 'error');
   });
@@ -28,7 +28,6 @@ describe('AppValidationError', () => {
           message: 'Test error'
         }
       };
-
       const error = new AppValidationError(originalError, mockNotificationService);
 
       expect(error).toBeTruthy();
@@ -76,8 +75,8 @@ describe('AppValidationError', () => {
       };
 
       new AppValidationError(originalError, mockNotificationService);
-
       const expectedMessage = Object.values(originalError.error.errors).join('<br>');
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         expectedMessage,
@@ -93,8 +92,8 @@ describe('AppValidationError', () => {
       };
 
       new AppValidationError(originalError, mockNotificationService);
+      const expectedMessage = `A következő mezők rosszul lettek kitöltve:<br>${originalError.error.invalids.join(', ')}`;
 
-      const expectedMessage = 'A következő mezők rosszul lettek kitöltve:<br>' + originalError.error.invalids.join(', ');
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         expectedMessage,
@@ -114,9 +113,9 @@ describe('AppValidationError', () => {
       };
 
       new AppValidationError(originalError, mockNotificationService);
-
       // Based on the code, if both exist, invalids takes precedence (it's checked last)
-      const expectedMessage = 'A következő mezők rosszul lettek kitöltve:<br>' + originalError.error.invalids.join(', ');
+      const expectedMessage = `A következő mezők rosszul lettek kitöltve:<br>${originalError.error.invalids.join(', ')}`;
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         expectedMessage,
@@ -149,9 +148,9 @@ describe('AppValidationError', () => {
       };
 
       new AppValidationError(originalError, mockNotificationService);
-
       // Empty array still passes !! check
       const expectedMessage = 'A következő mezők rosszul lettek kitöltve:<br>';
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         expectedMessage,
@@ -270,7 +269,6 @@ describe('AppValidationError', () => {
           message: 'Test error'
         }
       };
-
       const error = new AppValidationError(originalError, mockNotificationService);
 
       expect(error instanceof DdataCoreError).toBe(true);
@@ -282,7 +280,6 @@ describe('AppValidationError', () => {
           message: 'Test error'
         }
       };
-
       const error = new AppValidationError(originalError, mockNotificationService);
 
       // DdataCoreError has msg property and originalError property
@@ -296,9 +293,9 @@ describe('AppValidationError', () => {
       const originalError = {
         error: {
           errors: {
-            'email': 'Invalid email format',
-            'password': 'Password too short',
-            'confirmPassword': 'Passwords do not match'
+            email: 'Invalid email format',
+            password: 'Password too short',
+            confirmPassword: 'Passwords do not match'
           },
           invalids: ['username', 'age'],
           other: 'some other property'
@@ -306,9 +303,9 @@ describe('AppValidationError', () => {
       };
 
       new AppValidationError(originalError, mockNotificationService);
-
       // Should use invalids since it's checked last
       const expectedMessage = 'A következő mezők rosszul lettek kitöltve:<br>username, age';
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         expectedMessage,
@@ -320,8 +317,8 @@ describe('AppValidationError', () => {
       const originalError = {
         error: {
           errors: {
-            'field1': 'Error 1',
-            'field2': 'Error 2'
+            field1: 'Error 1',
+            field2: 'Error 2'
           }
         }
       };
@@ -339,17 +336,17 @@ describe('AppValidationError', () => {
       const originalError = {
         error: {
           errors: {
-            'field1': 'String error',
-            'field2': 123,
-            'field3': true,
-            'field4': null
+            field1: 'String error',
+            field2: 123,
+            field3: true,
+            field4: null
           }
         }
       };
 
       new AppValidationError(originalError, mockNotificationService);
-
       const expectedMessage = Object.values(originalError.error.errors).join('<br>');
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         expectedMessage,
