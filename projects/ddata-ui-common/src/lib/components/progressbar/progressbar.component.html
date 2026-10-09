@@ -1,7 +1,10 @@
 <div class="progress">
-  <div class="progress-bar bg-success"
+  <div
+    class="progress-bar bg-success"
     role="progressbar"
-    [ngClass]="{'progress-bar-striped progress-bar-animated': progress < 100}"
-    [ngStyle]="{'width': ((current + 1) / max) * 100 + '%'}"
-    >{{ progress === 100 ? '' : '' }}</div>
+    [ngClass]="{ 'progress-bar-striped progress-bar-animated': progress < 100 }"
+    [ngStyle]="{ width: ((current + 1) / max) * 100 + '%' }"
+  >
+    {{ progress === 100 ? '' : '' }}
+  </div>
 </div>

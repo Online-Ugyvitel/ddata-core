@@ -1,4 +1,4 @@
-import { Search } from './search.model';
+import { Search } from './search-concrete.model';
 import { SearchInterface } from './search.interface';
 
 export class BaseSearch extends Search implements SearchInterface {
