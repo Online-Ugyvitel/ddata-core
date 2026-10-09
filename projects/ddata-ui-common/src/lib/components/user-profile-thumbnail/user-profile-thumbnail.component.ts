@@ -17,7 +17,7 @@ interface UserInterface {
   standalone: false
 })
 export class DdataUiUserThumbnailComponent {
-  private internalUser: UserInterface;
+  private internalUser: UserInterface = { name: 'X', image: null };
 
   firstLetter = 'X';
   imageSrc = '';
@@ -33,7 +33,7 @@ export class DdataUiUserThumbnailComponent {
     }
 
     this.internalUser = userValue;
-    this.firstLetter = userValue.name.split('')[0].toUpperCase();
+    this.firstLetter = (userValue.name ?? '').charAt(0).toUpperCase();
     this.imageSrc = !!userValue.image && !!userValue.image.src ? userValue.image.src : '';
   }
 
