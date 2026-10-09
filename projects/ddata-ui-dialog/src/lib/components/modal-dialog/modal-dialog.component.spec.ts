@@ -1,76 +1,17 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChangeDetectorRef, ComponentFactoryResolver, ViewContainerRef, Component } from '@angular/core';
-import { EventEmitter } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { BaseModel } from 'ddata-core';
-import { DdataUiNoDataComponent } from 'ddata-ui-common';
-
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { DdataUiModalDialogComponent } from './modal-dialog.component';
-import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';
-
-// Mock component for testing
-@Component({
-  template: '<div>Mock Component</div>'
-})
-class MockDialogComponent {
-  data: any;
-  isModal = false;
-  multipleSelectEnabled = false;
-  isSelectionList = false;
-  loadData = true;
-  filter = {};
-  models: any[] = [];
-  selectedElements: any[] = [];
-  saveModel = new EventEmitter<any>();
-  select = new EventEmitter<any[]>();
-}
-
-// Mock component without select observable
-@Component({
-  template: '<div>Mock Component Without Select</div>'
-})
-class MockDialogComponentWithoutSelect {
-  data: any;
-  isModal = false;
-  multipleSelectEnabled = false;
-  isSelectionList = false;
-  loadData = true;
-  filter = {};
-  models: any[] = [];
-  selectedElements: any[] = [];
-  saveModel = new EventEmitter<any>();
-}
 
 describe('DdataUiModalDialogComponent', () => {
   let component: DdataUiModalDialogComponent;
   let fixture: ComponentFixture<DdataUiModalDialogComponent>;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let mockComponentFactoryResolver: jasmine.SpyObj<ComponentFactoryResolver>;
-  let mockViewContainerRef: jasmine.SpyObj<ViewContainerRef>;
-  let mockComponentRef: any;
-  let mockComponentFactory: any;
 
-  beforeEach(async () => {
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    mockComponentFactoryResolver = jasmine.createSpyObj('ComponentFactoryResolver', ['resolveComponentFactory']);
-    mockViewContainerRef = jasmine.createSpyObj('ViewContainerRef', ['clear', 'createComponent']);
-    
-    mockComponentRef = {
-      instance: new MockDialogComponent()
-    };
-    
-    mockComponentFactory = jasmine.createSpyObj('ComponentFactory', []);
-    mockComponentFactoryResolver.resolveComponentFactory.and.returnValue(mockComponentFactory);
-    mockViewContainerRef.createComponent.and.returnValue(mockComponentRef);
-
-    await TestBed.configureTestingModule({
-      declarations: [DdataUiModalDialogComponent, MockDialogComponent, MockDialogComponentWithoutSelect],
-      providers: [
-        { provide: ComponentFactoryResolver, useValue: mockComponentFactoryResolver },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef }
-      ]
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [DdataUiModalDialogComponent]
     }).compileComponents();
+  }));
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(DdataUiModalDialogComponent);
     component = fixture.componentInstance;
     

@@ -31,6 +31,7 @@ export * from './lib/services/local-data/local-data-service.interface';
 // remote data service & interface
 export * from './lib/services/remote-data/remote-data.service';
 export * from './lib/services/remote-data/remote-data-service.interface';
+export * from './lib/services/remote-data/request-headers.type';
 
 // abstract data service & interface
 export * from './lib/services/data/data-service.abstract';

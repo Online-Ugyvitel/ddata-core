@@ -17,20 +17,27 @@ describe('DescriptionPipe', () => {
   });
 
   it('it should be telephone number', () => {
-    expect(pipe.transform('tel:+03441314')).toBe('<a href="tel:+03441314" class="mr-3">+03441314</a> ');
+    expect(pipe.transform('tel:+03441314')).toBe(
+      '<a href="tel:+03441314" class="mr-3">+03441314</a> '
+    );
   });
 
   it('it should be email', () => {
-    expect(pipe.transform('email:test@email.com')).toBe('<a href="mailto:test@email.com" class="mr-3">test@email.com</a> ');
+    expect(pipe.transform('email:test@email.com')).toBe(
+      '<a href="mailto:test@email.com" class="mr-3">test@email.com</a> '
+    );
   });
 
   it('it should be url', () => {
-    expect(pipe.transform('url:http://www.test.com')).
-    toBe('<a href="http://www.test.com" class="mr-3" target="_blank">http://www.test.com</a> ');
+    expect(pipe.transform('url:http://www.test.com')).toBe(
+      '<a href="http://www.test.com" class="mr-3" target="_blank">http://www.test.com</a> '
+    );
   });
 
   it('it should be description', () => {
-    expect(pipe.transform('description: testbla')).toBe('<span class="description"> testbla</span> ');
+    expect(pipe.transform('description: testbla')).toBe(
+      '<span class="description"> testbla</span> '
+    );
   });
 
   it('it should be unrecognized', () => {
@@ -42,11 +49,15 @@ describe('DescriptionPipe', () => {
   });
 
   it('it should handle multiple pipe-separated values', () => {
-    expect(pipe.transform('tel:+123|email:test@test.com')).toBe('<a href="tel:+123" class="mr-3">+123</a> <a href="mailto:test@test.com" class="mr-3">test@test.com</a> ');
+    expect(pipe.transform('tel:+123|email:test@test.com')).toBe(
+      '<a href="tel:+123" class="mr-3">+123</a> <a href="mailto:test@test.com" class="mr-3">test@test.com</a> '
+    );
   });
 
   it('it should handle mixed content with pipes', () => {
-    expect(pipe.transform('plain text|tel:+123|more text')).toBe('plain text <a href="tel:+123" class="mr-3">+123</a> more text ');
+    expect(pipe.transform('plain text|tel:+123|more text')).toBe(
+      'plain text <a href="tel:+123" class="mr-3">+123</a> more text '
+    );
   });
 
   it('it should handle malformed prefixes', () => {
@@ -65,7 +76,12 @@ describe('DescriptionPipe', () => {
   });
 
   it('it should handle complex mixed content', () => {
-    expect(pipe.transform('Contact info|tel:+36123456789|email:user@domain.com|url:https://example.com|description:Main office'))
-      .toBe('Contact info <a href="tel:+36123456789" class="mr-3">+36123456789</a> <a href="mailto:user@domain.com" class="mr-3">user@domain.com</a> <a href="https://example.com" class="mr-3" target="_blank">https://example.com</a> <span class="description">Main office</span> ');
+    expect(
+      pipe.transform(
+        'Contact info|tel:+36123456789|email:user@domain.com|url:https://example.com|description:Main office'
+      )
+    ).toBe(
+      'Contact info <a href="tel:+36123456789" class="mr-3">+36123456789</a> <a href="mailto:user@domain.com" class="mr-3">user@domain.com</a> <a href="https://example.com" class="mr-3" target="_blank">https://example.com</a> <span class="description">Main office</span> '
+    );
   });
 });
