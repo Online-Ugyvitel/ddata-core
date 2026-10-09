@@ -14,13 +14,13 @@ describe('UnauthorizedError', () => {
       url: '/some-page'
     });
     mockStorageService = jasmine.createSpyObj('StorageService', ['clear']);
-    
+
     // Mock console.error
     consoleErrorSpy = spyOn(console, 'error');
-    
+
     // Mock document.getElementById
     spyOn(document, 'getElementById').and.returnValue(null);
-    
+
     // Sample original error
     originalError = {
       message: 'Unauthorized',
@@ -31,7 +31,7 @@ describe('UnauthorizedError', () => {
   describe('1. Error Creation', () => {
     it('should create the error instance', () => {
       const error = new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(error).toBeTruthy();
       expect(error).toBeDefined();
       expect(error).toBeInstanceOf(UnauthorizedError);
@@ -39,14 +39,14 @@ describe('UnauthorizedError', () => {
 
     it('should extend DdataCoreError', () => {
       const error = new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(error.constructor.name).toBe('UnauthorizedError');
       expect(error.originalError).toBe(originalError);
     });
 
     it('should log error message', () => {
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
     });
   });
@@ -60,7 +60,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(mockStorageService.clear).not.toHaveBeenCalled();
       expect(mockRouter.navigate).not.toHaveBeenCalled();
       expect(document.getElementById).not.toHaveBeenCalled();
@@ -74,7 +74,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(mockStorageService.clear).toHaveBeenCalled();
     });
   });
@@ -90,7 +90,7 @@ describe('UnauthorizedError', () => {
 
     it('should clear storage when router URL is not /login', () => {
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(mockStorageService.clear).toHaveBeenCalledTimes(1);
     });
   });
@@ -113,11 +113,12 @@ describe('UnauthorizedError', () => {
         if (id === 'nav-logout') {
           return mockLogoutElement;
         }
+
         return null;
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(document.getElementById).toHaveBeenCalledWith('nav-logout');
       expect(mockLogoutElement.click).toHaveBeenCalledTimes(1);
       expect(mockRouter.navigate).not.toHaveBeenCalled();
@@ -142,14 +143,16 @@ describe('UnauthorizedError', () => {
         if (id === 'nav-logout') {
           return null; // No logout element
         }
+
         if (id === 'nav-login') {
           return mockLoginElement; // Login element exists
         }
+
         return null;
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(document.getElementById).toHaveBeenCalledWith('nav-logout');
       expect(document.getElementById).toHaveBeenCalledWith('nav-login');
       expect(mockLoginElement.click).toHaveBeenCalledTimes(1);
@@ -170,7 +173,7 @@ describe('UnauthorizedError', () => {
       (document.getElementById as jasmine.Spy).and.returnValue(null);
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(document.getElementById).toHaveBeenCalledWith('nav-logout');
       expect(document.getElementById).toHaveBeenCalledWith('nav-login');
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
@@ -180,17 +183,18 @@ describe('UnauthorizedError', () => {
   describe('7. Complete Flow Integration Tests', () => {
     it('should execute complete flow for non-login URL with logout element', () => {
       const mockLogoutElement = jasmine.createSpyObj('HTMLElement', ['click']);
+
       Object.defineProperty(mockRouter, 'url', {
         get: () => '/profile',
         configurable: true
       });
-      
+
       (document.getElementById as jasmine.Spy).and.callFake((id: string) => {
         return id === 'nav-logout' ? mockLogoutElement : null;
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       // Verify complete flow
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
       expect(mockStorageService.clear).toHaveBeenCalled();
@@ -202,17 +206,18 @@ describe('UnauthorizedError', () => {
 
     it('should execute complete flow for non-login URL with login element only', () => {
       const mockLoginElement = jasmine.createSpyObj('HTMLElement', ['click']);
+
       Object.defineProperty(mockRouter, 'url', {
         get: () => '/settings',
         configurable: true
       });
-      
+
       (document.getElementById as jasmine.Spy).and.callFake((id: string) => {
         return id === 'nav-login' ? mockLoginElement : null;
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       // Verify complete flow
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
       expect(mockStorageService.clear).toHaveBeenCalled();
@@ -227,11 +232,11 @@ describe('UnauthorizedError', () => {
         get: () => '/admin',
         configurable: true
       });
-      
+
       (document.getElementById as jasmine.Spy).and.returnValue(null);
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       // Verify complete flow
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
       expect(mockStorageService.clear).toHaveBeenCalled();
@@ -247,7 +252,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       // Verify minimal flow for login URL
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
       expect(mockStorageService.clear).not.toHaveBeenCalled();
@@ -268,7 +273,7 @@ describe('UnauthorizedError', () => {
       expect(() => {
         new UnauthorizedError(mockRouter, undefined, mockStorageService);
       }).not.toThrow();
-      
+
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
     });
 
@@ -276,7 +281,7 @@ describe('UnauthorizedError', () => {
       expect(() => {
         new UnauthorizedError(mockRouter, null, mockStorageService);
       }).not.toThrow();
-      
+
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
     });
 
@@ -285,14 +290,11 @@ describe('UnauthorizedError', () => {
         message: 'Access denied',
         status: 401,
         error: {
-          trace: [
-            { file: 'app/Http/Controllers/AuthController.php', line: 42 }
-          ]
+          trace: [{ file: 'app/Http/Controllers/AuthController.php', line: 42 }]
         }
       };
-
       const error = new UnauthorizedError(mockRouter, complexError, mockStorageService);
-      
+
       expect(error.originalError).toBe(complexError);
       expect(consoleErrorSpy).toHaveBeenCalledWith('401 - Unauthorized Error');
     });
@@ -306,7 +308,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(mockStorageService.clear).not.toHaveBeenCalled();
     });
 
@@ -317,7 +319,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       // Should trigger logout flow because URL is not exactly '/login'
       expect(mockStorageService.clear).toHaveBeenCalled();
     });
@@ -329,7 +331,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       // Should trigger logout flow because URL is not exactly '/login'
       expect(mockStorageService.clear).toHaveBeenCalled();
     });
@@ -341,7 +343,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(mockStorageService.clear).toHaveBeenCalled();
     });
 
@@ -352,7 +354,7 @@ describe('UnauthorizedError', () => {
       });
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
-      
+
       expect(mockStorageService.clear).toHaveBeenCalled();
     });
   });
@@ -368,12 +370,13 @@ describe('UnauthorizedError', () => {
     it('should handle non-HTMLElement return from getElementById', () => {
       // Mock getElementById to return a non-HTMLElement that doesn't have click method
       const fakeElement = { notAClickMethod: () => {} };
+
       (document.getElementById as jasmine.Spy).and.returnValue(fakeElement as any);
 
       expect(() => {
         new UnauthorizedError(mockRouter, originalError, mockStorageService);
       }).not.toThrow();
-      
+
       // Should fall back to router navigation since elements don't have click method
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
     });
