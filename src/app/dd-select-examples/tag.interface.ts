@@ -9,8 +9,6 @@ export interface TagUIFieldsInterface {
 }
 
 export interface TagInterface
-  extends TagUIFieldsInterface,
-    BaseModelInterface<TagInterface>,
-    SelectableInterface {
+  extends TagUIFieldsInterface, BaseModelInterface<TagInterface>, SelectableInterface {
   id: ID;
 }

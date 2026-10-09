@@ -34,7 +34,12 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
   @Input() set data(value: Record<string, unknown>) {
     if (!!value) {
       Object.keys(value).forEach((key: string) => {
-        if (!!value[key] && key !== 'model' && key !== 'loadData') {
+        if (
+          value[key] !== null &&
+          value[key] !== undefined &&
+          key !== 'model' &&
+          key !== 'loadData'
+        ) {
           this[key] = value[key];
         }
       });
@@ -103,7 +108,11 @@ export abstract class BaseListComponent<T extends BaseModelInterface<T>>
   delete(model: T): void {
     if (this.isEmbed) {
       // delete model from models if the component is an embed child component
-      this.models.splice(this.models.indexOf(model), 1);
+      const index = this.models.indexOf(model);
+
+      if (index > -1) {
+        this.models.splice(index, 1);
+      }
     } else {
       // delete model via services if component is a main component
       this.helperService.delete(model, this).subscribe();

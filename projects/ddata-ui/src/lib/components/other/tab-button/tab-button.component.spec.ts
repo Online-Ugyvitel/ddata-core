@@ -64,12 +64,6 @@ describe('TabButtonComponent', () => {
   let debugElement;
   let element;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [TabButtonComponent],
