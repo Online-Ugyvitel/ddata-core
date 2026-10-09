@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, ComponentRef, ViewContainerRef } from '@angular/core';
-import { BaseModelInterface } from 'ddata-core';
+import { BaseModelInterface } from '@netdjw/ddata-core';
 import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';
 import {
   DialogContentInterface,

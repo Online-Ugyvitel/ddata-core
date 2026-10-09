@@ -8,7 +8,12 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { BaseModel, BaseModelInterface, DdataCoreModule, FieldsInterface } from 'ddata-core';
+import {
+  BaseModel,
+  BaseModelInterface,
+  DdataCoreModule,
+  FieldsInterface
+} from '@netdjw/ddata-core';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 import { WordCounterComponent } from '../word-counter/word-counter.component';

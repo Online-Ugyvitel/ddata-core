@@ -5,7 +5,7 @@ import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
-import { DdataCoreModule, BaseModel } from 'ddata-core';
+import { DdataCoreModule, BaseModel } from '@netdjw/ddata-core';
 import { DdataInputTimeComponent } from './time-input.component';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
