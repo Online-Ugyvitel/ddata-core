@@ -80,6 +80,7 @@ describe('ProxyService', () => {
       'getPage',
       'getUri',
       'postUri',
+      'putUri',
       'save',
       'delete',
       'deleteMultiple',
@@ -336,7 +337,7 @@ describe('ProxyService', () => {
 
       service.getUri('/test-uri').subscribe(result => {
         expect(result).toEqual(mockResponse);
-        expect(mockRemoteDataService.getUri).toHaveBeenCalledWith('/test-uri');
+        expect(mockRemoteDataService.getUri).toHaveBeenCalledWith('/test-uri', undefined);
       });
     });
   });
@@ -349,7 +350,7 @@ describe('ProxyService', () => {
 
       service.postUri(mockData, '/test-uri').subscribe(result => {
         expect(result).toEqual(mockResponse);
-        expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(mockData, '/test-uri');
+        expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(mockData, '/test-uri', undefined);
       });
     });
   });
@@ -617,8 +618,7 @@ describe('ProxyService', () => {
         to: 1
       });
 
-      // Mock the return value for the forEach case where id === 0
-      spyOn(service, 'deleteMultiple').and.callThrough();
+      mockRemoteDataService.deleteMultiple.and.returnValue(of(true));
 
       // The method should process the models and remove ones with id 0
       service.deleteMultiple(models, paginate).subscribe(result => {
