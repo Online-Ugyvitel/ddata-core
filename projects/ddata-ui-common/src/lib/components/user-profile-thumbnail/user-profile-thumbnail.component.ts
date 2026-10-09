@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 interface ImageInterface {
   src: string;
@@ -10,37 +10,34 @@ interface UserInterface {
 }
 
 @Component({
-    selector: 'app-user-profile-thumbnail',
-    templateUrl: './user-profile-thumbnail.component.html',
-    styleUrls: ['./user-profile-thumbnail.component.scss'],
-    standalone: false
+  selector: 'dd-user-profile-thumbnail',
+  templateUrl: './user-profile-thumbnail.component.html',
+  styleUrls: ['./user-profile-thumbnail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
-export class DdataUiUserThumbnailComponent implements OnInit {
-  private _user: UserInterface = { name: 'X', image: null };
-  
-  @Input() set user(value: UserInterface) {
-    if (!value) {
-      value = {
-        name: 'X',
-        image: null,
-      };
-    }
-
-    this._user = value;
-    this.firstLetter = value.name.split('')[0].toUpperCase();
-    this.imageSrc = !!value.image && !!value.image.src ? value.image.src : '';
-  }
-
-  get user(): UserInterface {
-    return this._user;
-  }
+export class DdataUiUserThumbnailComponent {
+  private internalUser: UserInterface;
 
   firstLetter = 'X';
   imageSrc = '';
 
-  constructor() { }
+  @Input() set user(value: UserInterface) {
+    let userValue = value;
 
-  ngOnInit(): void {
+    if (!userValue) {
+      userValue = {
+        name: 'X',
+        image: null
+      };
+    }
+
+    this.internalUser = userValue;
+    this.firstLetter = userValue.name.split('')[0].toUpperCase();
+    this.imageSrc = !!userValue.image && !!userValue.image.src ? userValue.image.src : '';
   }
 
+  get user(): UserInterface {
+    return this.internalUser;
+  }
 }

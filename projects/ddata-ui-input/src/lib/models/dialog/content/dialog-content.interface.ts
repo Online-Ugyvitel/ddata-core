@@ -2,26 +2,26 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { Type } from '@angular/core';
 
 export interface OptionsInterface {
-  saveModel?: Observable<any>;
-  select?: Observable<any>;
+  saveModel?: Observable<unknown>;
+  select?: Observable<unknown>;
   isModal?: boolean;
   multipleSelectEnabled?: boolean;
   isSelectionList?: boolean;
-  selectedElements?: any[];
-  models?: any[];
+  selectedElements?: Array<unknown>;
+  models?: Array<unknown>;
   loadData?: boolean;
-  filter?: any;
+  filter?: unknown;
   datasArrived?: BehaviorSubject<number>;
 }
 
 export interface DialogContentInterface extends OptionsInterface {
-  component: any;
-  data: any;
+  component: unknown;
+  data: unknown;
 }
 
 export interface DialogContentWithOptionsInterface {
-  createEditComponent?: Type<any>;
+  createEditComponent?: Type<unknown>;
   createEditOptions?: OptionsInterface;
-  listComponent?: Type<any>;
+  listComponent?: Type<unknown>;
   listOptions?: OptionsInterface;
 }
