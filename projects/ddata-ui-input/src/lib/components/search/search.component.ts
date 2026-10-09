@@ -152,7 +152,8 @@ export class DdataInputSearchComponent implements OnDestroy {
         finalize(() => this.spinner.off('global-search-change-page'))
       )
       .subscribe({
-        error: (error: unknown) => console.error('Changing the page of the search result failed', error)
+        error: (error: unknown) =>
+          console.error('Changing the page of the search result failed', error)
       });
   }
 
