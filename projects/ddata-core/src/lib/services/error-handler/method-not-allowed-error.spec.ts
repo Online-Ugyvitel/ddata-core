@@ -10,7 +10,7 @@ describe('MethodNotAllowedError', () => {
   beforeEach(() => {
     // Create spy object for NotificationService
     mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
-    
+
     // Spy on console.error
     originalConsoleError = console.error;
     spyOn(console, 'error');
@@ -28,7 +28,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
       expect(error).toBeTruthy();
@@ -41,7 +40,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
       expect(error.originalError).toBe(originalError);
@@ -56,7 +54,10 @@ describe('MethodNotAllowedError', () => {
 
       new MethodNotAllowedError(originalError, mockNotificationService);
 
-      expect(console.error).toHaveBeenCalledWith('Method Not Allowed Error: ', 'Method not allowed');
+      expect(console.error).toHaveBeenCalledWith(
+        'Method Not Allowed Error: ',
+        'Method not allowed'
+      );
     });
 
     it('should call notificationService.add with correct parameters', () => {
@@ -83,7 +84,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
       expect(error).toBeInstanceOf(DdataCoreError);
@@ -95,7 +95,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
       expect(error).toBeInstanceOf(MethodNotAllowedError);
@@ -107,7 +106,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
       expect(Object.getPrototypeOf(error)).toBe(MethodNotAllowedError.prototype);
@@ -124,7 +122,10 @@ describe('MethodNotAllowedError', () => {
 
       new MethodNotAllowedError(originalError, mockNotificationService);
 
-      expect(console.error).toHaveBeenCalledWith('Method Not Allowed Error: ', 'Custom method not allowed message');
+      expect(console.error).toHaveBeenCalledWith(
+        'Method Not Allowed Error: ',
+        'Custom method not allowed message'
+      );
     });
 
     it('should handle originalError with empty message', () => {
@@ -169,7 +170,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       // Create a different mock
       const otherMockService = jasmine.createSpyObj('NotificationService', ['add']);
 
@@ -184,61 +184,55 @@ describe('MethodNotAllowedError', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should throw when originalError lacks error property', () => {
+    it('should not throw when originalError lacks error property', () => {
       const originalError = {} as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
-    it('should throw when originalError has null error property', () => {
+    it('should not throw when originalError has null error property', () => {
       const originalError = {
         error: null
       } as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
-    it('should throw when originalError has undefined error property', () => {
+    it('should not throw when originalError has undefined error property', () => {
       const originalError = {
         error: undefined
       } as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
-    it('should throw when originalError is null', () => {
+    it('should not throw when originalError is null', () => {
       const originalError = null as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
-    it('should throw when originalError is undefined', () => {
+    it('should not throw when originalError is undefined', () => {
       const originalError = undefined as any;
 
       expect(() => {
         new MethodNotAllowedError(originalError, mockNotificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
-    it('should not call console.error or notificationService when constructor throws', () => {
-      const originalError = null as any;
+    it('should still log and notify when originalError is null', () => {
+      new MethodNotAllowedError(null as any, mockNotificationService);
 
-      try {
-        new MethodNotAllowedError(originalError, mockNotificationService);
-      } catch (error) {
-        // Expected to throw
-      }
-
-      expect(console.error).not.toHaveBeenCalled();
-      expect(mockNotificationService.add).not.toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalled();
+      expect(mockNotificationService.add).toHaveBeenCalled();
     });
 
     it('should handle originalError.error without message property', () => {
@@ -271,7 +265,11 @@ describe('MethodNotAllowedError', () => {
 
       new MethodNotAllowedError(originalError, mockNotificationService);
 
-      expect(console.error).toHaveBeenCalledWith('Method Not Allowed Error: ', 'The method is not allowed for this resource');
+      expect(console.error).toHaveBeenCalledWith(
+        'Method Not Allowed Error: ',
+        'The method is not allowed for this resource'
+      );
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         'A funkció nem érhető el.',
@@ -300,8 +298,7 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
-      const callOrder: string[] = [];
+      const callOrder: Array<string> = [];
 
       // Mock console.error to track call order
       (console.error as jasmine.Spy).and.callFake(() => {
@@ -328,7 +325,11 @@ describe('MethodNotAllowedError', () => {
       // Verify that methods are called with original functionality preserved
       new MethodNotAllowedError(originalError, mockNotificationService);
 
-      expect(console.error).toHaveBeenCalledWith('Method Not Allowed Error: ', 'Method not allowed');
+      expect(console.error).toHaveBeenCalledWith(
+        'Method Not Allowed Error: ',
+        'Method not allowed'
+      );
+
       expect(mockNotificationService.add).toHaveBeenCalledWith(
         'Hiba',
         'A funkció nem érhető el.',
@@ -344,7 +345,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
       // Verify inherited properties from DdataCoreError
@@ -358,7 +358,6 @@ describe('MethodNotAllowedError', () => {
           message: 'Method not allowed'
         }
       };
-
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
       expect(error.constructor.name).toBe('MethodNotAllowedError');
