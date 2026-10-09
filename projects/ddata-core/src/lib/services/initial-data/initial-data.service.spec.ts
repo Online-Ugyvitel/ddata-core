@@ -1,6 +1,9 @@
 import 'zone.js/testing';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { Injector } from '@angular/core';
@@ -20,19 +23,11 @@ describe('InitialDataService', () => {
   let httpMock: HttpTestingController;
   let envServiceMock: any;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-        teardown: { destroyAfterEach: false }
-      }
-    );
-  });
-
   beforeEach(() => {
     // Create spies for dependencies
     const storageServiceSpyObj = jasmine.createSpyObj('StorageService', ['setItem']);
     const spinnerServiceSpyObj = jasmine.createSpyObj('SpinnerService', ['on', 'off']);
+
     envServiceMock = { environment: { apiUrl: 'http://dummy.test/api', debug: false } };
 
     TestBed.configureTestingModule({
@@ -49,8 +44,12 @@ describe('InitialDataService', () => {
     });
 
     // Set up the module injectors
-    DdataCoreModule.InjectorInstance = TestBed;
-    DdataInjectorModule.InjectorInstance = TestBed;
+    DdataCoreModule.InjectorInstance = {
+      get: (token: never) => TestBed.inject(token)
+    };
+    DdataInjectorModule.InjectorInstance = {
+      get: (token: never) => TestBed.inject(token)
+    };
 
     service = TestBed.inject(InitialDataService);
     storageServiceSpy = TestBed.inject(StorageService) as jasmine.SpyObj<StorageService>;
@@ -80,37 +79,50 @@ describe('InitialDataService', () => {
   describe('refresh()', () => {
     it('should call spinner on/off and make HTTP request to /init endpoint', fakeAsync(() => {
       const mockResponse = {
-        users: [{ id: 1, name: 'John' }, { id: 2, name: 'Jane' }],
+        users: [
+          { id: 1, name: 'John' },
+          { id: 2, name: 'Jane' }
+        ],
         settings: { theme: 'dark', language: 'en' },
         permissions: ['read', 'write']
       };
-
       let observableResult: boolean | undefined;
 
       // Subscribe to the refresh observable
-      service.refresh().subscribe(result => {
+      service.refresh().subscribe((result) => {
         observableResult = result;
       });
 
       // Verify that spinner.on was called
       expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
-
       // Handle the HTTP request
       const req = httpMock.expectOne('http://dummy.test/api/init');
+
       expect(req.request.method).toBe('GET');
       expect(req.request.headers.get('Authorization')).toMatch(/^Bearer test-token/);
       expect(req.request.headers.get('Content-Type')).toBe('application/json');
       expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
-      
+
       // Flush the response
       req.flush(mockResponse);
       tick();
 
       // Verify that storage service was called for each key in the response
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(3);
-      expect(storageServiceSpy.setItem).toHaveBeenCalledWith('users', JSON.stringify(mockResponse.users));
-      expect(storageServiceSpy.setItem).toHaveBeenCalledWith('settings', JSON.stringify(mockResponse.settings));
-      expect(storageServiceSpy.setItem).toHaveBeenCalledWith('permissions', JSON.stringify(mockResponse.permissions));
+      expect(storageServiceSpy.setItem).toHaveBeenCalledWith(
+        'users',
+        JSON.stringify(mockResponse.users)
+      );
+
+      expect(storageServiceSpy.setItem).toHaveBeenCalledWith(
+        'settings',
+        JSON.stringify(mockResponse.settings)
+      );
+
+      expect(storageServiceSpy.setItem).toHaveBeenCalledWith(
+        'permissions',
+        JSON.stringify(mockResponse.permissions)
+      );
 
       // Verify that spinner.off was called
       expect((service as any).spinner.off).toHaveBeenCalledWith('dashboard-init');
@@ -121,20 +133,19 @@ describe('InitialDataService', () => {
 
     it('should handle empty response object correctly', fakeAsync(() => {
       const mockResponse = {};
-
       let observableResult: boolean | undefined;
 
-      service.refresh().subscribe(result => {
+      service.refresh().subscribe((result) => {
         observableResult = result;
       });
 
       // Verify spinner.on was called
       expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
-
       // Handle the HTTP request
       const req = httpMock.expectOne('http://dummy.test/api/init');
+
       expect(req.request.method).toBe('GET');
-      
+
       // Flush empty response
       req.flush(mockResponse);
       tick();
@@ -153,27 +164,29 @@ describe('InitialDataService', () => {
       const mockResponse = {
         singleKey: 'singleValue'
       };
-
       let observableResult: boolean | undefined;
 
-      service.refresh().subscribe(result => {
+      service.refresh().subscribe((result) => {
         observableResult = result;
       });
 
       // Verify spinner.on was called
       expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
-
       // Handle the HTTP request
       const req = httpMock.expectOne('http://dummy.test/api/init');
+
       expect(req.request.method).toBe('GET');
-      
+
       // Flush the response
       req.flush(mockResponse);
       tick();
 
       // Verify storage service was called once
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(1);
-      expect(storageServiceSpy.setItem).toHaveBeenCalledWith('singleKey', JSON.stringify('singleValue'));
+      expect(storageServiceSpy.setItem).toHaveBeenCalledWith(
+        'singleKey',
+        JSON.stringify('singleValue')
+      );
 
       // Verify spinner.off was called
       expect((service as any).spinner.off).toHaveBeenCalledWith('dashboard-init');
@@ -194,27 +207,29 @@ describe('InitialDataService', () => {
           }
         }
       };
-
       let observableResult: boolean | undefined;
 
-      service.refresh().subscribe(result => {
+      service.refresh().subscribe((result) => {
         observableResult = result;
       });
 
       // Verify spinner.on was called
       expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
-
       // Handle the HTTP request
       const req = httpMock.expectOne('http://dummy.test/api/init');
+
       expect(req.request.method).toBe('GET');
-      
+
       // Flush the response
       req.flush(mockResponse);
       tick();
 
       // Verify storage service was called with proper JSON stringification
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(1);
-      expect(storageServiceSpy.setItem).toHaveBeenCalledWith('complexData', JSON.stringify(mockResponse.complexData));
+      expect(storageServiceSpy.setItem).toHaveBeenCalledWith(
+        'complexData',
+        JSON.stringify(mockResponse.complexData)
+      );
 
       // Verify spinner.off was called
       expect((service as any).spinner.off).toHaveBeenCalledWith('dashboard-init');
@@ -231,20 +246,19 @@ describe('InitialDataService', () => {
         emptyString: '',
         falseValue: false
       };
-
       let observableResult: boolean | undefined;
 
-      service.refresh().subscribe(result => {
+      service.refresh().subscribe((result) => {
         observableResult = result;
       });
 
       // Verify spinner.on was called
       expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
-
       // Handle the HTTP request
       const req = httpMock.expectOne('http://dummy.test/api/init');
+
       expect(req.request.method).toBe('GET');
-      
+
       // Flush the response
       req.flush(mockResponse);
       tick();
@@ -252,7 +266,11 @@ describe('InitialDataService', () => {
       // Verify storage service was called for each key (including falsy values)
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(5);
       expect(storageServiceSpy.setItem).toHaveBeenCalledWith('nullValue', JSON.stringify(null));
-      expect(storageServiceSpy.setItem).toHaveBeenCalledWith('undefinedValue', JSON.stringify(undefined));
+      expect(storageServiceSpy.setItem).toHaveBeenCalledWith(
+        'undefinedValue',
+        JSON.stringify(undefined)
+      );
+
       expect(storageServiceSpy.setItem).toHaveBeenCalledWith('zeroValue', JSON.stringify(0));
       expect(storageServiceSpy.setItem).toHaveBeenCalledWith('emptyString', JSON.stringify(''));
       expect(storageServiceSpy.setItem).toHaveBeenCalledWith('falseValue', JSON.stringify(false));
@@ -269,22 +287,23 @@ describe('InitialDataService', () => {
       let observableResult: boolean | undefined;
 
       service.refresh().subscribe({
-        next: result => {
+        next: (result) => {
           observableResult = result;
         },
-        error: error => {
+        error: (error) => {
           errorOccurred = true;
+
           expect(error.status).toBe(500);
         }
       });
 
       // Verify spinner.on was called
       expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
-
       // Handle the HTTP request and simulate an error
       const req = httpMock.expectOne('http://dummy.test/api/init');
+
       expect(req.request.method).toBe('GET');
-      
+
       // Flush an error response
       req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
       tick();
@@ -307,6 +326,7 @@ describe('InitialDataService', () => {
       // First call
       service.refresh().subscribe();
       let req = httpMock.expectOne('http://dummy.test/api/init');
+
       req.flush(mockResponse1);
       tick();
 
