@@ -8,7 +8,7 @@ import {
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { DdataInputCheckboxComponent } from './checkbox.component';
-import { DdataCoreModule, BaseModel } from 'ddata-core';
+import { DdataCoreModule, BaseModel } from '@netdjw/ddata-core';
 
 describe('DdataInputCheckboxComponent', () => {
   let component: DdataInputCheckboxComponent;

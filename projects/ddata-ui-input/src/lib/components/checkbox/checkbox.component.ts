@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons';
-import { BaseModel, BaseModelInterface, FieldsInterface } from 'ddata-core';
+import { BaseModel, BaseModelInterface, FieldsInterface } from '@netdjw/ddata-core';
 
 @Component({
   selector: 'dd-input-checkbox',

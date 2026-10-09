@@ -1,4 +1,4 @@
-import { ID } from 'ddata-core';
+import { ID } from '@netdjw/ddata-core';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 export interface SearchResultInterface {
