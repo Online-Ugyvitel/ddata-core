@@ -91,7 +91,7 @@ export class DdataUiModalDialogComponent {
 
     this.componentRef = this.dialogHost.createComponent(this.dialogContent.component);
 
-    if (!!this.dialogContent.data.model) {
+    if (!!this.dialogContent.data?.model) {
       // Assign provided model (could be plain object in tests) with relaxed casting
 
       (this.componentRef.instance as BaseCreateEditComponent<BaseModelInterface<any>>).model = this
