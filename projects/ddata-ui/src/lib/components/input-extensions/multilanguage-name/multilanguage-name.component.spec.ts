@@ -7,7 +7,7 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 import { AppModule } from 'src/app/app.module';
 import { MultilanguageNameComponent } from './multilanguage-name.component';
-import { BaseModel, ID } from 'ddata-core';
+import { BaseModel, ID } from '@netdjw/ddata-core';
 import { LangService } from 'src/app/services/lang/lang.service';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { Name, MultilanguageNameInterface } from 'src/app/models/name/name.model';
@@ -91,7 +91,7 @@ describe('MultilanguageNameComponent', () => {
     expect(component.model.names[1].lang_id).toBe(1); // Kitörölte középről a megadott elemet.
     expect(component.model.names[2].lang_id).toBe(1);
 
-    // Ha tovább törölnék, akkor még ha nem is talál pontos találatot, az utolsó elemet törölni fogja.
+    // Ha tovább törölnének, akkor még ha nem is talál pontos találatot, az utolsó elemet törölni fogja.
 
     // component.deleteName((forDelete as Name));
     // expect(component.model.names.length).toBe(7);

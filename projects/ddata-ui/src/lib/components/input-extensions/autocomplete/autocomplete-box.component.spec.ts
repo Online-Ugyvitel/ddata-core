@@ -7,7 +7,7 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 import { AppModule } from 'src/app/app.module';
 import { AutocompleteBoxComponent } from './autocomplete-box.component';
-import { BaseModel, ValidatorService } from 'ddata-core';
+import { BaseModel, ValidatorService } from '@netdjw/ddata-core';
 import { Tag } from '../../../../../../../src/app/dd-select-examples/tag.model';
 
 declare const document: unknown;
