@@ -7,7 +7,7 @@ export class AppValidationError extends DdataCoreError {
   constructor(originalError: any, notificationService: NotificationService) {
     super(originalError);
 
-    console.error('Validation Error: ', originalError.error);
+    console.error('Validation Error: ', originalError?.error);
     let str = 'Valamelyik adatmező nem a megfeleő formátumú';
 
     if (!!originalError?.error?.errors) {
