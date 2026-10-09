@@ -329,6 +329,18 @@ describe('DdataSimpleSelectComponent', () => {
     });
   });
 
+  describe('Selected value type', () => {
+    it('should keep numeric values numeric when an option is chosen', () => {
+      const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
+
+      select.selectedIndex = 3; // empty option + 3 items -> Mexico
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+
+      expect(component.model['country_id']).toBe(3);
+    });
+  });
+
   describe('Required Field Asterisk Display', () => {
     it('should render the component and label when model is provided', () => {
       // Ensure we have a proper model setup
