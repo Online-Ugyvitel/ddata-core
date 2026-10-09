@@ -2,7 +2,7 @@
 
 ## Overview
 
-`ddata-ui-input` is an Angular library that provides a comprehensive suite of form input components designed to work seamlessly with the `ddata-core` ecosystem. It eliminates the need to build custom input components from scratch by providing battle-tested, feature-rich components with consistent APIs, built-in validation, and standardized UI patterns.
+`@netdjw/ddata-ui-input` is an Angular library that provides a comprehensive suite of form input components designed to work seamlessly with the `@netdjw/ddata-core` ecosystem. It eliminates the need to build custom input components from scratch by providing battle-tested, feature-rich components with consistent APIs, built-in validation, and standardized UI patterns.
 
 ## Why Use DData UI Input Instead of Custom Implementation?
 
@@ -322,21 +322,21 @@ Instead of implementing these patterns repeatedly:
 ddata-ui-input is the **presentation layer** that sits on top of ddata-core's **data management layer**:
 
 ```
-┌─────────────────────────────────────────┐
+┌───────────────────────────────────────┐
 │           ddata-ui-input                │  ← Presentation Layer
 │  ┌─────────────┐ ┌─────────────┐       │
 │  │ dd-input    │ │ dd-select   │ ...   │
 │  │ dd-textarea │ │ dd-checkbox │       │
 │  └─────────────┘ └─────────────┘       │
-└─────────────────┬───────────────────────┘
+└─────────────────┬────────────────────────┘
                   │ uses
-┌─────────────────┴───────────────────────┐
+┌─────────────────┴────────────────────────┐
 │              ddata-core                 │  ← Data Management Layer
 │  ┌─────────────┐ ┌─────────────┐       │
 │  │ BaseModel   │ │ Validation  │       │
 │  │ ProxyService│ │ LocalStorage│       │
 │  └─────────────┘ └─────────────┘       │
-└─────────────────────────────────────────┘
+└───────────────────────────────────────┘
 ```
 
 ### **Model-Driven Architecture**
@@ -434,7 +434,7 @@ export class User extends BaseModel {
 ## Dependencies
 
 **Core Dependencies:**
-- **ddata-core** (^0.3.8) - **REQUIRED** - Provides BaseModel, validation, field definitions, and data management
+- **@netdjw/ddata-core** (^0.3.8) - **REQUIRED** - Provides BaseModel, validation, field definitions, and data management
 - **@angular/common** (>=13.2.3) - Angular common module for directives and pipes
 - **@angular/core** (>=13.2.3) - Angular core framework
 
@@ -447,14 +447,14 @@ export class User extends BaseModel {
 - **ngx-material-timepicker** (^5.5.3) - Material Design time picker component
 
 **Utility Dependencies:**
-- **ddata-ui-common** (^0.1.17) - Shared UI utilities and base components
+- **@netdjw/ddata-ui-common** (^0.1.17) - Shared UI utilities and base components
 - **moment** (^2.27.0) - Date/time manipulation and formatting
 - **@angular/localize** (>=12.2.11) - Internationalization support
 - **pluralize** (^8.0.0) - English pluralization rules (for word counters)
 
 **Why Each Dependency Matters:**
 
-- **ddata-core**: Without this, components won't have validation, field metadata, or model structure
+- **@netdjw/ddata-core**: Without this, components won't have validation, field metadata, or model structure
 - **FontAwesome**: Provides consistent iconography across all input components
 - **ng-bootstrap**: Powers the professional date picker experience
 - **ngx-color-picker**: Enables advanced color selection with RGB, HSL, HEX support  
@@ -465,7 +465,7 @@ export class User extends BaseModel {
 ## Module Import
 
 ```typescript
-import { DdataUiInputModule } from 'ddata-ui-input';
+import { DdataUiInputModule } from '@netdjw/ddata-ui-input';
 
 @NgModule({
   imports: [
@@ -2625,7 +2625,7 @@ export class User extends BaseModel {
 export class User extends BaseModel {
   validationRules = {
     // Expensive regex on every keystroke
-    email: ['required', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/']
+    email: ['required', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/']
   };
 }
 ```
