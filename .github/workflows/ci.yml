@@ -38,6 +38,10 @@ jobs:
         npm run build:ui-input
         npm run build:ui-file
 
+    # Installs the packed packages into a scratch project and imports them, like a consumer would.
+    - name: Verify consumer installation
+      run: npm run verify:consumer
+
     - name: Lint
       run: npm run lint
 
