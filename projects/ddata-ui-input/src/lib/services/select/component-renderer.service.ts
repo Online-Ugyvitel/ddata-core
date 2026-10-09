@@ -75,10 +75,10 @@ export class ComponentRendererService {
     }
 
     // Set model if it exists on the instance (not all components may have this property)
-    if ('model' in this.componentRef.instance) {
+    if (!!this.componentRef.instance && 'model' in this.componentRef.instance) {
       (this.componentRef.instance as { model: unknown }).model = (
-        dialogContent.data as { model: unknown }
-      ).model;
+        dialogContent.data as { model: unknown } | undefined
+      )?.model;
     }
 
     this.instance = this.componentRef.instance;

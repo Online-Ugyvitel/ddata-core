@@ -7,18 +7,20 @@ export class TestModel implements TestModelInterface {
   readonly api_endpoint = '/test';
   readonly model_name = 'TestModel';
   readonly use_localstorage = false;
-  
+
   id: ID = 0 as ID;
   name: string = '';
   tabs?: any;
   isValid = false;
-  validationErrors: string[] = [];
+  validationErrors: Array<string> = [];
   validationRules: ValidationRuleInterface = {};
 
   init(data?: any): TestModelInterface {
     const incoming = !!data ? data : {};
-    this.id = !!incoming.id ? incoming.id as ID : 0 as ID;
+
+    this.id = !!incoming.id ? (incoming.id as ID) : (0 as ID);
     this.name = !!incoming.name ? incoming.name : '';
+
     return this;
   }
 
@@ -100,13 +102,15 @@ export class TestModel implements TestModelInterface {
     this.isValid = true;
   }
 
-  getValidatedErrorFields(): string[] {
+  getValidatedErrorFields(): Array<string> {
     return this.validationErrors;
   }
 
   setDate(date: Date, days: number): ISODate {
     const newDate = new Date(date);
+
     newDate.setDate(newDate.getDate() + days);
+
     return newDate.toISOString().split('T')[0] as ISODate;
   }
 
@@ -115,7 +119,9 @@ export class TestModel implements TestModelInterface {
   }
 
   getCurrentISODate(): ISODate {
-    return new Date().toISOString().split('T')[0] as ISODate;
+    const isoString = new Date().toISOString();
+
+    return isoString.split('T')[0] as ISODate;
   }
 
   toISODate(date: Date): ISODate {
@@ -128,7 +134,9 @@ export class TestModel implements TestModelInterface {
 
   calculateDateWithoutWeekend(date: string, days: number, sequence: string): ISODate {
     const startDate = new Date(date);
+
     startDate.setDate(startDate.getDate() + days);
+
     return startDate.toISOString().split('T')[0] as ISODate;
   }
 

@@ -35,7 +35,7 @@ export class HelperActivatedRouteService {
    */
   getId(): number {
     let id = 0;
-    const url = window.location.href;
+    const url = this.getHref();
     const urlParts = url.split('/');
     const itemsNumber = urlParts.length - 1;
     const regex = new RegExp(/^\d+$/);
@@ -64,7 +64,7 @@ export class HelperActivatedRouteService {
    */
   getUniqueListId(): number {
     let id = 0;
-    const url = window.location.href;
+    const url = this.getHref();
     const urlParts = url.split('/');
     const regex = new RegExp(/^\d+$/);
     const isUrlIncludeList = urlParts.includes('list');
@@ -88,7 +88,7 @@ export class HelperActivatedRouteService {
    */
   getUniqueId(lastWord: string): number {
     let id = 0;
-    const url = window.location.href;
+    const url = this.getHref();
     const urlParts = url.split('/');
     const regex = new RegExp(/^\d+$/);
     const isUrlIncludeList = urlParts.includes(lastWord);
@@ -102,5 +102,12 @@ export class HelperActivatedRouteService {
     }
 
     return id;
+  }
+
+  /**
+   * The current URL of the browser. It is a separate method so the URL can be replaced in tests.
+   */
+  protected getHref(): string {
+    return window.location.href;
   }
 }

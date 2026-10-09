@@ -28,7 +28,16 @@ export class DdataMultipleSelectComponent {
 
   // behavior
   @Input() mode: SelectType = 'multiple';
-  @Input() isRequire = false;
+  @Input() set isRequired(value: boolean) {
+    this._isRequired = value;
+    // ensure OnPush view picks up external or direct changes
+    this.changeDetector.markForCheck();
+  }
+
+  get isRequired(): boolean {
+    return this._isRequired;
+  }
+
   @Input() disabledAppearance = false;
   @Input() disabled = false;
   @Input() addEmptyOption = true;
@@ -78,6 +87,8 @@ export class DdataMultipleSelectComponent {
   private readonly helperService: InputHelperServiceInterface =
     DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
 
+  // tslint:disable-next-line:variable-name  (intentionally using leading underscore for backing field of Input setter)
+  private _isRequired = false;
   private readonly random: string = this.helperService.randChars();
   private internalDialogSettings: DialogContentWithOptionsInterface;
   isModalVisible = false;
@@ -93,8 +104,13 @@ export class DdataMultipleSelectComponent {
   }
 
   showModal(): void {
-    this.isModalVisible = true;
+    if (!this.internalDialogSettings) {
+      console.error('dialogSettings is not defined. Cannot show modal.');
 
+      return;
+    }
+
+    this.isModalVisible = true;
     this.changeDetector.detectChanges();
   }
 
@@ -106,20 +122,22 @@ export class DdataMultipleSelectComponent {
     this.selected.emit(event);
   }
 
-  selectModelEmit(event: Record<string, unknown>): void {
-    event.is_selected = true;
+  selectModelEmit(event: unknown): void {
+    const record = event as Record<string, unknown>;
+
+    record.is_selected = true;
 
     if (this.mode === 'single') {
-      this.model[this.getObjectFieldName()] = event;
-      this.model[this.field] = event.id;
+      this.model[this.getObjectFieldName()] = record;
+      this.model[this.field] = record.id;
     }
 
     if (this.mode === 'multiple') {
       // TODO avoid duplicate add
-      this.model[this.field].push(event);
+      this.model[this.field].push(record);
     }
 
-    this.selectModel.emit(event);
+    this.selectModel.emit(record);
   }
 
   deleteFromMultipleSelectedList(item: BaseModelInterface<unknown>): void {
@@ -148,5 +166,9 @@ export class DdataMultipleSelectComponent {
 
   getObjectFieldName(): string {
     return this.field.split('_id')[0];
+  }
+
+  trackByFn(index: number, item: unknown): unknown {
+    return item || index;
   }
 }
