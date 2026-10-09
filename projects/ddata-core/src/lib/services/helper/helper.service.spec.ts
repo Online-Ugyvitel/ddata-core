@@ -1,11 +1,8 @@
 // tslint:disable: max-line-length
 /* eslint-disable max-classes-per-file */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable jasmine/no-spec-dupes */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
+
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
@@ -83,7 +80,7 @@ class MockProxyService {
       to: 0,
       total: 0,
       last_page: 1
-    } as PaginateInterface);
+    });
   }
 }
 
@@ -148,8 +145,8 @@ describe('HelperService', () => {
     };
 
     // Mock both static properties
-    DdataCoreModule.InjectorInstance = mockInjector as any;
-    DdataInjectorModule.InjectorInstance = mockInjector as any;
+    DdataCoreModule.InjectorInstance = mockInjector;
+    DdataInjectorModule.InjectorInstance = mockInjector;
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
@@ -174,8 +171,8 @@ describe('HelperService', () => {
 
   afterEach(() => {
     // Clean up the static properties
-    DdataCoreModule.InjectorInstance = null as any;
-    DdataInjectorModule.InjectorInstance = null as any;
+    DdataCoreModule.InjectorInstance = null;
+    DdataInjectorModule.InjectorInstance = null;
   });
 
   it('should be created', () => {

@@ -8,9 +8,7 @@ import { DdataChooseSelectedButtonComponentInterface } from './dd-choose-selecte
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DdataChooseSelectedButtonComponent
-  implements DdataChooseSelectedButtonComponentInterface
-{
+export class DdataChooseSelectedButtonComponent implements DdataChooseSelectedButtonComponentInterface {
   @Input() multipleSelectEnabled = true;
   @Output() readonly choosed: EventEmitter<void> = new EventEmitter();
 

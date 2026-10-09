@@ -48,40 +48,40 @@ export class FileModel extends BaseModel implements FileModelInterface {
   // Accept any raw data so tests and external callers can supply primitive literals
   // that will be coerced into the branded domain field types internally.
   // (Using `any` here avoids widespread casting in tests for branded types.)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   init(data: any = {}): FileModelInterface {
     const d = data || {};
 
     // Allow raw primitives in tests and coerce to branded types
-    this.id = (d.id as unknown as ID) ?? (0 as ID);
-    
+    this.id = d.id ?? (0 as ID);
+
     if (this.id === (undefined as unknown as ID) || this.id === (null as unknown as ID)) {
       this.id = 0 as ID;
     }
-    
-    this.folder_id = (d.folder_id as unknown as ID) ?? (0 as ID);
-    
+
+    this.folder_id = d.folder_id ?? (0 as ID);
+
     if (
       this.folder_id === (undefined as unknown as ID) ||
       this.folder_id === (null as unknown as ID)
     ) {
       this.folder_id = 0 as ID;
     }
-    
-    this.name = (d.name as unknown as FileName) ?? ('' as FileName);
 
-    this.file_name_and_path =
-      (d.file_name_and_path as unknown as FileNameWithPath) ?? ('' as FileNameWithPath);
-    this.file_name_slug = (d.file_name_slug as unknown as FileNameSlug) ?? ('' as FileNameSlug);
-    this.size = (d.size as unknown as FileSizeInByte) ?? (0 as FileSizeInByte);
-    
+    this.name = d.name ?? ('' as FileName);
+
+    this.file_name_and_path = d.file_name_and_path ?? ('' as FileNameWithPath);
+    this.file_name_slug = d.file_name_slug ?? ('' as FileNameSlug);
+    this.size = d.size ?? (0 as FileSizeInByte);
+
     if (
       (this.size as unknown as number) === undefined ||
       (this.size as unknown as number) === null
     ) {
       this.size = 0 as FileSizeInByte;
     }
-    
-    this.mimetype = (d.mimetype as unknown as MimeType) ?? ('' as MimeType);
+
+    this.mimetype = d.mimetype ?? ('' as MimeType);
 
     // Convert is_primary truthy/falsy semantics
     this.is_primary = !!(d as Record<string, unknown>).is_primary;

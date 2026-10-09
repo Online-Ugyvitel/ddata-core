@@ -51,6 +51,7 @@ describe('DdataInputSearchComponent', () => {
         if (tokenStr.includes('SpinnerService')) {
           return mockSpinnerService;
         }
+
         if (tokenStr.includes('ProxyFactoryService')) {
           return mockProxyFactoryService;
         }
@@ -67,7 +68,7 @@ describe('DdataInputSearchComponent', () => {
       })
     };
 
-  // Set the mock injectors (core + injector module used by RemoteDataService)
+    // Set the mock injectors (core + injector module used by RemoteDataService)
     DdataCoreModule.InjectorInstance = mockInjector;
     (DdataInjectorModule as unknown as { InjectorInstance: unknown }).InjectorInstance =
       mockInjector;

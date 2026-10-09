@@ -15,7 +15,8 @@ export interface FolderUIFieldsInterface {
   title: string;
 }
 export interface FolderInterface
-  extends FolderUIFieldsInterface,
+  extends
+    FolderUIFieldsInterface,
     BaseModelWithoutTypeDefinitionInterface,
     FieldsInterface<FolderUIFieldsInterface> {
   id: ID;

@@ -4,10 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DdataUiCommonModule } from 'ddata-ui-common';
 import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
-import {
-  MatTimepickerModule,
-  provideNativeDateTimeAdapter
-} from '@dhutaryan/ngx-mat-timepicker';
+import { MatTimepickerModule, provideNativeDateTimeAdapter } from '@dhutaryan/ngx-mat-timepicker';
 
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { DdataInputCheckboxComponent } from './components/checkbox/checkbox.component';

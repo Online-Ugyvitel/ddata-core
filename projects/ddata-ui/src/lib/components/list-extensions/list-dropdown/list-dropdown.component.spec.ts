@@ -41,12 +41,6 @@ describe('ListDropdownComponent', () => {
   let component: ListDropdownComponent;
   let fixture: ComponentFixture<ListDropdownComponent>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ListDropdownComponent],
@@ -67,42 +61,39 @@ describe('ListDropdownComponent', () => {
 
   it('createCertificate() should create certificate', () => {
     component = new ListDropdownComponent();
-    // eslint-disable-next-line no-undef
+
     spyOn(console, 'error');
     component.createCertificate(1);
 
-    // eslint-disable-next-line no-undef
     expect(console.error).toHaveBeenCalledWith('Missing company data.');
 
     component.company = new Company().init();
     component.company.id = 11 as ID;
     let newCertificate: CertificationInterface;
 
-    // eslint-disable-next-line no-undef
     spyOn(console, 'log');
 
     component.createCertificate(11);
     fixture.detectChanges();
 
-    // eslint-disable-next-line no-undef, no-console
+    // eslint-disable-next-line no-console
     expect(console.log).toHaveBeenCalledWith('Model hiba');
 
     component.createCertificate(17);
     fixture.detectChanges();
 
-    // eslint-disable-next-line no-undef, no-console
+    // eslint-disable-next-line no-console
     expect(console.log).toHaveBeenCalledWith('Model hiba');
 
     component.createCertificate(18);
     fixture.detectChanges();
 
-    // eslint-disable-next-line no-undef, no-console
+    // eslint-disable-next-line no-console
     expect(console.log).toHaveBeenCalledWith('Model hiba');
 
     component.createCertificate(1);
     fixture.detectChanges();
 
-    // eslint-disable-next-line no-undef
     expect(console.error).toHaveBeenCalledWith('Certificate_id (', 1, ') is not valid.');
 
     spyOn(component.showModal, 'emit');

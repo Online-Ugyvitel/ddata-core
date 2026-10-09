@@ -14,12 +14,6 @@ describe('DdataUiConfirmDialogComponent', () => {
   let debugElement;
   let element;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DdataUiConfirmDialogComponent],
@@ -45,28 +39,28 @@ describe('DdataUiConfirmDialogComponent', () => {
   it('showDialog flag should toggle visibility logic', () => {
     expect(component.showDialog).toBe(false);
     component.showDialog = true;
-    
+
     expect(component.showDialog).toBe(true);
     component.cancel();
-    
+
     expect(component.showDialog).toBe(false);
   });
 
   it('cancel() method should set showDialog to false', () => {
     component.showDialog = true;
-    
+
     expect(component.showDialog).toBe(true);
     component.cancel();
-    
+
     expect(component.showDialog).toBe(false);
   });
 
   it('confirmModal() method should set showDialog to false', () => {
     component.showDialog = true;
-    
+
     expect(component.showDialog).toBe(true);
     component.confirmModal();
-    
+
     expect(component.showDialog).toBe(false);
   });
 });

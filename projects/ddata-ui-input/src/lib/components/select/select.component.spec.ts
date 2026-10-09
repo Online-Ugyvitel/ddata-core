@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/dot-notation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DdataSelectComponent } from './select.component';
 import { DdataCoreModule } from 'ddata-core';
@@ -59,15 +58,19 @@ describe('DdataSelectComponent', () => {
                 return false;
               }
               const validationRule = model.validationRules[field];
+
               if (Array.isArray(validationRule)) {
                 return validationRule.includes('required');
               }
+
               if (typeof validationRule === 'object' && !!validationRule.required) {
                 return true;
               }
+
               if (typeof validationRule === 'string') {
                 return validationRule === 'required';
               }
+
               return false;
             } catch {
               return false;
@@ -144,13 +147,13 @@ describe('DdataSelectComponent', () => {
     });
 
     it('should default to simple mode when null is provided', () => {
-      component.mode = null as any as SelectType;
+      component.mode = null;
 
       expect(component.mode).toBe('simple');
     });
 
     it('should default to simple mode when undefined is provided', () => {
-      component.mode = undefined as any as SelectType;
+      component.mode = undefined;
 
       expect(component.mode).toBe('simple');
     });
@@ -173,7 +176,6 @@ describe('DdataSelectComponent', () => {
     });
 
     it('should handle model without fields', () => {
-      // eslint-disable-next-line no-undef
       spyOn(console, 'error');
       const modelWithoutFields = { ...mockModel, fields: null };
 
@@ -181,7 +183,6 @@ describe('DdataSelectComponent', () => {
       component.mode = 'single';
       component.model = modelWithoutFields as any;
 
-      // eslint-disable-next-line no-undef
       expect(console.error).toHaveBeenCalledWith(
         `Your ${modelWithoutFields.model_name}'s 'fields' field is`,
         null
@@ -189,7 +190,6 @@ describe('DdataSelectComponent', () => {
     });
 
     it('should handle model with missing field definition', () => {
-      // eslint-disable-next-line no-undef
       spyOn(console, 'error');
       const modelWithMissingField = {
         ...mockModel,
@@ -201,7 +201,6 @@ describe('DdataSelectComponent', () => {
       component.field = 'missing_field';
       component.model = modelWithMissingField as any;
 
-      // eslint-disable-next-line no-undef
       expect(console.error).toHaveBeenCalledWith(
         `The ${modelWithMissingField.model_name}'s missing_field field is `,
         undefined

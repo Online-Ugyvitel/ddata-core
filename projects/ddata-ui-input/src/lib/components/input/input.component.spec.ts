@@ -244,12 +244,11 @@ describe('DdataInputComponent counters', () => {
 
     fixture = TestBed.createComponent(DdataInputComponent);
     component = fixture.componentInstance;
-
     const model = new FakeModel();
 
     model.textField = 'alpha, beta, gamma';
     component.field = 'textField';
-    component.model = model as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+    component.model = model;
   });
 
   it('should not render counters by default', () => {
@@ -263,7 +262,6 @@ describe('DdataInputComponent counters', () => {
     fixture.componentRef.setInput('enableCharacterCounter', true);
     fixture.componentRef.setInput('maxLength', 100);
     fixture.detectChanges();
-
     const counter: HTMLElement = fixture.nativeElement.querySelector('character-counter');
 
     expect(counter.textContent?.trim()).toBe('18 / 100');
@@ -274,7 +272,6 @@ describe('DdataInputComponent counters', () => {
     fixture.componentRef.setInput('maxWords', 2);
     fixture.componentRef.setInput('wordCounterWarningMessage', 'Too many words');
     fixture.detectChanges();
-
     const counter: HTMLElement = fixture.nativeElement.querySelector('dd-word-counter');
 
     expect(counter.textContent?.trim()).toBe('3 / 2');

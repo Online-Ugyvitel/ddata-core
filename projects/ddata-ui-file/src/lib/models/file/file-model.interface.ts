@@ -22,7 +22,8 @@ export interface FileModelUIFieldsInterface {
   title: string;
 }
 export interface FileModelInterface
-  extends FileModelUIFieldsInterface,
+  extends
+    FileModelUIFieldsInterface,
     BaseModelWithoutTypeDefinitionInterface,
     FieldsInterface<FileModelUIFieldsInterface> {
   id: ID;

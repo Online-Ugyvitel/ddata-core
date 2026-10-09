@@ -157,12 +157,12 @@ describe('DdataTextareaComponent', () => {
     model.fields = { fake: { title: 'a' } };
 
     component.field = 'fake';
-    component.model = model as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+    component.model = model;
 
     expect(component._title).toBe('Test Title');
 
     model.fields = {};
-    component.model = model as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+    component.model = model;
 
     expect(mockInputHelperService.getTitle).toHaveBeenCalledWith(jasmine.any(BaseModel), 'fake');
   });
@@ -173,12 +173,12 @@ describe('DdataTextareaComponent', () => {
     model.fields = { fake: { label: 'a' } };
 
     component.field = 'fake';
-    component.model = model as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+    component.model = model;
 
     expect(component._label).toBe('Test Label');
 
     model.fields = {};
-    component.model = model as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+    component.model = model;
 
     expect(mockInputHelperService.getLabel).toHaveBeenCalledWith(jasmine.any(BaseModel), 'fake');
   });
@@ -189,12 +189,12 @@ describe('DdataTextareaComponent', () => {
     model.fields = { fake: { placeholder: 'a' } };
 
     component.field = 'fake';
-    component.model = model as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+    component.model = model;
 
     expect(component._placeholder).toBe('Test Placeholder');
 
     model.fields = {};
-    component.model = model as BaseModelInterface<unknown> & FieldsInterface<unknown>;
+    component.model = model;
 
     expect(mockInputHelperService.getPlaceholder).toHaveBeenCalledWith(
       jasmine.any(BaseModel),
@@ -232,7 +232,6 @@ describe('DdataTextareaComponent counters', () => {
 
     fixture = TestBed.createComponent(DdataTextareaComponent);
     component = fixture.componentInstance;
-
     const model = new BaseModel() as BaseModelInterface<unknown> & FieldsInterface<unknown>;
 
     (model as unknown as Record<string, string>)['description'] = 'one, two, three';
@@ -248,7 +247,6 @@ describe('DdataTextareaComponent counters', () => {
     fixture.componentRef.setInput('maxLength', 50);
     fixture.componentRef.setInput('maxWords', 5);
     fixture.detectChanges();
-
     const characterCounter: HTMLElement = fixture.nativeElement.querySelector('character-counter');
     const wordCounter: HTMLElement = fixture.nativeElement.querySelector('dd-word-counter');
 

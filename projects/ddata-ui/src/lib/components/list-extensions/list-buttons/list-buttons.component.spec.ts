@@ -10,12 +10,6 @@ describe('ListButtonsComponent', () => {
   let component: ListButtonsComponent;
   let fixture: ComponentFixture<ListButtonsComponent>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ListButtonsComponent],

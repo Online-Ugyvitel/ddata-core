@@ -12,12 +12,6 @@ describe('DdataUiFileListComponent', () => {
   let component: DdataUiFileListComponent;
   let fixture: ComponentFixture<DdataUiFileListComponent>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [Injector],
@@ -38,8 +32,8 @@ describe('DdataUiFileListComponent', () => {
   it('delete should delete a file', () => {
     component = new DdataUiFileListComponent();
     component.model.files = [
-      new FileModel().init({ name: 'test' } as unknown as Partial<FileModelInterface>),
-      new FileModel().init({ name: 'test2' } as unknown as Partial<FileModelInterface>)
+      new FileModel().init({ name: 'test' }),
+      new FileModel().init({ name: 'test2' })
     ];
     component.delete(component.model.files[0]);
 
@@ -48,10 +42,7 @@ describe('DdataUiFileListComponent', () => {
 
   it('fileuploadSuccess() should update model', () => {
     component = new DdataUiFileListComponent();
-    const files = [
-      new FileModel().init({ name: 'test' } as unknown as Partial<FileModelInterface>),
-      new FileModel().init({ name: 'test2' } as unknown as Partial<FileModelInterface>)
-    ];
+    const files = [new FileModel().init({ name: 'test' }), new FileModel().init({ name: 'test2' })];
 
     component.fileuploadSuccess(files);
 
@@ -78,15 +69,13 @@ describe('DdataUiFileListComponent', () => {
       new FileModel().init({
         name: 'test',
         file_name_slug: 'a'
-      } as unknown as Partial<FileModelInterface>),
+      }),
       new FileModel().init({
         name: 'test2',
         file_name_slug: 'b'
-      } as unknown as Partial<FileModelInterface>)
+      })
     ];
-    component.setPrimaryImage(
-      new FileModel().init({ file_name_slug: 'b' } as unknown as Partial<FileModelInterface>)
-    );
+    component.setPrimaryImage(new FileModel().init({ file_name_slug: 'b' }));
 
     expect(component.model.files[1].is_primary).toBeTrue();
   });

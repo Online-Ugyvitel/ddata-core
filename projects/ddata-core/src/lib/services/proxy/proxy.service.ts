@@ -195,11 +195,10 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
             this.localStorageService.delete(model);
           }
         }),
-        switchMap(
-          (): Observable<PaginateInterface> =>
-            this.remoteStorageService
-              .getAll()
-              .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
+        switchMap((): Observable<PaginateInterface> =>
+          this.remoteStorageService
+            .getAll()
+            .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
         )
       );
     } else {
@@ -241,11 +240,10 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
             });
           }
         }),
-        switchMap(
-          (): Observable<PaginateInterface> =>
-            this.remoteStorageService
-              .getAll()
-              .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
+        switchMap((): Observable<PaginateInterface> =>
+          this.remoteStorageService
+            .getAll()
+            .pipe(map((resultGetAll: PaginateInterface): PaginateInterface => resultGetAll))
         )
       );
     } else {

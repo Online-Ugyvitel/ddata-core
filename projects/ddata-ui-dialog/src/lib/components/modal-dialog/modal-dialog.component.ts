@@ -1,4 +1,5 @@
 // tslint:disable-next-line: max-line-length
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ChangeDetectorRef,
   Component,
@@ -55,15 +56,13 @@ export class DdataUiModalDialogComponent {
 
   isModalVisible = false;
   componentSubscription!: Subscription;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   componentRef!: ComponentRef<any>;
   icon = {
     close: faTimes
   };
 
-  constructor(
-    private readonly changeDetector: ChangeDetectorRef
-  ) {}
+  constructor(private readonly changeDetector: ChangeDetectorRef) {}
 
   close(emit: boolean = true): void {
     this.changeModalStatus(false);
@@ -87,15 +86,16 @@ export class DdataUiModalDialogComponent {
     if (!this.dialogContent) {
       return;
     }
+
     this.dialogHost.clear();
 
     this.componentRef = this.dialogHost.createComponent(this.dialogContent.component);
 
     if (!!this.dialogContent.data.model) {
       // Assign provided model (could be plain object in tests) with relaxed casting
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this.componentRef.instance as BaseCreateEditComponent<BaseModelInterface<any>>).model =
-        (this.dialogContent.data.model as any);
+
+      (this.componentRef.instance as BaseCreateEditComponent<BaseModelInterface<any>>).model = this
+        .dialogContent.data.model as any;
     }
 
     (this.componentRef.instance as DialogContentInterface).data = this.dialogContent.data;
@@ -109,25 +109,25 @@ export class DdataUiModalDialogComponent {
 
     if (!!this.dialogContent.data) {
       (this.componentRef.instance as DialogContentInterface).isModal = true;
-      (this.componentRef.instance as DialogContentInterface).multipleSelectEnabled =
-        (this.dialogContent.data.multipleSelectEnabled as any);
-      (this.componentRef.instance as DialogContentInterface).isSelectionList =
-        (this.dialogContent.data.isSelectionList as any);
-      (this.componentRef.instance as DialogContentInterface).loadData =
-        (this.dialogContent.data.loadData as any);
+      (this.componentRef.instance as DialogContentInterface).multipleSelectEnabled = this
+        .dialogContent.data.multipleSelectEnabled as any;
+      (this.componentRef.instance as DialogContentInterface).isSelectionList = this.dialogContent
+        .data.isSelectionList as any;
+      (this.componentRef.instance as DialogContentInterface).loadData = this.dialogContent.data
+        .loadData as any;
       (this.componentRef.instance as DialogContentInterface).filter =
         (this.dialogContent.data.filter as any) ?? {};
 
       // if the list component has preloaded datas
       if (!this.dialogContent.data.loadData && !!this.dialogContent.data.models) {
-        (this.componentRef.instance as DialogContentInterface).models =
-          (this.dialogContent.data.models as any);
+        (this.componentRef.instance as DialogContentInterface).models = this.dialogContent.data
+          .models as any;
       }
 
       // if there are previously selected elements
       if (!!this.dialogContent.data.selectedElements) {
         (this.componentRef.instance as DialogContentInterface).selectedElements = [
-          ...(this.dialogContent.data.selectedElements as any[])
+          ...(this.dialogContent.data.selectedElements as Array<any>)
         ];
       }
 

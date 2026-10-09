@@ -131,7 +131,7 @@ export class DdataSelectComponent {
     this.field$.set(fieldValue);
     // Recalculate meta information (label, prepend, append, required) if model already present
     const currentModel = this.model$();
-    
+
     if (currentModel) {
       try {
         if (currentModel.fields && currentModel.fields[fieldValue]) {

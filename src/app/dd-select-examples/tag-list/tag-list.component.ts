@@ -5,7 +5,7 @@ import { DdSelectExampleService } from '../dd-select-example.service';
 import { Tag } from '../tag.model';
 
 @Component({
-  selector: 'tag-list',
+  selector: 'dd-tag-list',
   templateUrl: './tag-list.component.html',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush

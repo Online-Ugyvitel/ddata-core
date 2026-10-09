@@ -11,7 +11,8 @@ export interface SearchUIFieldsInterface {
 }
 
 export interface SearchInterface
-  extends SearchUIFieldsInterface,
+  extends
+    SearchUIFieldsInterface,
     BaseModelInterface<SearchInterface>,
     BaseModelWithoutTypeDefinitionInterface {
   id: ID;

@@ -12,7 +12,8 @@ export interface AddressUIFieldsInterface {
 }
 
 export interface AddressInterface
-  extends AddressUIFieldsInterface,
+  extends
+    AddressUIFieldsInterface,
     BaseModelInterface<AddressInterface>,
     FieldsInterface<AddressUIFieldsInterface> {
   id: ID;

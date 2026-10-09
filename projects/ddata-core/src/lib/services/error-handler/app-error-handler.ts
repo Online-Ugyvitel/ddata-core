@@ -35,49 +35,34 @@ export class DdataCoreErrorHandler extends ErrorHandler {
 
   handleError(err: any): any {
     const router = DdataInjectorModule.InjectorInstance.get(Router);
-    const error = !!err.originalError ? err.originalError : err;
+    const error = err?.originalError || err;
+    const status: number | undefined = error?.status;
     let result: any;
 
     console.error('A részletes hiba:', err);
+    // each status code is handled by its own error class
+    const creators: Record<number, () => unknown> = {
+      400: () => new BadRequest(error, this.notificationService),
+      401: () => new UnauthorizedError(router, error, this.storageService),
+      403: () => new ForbiddenError(error, this.notificationService),
+      404: () => new NotFoundError(error, this.notificationService),
+      405: () => new MethodNotAllowedError(error, this.notificationService),
+      422: () => new UnprocessableEntity(error, this.notificationService),
+      430: () => new ErrorMessageFromApi(error, this.notificationService),
+      480: () => new AppValidationError(error, this.notificationService),
+      500: () => new InternalServerError(error, this.notificationService),
+      580: () => new ThirdPartyError(error, this.notificationService)
+    };
 
-    if (error.status === 400) {
-      result = throwError(new BadRequest(error, this.notificationService));
+    if (status !== undefined && creators[status]) {
+      result = throwError(creators[status]());
     }
 
-    if (error.status === 401) {
-      result = throwError(new UnauthorizedError(router, error, this.storageService));
-    }
-
-    if (error.status === 403) {
-      result = throwError(new ForbiddenError(error, this.notificationService));
-    }
-
-    if (error.status === 404) {
-      result = throwError(new NotFoundError(error, this.notificationService));
-    }
-
-    if (error.status === 405) {
-      result = throwError(new MethodNotAllowedError(error, this.notificationService));
-    }
-
-    if (error.status === 422) {
-      result = throwError(new UnprocessableEntity(error, this.notificationService));
-    }
-
-    if (error.status === 430) {
-      result = throwError(new ErrorMessageFromApi(error, this.notificationService));
-    }
-
-    if (error.status === 480 || err instanceof AppValidationError) {
+    if (
+      status !== 480 &&
+      (err instanceof AppValidationError || error instanceof AppValidationError)
+    ) {
       result = throwError(new AppValidationError(error, this.notificationService));
-    }
-
-    if (error.status === 500) {
-      result = throwError(new InternalServerError(error, this.notificationService));
-    }
-
-    if (error.status === 580) {
-      result = throwError(new ThirdPartyError(error, this.notificationService));
     }
 
     this.spinner.off('ERROR_HANDLER');

@@ -168,9 +168,9 @@ export class DdataInputTimeComponent implements AfterViewInit {
     if (typeof value !== 'string' || !/^\d{1,2}:\d{2}$/.test(value)) {
       return null;
     }
-
     const [hours, minutes] = value.split(':').map(Number);
     const result = new Date();
+
     result.setHours(hours, minutes, 0, 0);
 
     return Number.isNaN(result.getTime()) ? null : result;

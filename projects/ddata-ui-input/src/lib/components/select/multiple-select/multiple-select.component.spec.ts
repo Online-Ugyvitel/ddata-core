@@ -137,24 +137,20 @@ describe('DdataMultipleSelectComponent', () => {
     });
 
     it('should log error when null value is provided', () => {
-      // eslint-disable-next-line no-undef
       spyOn(console, 'error');
 
       component.dialogSettings = null;
 
-      // eslint-disable-next-line no-undef
       expect(console.error).toHaveBeenCalledWith(
         'You try to use dd-select as multiple select, but not defined dialogSettings. Please define it.'
       );
     });
 
     it('should log error when undefined value is provided', () => {
-      // eslint-disable-next-line no-undef
       spyOn(console, 'error');
 
       component.dialogSettings = undefined;
 
-      // eslint-disable-next-line no-undef
       expect(console.error).toHaveBeenCalledWith(
         'You try to use dd-select as multiple select, but not defined dialogSettings. Please define it.'
       );
@@ -423,7 +419,6 @@ describe('DdataMultipleSelectComponent', () => {
     });
 
     it('showModal should log error and not open when dialogSettings missing', () => {
-      // eslint-disable-next-line no-undef
       spyOn(console, 'error');
       // Force internal dialog settings to undefined
       (
@@ -433,7 +428,6 @@ describe('DdataMultipleSelectComponent', () => {
 
       component.showModal();
 
-      // eslint-disable-next-line no-undef
       expect(console.error).toHaveBeenCalledWith(
         'dialogSettings is not defined. Cannot show modal.'
       );

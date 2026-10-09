@@ -29,7 +29,7 @@ describe('DdataUiTagComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('class property should set _class to be the given value + \' tag\'', () => {
+  it("class property should set _class to be the given value + ' tag'", () => {
     component._class = '';
     component.class = 'Valami';
 
@@ -38,6 +38,7 @@ describe('DdataUiTagComponent', () => {
 
   it("deleteTag() method should call the delete property's emit", () => {
     const fakeModel = { name: 'Test Tag' } as any;
+
     component.tag = fakeModel;
     const fakeSpy = spyOn(component.delete, 'emit');
 
