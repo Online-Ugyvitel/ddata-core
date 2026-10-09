@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ShowSearchParametersComponent } from './show-search-parameters.component';
 
-xdescribe('ShowSearchParametersComponent', () => {
+describe('ShowSearchParametersComponent', () => {
   let component: ShowSearchParametersComponent;
   let fixture: ComponentFixture<ShowSearchParametersComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowSearchParametersComponent ]
-    })
-    .compileComponents();
+      declarations: [ShowSearchParametersComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
