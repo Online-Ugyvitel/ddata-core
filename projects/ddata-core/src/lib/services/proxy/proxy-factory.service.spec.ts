@@ -15,8 +15,9 @@ class MockModel implements BaseModelInterface<MockModel> {
   readonly model_name = 'MockModel';
   id: ID = 1 as ID;
   isValid = true;
-  validationErrors: string[] = [];
+  validationErrors: Array<string> = [];
   validationRules = {};
+  tabs?: any;
 
   // Required interface methods - minimal implementations for testing
   init(data?: any): any {
@@ -31,7 +32,7 @@ class MockModel implements BaseModelInterface<MockModel> {
     // Mock implementation
   }
 
-  getValidatedErrorFields(): string[] {
+  getValidatedErrorFields(): Array<string> {
     return [];
   }
 
@@ -62,8 +63,6 @@ class MockModel implements BaseModelInterface<MockModel> {
   getCurrentTime(): string {
     return '';
   }
-
-  tabs?: any;
 
   fieldAsBoolean(field: string, defaultValue: boolean, data: unknown): void {
     // Mock implementation
@@ -125,7 +124,9 @@ describe('ProxyFactoryService', () => {
 
   beforeEach(() => {
     // Create spy objects for dependencies
-    mockEnvService = jasmine.createSpyObj('EnvService', [], { environment: { apiUrl: 'http://localhost:3000/api' } });
+    mockEnvService = jasmine.createSpyObj('EnvService', [], {
+      environment: { apiUrl: 'http://localhost:3000/api' }
+    });
     mockHttpClient = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
 
     TestBed.configureTestingModule({
@@ -142,12 +143,14 @@ describe('ProxyFactoryService', () => {
         if (token === EnvService) {
           return mockEnvService;
         }
+
         if (token === HttpClient) {
           return mockHttpClient;
         }
+
         return null;
       })
-    } as any;
+    };
 
     service = TestBed.inject(ProxyFactoryService);
   });
@@ -170,14 +173,14 @@ describe('ProxyFactoryService', () => {
 
     it('should create an instance of the provided class', () => {
       const result = service.get(MockModel);
-      
+
       expect(result).toBeTruthy();
       expect(result instanceof ProxyService).toBe(true);
     });
 
     it('should return ProxyServiceInterface', () => {
       const result = service.get(MockModel);
-      
+
       // Check that the result implements ProxyServiceInterface methods
       expect(typeof result.getOne).toBe('function');
       expect(typeof result.getAll).toBe('function');
@@ -202,11 +205,11 @@ describe('ProxyFactoryService', () => {
 
     it('should create ProxyService with correct instance', () => {
       const result = service.get(MockModel);
-      
+
       // Access the private instance through the proxy service to verify it was created correctly
       // We can check this by calling a method that would use the instance
       expect(result).toBeDefined();
-      
+
       // Since ProxyService constructor takes an instance, and we can't directly access it,
       // we verify the service was created properly by checking it's not null/undefined
       expect(result).not.toBeNull();
@@ -216,7 +219,7 @@ describe('ProxyFactoryService', () => {
     it('should work with different model classes', () => {
       const result1 = service.get(MockModel);
       const result2 = service.get(MockModel); // Use the same model type for simplicity
-      
+
       expect(result1).toBeTruthy();
       expect(result2).toBeTruthy();
       expect(result1).not.toBe(result2); // Should be different instances
@@ -225,7 +228,7 @@ describe('ProxyFactoryService', () => {
     it('should create a new instance each time get is called', () => {
       const result1 = service.get(MockModel);
       const result2 = service.get(MockModel);
-      
+
       expect(result1).toBeTruthy();
       expect(result2).toBeTruthy();
       expect(result1).not.toBe(result2); // Should be different ProxyService instances
@@ -235,6 +238,7 @@ describe('ProxyFactoryService', () => {
   describe('Constructor', () => {
     it('should initialize without parameters', () => {
       const newService = new ProxyFactoryService<MockModel>();
+
       expect(newService).toBeTruthy();
       expect(typeof newService.get).toBe('function');
     });
@@ -242,7 +246,7 @@ describe('ProxyFactoryService', () => {
     it('should be instantiable directly', () => {
       const directService = new ProxyFactoryService<MockModel>();
       const result = directService.get(MockModel);
-      
+
       expect(result).toBeTruthy();
       expect(result instanceof ProxyService).toBe(true);
     });
@@ -254,7 +258,7 @@ describe('ProxyFactoryService', () => {
       // is properly constrained and works as expected
       const typedService = new ProxyFactoryService<MockModel>();
       const result: ProxyServiceInterface<MockModel> = typedService.get(MockModel);
-      
+
       expect(result).toBeTruthy();
       expect(typeof result.getOne).toBe('function');
     });
@@ -262,7 +266,7 @@ describe('ProxyFactoryService', () => {
     it('should create service with any model implementing BaseModelInterface', () => {
       const anyService = new ProxyFactoryService();
       const result = anyService.get(MockModel);
-      
+
       expect(result).toBeTruthy();
       expect(result instanceof ProxyService).toBe(true);
     });
