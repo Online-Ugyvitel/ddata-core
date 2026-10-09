@@ -1,10 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable no-param-reassign */
 /* eslint-disable jasmine/no-disabled-tests */
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
+
 // tslint:disable: variable-name
 import 'zone.js/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -308,7 +304,7 @@ xdescribe('RemoteDataService', () => {
       service.getOne(1).subscribe((res) => {
         expect(res).toBeTruthy();
         expect(res).toBeInstanceOf(DummyData);
-        expect(res.id).toBe(1 as ID);
+        expect(res.id).toBe(1);
       });
       const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/1');
 

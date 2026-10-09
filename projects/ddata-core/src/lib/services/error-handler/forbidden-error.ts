@@ -7,7 +7,7 @@ export class ForbiddenError extends DdataCoreError {
   constructor(originalError: any, notificationService: NotificationService) {
     super(originalError);
 
-    console.error('403 - Forbidden Error: ', originalError.error.message, originalError);
+    console.error('403 - Forbidden Error: ', originalError?.error?.message, originalError);
 
     notificationService.add(
       'Hiba',

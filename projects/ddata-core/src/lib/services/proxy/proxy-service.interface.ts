@@ -6,8 +6,9 @@ import { FileUploadProcessInterface } from '../../models/file/file-upload-proces
 import { DataServiceAbstractInterface } from '../data/data-service-abstract.interface';
 import { RequestHeaders } from '../remote-data/request-headers.type';
 
-export interface ProxyServiceInterface<T extends BaseModelInterface<T>>
-  extends DataServiceAbstractInterface<T> {
+export interface ProxyServiceInterface<
+  T extends BaseModelInterface<T>
+> extends DataServiceAbstractInterface<T> {
   getOne(id: number): Observable<T>;
   getAll(pageNumber?: number): Observable<PaginateInterface>;
   getAllSortedBy(fieldName?: string): Observable<Array<T>>;

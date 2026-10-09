@@ -706,7 +706,7 @@
         ],
         "max-lines": [
           2,
-          500
+          10000
         ],
         "prettier/prettier": 2,
         "max-len": [

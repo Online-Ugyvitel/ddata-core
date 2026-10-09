@@ -1,9 +1,5 @@
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
 import 'zone.js/testing';
 import { DdataUiUserThumbnailComponent } from './user-profile-thumbnail.component';
 
@@ -12,12 +8,6 @@ describe('DdataUiUserThumbnailComponent', () => {
   let fixture: ComponentFixture<DdataUiUserThumbnailComponent>;
   let debugElement;
   let element;
-
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
 
   beforeEach(() => {
     TestBed.configureTestingModule({

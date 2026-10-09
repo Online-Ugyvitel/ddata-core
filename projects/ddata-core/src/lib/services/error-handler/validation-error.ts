@@ -10,12 +10,12 @@ export class AppValidationError extends DdataCoreError {
     console.error('Validation Error: ', originalError.error);
     let str = 'Valamelyik adatmező nem a megfeleő formátumú';
 
-    if (!!originalError.error.errors) {
-      str = Object.values(originalError.error.errors).join('<br>');
+    if (!!originalError?.error?.errors) {
+      str = Object.values(originalError?.error?.errors).join('<br>');
     }
 
-    if (!!originalError.error.invalids) {
-      str = `A következő mezők rosszul lettek kitöltve:<br>${originalError.error.invalids.join(', ')}`;
+    if (!!originalError?.error?.invalids) {
+      str = `A következő mezők rosszul lettek kitöltve:<br>${originalError?.error?.invalids.join(', ')}`;
     }
 
     notificationService.add('Hiba', str, 'danger' as NotificationType);

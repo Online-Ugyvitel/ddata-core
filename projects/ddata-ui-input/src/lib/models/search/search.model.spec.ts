@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BaseSearch } from './base-search.model';
 import { Search } from './search-concrete.model';
 import { SearchInterface } from './search.interface';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let window: any;
 
 describe('Search Model', () => {

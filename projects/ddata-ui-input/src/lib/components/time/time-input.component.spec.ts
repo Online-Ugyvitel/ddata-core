@@ -60,15 +60,11 @@ describe('DdataInputTimeComponent', () => {
     component.field = 'api_endpoint';
     const fakeparameter = 'test';
 
-    expect(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (component.model as any).api_endpoint
-    ).toBe('/you/must/be/define/api_endpoint/in/your/model');
+    expect((component.model as any).api_endpoint).toBe(
+      '/you/must/be/define/api_endpoint/in/your/model'
+    );
     component.setTime(fakeparameter);
 
-    expect(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (component.model as any).api_endpoint
-    ).toBe(fakeparameter);
+    expect((component.model as any).api_endpoint).toBe(fakeparameter);
   });
 });
