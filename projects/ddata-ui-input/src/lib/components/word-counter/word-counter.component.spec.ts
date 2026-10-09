@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WordCounterComponent } from './word-counter.component';
 
@@ -6,11 +6,11 @@ describe('WordCounterComponent', () => {
   let component: WordCounterComponent;
   let fixture: ComponentFixture<WordCounterComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [WordCounterComponent]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(WordCounterComponent);

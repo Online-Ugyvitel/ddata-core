@@ -1627,7 +1627,7 @@ describe('ValidatorService', () => {
 
       try {
         validator.validateObject(invalidData, rules, true, settings);
-        fail('Should have thrown ValidationError');
+        expect.fail('Should have thrown ValidationError');
       } catch (error) {
         expect(error).toBeInstanceOf(ValidationError);
         expect(error.invalids).toContain('name');

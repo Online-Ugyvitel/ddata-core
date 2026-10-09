@@ -49,19 +49,23 @@ describe('DdataMultipleSelectComponent', () => {
     // Mock injector service
     let randCharsCounter = 0;
     const mockInjector = {
-      get: jasmine.createSpy('get').and.returnValue({
-        validateFieldValue: jasmine.createSpy('validateFieldValue').and.returnValue([]),
-        createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('test-id-123'),
-        randChars: jasmine
-          .createSpy('randChars')
-          .and.callFake(() => `test-random-chars-${++randCharsCounter}`),
-        getLabel: jasmine.createSpy('getLabel').and.returnValue('Test Label'),
-        getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue('Test Placeholder'),
-        getPrepend: jasmine.createSpy('getPrepend').and.returnValue('Test Prepend'),
-        getAppend: jasmine.createSpy('getAppend').and.returnValue('Test Append'),
-        isRequired: jasmine.createSpy('isRequired').and.returnValue(true),
-        validateField: jasmine.createSpy('validateField').and.returnValue(true)
-      })
+      get: vi
+        .fn()
+        .mockName('get')
+        .mockReturnValue({
+          validateFieldValue: vi.fn().mockName('validateFieldValue').mockReturnValue([]),
+          createUniqueId: vi.fn().mockName('createUniqueId').mockReturnValue('test-id-123'),
+          randChars: vi
+            .fn()
+            .mockName('randChars')
+            .mockImplementation(() => `test-random-chars-${++randCharsCounter}`),
+          getLabel: vi.fn().mockName('getLabel').mockReturnValue('Test Label'),
+          getPlaceholder: vi.fn().mockName('getPlaceholder').mockReturnValue('Test Placeholder'),
+          getPrepend: vi.fn().mockName('getPrepend').mockReturnValue('Test Prepend'),
+          getAppend: vi.fn().mockName('getAppend').mockReturnValue('Test Append'),
+          isRequired: vi.fn().mockName('isRequired').mockReturnValue(true),
+          validateField: vi.fn().mockName('validateField').mockReturnValue(true)
+        })
     };
 
     // Set up the mock injector before TestBed configuration
@@ -95,8 +99,10 @@ describe('DdataMultipleSelectComponent', () => {
 
   describe('Component Properties', () => {
     it('should have default values for inputs', () => {
-      const mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-      const newComponent = new DdataMultipleSelectComponent(mockChangeDetectorRef);
+      const mockChangeDetectorRef = {
+        detectChanges: vi.fn().mockName('ChangeDetectorRef.detectChanges')
+      };
+      const newComponent = new DdataMultipleSelectComponent(mockChangeDetectorRef as any);
 
       expect(newComponent.wrapperClass).toBe('d-flex flex-wrap');
       expect(newComponent.inputBlockClass).toBe('col-12 d-flex px-0');
@@ -115,8 +121,10 @@ describe('DdataMultipleSelectComponent', () => {
     it('should generate unique id', () => {
       component.field = 'test_field';
       const id1 = component.id;
-      const mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-      const newComponent = new DdataMultipleSelectComponent(mockChangeDetectorRef);
+      const mockChangeDetectorRef = {
+        detectChanges: vi.fn().mockName('ChangeDetectorRef.detectChanges')
+      };
+      const newComponent = new DdataMultipleSelectComponent(mockChangeDetectorRef as any);
 
       newComponent.field = 'test_field';
       const id2 = newComponent.id;
@@ -137,7 +145,7 @@ describe('DdataMultipleSelectComponent', () => {
     });
 
     it('should log error when null value is provided', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
 
       component.dialogSettings = null;
 
@@ -147,7 +155,7 @@ describe('DdataMultipleSelectComponent', () => {
     });
 
     it('should log error when undefined value is provided', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
 
       component.dialogSettings = undefined;
 
@@ -162,10 +170,12 @@ describe('DdataMultipleSelectComponent', () => {
       component.isModalVisible = false;
       // Get the actual change detector from the component
       const componentChangeDetector = (
-        component as unknown as { changeDetector: ChangeDetectorRef }
+        component as unknown as {
+          changeDetector: ChangeDetectorRef;
+        }
       ).changeDetector;
 
-      spyOn(componentChangeDetector, 'detectChanges');
+      vi.spyOn(componentChangeDetector, 'detectChanges').mockReturnValue(undefined);
 
       component.showModal();
 
@@ -184,7 +194,7 @@ describe('DdataMultipleSelectComponent', () => {
 
   describe('Event Emission', () => {
     it('should emit selected event', () => {
-      spyOn(component.selected, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
       const testEvent = { test: 'data' };
 
       component.selectedEmit(testEvent);
@@ -193,7 +203,7 @@ describe('DdataMultipleSelectComponent', () => {
     });
 
     it('should emit selectModel event', () => {
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
       const testEvent = { test: 'data' };
 
       component.selectModelEmit(testEvent);
@@ -212,7 +222,7 @@ describe('DdataMultipleSelectComponent', () => {
     it('should set is_selected to true on event', () => {
       const event: MockTagInterface = { id: 4, name: 'New Tag' };
 
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectModelEmit(event);
 
@@ -222,7 +232,7 @@ describe('DdataMultipleSelectComponent', () => {
     it('should add event to model field array', () => {
       const event = { id: 4, name: 'New Tag' };
 
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectModelEmit(event);
 
@@ -232,7 +242,7 @@ describe('DdataMultipleSelectComponent', () => {
     it('should emit selectModel event for multiple mode', () => {
       const event = { id: 4, name: 'New Tag' };
 
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectModelEmit(event);
 
@@ -250,7 +260,7 @@ describe('DdataMultipleSelectComponent', () => {
     it('should set object and id for single mode', () => {
       const event = { id: 5, name: 'Single Tag' };
 
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectModelEmit(event);
 
@@ -374,9 +384,13 @@ describe('DdataMultipleSelectComponent', () => {
   describe('Utility Methods and Edge Cases', () => {
     it('should call markForCheck when isRequired setter invoked', () => {
       // Access private changeDetector through casting
-      const cdRef = (component as unknown as { changeDetector: ChangeDetectorRef }).changeDetector;
+      const cdRef = (
+        component as unknown as {
+          changeDetector: ChangeDetectorRef;
+        }
+      ).changeDetector;
 
-      spyOn(cdRef, 'markForCheck');
+      vi.spyOn(cdRef, 'markForCheck').mockReturnValue(undefined);
 
       component.isRequired = true;
       component.isRequired = false;
@@ -432,11 +446,33 @@ describe('DdataMultipleSelectComponent', () => {
       expect(component.model['tags'].length).toBe(0);
     });
 
+    it('should resolve selectedModelName for a field without _id suffix', () => {
+      component.field = 'category';
+      component.text = 'name';
+      component.valueField = 'id';
+      component.items = [{ id: 3, name: 'Third' }];
+      component.model = { category: 3 } as unknown as MockModel;
+
+      expect(component.selectedModelName).toBe('Third');
+    });
+
+    it('should keep the plain value for a field without _id suffix on single select', () => {
+      component.mode = 'single';
+      component.field = 'category';
+      component.model = { category: 0 } as unknown as MockModel;
+
+      component.selectModelEmit({ id: 3, name: 'Third' });
+
+      expect(component.model['category']).toBe(3);
+    });
+
     it('showModal should log error and not open when dialogSettings missing', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       // Force internal dialog settings to undefined
       (
-        component as unknown as { internalDialogSettings?: DialogContentWithOptionsInterface }
+        component as unknown as {
+          internalDialogSettings?: DialogContentWithOptionsInterface;
+        }
       ).internalDialogSettings = undefined; // access private for test
       component.isModalVisible = false;
 
@@ -454,7 +490,9 @@ describe('DdataMultipleSelectComponent', () => {
       component.field = 'tags';
       // Force internal dialog settings removal
       (
-        component as unknown as { internalDialogSettings?: DialogContentWithOptionsInterface }
+        component as unknown as {
+          internalDialogSettings?: DialogContentWithOptionsInterface;
+        }
       ).internalDialogSettings = undefined; // access private for test
 
       expect(() =>

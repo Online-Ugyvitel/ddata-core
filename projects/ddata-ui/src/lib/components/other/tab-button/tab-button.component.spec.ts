@@ -1,4 +1,3 @@
-import 'zone.js/testing';
 import { Injector, Renderer2, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -13,7 +12,9 @@ import { TabsetComponent, TabsetConfig } from 'ngx-bootstrap/tabs';
 declare const document: unknown;
 
 class FakeRenderer2 extends Renderer2 {
-  get data(): { [key: string]: unknown } {
+  get data(): {
+    [key: string]: unknown;
+  } {
     return null;
   }
 
@@ -94,8 +95,8 @@ describe('TabButtonComponent', () => {
       new ElementRef('something')
     );
     component.service = new TabService();
-    const fakeSpy = spyOn(component.service, 'moveInTabsLeft');
-    const fakeSpy2 = spyOn(component as unknown, 'switchButtonName');
+    const fakeSpy = vi.spyOn(component.service, 'moveInTabsLeft').mockReturnValue(undefined);
+    const fakeSpy2 = vi.spyOn(component as unknown, 'switchButtonName').mockReturnValue(undefined);
 
     component.previousTab();
 
@@ -110,8 +111,8 @@ describe('TabButtonComponent', () => {
       new ElementRef('something')
     );
     component.service = new TabService();
-    const fakeSpy = spyOn(component.service, 'moveInTabsRight');
-    const fakeSpy2 = spyOn(component as unknown, 'switchButtonName');
+    const fakeSpy = vi.spyOn(component.service, 'moveInTabsRight').mockReturnValue(undefined);
+    const fakeSpy2 = vi.spyOn(component as unknown, 'switchButtonName').mockReturnValue(undefined);
 
     component.nextTab();
 

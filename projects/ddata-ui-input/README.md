@@ -97,3 +97,37 @@ The template context has the item (`let-item`) and a `remove` function:
     (click)="remove()"></span>
 </ng-template>
 ```
+
+## `dd-select` single mode
+
+`mode="single"` opens a dialog (list component) and lets the user pick exactly one record.
+The picked record's `valueField` (default: `id`) is written to the bound `field`.
+If the `field` ends with `_id`, the whole picked record is also stored on the model
+under the same name without the `_id` suffix (`category_id` -> `category`), and the
+selected record's `text` property (default: `name`) is shown in the input.
+
+```typescript
+export class Product extends BaseModel {
+  category_id: ID = 0;
+  category: Category | null = null; // filled automatically in single mode
+}
+```
+
+```html
+<dd-select
+  mode="single"
+  [model]="product"
+  field="category_id"
+  [items]="categories"
+  text="name"
+  valueField="id"
+  [dialogSettings]="categoryDialogSettings"
+  (selectModel)="onCategorySelected($event)"
+></dd-select>
+```
+
+- `selected` emits the stored value (the id), `selectModel` emits the whole record.
+- A `field` without the `_id` suffix works too: only the value is stored and the
+  displayed text is looked up in `items`.
+- Use `mode="simple"` for a plain `<select>`; the stored value keeps the type of `valueField`
+  (a number stays a number).

@@ -1,5 +1,11 @@
 # DData UI Input Testing Instructions
 
+> **Test runner:** the project uses **Vitest** (`@angular/build:unit-test`), not Jasmine/Karma. The examples below were written
+> for Jasmine; translate them as follows: `jasmine.createSpy(n).and.returnValue(v)` -> `vi.fn().mockReturnValue(v)`,
+> `.and.callFake(f)` -> `.mockImplementation(f)`, `spyOn(o, 'm')` -> `vi.spyOn(o, 'm')`, `jasmine.SpyObj<T>` -> `any`/`Mocked<T>`,
+> `spy.calls.reset()` -> `spy.mockClear()`. Run a project with `npx ng test <project> --no-watch`.
+
+
 ## Overview
 This document contains key learnings and best practices for testing components in the `ddata-ui-input` project, based on extensive debugging and fixing of test suite issues. **Updated with proven patterns that fixed 184+ failing tests.**
 

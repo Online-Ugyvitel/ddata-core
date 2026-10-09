@@ -12,7 +12,7 @@ describe('Selectable', () => {
     const model = new Selectable();
 
     expect(model).toBeInstanceOf(Selectable);
-    expect(model).toEqual(jasmine.objectContaining({}));
+    expect(model).toEqual(expect.objectContaining({}));
   });
 
   it('should implement SelectableInterface', () => {

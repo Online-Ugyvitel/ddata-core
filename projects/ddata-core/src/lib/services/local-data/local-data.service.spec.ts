@@ -101,22 +101,25 @@ class MockModel implements BaseModelInterface<MockModel> {
 
 describe('LocalDataService', () => {
   let service: LocalDataService<MockModel>;
-  let mockStorageService: jasmine.SpyObj<StorageService>;
-  let mockSorterService: jasmine.SpyObj<SorterService<MockModel>>;
+  let mockStorageService: any;
+  let mockSorterService: any;
   let mockModel: MockModel;
 
   beforeEach(() => {
     // Create spy objects for dependencies
-    mockStorageService = jasmine.createSpyObj('StorageService', [
-      'setItem',
-      'removeItem',
-      'clear',
-      'watchStorage'
-    ]);
-    mockStorageService.setItem.and.callFake((key: string, value: string) =>
+    mockStorageService = {
+      setItem: vi.fn().mockName('StorageService.setItem'),
+      removeItem: vi.fn().mockName('StorageService.removeItem'),
+      clear: vi.fn().mockName('StorageService.clear'),
+      watchStorage: vi.fn().mockName('StorageService.watchStorage')
+    };
+    mockStorageService.setItem.mockImplementation((key: string, value: string) =>
       localStorage.setItem(key, value)
     );
-    mockSorterService = jasmine.createSpyObj('SorterService', ['sortBy', 'sortByDesc']);
+    mockSorterService = {
+      sortBy: vi.fn().mockName('SorterService.sortBy'),
+      sortByDesc: vi.fn().mockName('SorterService.sortByDesc')
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -127,14 +130,16 @@ describe('LocalDataService', () => {
 
     mockModel = new MockModel();
     // Mock localStorage
-    let store: { [key: string]: string } = {};
+    let store: {
+      [key: string]: string;
+    } = {};
 
-    spyOn(localStorage, 'getItem').and.callFake((key: string) => store[key] || null);
-    spyOn(localStorage, 'setItem').and.callFake(
+    vi.spyOn(localStorage, 'getItem').mockImplementation((key: string) => store[key] || null);
+    vi.spyOn(localStorage, 'setItem').mockImplementation(
       (key: string, value: string) => (store[key] = value)
     );
-    spyOn(localStorage, 'removeItem').and.callFake((key: string) => delete store[key]);
-    spyOn(localStorage, 'clear').and.callFake(() => (store = {}));
+    vi.spyOn(localStorage, 'removeItem').mockImplementation((key: string) => delete store[key]);
+    vi.spyOn(localStorage, 'clear').mockImplementation(() => (store = {}));
 
     // Create service with mock model
     service = new LocalDataService(mockModel);
@@ -155,7 +160,7 @@ describe('LocalDataService', () => {
     });
 
     it('should be the correct type', () => {
-      expect(service.constructor.name).toBe('LocalDataService');
+      expect(service).toBeInstanceOf(LocalDataService);
     });
 
     it('should initialize with correct storage item name', () => {
@@ -168,7 +173,7 @@ describe('LocalDataService', () => {
 
     it('should create a copy of the model', () => {
       expect(service['copyOfModel']).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           model_name: 'MockModel'
         })
       );
@@ -221,10 +226,9 @@ describe('LocalDataService', () => {
       expect(typeof result.subscribe).toBe('function');
     });
 
-    it('should emit when storage subject emits', (done) => {
+    it('should emit when storage subject emits', async () => {
       service.watch().subscribe((value) => {
         expect(value).toBe(true);
-        done();
       });
 
       service['storageSubject'].next(true);
@@ -316,7 +320,7 @@ describe('LocalDataService', () => {
     });
 
     it('should call updateLocalstorage after successful deletion', () => {
-      spyOn(service, 'updateLocalstorage');
+      vi.spyOn(service, 'updateLocalstorage').mockReturnValue(undefined);
       const modelToDelete = service['db'][0];
 
       service.delete(modelToDelete);
@@ -357,7 +361,7 @@ describe('LocalDataService', () => {
     });
 
     it('should call allFromLocal to refresh internal data', () => {
-      spyOn(service, 'allFromLocal');
+      vi.spyOn(service, 'allFromLocal').mockReturnValue(undefined);
       const testData = [];
 
       service.updateLocalstorage(testData);
@@ -366,7 +370,7 @@ describe('LocalDataService', () => {
     });
 
     it('should emit to storage subject', () => {
-      spyOn(service['storageSubject'], 'next');
+      vi.spyOn(service['storageSubject'], 'next').mockReturnValue(undefined);
       const testData = [];
 
       service.updateLocalstorage(testData);
@@ -396,7 +400,7 @@ describe('LocalDataService', () => {
     it('should call sorterService.sortBy with correct parameters', () => {
       const mockSortedData = [...service['db']];
 
-      mockSorterService.sortBy.and.returnValue(mockSortedData);
+      mockSorterService.sortBy.mockReturnValue(mockSortedData);
 
       service.allFromLocalSortedBy('name');
 
@@ -406,7 +410,7 @@ describe('LocalDataService', () => {
     it('should return sorted data from sorterService', () => {
       const mockSortedData = [service['db'][1], service['db'][2], service['db'][0]];
 
-      mockSorterService.sortBy.and.returnValue(mockSortedData);
+      mockSorterService.sortBy.mockReturnValue(mockSortedData);
       const result = service.allFromLocalSortedBy('name');
 
       expect(result).toBe(mockSortedData);
@@ -438,7 +442,7 @@ describe('LocalDataService', () => {
     it('should call sorterService.sortByDesc with correct parameters', () => {
       const mockSortedData = [...service['db']].reverse();
 
-      mockSorterService.sortByDesc.and.returnValue(mockSortedData);
+      mockSorterService.sortByDesc.mockReturnValue(mockSortedData);
 
       service.allFromLocalSortedByDesc('name');
 
@@ -448,7 +452,7 @@ describe('LocalDataService', () => {
     it('should return descending sorted data from sorterService', () => {
       const mockSortedData = [service['db'][2], service['db'][1], service['db'][0]];
 
-      mockSorterService.sortByDesc.and.returnValue(mockSortedData);
+      mockSorterService.sortByDesc.mockReturnValue(mockSortedData);
       const result = service.allFromLocalSortedByDesc('value');
 
       expect(result).toBe(mockSortedData);
@@ -476,7 +480,7 @@ describe('LocalDataService', () => {
     });
 
     it('should return initialized copy when model not found', () => {
-      spyOn(service['copyOfModel'], 'init').and.returnValue(new MockModel());
+      vi.spyOn(service['copyOfModel'], 'init').mockReturnValue(new MockModel());
       const result = service.findById(999);
 
       expect(service['copyOfModel'].init).toHaveBeenCalled();
@@ -503,14 +507,14 @@ describe('LocalDataService', () => {
     });
 
     it('should handle zero id', () => {
-      spyOn(service['copyOfModel'], 'init').and.returnValue(new MockModel());
+      vi.spyOn(service['copyOfModel'], 'init').mockReturnValue(new MockModel());
       const result = service.findById(0);
 
       expect(service['copyOfModel'].init).toHaveBeenCalled();
     });
 
     it('should handle negative id', () => {
-      spyOn(service['copyOfModel'], 'init').and.returnValue(new MockModel());
+      vi.spyOn(service['copyOfModel'], 'init').mockReturnValue(new MockModel());
       const result = service.findById(-1);
 
       expect(service['copyOfModel'].init).toHaveBeenCalled();
@@ -657,7 +661,7 @@ describe('LocalDataService', () => {
 
       localStorage.setItem('mock_models', JSON.stringify(mockData));
       service.allFromLocal();
-      spyOn(service, 'updateLocalstorage');
+      vi.spyOn(service, 'updateLocalstorage').mockReturnValue(undefined);
     });
 
     describe('Creating new model (id = 0)', () => {
@@ -848,7 +852,7 @@ describe('LocalDataService', () => {
       service.delete(service.findById(2));
 
       expect(service['db'].length).toBe(1);
-      expect(service.findById(2)).toEqual(jasmine.any(MockModel)); // Returns copy when not found
+      expect(service.findById(2)).toEqual(expect.any(MockModel)); // Returns copy when not found
     });
 
     it('should handle localStorage round-trip correctly', () => {
@@ -883,10 +887,10 @@ describe('LocalDataService', () => {
       models.forEach((model, index) => service.save(model, index + 1));
 
       // Mock sorter service to return predictable results
-      mockSorterService.sortBy.and.returnValue(
+      mockSorterService.sortBy.mockReturnValue(
         [...service['db']].sort((a, b) => a.name.localeCompare(b.name))
       );
-      mockSorterService.sortByDesc.and.returnValue(
+      mockSorterService.sortByDesc.mockReturnValue(
         [...service['db']].sort((a, b) => b.name.localeCompare(a.name))
       );
       const sortedAsc = service.allFromLocalSortedBy('name');
@@ -898,28 +902,26 @@ describe('LocalDataService', () => {
   });
 
   describe('Observable behavior', () => {
-    it('should emit updates when updateLocalstorage is called', (done) => {
+    it('should emit updates when updateLocalstorage is called', async () => {
       let emissionCount = 0;
 
       service.watch().subscribe(() => {
         emissionCount++;
 
         if (emissionCount === 1) {
-          done();
         }
       });
 
       service.updateLocalstorage([]);
     });
 
-    it('should emit updates on save operations', (done) => {
+    it('should emit updates on save operations', async () => {
       let emissionCount = 0;
 
       service.watch().subscribe(() => {
         emissionCount++;
 
         if (emissionCount === 1) {
-          done();
         }
       });
       const newModel = new MockModel();
@@ -928,7 +930,7 @@ describe('LocalDataService', () => {
       service.save(newModel, 1);
     });
 
-    it('should emit updates on delete operations', (done) => {
+    it('should emit updates on delete operations', async () => {
       // Setup initial data
       const mockData = [{ id: 1, name: 'Test', value: 10 }];
 
@@ -940,7 +942,6 @@ describe('LocalDataService', () => {
         emissionCount++;
 
         if (emissionCount === 1) {
-          done();
         }
       });
 

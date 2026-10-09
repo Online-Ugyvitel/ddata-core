@@ -1,19 +1,22 @@
+import type { Mock } from 'vitest';
 import { MethodNotAllowedError } from './method-not-allowed-error';
 import { DdataCoreError } from './ddata-core-error';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 describe('MethodNotAllowedError', () => {
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
+  let mockNotificationService: any;
   let originalConsoleError: any;
 
   beforeEach(() => {
     // Create spy object for NotificationService
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
+    mockNotificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
 
     // Spy on console.error
     originalConsoleError = console.error;
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   afterEach(() => {
@@ -171,9 +174,11 @@ describe('MethodNotAllowedError', () => {
         }
       };
       // Create a different mock
-      const otherMockService = jasmine.createSpyObj('NotificationService', ['add']);
+      const otherMockService = {
+        add: vi.fn().mockName('NotificationService.add')
+      };
 
-      new MethodNotAllowedError(originalError, otherMockService);
+      new MethodNotAllowedError(originalError, otherMockService as any);
 
       expect(otherMockService.add).toHaveBeenCalledWith(
         'Hiba',
@@ -301,12 +306,12 @@ describe('MethodNotAllowedError', () => {
       const callOrder: Array<string> = [];
 
       // Mock console.error to track call order
-      (console.error as jasmine.Spy).and.callFake(() => {
+      (console.error as Mock).mockImplementation(() => {
         callOrder.push('console.error');
       });
 
       // Mock notificationService.add to track call order
-      mockNotificationService.add.and.callFake(() => {
+      mockNotificationService.add.mockImplementation(() => {
         callOrder.push('notificationService.add');
       });
 

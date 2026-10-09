@@ -80,7 +80,7 @@ for (const serviceType of [RemoteDataService, ProxyService]) {
     for (const request of requests) {
       describe(request.method, () => {
         it('uses the expected URL, body and default headers when headers are omitted', () => {
-          const response = jasmine.createSpy('response');
+          const response = vi.fn().mockName('response');
 
           request.send().subscribe(response);
           const req = httpMock.expectOne(request.url);
@@ -93,7 +93,9 @@ for (const serviceType of [RemoteDataService, ProxyService]) {
           expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
           req.flush({ updated: true });
 
-          expect(response).toHaveBeenCalledOnceWith({ updated: true });
+          expect(response).toHaveBeenCalledTimes(1);
+
+          expect(response).toHaveBeenCalledWith({ updated: true });
         });
 
         it('merges header objects without changing their values or dropping defaults', () => {
@@ -128,7 +130,7 @@ for (const serviceType of [RemoteDataService, ProxyService]) {
 
           expect(req.request.headers.getAll('X-Tag')).toEqual(['first', 'second']);
           expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
-          expect(headers.has('Accepted-Encoding')).toBeFalse();
+          expect(headers.has('Accepted-Encoding')).toBe(false);
           expect(headers.getAll('X-Tag')).toEqual(['first', 'second']);
           req.flush({});
         });
@@ -156,7 +158,7 @@ for (const serviceType of [RemoteDataService, ProxyService]) {
           expect(first.request.headers.get('Authorization')).toBe('Bearer custom-token');
           expect(first.request.headers.get('X-Request-Id')).toBe('first');
           expect(second.request.headers.get('Authorization')).toBe('Bearer refreshed-token');
-          expect(second.request.headers.has('X-Request-Id')).toBeFalse();
+          expect(second.request.headers.has('X-Request-Id')).toBe(false);
           second.flush({});
           first.flush({});
         });
@@ -167,7 +169,7 @@ for (const serviceType of [RemoteDataService, ProxyService]) {
           service.getAll().subscribe();
           const req = httpMock.expectOne('http://dummy.test/api/uri-model');
 
-          expect(req.request.headers.has('X-Request-Id')).toBeFalse();
+          expect(req.request.headers.has('X-Request-Id')).toBe(false);
           expect(req.request.headers.get('Authorization')).toBe('Bearer uri-test-token');
           req.flush({ data: [] });
         });

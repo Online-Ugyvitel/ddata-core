@@ -1,28 +1,29 @@
+import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { UnprocessableEntity } from './unprocessable-entity-error';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 describe('UnprocessableEntity', () => {
-  let notificationService: jasmine.SpyObj<NotificationService>;
-  let consoleErrorSpy: jasmine.Spy;
+  let notificationService: any;
+  let consoleErrorSpy: Mock;
 
   beforeEach(() => {
-    const notificationServiceSpy = jasmine.createSpyObj('NotificationService', ['add']);
+    const notificationServiceSpy = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
 
     TestBed.configureTestingModule({
       providers: [{ provide: NotificationService, useValue: notificationServiceSpy }]
     });
 
-    notificationService = TestBed.inject(
-      NotificationService
-    ) as jasmine.SpyObj<NotificationService>;
-    consoleErrorSpy = spyOn(console, 'error');
+    notificationService = TestBed.inject(NotificationService) as any;
+    consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   afterEach(() => {
-    consoleErrorSpy.calls.reset();
-    notificationService.add.calls.reset();
+    consoleErrorSpy.mockClear();
+    notificationService.add.mockClear();
   });
 
   describe('1. Constructor Tests', () => {
@@ -337,13 +338,13 @@ describe('UnprocessableEntity', () => {
       ];
 
       testCases.forEach((originalError, index) => {
-        notificationService.add.calls.reset();
+        notificationService.add.mockClear();
 
         new UnprocessableEntity(originalError, notificationService);
 
         expect(notificationService.add).toHaveBeenCalledWith(
-          jasmine.any(String),
-          jasmine.any(String),
+          expect.any(String),
+          expect.any(String),
           'danger' as NotificationType
         );
       });

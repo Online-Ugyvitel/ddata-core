@@ -1,5 +1,5 @@
-import 'zone.js/testing';
-import { Component, DebugElement, EventEmitter } from '@angular/core';
+import type { Mock } from 'vitest';
+import { Component, DebugElement, EventEmitter, NgModule } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -74,7 +74,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
     testModel.is_selected = true;
 
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
     component.chooseSelect(testModel);
 
@@ -85,7 +85,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   it('should emit component model when chooseSelect is called with component model', () => {
     component.model.is_selected = true;
 
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
     component.chooseSelect(component.model);
 
@@ -98,7 +98,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
     differentModel.is_selected = true;
 
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
     component.chooseSelect(differentModel);
 
@@ -128,7 +128,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   });
 
   it('should call chooseSelect with component model when button is clicked', () => {
-    spyOn(component, 'chooseSelect');
+    vi.spyOn(component, 'chooseSelect').mockReturnValue(undefined);
     const buttonElement = fixture.debugElement.query(By.css('button'));
 
     buttonElement.nativeElement.click();
@@ -138,7 +138,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   });
 
   it('should emit choosed event when button is clicked', () => {
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
     const buttonElement = fixture.debugElement.query(By.css('button'));
 
     buttonElement.nativeElement.click();
@@ -153,7 +153,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
     component.model = customModel;
     fixture.detectChanges();
 
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
     const buttonElement = fixture.debugElement.query(By.css('button'));
 
     buttonElement.nativeElement.click();
@@ -174,9 +174,15 @@ describe('DdataSelectableListElementButtonComponent', () => {
     })
     class TestHostComponent {}
 
+    // the template compiler needs a module to resolve the elements used by the host template
+    @NgModule({
+      declarations: [DdataSelectableListElementButtonComponent, TestHostComponent]
+    })
+    class TestHostModule {}
+
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      declarations: [DdataSelectableListElementButtonComponent, TestHostComponent]
+      imports: [TestHostModule]
     });
     const hostFixture = TestBed.createComponent(TestHostComponent);
 
@@ -190,7 +196,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   it('should handle null model gracefully', () => {
     component.model = null;
 
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
     component.chooseSelect(null);
 
@@ -198,7 +204,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   });
 
   it('should handle undefined model gracefully', () => {
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
     component.chooseSelect(undefined);
 
@@ -224,13 +230,13 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
     // Test first instance
     component.model = model1;
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
     component.chooseSelect(model1);
 
     expect(component.choosed.emit).toHaveBeenCalledWith(model1);
 
     // Reset spy
-    (component.choosed.emit as jasmine.Spy).calls.reset();
+    (component.choosed.emit as Mock).mockClear();
 
     // Test second instance
     component.model = model2;
@@ -244,13 +250,13 @@ describe('DdataSelectableListElementButtonComponent', () => {
 
     testModel.is_selected = true;
 
-    spyOn(component.choosed, 'emit');
+    vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
     component.chooseSelect(testModel);
 
     expect(component.choosed.emit).toHaveBeenCalledWith(testModel);
     // Verify it's the exact same object reference
-    const emittedValue = (component.choosed.emit as jasmine.Spy).calls.mostRecent().args[0];
+    const emittedValue = vi.mocked(component.choosed.emit as Mock).mock.lastCall[0];
 
     expect(emittedValue).toBe(testModel);
   });

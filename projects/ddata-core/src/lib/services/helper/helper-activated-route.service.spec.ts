@@ -1,4 +1,3 @@
-import 'zone.js/testing';
 import { TestBed } from '@angular/core/testing';
 import { Observable } from 'rxjs';
 import { Params } from '@angular/router';
@@ -18,7 +17,12 @@ describe('HelperActivatedRouteService', () => {
    * Helper function to mock window.location.href
    */
   function mockLocation(href: string): void {
-    spyOn(service as unknown as { getHref: () => string }, 'getHref').and.returnValue(href);
+    vi.spyOn(
+      service as unknown as {
+        getHref: () => string;
+      },
+      'getHref'
+    ).mockReturnValue(href);
   }
 
   it('should be created', () => {
@@ -26,25 +30,23 @@ describe('HelperActivatedRouteService', () => {
   });
 
   describe('params()', () => {
-    it('should return Observable<Params> with id from getId()', (done) => {
+    it('should return Observable<Params> with id from getId()', async () => {
       mockLocation('http://example.com/some/path/edit/123');
       const result: Observable<Params> = service.params();
 
       result.subscribe((params) => {
         expect(params).toBeDefined();
         expect(params.id).toBe(123);
-        done();
       });
     });
 
-    it('should return Observable<Params> with id 0 when no valid id in URL', (done) => {
+    it('should return Observable<Params> with id 0 when no valid id in URL', async () => {
       mockLocation('http://example.com/some/path');
       const result: Observable<Params> = service.params();
 
       result.subscribe((params) => {
         expect(params).toBeDefined();
         expect(params.id).toBe(0);
-        done();
       });
     });
   });

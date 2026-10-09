@@ -1,4 +1,4 @@
-import 'zone.js/testing';
+import type { Mock } from 'vitest';
 import { EventEmitter, Injector } from '@angular/core';
 import { of } from 'rxjs';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
@@ -25,7 +25,7 @@ describe('BaseListComponent', () => {
     mockHelperFactoryService = new MockHelperFactoryService();
     // Mock DdataCoreModule.InjectorInstance completely
     const mockInjector = {
-      get: jasmine.createSpy('get').and.returnValue(mockActivatedRoute)
+      get: vi.fn().mockName('get').mockReturnValue(mockActivatedRoute)
     };
 
     (DdataCoreModule as any).InjectorInstance = mockInjector;
@@ -41,13 +41,13 @@ describe('BaseListComponent', () => {
     });
 
     // Patch the constructor to avoid dependency chain
-    spyOn(HelperFactoryService.prototype, 'get').and.returnValue(mockHelperService);
+    vi.spyOn(HelperFactoryService.prototype, 'get').mockReturnValue(mockHelperService);
 
     fixture = TestBed.createComponent(TestListComponent);
     component = fixture.componentInstance;
 
     // Prevent ngOnInit from calling load automatically
-    spyOn(component, 'load').and.stub();
+    vi.spyOn(component, 'load').mockImplementation(() => {});
 
     fixture.detectChanges();
   });
@@ -85,7 +85,7 @@ describe('BaseListComponent', () => {
     });
 
     it('should call load on ngOnInit', () => {
-      (component.load as jasmine.Spy).calls.reset();
+      (component.load as Mock).mockClear();
 
       component.ngOnInit();
 
@@ -199,12 +199,12 @@ describe('BaseListComponent', () => {
 
   describe('load method', () => {
     beforeEach(() => {
-      (component.load as jasmine.Spy).and.callThrough();
+      vi.mocked(component.load).mockRestore();
     });
 
     it('should not load data when loadData is false', () => {
       component.loadData = false;
-      spyOn(component as any, 'setGetRequest');
+      vi.spyOn(component as any, 'setGetRequest').mockReturnValue(undefined);
 
       component.load();
 
@@ -213,7 +213,7 @@ describe('BaseListComponent', () => {
 
     it('should load data when loadData is true', () => {
       component.loadData = true;
-      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(component as any, 'setGetRequest').mockReturnValue(of(mockPaginateWithData));
 
       component.load();
 
@@ -226,7 +226,7 @@ describe('BaseListComponent', () => {
   describe('setGetRequest method (private)', () => {
     it('should call helperService.getAll when filter is empty', () => {
       component.filter = {};
-      spyOn(mockHelperService, 'getAll').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(mockHelperService, 'getAll').mockReturnValue(of(mockPaginateWithData));
 
       (component as any).setGetRequest().subscribe();
 
@@ -242,7 +242,7 @@ describe('BaseListComponent', () => {
       const testFilter = { name: 'test' };
 
       component.filter = testFilter;
-      spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(mockHelperService, 'search').mockReturnValue(of(mockPaginateWithData));
 
       (component as any).setGetRequest().subscribe();
 
@@ -284,7 +284,7 @@ describe('BaseListComponent', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
       const fieldName = 'isActive';
 
-      spyOn(mockHelperService, 'booleanChange').and.returnValue(of(true));
+      vi.spyOn(mockHelperService, 'booleanChange').mockReturnValue(of(true));
 
       component.toggleCheckbox(testModel, fieldName);
 
@@ -296,7 +296,7 @@ describe('BaseListComponent', () => {
     it('should call helperService.edit with model and component reference', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
 
-      spyOn(mockHelperService, 'edit');
+      vi.spyOn(mockHelperService, 'edit').mockReturnValue(undefined);
 
       component.edit(testModel);
 
@@ -320,7 +320,7 @@ describe('BaseListComponent', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
 
       component.isEmbed = false;
-      spyOn(mockHelperService, 'delete').and.returnValue(of(true));
+      vi.spyOn(mockHelperService, 'delete').mockReturnValue(of(true));
 
       component.delete(testModel);
 
@@ -348,7 +348,7 @@ describe('BaseListComponent', () => {
         new TestModel().init({ id: 2, name: 'Test2' })
       ];
 
-      spyOn(mockHelperService, 'deleteMultiple').and.returnValue(of(true));
+      vi.spyOn(mockHelperService, 'deleteMultiple').mockReturnValue(of(true));
 
       component.deleteMultiple(testModels);
 
@@ -360,7 +360,7 @@ describe('BaseListComponent', () => {
     it('should update currentPageNumber and call setGetRequest', () => {
       const newPage = 3;
 
-      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(component as any, 'setGetRequest').mockReturnValue(of(mockPaginateWithData));
 
       component.changePage(newPage);
 
@@ -369,7 +369,7 @@ describe('BaseListComponent', () => {
     });
 
     it('should handle changePage with zero page number', () => {
-      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(component as any, 'setGetRequest').mockReturnValue(of(mockPaginateWithData));
 
       component.changePage(0);
 
@@ -378,7 +378,7 @@ describe('BaseListComponent', () => {
     });
 
     it('should handle changePage with negative page number', () => {
-      spyOn(component as any, 'setGetRequest').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(component as any, 'setGetRequest').mockReturnValue(of(mockPaginateWithData));
 
       component.changePage(-1);
 
@@ -391,7 +391,7 @@ describe('BaseListComponent', () => {
       component.filter = { name: 'test' };
 
       // Setup the observable to return data
-      spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(mockHelperService, 'search').mockReturnValue(of(mockPaginateWithData));
 
       component.changePage(2);
 
@@ -407,7 +407,7 @@ describe('BaseListComponent', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
 
       component.isModal = true;
-      spyOn(mockHelperService, 'save').and.returnValue(of(true));
+      vi.spyOn(mockHelperService, 'save').mockReturnValue(of(true));
 
       component.save(testModel);
 
@@ -422,7 +422,7 @@ describe('BaseListComponent', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
 
       component.isModal = false;
-      spyOn(mockHelperService, 'save').and.returnValue(of(true));
+      vi.spyOn(mockHelperService, 'save').mockReturnValue(of(true));
 
       component.save(testModel);
 
@@ -434,7 +434,7 @@ describe('BaseListComponent', () => {
     it('should emit editModel when edit is called through helper service', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
 
-      spyOn(component.editModel, 'emit');
+      vi.spyOn(component.editModel, 'emit').mockReturnValue(undefined);
 
       // Simulate the helper service calling the edit method
       mockHelperService.edit(testModel, component);
@@ -446,7 +446,7 @@ describe('BaseListComponent', () => {
       const testModel = new TestModel().init({ id: 1, name: 'Test' });
 
       component.isEmbed = false;
-      spyOn(component.deleteModel, 'emit');
+      vi.spyOn(component.deleteModel, 'emit').mockReturnValue(undefined);
 
       component.delete(testModel);
 
@@ -459,7 +459,7 @@ describe('BaseListComponent', () => {
         new TestModel().init({ id: 2, name: 'Test2' })
       ];
 
-      spyOn(component.deleteMultipleModels, 'emit');
+      vi.spyOn(component.deleteMultipleModels, 'emit').mockReturnValue(undefined);
 
       component.deleteMultiple(testModels);
 
@@ -469,10 +469,10 @@ describe('BaseListComponent', () => {
 
   describe('Integration Tests', () => {
     it('should handle complete load cycle with empty filter', () => {
-      (component.load as jasmine.Spy).and.callThrough();
+      vi.mocked(component.load).mockRestore();
       component.loadData = true;
       component.filter = {};
-      spyOn(mockHelperService, 'getAll').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(mockHelperService, 'getAll').mockReturnValue(of(mockPaginateWithData));
 
       component.load();
 
@@ -482,10 +482,10 @@ describe('BaseListComponent', () => {
     });
 
     it('should handle complete load cycle with filter', () => {
-      (component.load as jasmine.Spy).and.callThrough();
+      vi.mocked(component.load).mockRestore();
       component.loadData = true;
       component.filter = { name: 'test' };
-      spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(mockHelperService, 'search').mockReturnValue(of(mockPaginateWithData));
 
       component.load();
 
@@ -496,7 +496,7 @@ describe('BaseListComponent', () => {
 
     it('should handle page change and reload data with search when filter exists', () => {
       component.filter = { status: 'active' };
-      spyOn(mockHelperService, 'search').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(mockHelperService, 'search').mockReturnValue(of(mockPaginateWithData));
 
       component.changePage(2);
 
@@ -506,7 +506,7 @@ describe('BaseListComponent', () => {
 
     it('should handle page change and reload data with getAll when filter is empty', () => {
       component.filter = {};
-      spyOn(mockHelperService, 'getAll').and.returnValue(of(mockPaginateWithData));
+      vi.spyOn(mockHelperService, 'getAll').mockReturnValue(of(mockPaginateWithData));
 
       component.changePage(3);
 

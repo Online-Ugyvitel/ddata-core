@@ -46,16 +46,15 @@ describe('SpinnerService', () => {
       expect(typeof observable.subscribe).toBe('function');
     });
 
-    it('should emit true when spinner is turned on', (done) => {
+    it('should emit true when spinner is turned on', async () => {
       service.watch().subscribe((value) => {
         expect(value).toBe(true);
-        done();
       });
 
       service.on('test-starter');
     });
 
-    it('should emit false when spinner is turned off', (done) => {
+    it('should emit false when spinner is turned off', async () => {
       let emissionCount = 0;
 
       service.watch().subscribe((value) => {
@@ -67,7 +66,6 @@ describe('SpinnerService', () => {
         } else if (emissionCount === 2) {
           // Second emission - spinner off
           expect(value).toBe(false);
-          done();
         }
       });
 
@@ -75,7 +73,7 @@ describe('SpinnerService', () => {
       service.off('test-starter');
     });
 
-    it('should not emit until state changes', (done) => {
+    it('should not emit until state changes', async () => {
       let emitted = false;
       const subscription = service.watch().subscribe((value) => {
         emitted = true;
@@ -85,7 +83,6 @@ describe('SpinnerService', () => {
       setTimeout(() => {
         expect(emitted).toBe(false);
         subscription.unsubscribe();
-        done();
       }, 100);
     });
   });
@@ -130,7 +127,7 @@ describe('SpinnerService', () => {
 
     it('should log debug message when environment.debug is true', () => {
       (service as any).appEnv.environment = { debug: true };
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const starter = 'test-starter';
 
       service.on(starter);
@@ -140,7 +137,7 @@ describe('SpinnerService', () => {
 
     it('should not log debug message when environment.debug is false', () => {
       (service as any).appEnv.environment = { debug: false };
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const starter = 'test-starter';
 
       service.on(starter);
@@ -148,10 +145,9 @@ describe('SpinnerService', () => {
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it('should emit observable change when spinner is turned on', (done) => {
+    it('should emit observable change when spinner is turned on', async () => {
       service.watch().subscribe((value) => {
         expect(value).toBe(true);
-        done();
       });
 
       service.on('test-starter');
@@ -196,7 +192,7 @@ describe('SpinnerService', () => {
 
     it('should handle ERROR_HANDLER starter specially', () => {
       (service as any).appEnv.environment = { debug: true };
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const result = service.off('ERROR_HANDLER');
 
       expect(result).toBe(true);
@@ -207,7 +203,7 @@ describe('SpinnerService', () => {
 
     it('should handle ERROR_HANDLER starter without debug logging when debug is false', () => {
       (service as any).appEnv.environment = { debug: false };
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const result = service.off('ERROR_HANDLER');
 
       expect(result).toBe(true);
@@ -229,7 +225,7 @@ describe('SpinnerService', () => {
 
     it('should log debug message when environment.debug is true', () => {
       (service as any).appEnv.environment = { debug: true };
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const starter = 'test-starter';
 
       service.off(starter);
@@ -239,7 +235,7 @@ describe('SpinnerService', () => {
 
     it('should not log debug message when environment.debug is false', () => {
       (service as any).appEnv.environment = { debug: false };
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const starter = 'test-starter';
 
       service.off(starter);
@@ -247,7 +243,7 @@ describe('SpinnerService', () => {
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it('should emit observable change when spinner is turned off', (done) => {
+    it('should emit observable change when spinner is turned off', async () => {
       let emissionCount = 0;
 
       service.watch().subscribe((value) => {
@@ -256,7 +252,6 @@ describe('SpinnerService', () => {
         if (emissionCount === 1) {
           // The watch subject does not replay: the first emission is the spinner turned off
           expect(value).toBe(false);
-          done();
         }
       });
 
@@ -341,7 +336,7 @@ describe('SpinnerService', () => {
       expect(service.getStatus()).toBe(true);
     });
 
-    it('should emit observable changes when values are set', (done) => {
+    it('should emit observable changes when values are set', async () => {
       let emissionCount = 0;
 
       service.watch().subscribe((value) => {
@@ -349,7 +344,6 @@ describe('SpinnerService', () => {
 
         if (emissionCount === 1) {
           expect(value).toBe(true);
-          done();
         }
       });
 
@@ -399,7 +393,7 @@ describe('SpinnerService', () => {
 
     it('should handle null environment object', () => {
       (service as any).appEnv.environment = null;
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const result = service.on('test-starter');
 
       expect(result).toBe(true);
@@ -408,7 +402,7 @@ describe('SpinnerService', () => {
 
     it('should handle undefined debug property', () => {
       (service as any).appEnv.environment = {};
-      spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockReturnValue(undefined);
       const result = service.on('test-starter');
 
       expect(result).toBe(true);

@@ -23,16 +23,22 @@ describe('DdataSimpleSelectComponent', () => {
     let callCount = 0;
     // Mock DdataCoreModule.InjectorInstance to prevent runtime errors
     const mockInjector = {
-      get: jasmine.createSpy('get').and.returnValue({
-        randChars: jasmine.createSpy('randChars').and.callFake(() => `mock-random-${++callCount}`),
-        getTitle: jasmine.createSpy('getTitle').and.returnValue('Test Title'),
-        getLabel: jasmine.createSpy('getLabel').and.returnValue('Test Label'),
-        getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue('Test Placeholder'),
-        getPrepend: jasmine.createSpy('getPrepend').and.returnValue('Test Prepend'),
-        getAppend: jasmine.createSpy('getAppend').and.returnValue('Test Append'),
-        isRequired: jasmine.createSpy('isRequired').and.returnValue(true),
-        validateField: jasmine.createSpy('validateField').and.returnValue(true)
-      })
+      get: vi
+        .fn()
+        .mockName('get')
+        .mockReturnValue({
+          randChars: vi
+            .fn()
+            .mockName('randChars')
+            .mockImplementation(() => `mock-random-${++callCount}`),
+          getTitle: vi.fn().mockName('getTitle').mockReturnValue('Test Title'),
+          getLabel: vi.fn().mockName('getLabel').mockReturnValue('Test Label'),
+          getPlaceholder: vi.fn().mockName('getPlaceholder').mockReturnValue('Test Placeholder'),
+          getPrepend: vi.fn().mockName('getPrepend').mockReturnValue('Test Prepend'),
+          getAppend: vi.fn().mockName('getAppend').mockReturnValue('Test Append'),
+          isRequired: vi.fn().mockName('isRequired').mockReturnValue(true),
+          validateField: vi.fn().mockName('validateField').mockReturnValue(true)
+        })
     };
 
     // Set up the mock injector before TestBed configuration
@@ -102,8 +108,8 @@ describe('DdataSimpleSelectComponent', () => {
     });
 
     it('should find and set selected model based on field value', () => {
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -111,8 +117,8 @@ describe('DdataSimpleSelectComponent', () => {
     });
 
     it('should emit selected event with field value', () => {
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -120,8 +126,8 @@ describe('DdataSimpleSelectComponent', () => {
     });
 
     it('should emit selectModel event with found model', () => {
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -130,8 +136,8 @@ describe('DdataSimpleSelectComponent', () => {
 
     it('should handle when no matching item is found', () => {
       component.model = { country_id: 999 } as unknown as MockModel;
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -146,8 +152,8 @@ describe('DdataSimpleSelectComponent', () => {
         { id: 1, tag_id: 1, name: 'Tag 1' },
         { id: 2, tag_id: 2, name: 'Tag 2' }
       ];
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -162,8 +168,8 @@ describe('DdataSimpleSelectComponent', () => {
       expect(() => component.selectItem()).not.toThrow();
 
       // Should not emit events when model is null
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -174,8 +180,8 @@ describe('DdataSimpleSelectComponent', () => {
     it('should handle empty items array', () => {
       component.items = [];
       component.model = { country_id: 1, validationErrors: [] } as unknown as MockModel;
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -193,8 +199,8 @@ describe('DdataSimpleSelectComponent', () => {
     it('should handle undefined field in model', () => {
       component.model = {} as unknown as MockModel;
       component.field = 'nonexistent_field';
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -209,8 +215,8 @@ describe('DdataSimpleSelectComponent', () => {
       ];
       component.model = { country_id: 2 } as unknown as MockModel;
       component.field = 'country_id';
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -287,7 +293,7 @@ describe('DdataSimpleSelectComponent', () => {
       component.field = 'item_id';
       component.valueField = 'id';
 
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectItem();
 
@@ -295,8 +301,8 @@ describe('DdataSimpleSelectComponent', () => {
     });
 
     it('should handle multiple select operations', () => {
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       // First selection
       component.model = { country_id: 1 } as unknown as MockModel;
@@ -326,6 +332,18 @@ describe('DdataSimpleSelectComponent', () => {
       component.model = null;
 
       expect(component.model).toBeNull();
+    });
+  });
+
+  describe('Selected value type', () => {
+    it('should keep numeric values numeric when an option is chosen', () => {
+      const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
+
+      select.selectedIndex = 3; // empty option + 3 items -> Mexico
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+
+      expect(component.model['country_id']).toBe(3);
     });
   });
 

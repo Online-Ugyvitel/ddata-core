@@ -119,15 +119,20 @@ class MockModel implements BaseModelInterface<MockModel> {
 
 describe('ProxyFactoryService', () => {
   let service: ProxyFactoryService<MockModel>;
-  let mockEnvService: jasmine.SpyObj<EnvService>;
-  let mockHttpClient: jasmine.SpyObj<HttpClient>;
+  let mockEnvService: any;
+  let mockHttpClient: any;
 
   beforeEach(() => {
     // Create spy objects for dependencies
-    mockEnvService = jasmine.createSpyObj('EnvService', [], {
+    mockEnvService = {
       environment: { apiUrl: 'http://localhost:3000/api' }
-    });
-    mockHttpClient = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
+    };
+    mockHttpClient = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      put: vi.fn().mockName('HttpClient.put'),
+      delete: vi.fn().mockName('HttpClient.delete')
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -139,17 +144,20 @@ describe('ProxyFactoryService', () => {
 
     // Mock the DdataInjectorModule.InjectorInstance
     DdataInjectorModule.InjectorInstance = {
-      get: jasmine.createSpy('get').and.callFake((token: any) => {
-        if (token === EnvService) {
-          return mockEnvService;
-        }
+      get: vi
+        .fn()
+        .mockName('get')
+        .mockImplementation((token: any) => {
+          if (token === EnvService) {
+            return mockEnvService;
+          }
 
-        if (token === HttpClient) {
-          return mockHttpClient;
-        }
+          if (token === HttpClient) {
+            return mockHttpClient;
+          }
 
-        return null;
-      })
+          return null;
+        })
     };
 
     service = TestBed.inject(ProxyFactoryService);

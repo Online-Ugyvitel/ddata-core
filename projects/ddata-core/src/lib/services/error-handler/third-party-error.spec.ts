@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
@@ -5,24 +6,26 @@ import { ThirdPartyError } from './third-party-error';
 import { DdataCoreError } from './ddata-core-error';
 
 describe('ThirdPartyError', () => {
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let consoleErrorSpy: jasmine.Spy;
+  let mockNotificationService: any;
+  let consoleErrorSpy: Mock;
 
   beforeEach(() => {
     // Create a spy object for NotificationService
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
+    mockNotificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
 
     TestBed.configureTestingModule({
       providers: [{ provide: NotificationService, useValue: mockNotificationService }]
     });
 
     // Spy on console.error
-    consoleErrorSpy = spyOn(console, 'error');
+    consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   afterEach(() => {
     // Clean up console spy after each test
-    consoleErrorSpy.calls.reset();
+    consoleErrorSpy.mockClear();
   });
 
   describe('constructor', () => {
@@ -295,7 +298,7 @@ describe('ThirdPartyError', () => {
       const originalError = { error: 'Any error' };
 
       new ThirdPartyError(originalError, mockNotificationService);
-      const addCall = mockNotificationService.add.calls.mostRecent();
+      const addCall = { args: mockNotificationService.add.mock.lastCall };
 
       expect(addCall.args[2]).toBe('danger' as NotificationType);
     });
@@ -304,7 +307,7 @@ describe('ThirdPartyError', () => {
       const originalError = { error: 'Any error' };
 
       new ThirdPartyError(originalError, mockNotificationService);
-      const addCall = mockNotificationService.add.calls.mostRecent();
+      const addCall = { args: mockNotificationService.add.mock.lastCall };
 
       expect(addCall.args[0]).toBe('Hiba');
     });
@@ -317,7 +320,7 @@ describe('ThirdPartyError', () => {
       new ThirdPartyError(originalError, mockNotificationService);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith('580 - API message: ', 'Test message');
-      const call = consoleErrorSpy.calls.mostRecent();
+      const call = { args: consoleErrorSpy.mock.lastCall };
 
       expect(call.args[0]).toBe('580 - API message: ');
       expect(call.args[1]).toBe('Test message');

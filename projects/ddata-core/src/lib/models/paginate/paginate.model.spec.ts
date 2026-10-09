@@ -69,7 +69,7 @@ describe('Paginate', () => {
     it('should implement PaginateInterface', () => {
       const paginate = new Paginate(mockType);
 
-      expect(paginate).toEqual(jasmine.any(Object));
+      expect(paginate).toEqual(expect.any(Object));
       // Verify it has all interface properties
       expect(paginate.hasOwnProperty('current_page')).toBe(true);
       expect(paginate.hasOwnProperty('per_page')).toBe(true);
@@ -285,16 +285,20 @@ describe('Paginate', () => {
     });
 
     it('should call init method on each data item', () => {
-      const mockTypeWithSpy = jasmine.createSpy('MockType').and.returnValue({
-        init: jasmine.createSpy('init').and.returnValue({ id: 0, name: '' })
-      });
+      const initSpy = vi.fn().mockName('init').mockReturnValue({ id: 0, name: '' });
+      const mockTypeWithSpy = vi
+        .fn()
+        .mockName('MockType')
+        .mockImplementation(function () {
+          return { init: initSpy };
+        });
       const testData = {
         data: [{ id: 1, name: 'Test' }]
       };
       const paginate = new Paginate(mockTypeWithSpy, testData);
 
       expect(mockTypeWithSpy).toHaveBeenCalled();
-      expect(mockTypeWithSpy().init).toHaveBeenCalledWith({ id: 1, name: 'Test' });
+      expect(initSpy).toHaveBeenCalledWith({ id: 1, name: 'Test' });
     });
   });
 

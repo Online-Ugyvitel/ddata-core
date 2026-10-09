@@ -9,24 +9,24 @@ class DummyComponent {
 
 describe('ComponentRendererService', () => {
   let service: ComponentRendererService;
-  let changeDetector: jasmine.SpyObj<ChangeDetectorRef>;
-  let dialogHost: jasmine.SpyObj<ViewContainerRef>;
+  let changeDetector: any;
+  let dialogHost: any;
   let instance: Record<string, unknown>;
   const createComponentRef = (value: unknown): ComponentRef<DialogContentInterface> =>
     ({ instance: value }) as unknown as ComponentRef<DialogContentInterface>;
 
   beforeEach(() => {
-    changeDetector = jasmine.createSpyObj<ChangeDetectorRef>('ChangeDetectorRef', [
-      'detectChanges'
-    ]);
-    dialogHost = jasmine.createSpyObj<ViewContainerRef>('ViewContainerRef', [
-      'clear',
-      'createComponent'
-    ]);
+    changeDetector = {
+      detectChanges: vi.fn().mockName('ChangeDetectorRef.detectChanges')
+    };
+    dialogHost = {
+      clear: vi.fn().mockName('ViewContainerRef.clear'),
+      createComponent: vi.fn().mockName('ViewContainerRef.createComponent')
+    };
     instance = { model: null, datasArrived: new BehaviorSubject<number>(0) };
-    dialogHost.createComponent.and.returnValue(createComponentRef(instance));
+    dialogHost.createComponent.mockReturnValue(createComponentRef(instance));
     service = new ComponentRendererService(changeDetector);
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   it('should be created with the list method', () => {
@@ -93,7 +93,7 @@ describe('ComponentRendererService', () => {
       const models = [{ id: 1 }, { id: 2 }];
       const datasArrived = instance['datasArrived'] as BehaviorSubject<number>;
 
-      spyOn(datasArrived, 'next');
+      vi.spyOn(datasArrived, 'next').mockReturnValue(undefined);
       service
         .setDialogHost(dialogHost)
         .setMethod('list')
@@ -139,7 +139,7 @@ describe('ComponentRendererService', () => {
     });
 
     it('should log an error when the component could not be created', () => {
-      dialogHost.createComponent.and.returnValue(null);
+      dialogHost.createComponent.mockReturnValue(null);
       service.setDialogHost(dialogHost).setSettings({ listComponent: DummyComponent });
 
       expect(service.render()).toBeUndefined();

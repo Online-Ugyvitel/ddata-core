@@ -1,4 +1,3 @@
-import 'zone.js/testing';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -103,7 +102,7 @@ describe('DdataUiTagComponent', () => {
     const fakeModel: TagInterface = { name: 'test tag' };
 
     component.tag = fakeModel;
-    const fakeSpy = spyOn(component.delete, 'emit');
+    const fakeSpy = vi.spyOn(component.delete, 'emit').mockReturnValue(undefined);
 
     component.deleteTag();
 
@@ -111,7 +110,7 @@ describe('DdataUiTagComponent', () => {
   });
 
   it('deleteTag() method should emit undefined when tag is not set', () => {
-    const fakeSpy = spyOn(component.delete, 'emit');
+    const fakeSpy = vi.spyOn(component.delete, 'emit').mockReturnValue(undefined);
 
     component.deleteTag();
 
@@ -120,7 +119,7 @@ describe('DdataUiTagComponent', () => {
 
   it('deleteTag() method should emit null when tag is null', () => {
     component.tag = null;
-    const fakeSpy = spyOn(component.delete, 'emit');
+    const fakeSpy = vi.spyOn(component.delete, 'emit').mockReturnValue(undefined);
 
     component.deleteTag();
 

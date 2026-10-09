@@ -9,7 +9,6 @@ import { ColorHexaCode, ID } from '@netdjw/ddata-core';
 import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
 import { KanbanStatusInterface } from 'src/app/models/kanban/status/kanban-status.interface';
 import { KanbanStatus } from 'src/app/models/kanban/status/kanban-status.model';
-import 'zone.js/testing';
 import { KanbanCasefile } from './../../models/kanban/casefile/kanban-casefile.model';
 import { ViewKanban } from './../../models/view/kanban/view-kanban.model';
 import { ViewKanbanComponent } from './view-kanban.component';
@@ -111,7 +110,7 @@ describe('ViewKanbanComponent', () => {
     });
     component.dragover(component.kanbanData.statuses[0]);
 
-    expect(component.dragOverStatus.is_drag_over).toBeTrue();
+    expect(component.dragOverStatus.is_drag_over).toBe(true);
   });
 
   it('dragend() method should update casefile', () => {
@@ -126,7 +125,7 @@ describe('ViewKanbanComponent', () => {
     } as unknown as CasefileInterface;
 
     component = fixture.componentInstance;
-    const spy = spyOn(component.updateCasefile, 'emit');
+    const spy = vi.spyOn(component.updateCasefile, 'emit').mockReturnValue(undefined);
 
     component.dragCasefile = fakedata;
     component.originalData.push(component.dragCasefile);

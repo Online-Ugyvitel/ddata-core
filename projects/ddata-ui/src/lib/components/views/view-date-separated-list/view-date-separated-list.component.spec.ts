@@ -62,7 +62,7 @@ describe('ViewDateSeparatedListComponent', () => {
     ];
 
     component = fixture.componentInstance;
-    const spy = spyOn(component, 'setListItemName').and.callThrough();
+    const spy = vi.spyOn(component, 'setListItemName');
     let convertedData = component.convertToDateSeparatedList(fakedata);
 
     expect(convertedData.length).toBe(2);
@@ -114,7 +114,7 @@ describe('ViewDateSeparatedListComponent', () => {
 
     component = fixture.componentInstance;
     component.originalData.push(fake);
-    const spy = spyOn(component.openCasefile, 'emit');
+    const spy = vi.spyOn(component.openCasefile, 'emit').mockReturnValue(undefined);
 
     component.open(fake);
 
@@ -126,7 +126,7 @@ describe('ViewDateSeparatedListComponent', () => {
 
     component = fixture.componentInstance;
     component.originalData.push(fake);
-    const spy = spyOn(component.deleteCasefile, 'emit');
+    const spy = vi.spyOn(component.deleteCasefile, 'emit').mockReturnValue(undefined);
 
     component.delete(fake);
 

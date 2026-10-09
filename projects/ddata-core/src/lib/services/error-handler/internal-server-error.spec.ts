@@ -1,18 +1,21 @@
+import type { Mock } from 'vitest';
 import { InternalServerError } from './internal-server-error';
 import { DdataCoreError } from './ddata-core-error';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 describe('InternalServerError', () => {
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let consoleErrorSpy: jasmine.Spy;
+  let mockNotificationService: any;
+  let consoleErrorSpy: Mock;
 
   beforeEach(() => {
     // Create a spy object for NotificationService
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
+    mockNotificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
 
     // Spy on console.error
-    consoleErrorSpy = spyOn(console, 'error');
+    consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   describe('constructor', () => {
@@ -314,8 +317,8 @@ describe('InternalServerError', () => {
       ];
 
       testCases.forEach((message, index) => {
-        consoleErrorSpy.calls.reset();
-        mockNotificationService.add.calls.reset();
+        consoleErrorSpy.mockClear();
+        mockNotificationService.add.mockClear();
         const originalError = {
           error: {
             message: message
@@ -343,7 +346,7 @@ describe('InternalServerError', () => {
       };
 
       new InternalServerError(originalError, mockNotificationService);
-      const callArgs = mockNotificationService.add.calls.mostRecent().args;
+      const callArgs = vi.mocked(mockNotificationService.add).mock.lastCall;
 
       expect(callArgs[2]).toBe('danger');
       expect(typeof callArgs[2]).toBe('string');
@@ -379,8 +382,8 @@ describe('InternalServerError', () => {
       ];
 
       testCases.forEach((testCase, index) => {
-        consoleErrorSpy.calls.reset();
-        mockNotificationService.add.calls.reset();
+        consoleErrorSpy.mockClear();
+        mockNotificationService.add.mockClear();
 
         expect(() => {
           new InternalServerError(testCase, mockNotificationService);

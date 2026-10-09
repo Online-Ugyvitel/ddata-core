@@ -1,6 +1,3 @@
-/* eslint-disable jasmine/prefer-toHaveBeenCalledWith */
-
-import 'zone.js/testing';
 import { Component, EventEmitter, Injector } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { of, Observable } from 'rxjs';
@@ -124,7 +121,7 @@ describe('BaseCreateEditComponent', () => {
     mockHelperFactoryService = new MockHelperFactoryService();
     // Mock DdataCoreModule.InjectorInstance completely
     const mockInjector = {
-      get: jasmine.createSpy('get').and.returnValue({})
+      get: vi.fn().mockName('get').mockReturnValue({})
     };
 
     (DdataCoreModule as any).InjectorInstance = mockInjector;
@@ -139,7 +136,7 @@ describe('BaseCreateEditComponent', () => {
     });
 
     // Patch the constructor to avoid dependency chain
-    spyOn(HelperFactoryService.prototype, 'get').and.returnValue(mockHelperService);
+    vi.spyOn(HelperFactoryService.prototype, 'get').mockReturnValue(mockHelperService);
 
     fixture = TestBed.createComponent(TestCreateEditComponent);
     component = fixture.componentInstance;
@@ -238,21 +235,21 @@ describe('BaseCreateEditComponent', () => {
   });
 
   it('should call load function in ngOnInit', () => {
-    spyOn(component, 'load');
+    vi.spyOn(component, 'load').mockReturnValue(undefined);
     component.ngOnInit();
 
     expect(component.load).toHaveBeenCalled();
   });
 
   it('should call helperService.getOne in load function', () => {
-    spyOn(component.helperService, 'getOne').and.returnValue(of(true));
+    vi.spyOn(component.helperService, 'getOne').mockReturnValue(of(true));
     component.load();
 
     expect(component.helperService.getOne).toHaveBeenCalledWith(component.model, component.isModal);
   });
 
   it('should call helperService.save in save function', () => {
-    spyOn(component.helperService, 'save').and.returnValue(of(true));
+    vi.spyOn(component.helperService, 'save').mockReturnValue(of(true));
     component.save();
 
     expect(component.helperService.save).toHaveBeenCalledWith(
@@ -264,14 +261,14 @@ describe('BaseCreateEditComponent', () => {
   });
 
   it('should call helperService.saveAsNew in saveAsNew function', () => {
-    spyOn(component.helperService, 'saveAsNew').and.returnValue(of(true));
+    vi.spyOn(component.helperService, 'saveAsNew').mockReturnValue(of(true));
     component.saveAsNew();
 
     expect(component.helperService.saveAsNew).toHaveBeenCalledWith(component.model);
   });
 
   it('should call helperService.stepBack in stepBack function', () => {
-    spyOn(component.helperService, 'stepBack');
+    vi.spyOn(component.helperService, 'stepBack').mockReturnValue(undefined);
     component.stepBack();
 
     expect(component.helperService.stepBack).toHaveBeenCalledWith(
@@ -283,7 +280,7 @@ describe('BaseCreateEditComponent', () => {
 
   it('should navigate to {model.api_endpoint}/list URL when stepBack is called in non-modal mode', () => {
     component.isModal = false;
-    spyOn(component.helperService, 'stepBack');
+    vi.spyOn(component.helperService, 'stepBack').mockReturnValue(undefined);
     component.stepBack();
 
     expect(component.helperService.stepBack).toHaveBeenCalledWith(
@@ -295,8 +292,8 @@ describe('BaseCreateEditComponent', () => {
 
   it('should emit null in saveModel output when stepBack is called in modal mode', () => {
     component.isModal = true;
-    spyOn(component.saveModel, 'emit');
-    spyOn(component.helperService, 'stepBack').and.callFake((model, isModal, emitter) => {
+    vi.spyOn(component.saveModel, 'emit').mockReturnValue(undefined);
+    vi.spyOn(component.helperService, 'stepBack').mockImplementation((model, isModal, emitter) => {
       if (isModal) {
         emitter.emit(null);
       }

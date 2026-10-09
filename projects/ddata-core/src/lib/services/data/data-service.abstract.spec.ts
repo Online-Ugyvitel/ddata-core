@@ -8,6 +8,10 @@ describe('DataServiceAbstract', () => {
   let service: TestDataService;
   let mockModel: MockModel;
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   beforeEach(() => {
     mockModel = new MockModel();
     service = new TestDataService(mockModel);
@@ -103,7 +107,7 @@ describe('DataServiceAbstract', () => {
     it('should hydrate single item', () => {
       const data = [{ id: 1, name: 'item1' }];
 
-      spyOn(mockModel, 'init').and.returnValue(new MockModel());
+      vi.spyOn(MockModel.prototype, 'init').mockReturnValue(new MockModel());
       const result = service.hydrateArray(data);
 
       expect(result.length).toBe(1);
@@ -117,7 +121,7 @@ describe('DataServiceAbstract', () => {
         { id: 3, name: 'item3' }
       ];
 
-      spyOn(mockModel, 'init').and.returnValue(new MockModel());
+      vi.spyOn(MockModel.prototype, 'init').mockReturnValue(new MockModel());
       const result = service.hydrateArray(data);
 
       expect(result.length).toBe(3);
@@ -133,7 +137,7 @@ describe('DataServiceAbstract', () => {
       mockModel.tags = ['existing', 'tags'];
       const data = [{ id: 1, name: 'item1' }];
 
-      spyOn(mockModel, 'init').and.returnValue(new MockModel());
+      vi.spyOn(MockModel.prototype, 'init').mockReturnValue(new MockModel());
 
       service.hydrateArray(data);
 
@@ -168,7 +172,7 @@ describe('DataServiceAbstract', () => {
         {} // empty object
       ];
 
-      spyOn(mockModel, 'init').and.returnValue(new MockModel());
+      vi.spyOn(MockModel.prototype, 'init').mockReturnValue(new MockModel());
       const result = service.hydrateArray(data);
 
       expect(result.length).toBe(4);
@@ -183,7 +187,7 @@ describe('DataServiceAbstract', () => {
       const model1 = new MockModel();
       const model2 = new MockModel();
 
-      spyOn(mockModel, 'init').and.returnValues(model1, model2);
+      vi.spyOn(MockModel.prototype, 'init').mockReturnValueOnce(model1).mockReturnValueOnce(model2);
       const result = service.hydrateArray(data);
 
       expect(result.length).toBe(2);
@@ -199,7 +203,7 @@ describe('DataServiceAbstract', () => {
         { id: undefined, name: undefined }
       ];
 
-      spyOn(mockModel, 'init').and.returnValue(new MockModel());
+      vi.spyOn(MockModel.prototype, 'init').mockReturnValue(new MockModel());
       const result = service.hydrateArray(data);
 
       expect(result.length).toBe(3);
@@ -217,8 +221,9 @@ describe('DataServiceAbstract', () => {
         Object.assign(new MockModel(), { id: 1, name: 'first' }),
         Object.assign(new MockModel(), { id: 2, name: 'second' })
       ];
+      const initSpy = vi.spyOn(MockModel.prototype, 'init');
 
-      spyOn(mockModel, 'init').and.returnValues(...models);
+      models.forEach((model) => initSpy.mockReturnValueOnce(model));
       const result = service.hydrateArray(data);
 
       expect(result[0]).toBe(models[0]);
@@ -246,7 +251,7 @@ describe('DataServiceAbstract', () => {
     });
 
     it('should create a PaginateInterface object', () => {
-      spyOn(service, 'hydrateArray').and.returnValue([]);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
 
       expect(result).toBeDefined();
@@ -254,15 +259,15 @@ describe('DataServiceAbstract', () => {
     });
 
     it('should hydrate paginate object with provided data', () => {
-      spyOn(service, 'hydrateArray').and.returnValue([]);
-      spyOn(service, 'hydrate').and.callThrough();
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
+      vi.spyOn(service, 'hydrate');
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
 
-      expect(service.hydrate).toHaveBeenCalledWith(jasmine.any(Paginate), mockPaginateData);
+      expect(service.hydrate).toHaveBeenCalledWith(expect.any(Paginate), mockPaginateData);
     });
 
     it('should call hydrateArray with data property', () => {
-      spyOn(service, 'hydrateArray').and.returnValue([]);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
 
       service['getNewPaginateObject'](MockModel, mockPaginateData);
 
@@ -272,7 +277,7 @@ describe('DataServiceAbstract', () => {
     it('should set data property with hydrated array', () => {
       const hydratedModels = [new MockModel(), new MockModel()];
 
-      spyOn(service, 'hydrateArray').and.returnValue(hydratedModels);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue(hydratedModels);
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
 
       expect(result.data).toBe(hydratedModels);
@@ -280,7 +285,7 @@ describe('DataServiceAbstract', () => {
     });
 
     it('should preserve paginate metadata', () => {
-      spyOn(service, 'hydrateArray').and.returnValue([]);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
 
       expect(result.current_page).toBe(1);
@@ -297,7 +302,7 @@ describe('DataServiceAbstract', () => {
         data: []
       };
 
-      spyOn(service, 'hydrateArray').and.returnValue([]);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
       const result = service['getNewPaginateObject'](MockModel, emptyPaginateData);
 
       expect(result.data).toEqual([]);
@@ -312,14 +317,14 @@ describe('DataServiceAbstract', () => {
         // no data property
       };
 
-      spyOn(service, 'hydrateArray').and.returnValue([]);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
       const result = service['getNewPaginateObject'](MockModel, noPaginateData);
 
       expect(service.hydrateArray).toHaveBeenCalledWith(undefined);
     });
 
     it('should return object that implements PaginateInterface', () => {
-      spyOn(service, 'hydrateArray').and.returnValue([]);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
 
       // Check that result has all PaginateInterface properties
@@ -354,7 +359,7 @@ describe('DataServiceAbstract', () => {
         return model.init(item);
       });
 
-      spyOn(service, 'hydrateArray').and.returnValue(hydratedModels);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue(hydratedModels);
       const result = service['getNewPaginateObject'](MockModel, complexPaginateData);
 
       expect(result.current_page).toBe(2);
@@ -408,7 +413,7 @@ describe('DataServiceAbstract', () => {
 
   describe('Edge cases and error handling', () => {
     it('should handle model without constructor gracefully', () => {
-      const plainModel = { id: 0, name: '', init: jasmine.createSpy('init') };
+      const plainModel = { id: 0, name: '', init: vi.fn().mockName('init') };
       const plainService = new TestDataService(plainModel as any);
 
       expect(() => {

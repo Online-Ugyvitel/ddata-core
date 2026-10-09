@@ -93,7 +93,8 @@ export class DdataMultipleSelectDialogComponent implements OnInit, AfterViewInit
     if (this.mode === 'single') {
       const selectedModel = this.model[this.getObjectFieldName()];
 
-      if (!!selectedModel) {
+      // a field without `_id` suffix holds the plain value, not the related object
+      if (!!selectedModel && typeof selectedModel === 'object') {
         this.componentRendererService.setSelectedModels([selectedModel]);
       }
     }

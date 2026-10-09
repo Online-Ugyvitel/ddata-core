@@ -25,9 +25,9 @@ describe('BaseSearch', () => {
     it('should implement SearchInterface', () => {
       // Check that the model has required SearchInterface properties
       expect(model).toEqual(
-        jasmine.objectContaining({
-          api_endpoint: jasmine.any(String),
-          model_name: jasmine.any(String)
+        expect.objectContaining({
+          api_endpoint: expect.any(String),
+          model_name: expect.any(String)
         })
       );
     });

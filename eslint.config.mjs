@@ -8,7 +8,6 @@ import angularTemplateParser from '@angular-eslint/template-parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
-import jasminePlugin from 'eslint-plugin-jasmine';
 import noNullPlugin from 'eslint-plugin-no-null';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
@@ -39,7 +38,6 @@ const plugins = {
   '@angular-eslint': angularPlugin,
   '@angular-eslint/template': angularTemplatePlugin,
   '@typescript-eslint': tsPlugin,
-  jasmine: jasminePlugin,
   'no-null': noNullPlugin,
   prettier: prettierPlugin,
   unicorn: unicornPlugin,
@@ -131,7 +129,6 @@ const buildScope = ({ dir, prefix }) => {
       },
       plugins,
       rules: {
-        ...jasminePlugin.configs.recommended.rules,
         ...mapRules(specOverride.rules),
         ...mapRules(rc === rootRc ? {} : rc.rules),
       },
@@ -165,11 +162,14 @@ const buildScope = ({ dir, prefix }) => {
       'import/no-extraneous-dependencies': 'off',
       'max-classes-per-file': 'off',
       'no-console': 'off',
-      'jasmine/missing-expect': 'off',
-      // the fixer of this rule crashes ESLint on `toBe(undefined)` / `toBe(null)` comparisons
-      'jasmine/prefer-toBeUndefined': 'off',
-      'jasmine/prefer-toBeNull': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
+      // prettier splits chained mocks like `vi.fn().mockReturnValue()` differently than this rule wants
+      'newline-per-chained-call': 'off',
+      // vitest specs are often async only to flush promises, and empty mock implementations are common
+      '@typescript-eslint/require-await': 'off',
+      'no-empty': 'off',
+      'no-empty-function': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
     },
   });
 
@@ -178,13 +178,6 @@ const buildScope = ({ dir, prefix }) => {
     // the sibling @netdjw/ddata-* packages resolve to dist/, which only exists after they are built
     rules: { 'import/no-unresolved': ['error', { ignore: ['^@netdjw/ddata-'] }] },
   });
-
-  if (dir === 'projects/ddata-ui-file') {
-    configs.push({
-      files: toGlobs(prefix, ['file.model.spec.ts']),
-      rules: { 'jasmine/missing-expect': ['error', 'expect()', 'expectAsync()', 'expectLoose()'] },
-    });
-  }
 
   if (dir === 'projects/ddata-ui') {
     // ddata-ui still imports files of the consuming application (src/app/...) and private packages; the package is not part of the build yet.

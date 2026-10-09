@@ -30,11 +30,11 @@
         (change)="selectItem()"
       >
         @if (addEmptyOption) {
-          <option data-default value="0">-- {{ unselectedText }} --</option>
+          <option data-default [ngValue]="0">-- {{ unselectedText }} --</option>
         }
 
         @for (item of items; track item[valueField]) {
-          <option [value]="item[valueField]" [selected]="item[valueField] === model[field]">
+          <option [ngValue]="item[valueField]" [selected]="item[valueField] === model[field]">
             {{ item[text] }}
           </option>
         }

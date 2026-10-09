@@ -1,24 +1,27 @@
+import type { Mock } from 'vitest';
 import { AppValidationError } from './validation-error';
 import { DdataCoreError } from './ddata-core-error';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 describe('AppValidationError', () => {
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let consoleSpy: jasmine.Spy;
+  let mockNotificationService: any;
+  let consoleSpy: Mock;
 
   beforeEach(() => {
     // Create spy for NotificationService
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
+    mockNotificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
 
     // Spy on console.error
-    consoleSpy = spyOn(console, 'error');
+    consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   afterEach(() => {
     // Clean up spies
-    consoleSpy.calls.reset();
-    mockNotificationService.add.calls.reset();
+    consoleSpy.mockClear();
+    mockNotificationService.add.mockClear();
   });
 
   describe('Constructor', () => {

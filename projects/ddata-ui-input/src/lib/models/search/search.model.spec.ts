@@ -13,34 +13,44 @@ describe('Search Model', () => {
     Object.defineProperty(window, 'DdataCoreModule', {
       value: {
         InjectorInstance: {
-          get: jasmine.createSpy('get').and.callFake((serviceName: string) => {
-            if (serviceName === 'InputHelperService') {
-              return {
-                validateFieldValue: jasmine.createSpy('validateFieldValue').and.returnValue(true),
-                createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('test-id'),
-                randChars: jasmine.createSpy('randChars').and.returnValue('rand123'),
-                getTitle: jasmine
-                  .createSpy('getTitle')
-                  .and.callFake((modelParam: unknown, field: string) => `${field} title`),
-                getLabel: jasmine
-                  .createSpy('getLabel')
-                  .and.callFake((modelParam: unknown, field: string) => `${field} label`),
-                getPlaceholder: jasmine
-                  .createSpy('getPlaceholder')
-                  .and.callFake((modelParam: unknown, field: string) => `${field} placeholder`),
-                getPrepend: jasmine
-                  .createSpy('getPrepend')
-                  .and.callFake((modelParam: unknown, field: string) => `${field} prepend`),
-                getAppend: jasmine
-                  .createSpy('getAppend')
-                  .and.callFake((modelParam: unknown, field: string) => `${field} append`),
-                isRequired: jasmine.createSpy('isRequired').and.returnValue(false),
-                validateField: jasmine.createSpy('validateField').and.returnValue(true)
-              };
-            }
+          get: vi
+            .fn()
+            .mockName('get')
+            .mockImplementation((serviceName: string) => {
+              if (serviceName === 'InputHelperService') {
+                return {
+                  validateFieldValue: vi.fn().mockName('validateFieldValue').mockReturnValue(true),
+                  createUniqueId: vi.fn().mockName('createUniqueId').mockReturnValue('test-id'),
+                  randChars: vi.fn().mockName('randChars').mockReturnValue('rand123'),
+                  getTitle: vi
+                    .fn()
+                    .mockName('getTitle')
+                    .mockImplementation((modelParam: unknown, field: string) => `${field} title`),
+                  getLabel: vi
+                    .fn()
+                    .mockName('getLabel')
+                    .mockImplementation((modelParam: unknown, field: string) => `${field} label`),
+                  getPlaceholder: vi
+                    .fn()
+                    .mockName('getPlaceholder')
+                    .mockImplementation(
+                      (modelParam: unknown, field: string) => `${field} placeholder`
+                    ),
+                  getPrepend: vi
+                    .fn()
+                    .mockName('getPrepend')
+                    .mockImplementation((modelParam: unknown, field: string) => `${field} prepend`),
+                  getAppend: vi
+                    .fn()
+                    .mockName('getAppend')
+                    .mockImplementation((modelParam: unknown, field: string) => `${field} append`),
+                  isRequired: vi.fn().mockName('isRequired').mockReturnValue(false),
+                  validateField: vi.fn().mockName('validateField').mockReturnValue(true)
+                };
+              }
 
-            return null;
-          })
+              return null;
+            })
         }
       },
       writable: true,
@@ -182,7 +192,7 @@ describe('Search Model', () => {
       const result = model.init();
 
       expect(result).toBe(model);
-      expect(result).toEqual(jasmine.any(BaseSearch));
+      expect(result).toEqual(expect.any(BaseSearch));
     });
 
     it('should initialize with empty object when no data provided', () => {
@@ -309,42 +319,78 @@ describe('Search Model', () => {
       model.init({ searchText: 'my search term' });
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe('my search term');
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe('my search term');
     });
 
     it('should return empty string when searchText is empty', () => {
       model.init({ searchText: '' });
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe('');
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe('');
     });
 
     it('should return empty string when searchText is null', () => {
       model.searchText = null;
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe('');
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe('');
     });
 
     it('should return empty string when searchText is undefined', () => {
       model.searchText = undefined;
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe('');
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe('');
     });
 
     it('should return empty string when searchText is falsy', () => {
       model.searchText = false as any;
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe('');
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe('');
     });
 
     it('should preserve whitespace in searchText', () => {
       model.init({ searchText: '  spaced search  ' });
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe('  spaced search  ');
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe('  spaced search  ');
     });
   });
 
@@ -479,14 +525,26 @@ describe('Search Model', () => {
       model.searchText = true as any;
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe(true); // The method returns the original value, not string conversion
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe(true); // The method returns the original value, not string conversion
     });
 
     it('should handle numeric searchText in prepareToSave', () => {
       model.searchText = 12345 as any;
       const result = model.prepareToSave();
 
-      expect((result as { term: unknown }).term).toBe(12345); // The method returns the original value, not string conversion
+      expect(
+        (
+          result as {
+            term: unknown;
+          }
+        ).term
+      ).toBe(12345); // The method returns the original value, not string conversion
     });
   });
 });
