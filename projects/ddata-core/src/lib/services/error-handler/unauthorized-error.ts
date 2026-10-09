@@ -13,16 +13,16 @@ export class UnauthorizedError extends DdataCoreError {
 
     if (router.url !== '/login') {
       storageService.clear();
-      const logoutNavbarItem: HTMLElement = document.getElementById('nav-logout');
+      const logoutNavbarItem: HTMLElement | null = document.getElementById('nav-logout');
 
-      if (logoutNavbarItem !== null) {
+      if (typeof logoutNavbarItem?.click === 'function') {
         // ha van logout menüpont
         logoutNavbarItem.click();
       } else {
         // ha nincs logout menüpont
-        const loginNavbarItem: HTMLElement = document.getElementById('nav-login');
+        const loginNavbarItem: HTMLElement | null = document.getElementById('nav-login');
 
-        if (loginNavbarItem !== null) {
+        if (typeof loginNavbarItem?.click === 'function') {
           // ha van login menüpont
           loginNavbarItem.click();
         } else {
