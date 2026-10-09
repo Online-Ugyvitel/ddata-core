@@ -33,11 +33,12 @@ export class DdataUiPaginateComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    this._paginate = this.paginate ? of(this.paginate) : undefined;
     this.numbers = of(this.paginate).pipe(
       map((result: PaginateInterface) => {
-        this.currentPage = result.current_page;
+        this.currentPage = result?.current_page ?? 0;
 
-        return Array(result.last_page)
+        return Array(result?.last_page ?? 0)
           .fill(0)
           .map((x, i) => i + 1);
       })
