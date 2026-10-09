@@ -1,4 +1,10 @@
-import { BaseModelWithoutTypeDefinitionInterface, Description, FieldsInterface, ID, URI } from 'ddata-core';
+import {
+  BaseModelWithoutTypeDefinitionInterface,
+  Description,
+  FieldsInterface,
+  ID,
+  URI
+} from 'ddata-core';
 
 export interface FolderUIFieldsInterface {
   parent_id: ID;
@@ -8,10 +14,10 @@ export interface FolderUIFieldsInterface {
   uri: URI;
   title: string;
 }
-export interface FolderInterface extends
-  FolderUIFieldsInterface,
-  BaseModelWithoutTypeDefinitionInterface,
-  FieldsInterface<FolderUIFieldsInterface> {
-
+export interface FolderInterface
+  extends
+    FolderUIFieldsInterface,
+    BaseModelWithoutTypeDefinitionInterface,
+    FieldsInterface<FolderUIFieldsInterface> {
   id: ID;
 }
