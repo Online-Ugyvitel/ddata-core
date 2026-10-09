@@ -1,0 +1,108 @@
+name: Publish packages
+
+on:
+  push:
+    branches: [ master ]
+
+# Publishing must never run in parallel, otherwise two runs could race for the same version.
+concurrency:
+  group: publish-packages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    env:
+      REGISTRY: https://npm.pkg.github.com
+      # Token with the write:packages scope for the @netdjw scope, stored as a repository secret.
+      NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+
+    # The npmrc only references the token through an environment variable, so the token is never written to disk.
+    - name: Configure GitHub Packages
+      run: |
+        if [ -z "$NODE_AUTH_TOKEN" ]; then
+          echo "::error::The GH_PACKAGES_TOKEN repository secret is missing."
+          exit 1
+        fi
+        npmrc="$RUNNER_TEMP/publish.npmrc"
+        printf '%s\n' \
+          '@netdjw:registry=https://npm.pkg.github.com' \
+          '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$npmrc"
+        echo "NPM_CONFIG_USERCONFIG=$npmrc" >> "$GITHUB_ENV"
+
+    # A package is published only when its name@version does not exist in the registry yet.
+    # The list keeps the dependency order, which is also the build and publish order.
+    - name: Detect packages with a new version
+      id: detect
+      run: |
+        to_publish=""
+        for dir in ddata-core ddata-a11y ddata-ui-common ddata-ui-dialog ddata-ui-input ddata-ui-file; do
+          name=$(node -p "require('./projects/$dir/package.json').name")
+          version=$(node -p "require('./projects/$dir/package.json').version")
+          case "$name" in
+            @netdjw/*) ;;
+            *)
+              echo "::warning::Skipping $dir: the package name '$name' has no @netdjw scope, GitHub Packages cannot publish it."
+              continue
+              ;;
+          esac
+          if output=$(npm view "$name@$version" version --registry "$REGISTRY" 2>&1); then
+            if [ -n "$output" ]; then
+              echo "$name@$version already exists, skipping."
+              continue
+            fi
+          elif ! grep -q 'E404' <<< "$output"; then
+            echo "::error::Could not query $name@$version from the registry:"
+            echo "$output"
+            exit 1
+          fi
+          echo "$name@$version is new."
+          to_publish="$to_publish $dir"
+        done
+        echo "packages=$(echo $to_publish)" >> "$GITHUB_OUTPUT"
+
+    - name: Nothing to publish
+      if: steps.detect.outputs.packages == ''
+      run: echo "No package version changed, nothing to publish."
+
+    - name: Install dependencies
+      if: steps.detect.outputs.packages != ''
+      run: |
+        rm -f .npmrc
+        rm -f package-lock.json
+        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
+
+    # The packages import each other through their built output, so they are built in dependency order.
+    - name: Build packages
+      if: steps.detect.outputs.packages != ''
+      run: |
+        npm run build:core
+        npm run build:a11y
+        npm run build:ui-common
+        npm run build:ui-dialog
+        npm run build:ui-input
+        npm run build:ui-file
+
+    - name: Publish packages
+      if: steps.detect.outputs.packages != ''
+      env:
+        PACKAGES: ${{ steps.detect.outputs.packages }}
+      run: |
+        set -e
+        for dir in $PACKAGES; do
+          echo "Publishing $dir"
+          (cd "dist/$dir" && npm publish --registry "$REGISTRY")
+        done
