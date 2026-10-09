@@ -6,7 +6,15 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
-import { BaseModel, BaseModelInterface, DdataCoreModule, FieldsInterface, ID, ISODate, ValidatorService } from 'ddata-core';
+import {
+  BaseModel,
+  BaseModelInterface,
+  DdataCoreModule,
+  FieldsInterface,
+  ID,
+  ISODate,
+  ValidatorService
+} from 'ddata-core';
 import * as moment from 'moment';
 import { DdataUiInputModule } from '../../ddata-ui-input.module';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
@@ -22,8 +30,8 @@ class MockModel extends BaseModel implements MockModelInterface {
   date: ISODate;
   requiredDate: ISODate;
 
-  init(data?: any): this {
-    data = !!data ? data : {};
+  init(initData?: any): this {
+    const data = !!initData ? initData : {};
 
     this.id = !!data.id ? data.id : 0;
     this.date = !!data.date ? data.date : '';
@@ -54,7 +62,6 @@ class MockModel extends BaseModel implements MockModelInterface {
     return this;
   }
 }
-
 // Components are OnPush by default in Angular 22, so direct property changes need an explicit dirty mark.
 const detectChangesOf = (fixture: ComponentFixture<unknown>): void => {
   fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck();
@@ -69,10 +76,16 @@ describe('DdataInputDateComponent', () => {
 
   beforeEach(async () => {
     mockHelperService = jasmine.createSpyObj('InputHelperService', [
-      'getTitle', 'getLabel', 'getPlaceholder', 'getPrepend', 'getAppend', 
-      'isRequired', 'validateField', 'randChars'
+      'getTitle',
+      'getLabel',
+      'getPlaceholder',
+      'getPrepend',
+      'getAppend',
+      'isRequired',
+      'validateField',
+      'randChars'
     ]);
-    
+
     mockChangeDetector = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
 
     // Set up default return values
@@ -116,16 +129,16 @@ describe('DdataInputDateComponent', () => {
           provide: HttpClient,
           useValue: jasmine.createSpyObj('HttpClient', ['get'])
         }
-      ],
+      ]
     })
       .compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(DdataInputDateComponent);
         component = fixture.componentInstance;
-        
+
         // Override the helperService property to use our mock
         component.helperService = mockHelperService;
-        
+
         detectChangesOf(fixture);
       });
   });
@@ -172,17 +185,21 @@ describe('DdataInputDateComponent', () => {
     describe('moment setter', () => {
       it('should set moment value when provided', () => {
         const customMoment = { custom: true };
+
         component.moment = customMoment;
+
         expect(component._moment).toBe(customMoment);
       });
 
       it('should set default moment when falsy value provided', () => {
         component.moment = null;
+
         expect(component._moment).toBe(moment);
       });
 
       it('should set default moment when undefined provided', () => {
         component.moment = undefined;
+
         expect(component._moment).toBe(moment);
       });
     });
@@ -190,17 +207,21 @@ describe('DdataInputDateComponent', () => {
     describe('model setter', () => {
       it('should set model when valid model provided', () => {
         const testModel = new MockModel().init({ date: '2023-01-01' });
+
         component.model = testModel;
+
         expect(component._model).toBe(testModel);
       });
 
       it('should create new BaseModel when null provided', () => {
         component.model = null;
+
         expect(component._model).toBeInstanceOf(BaseModel);
       });
 
       it('should call helper service methods when model has fields', () => {
         const testModel = new MockModel().init({ date: '2023-01-01' });
+
         component._field = 'date';
         component.model = testModel;
 
@@ -213,6 +234,7 @@ describe('DdataInputDateComponent', () => {
 
       it('should set properties from helper service when model has fields', () => {
         const testModel = new MockModel().init({ date: '2023-01-01' });
+
         component._field = 'date';
         component.model = testModel;
 
@@ -225,6 +247,7 @@ describe('DdataInputDateComponent', () => {
 
       it('should call isRequired when model has validation rules', () => {
         const testModel = new MockModel().init({ requiredDate: '2023-01-01' });
+
         component._field = 'requiredDate';
         mockHelperService.isRequired.and.returnValue(true);
         component.model = testModel;
@@ -235,6 +258,7 @@ describe('DdataInputDateComponent', () => {
 
       it('should not call helper methods when model has no fields for the field', () => {
         const testModel = new MockModel().init({});
+
         component._field = 'nonexistentField';
         mockHelperService.getTitle.calls.reset();
         component.model = testModel;
@@ -246,7 +270,9 @@ describe('DdataInputDateComponent', () => {
     describe('model getter', () => {
       it('should return the current _model', () => {
         const testModel = new MockModel().init({ date: '2023-01-01' });
+
         component._model = testModel;
+
         expect(component.model).toBe(testModel);
       });
     });
@@ -254,11 +280,13 @@ describe('DdataInputDateComponent', () => {
     describe('field setter', () => {
       it('should set field when valid string provided', () => {
         component.field = 'testField';
+
         expect(component._field).toBe('testField');
       });
 
       it('should set field to "isValid" when "undefined" string provided', () => {
         component.field = 'undefined';
+
         expect(component._field).toBe('isValid');
       });
     });
@@ -266,11 +294,13 @@ describe('DdataInputDateComponent', () => {
     describe('append setter', () => {
       it('should set append when valid string provided', () => {
         component.append = 'USD';
+
         expect(component._append).toBe('USD');
       });
 
       it('should set append to empty string when "undefined" string provided', () => {
         component.append = 'undefined';
+
         expect(component._append).toBe('');
       });
     });
@@ -278,11 +308,13 @@ describe('DdataInputDateComponent', () => {
     describe('prepend setter', () => {
       it('should set prepend when valid string provided', () => {
         component.prepend = '$';
+
         expect(component._prepend).toBe('$');
       });
 
       it('should set prepend to empty string when "undefined" string provided', () => {
         component.prepend = 'undefined';
+
         expect(component._prepend).toBe('');
       });
     });
@@ -290,11 +322,13 @@ describe('DdataInputDateComponent', () => {
     describe('labelText setter', () => {
       it('should set label when valid string provided', () => {
         component.labelText = 'Custom Label';
+
         expect(component._label).toBe('Custom Label');
       });
 
       it('should set label to empty string when "undefined" string provided', () => {
         component.labelText = 'undefined';
+
         expect(component._label).toBe('');
       });
     });
@@ -312,6 +346,7 @@ describe('DdataInputDateComponent', () => {
 
     it('should set selectedValue from model field when model has value', () => {
       const testModel = new MockModel().init({ date: '2023-01-15' });
+
       component._model = testModel;
       component._field = 'date';
 
@@ -322,6 +357,7 @@ describe('DdataInputDateComponent', () => {
 
     it('should not change selectedValue when model field is empty', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
       component.selectedValue = '';
@@ -356,7 +392,7 @@ describe('DdataInputDateComponent', () => {
       testModel = new MockModel().init({ date: '' });
       component._model = testModel;
       component._field = 'date';
-      
+
       mockNgbDate = {
         year: 2023,
         month: 7,
@@ -367,7 +403,7 @@ describe('DdataInputDateComponent', () => {
     it('should format date correctly with padding', () => {
       mockNgbDate.month = 7;
       mockNgbDate.day = 5;
-      
+
       component.change(mockNgbDate);
 
       expect(component.selectedValue).toBe('2023-07-05');
@@ -388,7 +424,10 @@ describe('DdataInputDateComponent', () => {
     it('should call validateField with correct parameters', () => {
       component.change(mockNgbDate);
 
-      expect(mockHelperService.validateField).toHaveBeenCalledWith(component._model, component._field);
+      expect(mockHelperService.validateField).toHaveBeenCalledWith(
+        component._model,
+        component._field
+      );
     });
 
     it('should emit changed event when validation passes', () => {
@@ -447,14 +486,15 @@ describe('DdataInputDateComponent', () => {
   describe('Integration Tests', () => {
     it('should handle complete workflow with valid date', fakeAsync(() => {
       const testModel = new MockModel().init({ date: '2022-02-19' });
+
       component._model = testModel;
       component._field = 'date';
       spyOn(component.changed, 'emit');
 
       detectChangesOf(fixture);
-
       const newDate = '2022-12-12';
       const event = { target: { value: newDate } };
+
       component.typeChange(event);
 
       expect(component._model['date']).toEqual(newDate);
@@ -462,12 +502,13 @@ describe('DdataInputDateComponent', () => {
 
     it('should handle NgbDate change with validation', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
       spyOn(component.changed, 'emit');
       mockHelperService.validateField.and.returnValue(true);
-
       const ngbDate = { year: 2023, month: 8, day: 20 } as NgbDate;
+
       component.change(ngbDate);
 
       expect(component.selectedValue).toBe('2023-08-20');
@@ -477,6 +518,7 @@ describe('DdataInputDateComponent', () => {
 
     it('should initialize properly with all dependencies', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._field = 'date';
       component.model = testModel;
 
@@ -500,6 +542,7 @@ describe('DdataInputDateComponent', () => {
 
     it('should work with different field names', () => {
       const testModel = new MockModel().init({ requiredDate: '2023-05-10' });
+
       component._field = 'requiredDate';
       component.model = testModel;
 
@@ -514,23 +557,29 @@ describe('DdataInputDateComponent', () => {
 
     it('should set selectedValue from initial model value', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._model = testModel;
       component._field = 'date';
-      
+
       // Simulate component initialization
-      component.selectedValue = !!component.model[component._field] ? component.model[component._field] : '';
-      
+      component.selectedValue = !!component.model[component._field]
+        ? component.model[component._field]
+        : '';
+
       expect(component.selectedValue).toBe('2023-01-01');
     });
 
     it('should set selectedValue as empty string when model field is empty', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
-      
+
       // Simulate component initialization
-      component.selectedValue = !!component.model[component._field] ? component.model[component._field] : '';
-      
+      component.selectedValue = !!component.model[component._field]
+        ? component.model[component._field]
+        : '';
+
       expect(component.selectedValue).toBe('');
     });
   });
@@ -547,170 +596,177 @@ describe('DdataInputDateComponent', () => {
 
     it('should display label when showLabel is true', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._model = testModel;
       component._field = 'date';
       component._label = 'Test Label';
       component.showLabel = true;
-      
+
       detectChangesOf(fixture);
-      
       const labelElement = fixture.debugElement.query(By.css('label'));
+
       expect(labelElement).toBeTruthy();
     });
 
     it('should not display label when showLabel is false', () => {
       component.showLabel = false;
-      
+
       detectChangesOf(fixture);
-      
       const labelElement = fixture.debugElement.query(By.css('label.col-form-label'));
+
       expect(labelElement).toBeFalsy();
     });
 
     it('should show prepend text when _prepend is not empty', () => {
       component._prepend = '$';
-      
+
       detectChangesOf(fixture);
-      
       const prependElement = fixture.debugElement.query(By.css('.input-group-prepend'));
+
       expect(prependElement).toBeTruthy();
     });
 
     it('should not show prepend when _prepend is empty', () => {
       component._prepend = '';
-      
+
       detectChangesOf(fixture);
-      
       const prependElement = fixture.debugElement.query(By.css('div.input-group-prepend'));
+
       expect(prependElement).toBeFalsy();
     });
 
     it('should show append text when _append is not empty', () => {
       component._append = 'USD';
-      
+
       detectChangesOf(fixture);
-      
       const appendElement = fixture.debugElement.query(By.css('.input-group-append'));
+
       expect(appendElement).toBeTruthy();
     });
 
     it('should not show append when _append is empty', () => {
       component._append = '';
-      
+
       detectChangesOf(fixture);
-      
       const appendElement = fixture.debugElement.query(By.css('.input-group-append'));
+
       expect(appendElement).toBeFalsy();
     });
 
     it('should show input when not in view-only mode', () => {
       component.isViewOnly = false;
-      
+
       detectChangesOf(fixture);
-      
       const inputElement = fixture.debugElement.query(By.css('input'));
+
       expect(inputElement).toBeTruthy();
     });
 
     it('should show view-only div when in view-only mode', () => {
       component.isViewOnly = true;
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._model = testModel;
       component._field = 'date';
-      
+
       detectChangesOf(fixture);
-      
       const viewOnlyElement = fixture.debugElement.query(By.css('.form-control.border-0.bg-light'));
+
       expect(viewOnlyElement).toBeTruthy();
     });
 
     it('should show calendar icon when showIcon is true and not disabled', () => {
       component.showIcon = true;
       component.disabled = false;
-      
+
       detectChangesOf(fixture);
-      
       const iconElement = fixture.debugElement.query(By.css('fa-icon'));
+
       expect(iconElement).toBeTruthy();
     });
 
     it('should not show calendar icon when disabled', () => {
       component.showIcon = true;
       component.disabled = true;
-      
+
       detectChangesOf(fixture);
-      
       const iconElement = fixture.debugElement.query(By.css('fa-icon'));
+
       expect(iconElement).toBeFalsy();
     });
 
     it('should not show calendar icon when showIcon is false', () => {
       component.showIcon = false;
       component.disabled = false;
-      
+
       detectChangesOf(fixture);
-      
       const iconElement = fixture.debugElement.query(By.css('fa-icon'));
+
       expect(iconElement).toBeFalsy();
     });
 
     it('should apply validation error class when field has validation errors', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       testModel.validationErrors = ['date']; // Add validation error
       component._model = testModel;
       component._field = 'date';
       component.isViewOnly = false;
-      
+
       detectChangesOf(fixture);
-      
       const inputElement = fixture.debugElement.query(By.css('input'));
+
       expect(inputElement.nativeElement.classList.contains('invalid')).toBeTruthy();
     });
 
     it('should not apply validation error class when field has no validation errors', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       testModel.validationErrors = []; // No validation errors
       component._model = testModel;
       component._field = 'date';
       component.isViewOnly = false;
-      
+
       detectChangesOf(fixture);
-      
       const inputElement = fixture.debugElement.query(By.css('input'));
+
       expect(inputElement.nativeElement.classList.contains('invalid')).toBeFalsy();
     });
 
     it('should show required indicator when field is required', () => {
       const testModel = new MockModel().init({ requiredDate: '2023-01-01' });
+
       component._model = testModel;
       component._field = 'requiredDate';
       component._label = 'Required Field';
       component._isRequired = true;
       component.showLabel = true;
-      
+
       detectChangesOf(fixture);
-      
       const requiredSpan = fixture.debugElement.query(By.css('span'));
+
       expect(requiredSpan).toBeTruthy();
       expect(requiredSpan.nativeElement.textContent.trim()).toBe('*');
     });
 
     it('should not show required indicator when field is not required', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._model = testModel;
       component._field = 'date';
       component._label = 'Optional Field';
       component._isRequired = false;
       component.showLabel = true;
-      
+
       detectChangesOf(fixture);
-      
       const requiredSpan = fixture.debugElement.query(By.css('span'));
+
       expect(requiredSpan).toBeFalsy();
     });
 
     it('should set correct input attributes', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._model = testModel;
       component._field = 'date';
       component._placeholder = 'Enter date';
@@ -719,12 +775,11 @@ describe('DdataInputDateComponent', () => {
       component.disabled = false;
       component.isViewOnly = false;
       component.random = 'test123';
-      
+
       detectChangesOf(fixture);
-      
       const inputElement = fixture.debugElement.query(By.css('input'));
       const input = inputElement.nativeElement;
-      
+
       expect(input.id).toBe('date_test123');
       expect(input.name).toBe('date_test123');
       expect(input.placeholder).toBe('Enter date');
@@ -736,13 +791,13 @@ describe('DdataInputDateComponent', () => {
 
     it('should disable input when disabled is true', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._model = testModel;
       component._field = 'date';
       component.disabled = true;
       component.isViewOnly = false;
-      
+
       detectChangesOf(fixture);
-      
       const inputElement = fixture.debugElement.query(By.css('input'));
 
       expect(inputElement.nativeElement.disabled).toBe(true);
@@ -752,41 +807,44 @@ describe('DdataInputDateComponent', () => {
   describe('Edge Cases and Error Handling', () => {
     it('should handle null NgbDate in change method gracefully', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
-      
+
       expect(() => {
-        component.change(null as any);
+        component.change(null);
       }).toThrowError();
     });
 
     it('should handle undefined event in typeChange method', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
-      
+
       expect(() => {
-        component.typeChange(undefined as any);
+        component.typeChange(undefined);
       }).toThrowError();
     });
 
     it('should handle null event in typeChange method', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
-      
+
       expect(() => {
-        component.typeChange(null as any);
+        component.typeChange(null);
       }).toThrowError();
     });
 
     it('should handle event with null target in typeChange method', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
-      
       const event = { target: null };
-      
+
       expect(() => {
         component.typeChange(event as any);
       }).toThrowError();
@@ -794,26 +852,29 @@ describe('DdataInputDateComponent', () => {
 
     it('should handle empty field name', () => {
       const testModel = new MockModel().init({ date: '2023-01-01' });
+
       component._field = '';
       component.model = testModel;
-      
+
       expect(component._field).toBe('');
     });
 
     it('should handle model without fields property', () => {
       const emptyModel = new BaseModel();
+
       component._field = 'nonexistent';
       component.model = emptyModel;
-      
+
       // Should not call helper methods when fields don't exist
       expect(mockHelperService.getTitle).not.toHaveBeenCalled();
     });
 
     it('should handle model without validationRules property', () => {
       const emptyModel = new BaseModel();
+
       component._field = 'nonexistent';
       component.model = emptyModel;
-      
+
       // Should not call isRequired when validationRules don't exist
       expect(mockHelperService.isRequired).not.toHaveBeenCalled();
     });
@@ -821,36 +882,40 @@ describe('DdataInputDateComponent', () => {
     it('should maintain selectedValue when model is updated without field value', () => {
       component.selectedValue = 'existing-value';
       const testModel = new MockModel().init({});
+
       component._field = 'date';
       component.model = testModel;
-      
+
       component.ngOnInit();
-      
+
       expect(component.selectedValue).toBe('existing-value');
     });
 
     it('should work with different date formats in change method', () => {
       const testModel = new MockModel().init({ date: '' });
+
       component._model = testModel;
       component._field = 'date';
-      
       const ngbDate = { year: 2023, month: 12, day: 31 } as NgbDate;
+
       component.change(ngbDate);
-      
+
       expect(component.selectedValue).toBe('2023-12-31');
     });
 
     it('should handle very long field names', () => {
       const longFieldName = 'a'.repeat(100);
+
       component.field = longFieldName;
-      
+
       expect(component._field).toBe(longFieldName);
     });
 
     it('should handle special characters in field names', () => {
       const specialFieldName = 'field-with_special.chars$123';
+
       component.field = specialFieldName;
-      
+
       expect(component._field).toBe(specialFieldName);
     });
   });
