@@ -163,6 +163,10 @@ const buildScope = ({ dir, prefix }) => {
       '@typescript-eslint/explicit-function-return-type': 'off',
       'import/no-unresolved': 'off',
       'import/no-extraneous-dependencies': 'off',
+      'max-classes-per-file': 'off',
+      'no-console': 'off',
+      'jasmine/missing-expect': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
     },
   });
 

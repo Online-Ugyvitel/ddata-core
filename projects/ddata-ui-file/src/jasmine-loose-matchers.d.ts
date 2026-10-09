@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars */
 // Specs compare plain literals with branded domain types (ID, FileSizeInByte, ...) and with differently typed
 // error payloads, so the matchers accept any expected value in addition to the strict jasmine typings.
 declare namespace jasmine {
   interface Matchers<T> {
     toBe(expected: unknown, expectationFailOutput?: unknown): void;
     toEqual(expected: unknown, expectationFailOutput?: unknown): void;
+    toHaveBeenCalledWith(...params: Array<unknown>): void;
+    toHaveBeenCalledOnceWith(...params: Array<unknown>): void;
+  }
+
+  interface FunctionMatchers<Fn extends Func> {
     toHaveBeenCalledWith(...params: Array<unknown>): void;
     toHaveBeenCalledOnceWith(...params: Array<unknown>): void;
   }
