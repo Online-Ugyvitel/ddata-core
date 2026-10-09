@@ -1,5 +1,5 @@
 <ng-container *ngIf="!!_paginate">
-  <nav [attr.aria-label]="paginatorText" *ngIf="(numbers | async).length">
+  <nav [attr.aria-label]="paginatorText" *ngIf="(numbers | async)?.length">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="paginate.current_page - 1 < 1">
         <a class="page-link" href="javascript:void(0);" tabindex="-1" (click)="swithPage('prev')">

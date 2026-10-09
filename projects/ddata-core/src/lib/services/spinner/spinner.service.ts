@@ -48,14 +48,14 @@ export class SpinnerService implements SpinnerServiceInterface {
    * @param starter any unique random string to avoid multiple spinners show
    */
   private setStatus(state: 'on' | 'off', starter: string): boolean {
-    if (!!this.appEnv.environment.debug) {
+    if (!!this.appEnv.environment?.debug) {
       console.log('global spinner set', state, starter);
     }
 
     if (starter === 'ERROR_HANDLER') {
       this.setValues();
 
-      if (!!this.appEnv.environment.debug) {
+      if (!!this.appEnv.environment?.debug) {
         console.log('Spinner set off by ERROR_HANDLER');
       }
 

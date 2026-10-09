@@ -28,9 +28,11 @@ export class InputHelperService implements InputHelperServiceInterface {
       model.validationRules[field]
     );
 
-    // if not valid & validation error is not set
-    if (!isValid && !model.validationErrors.includes(field)) {
-      model.validationErrors.push(field);
+    // if not valid: the field is added to the validation errors (once)
+    if (!isValid) {
+      if (!model.validationErrors.includes(field)) {
+        model.validationErrors.push(field);
+      }
 
       return false;
     }
@@ -44,7 +46,7 @@ export class InputHelperService implements InputHelperServiceInterface {
   }
 
   getTitle(model: BaseModelInterface<unknown> & FieldsInterface<unknown>, field: string): string {
-    if (!model || !model.fields[field] || !model.fields[field].title) {
+    if (!model?.fields?.[field] || !model.fields[field].title) {
       console.error(
         `The model not contains the '${field}' field's title. You need to set in your model the fields.${field}.title field.`
       );
@@ -56,7 +58,7 @@ export class InputHelperService implements InputHelperServiceInterface {
   }
 
   getLabel(model: BaseModelInterface<unknown> & FieldsInterface<unknown>, field: string): string {
-    if (!model || !model.fields[field] || !model.fields[field].label) {
+    if (!model?.fields?.[field] || !model.fields[field].label) {
       console.error(
         `The model not contains the '${field}' field's label. You need to set in your model the fields.${field}.label field.`
       );
@@ -71,7 +73,7 @@ export class InputHelperService implements InputHelperServiceInterface {
     model: BaseModelInterface<unknown> & FieldsInterface<unknown>,
     field: string
   ): string {
-    if (!model || !model.fields[field] || !model.fields[field].placeholder) {
+    if (!model?.fields?.[field] || !model.fields[field].placeholder) {
       console.error(
         `The model not contains the '${field}' field's placeholder. You need to set in your model the fields.${field}.placeholder field.`
       );
@@ -83,7 +85,7 @@ export class InputHelperService implements InputHelperServiceInterface {
   }
 
   getPrepend(model: BaseModelInterface<unknown> & FieldsInterface<unknown>, field: string): string {
-    if (!model || !model.fields[field] || !model.fields[field].prepend) {
+    if (!model?.fields?.[field] || !model.fields[field].prepend) {
       return '';
     }
 
@@ -91,7 +93,7 @@ export class InputHelperService implements InputHelperServiceInterface {
   }
 
   getAppend(model: BaseModelInterface<unknown> & FieldsInterface<unknown>, field: string): string {
-    if (!model || !model.fields[field] || !model.fields[field].append) {
+    if (!model?.fields?.[field] || !model.fields[field].append) {
       return '';
     }
 

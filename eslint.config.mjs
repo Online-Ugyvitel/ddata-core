@@ -166,6 +166,9 @@ const buildScope = ({ dir, prefix }) => {
       'max-classes-per-file': 'off',
       'no-console': 'off',
       'jasmine/missing-expect': 'off',
+      // the fixer of this rule crashes ESLint on `toBe(undefined)` / `toBe(null)` comparisons
+      'jasmine/prefer-toBeUndefined': 'off',
+      'jasmine/prefer-toBeNull': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
     },
   });
