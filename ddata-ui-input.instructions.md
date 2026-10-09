@@ -2625,7 +2625,7 @@ export class User extends BaseModel {
 export class User extends BaseModel {
   validationRules = {
     // Expensive regex on every keystroke
-    email: ['required', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/']
+    email: ['required', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/']
   };
 }
 ```
