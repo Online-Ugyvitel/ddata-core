@@ -1,0 +1,618 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DdataSelectComponent } from './select.component';
+import { DdataCoreModule } from 'ddata-core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { SelectType } from './select.type';
+
+describe('DdataSelectComponent', () => {
+  let component: DdataSelectComponent;
+  let fixture: ComponentFixture<DdataSelectComponent>;
+  // Mock objects for testing
+  const mockCountry1 = { id: 1, name: 'United States' };
+  const mockCountry2 = { id: 2, name: 'Canada' };
+  const mockCountries = [mockCountry1, mockCountry2];
+  const mockModel = {
+    country_id: 1,
+    country: mockCountry1,
+    fields: {
+      country_id: {
+        label: 'Country',
+        title: 'Select a country'
+      }
+    },
+    validationRules: {
+      country_id: { required: true }
+    },
+    model_name: 'Address'
+  };
+
+  // Set up DdataCoreModule mock
+  beforeAll(() => {
+    Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
+      writable: true,
+      value: {
+        get: jasmine.createSpy('get').and.returnValue({
+          validateFieldValue: jasmine.createSpy('validateFieldValue'),
+          createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('unique-id-123'),
+          randChars: jasmine.createSpy('randChars').and.returnValue('random-123'),
+          getTitle: jasmine.createSpy('getTitle').and.callFake((model, field) => {
+            if (field === 'country_id' && model?.fields?.country_id?.title) {
+              return model.fields.country_id.title;
+            }
+
+            return 'Test Title';
+          }),
+          getLabel: jasmine.createSpy('getLabel').and.callFake((model, field) => {
+            if (field === 'country_id' && model?.fields?.country_id?.label) {
+              return model.fields.country_id.label;
+            }
+
+            return 'Test Label';
+          }),
+          getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue('Test Placeholder'),
+          getPrepend: jasmine.createSpy('getPrepend').and.returnValue(''),
+          getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
+          isRequired: jasmine.createSpy('isRequired').and.callFake((model, field) => {
+            try {
+              if (!model?.validationRules || !model.validationRules[field]) {
+                return false;
+              }
+              const validationRule = model.validationRules[field];
+
+              if (Array.isArray(validationRule)) {
+                return validationRule.includes('required');
+              }
+
+              if (typeof validationRule === 'object' && !!validationRule.required) {
+                return true;
+              }
+
+              if (typeof validationRule === 'string') {
+                return validationRule === 'required';
+              }
+
+              return false;
+            } catch {
+              return false;
+            }
+          }),
+          validateField: jasmine.createSpy('validateField').and.returnValue([])
+        })
+      }
+    });
+  });
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [DdataSelectComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(DdataSelectComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('Component Properties', () => {
+    it('should have default values for inputs', () => {
+      expect(component.wrapperClass).toBe('d-flex flex-wrap');
+      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
+      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
+      expect(component.inputBlockExtraClass).toBe('col-md-9');
+      expect(component.showLabel).toBe(true);
+      expect(component.disabledAppearance).toBe(false);
+      expect(component.disabled).toBe(false);
+      expect(component.addEmptyOption).toBe(true);
+      expect(component.text).toBe('name');
+      expect(component.valueField).toBe('id');
+      expect(component.unselectedText).toBe('Válassz');
+    });
+
+    it('should initialize with default mode as simple', () => {
+      expect(component.mode).toBe('simple');
+    });
+  });
+
+  describe('Deprecated Properties', () => {
+    it('should set mode to single when fakeSingleSelect is true', () => {
+      component.fakeSingleSelect = true;
+
+      expect(component.mode).toBe('single');
+    });
+
+    it('should set mode to multiple when multipleSelect is true', () => {
+      component.multipleSelect = true;
+
+      expect(component.mode).toBe('multiple');
+    });
+  });
+
+  describe('Mode Property', () => {
+    it('should set mode correctly', () => {
+      component.mode = 'single';
+
+      expect(component.mode).toBe('single');
+
+      component.mode = 'multiple';
+
+      expect(component.mode).toBe('multiple');
+
+      component.mode = 'simple';
+
+      expect(component.mode).toBe('simple');
+    });
+
+    it('should default to simple mode when null is provided', () => {
+      component.mode = null;
+
+      expect(component.mode).toBe('simple');
+    });
+
+    it('should default to simple mode when undefined is provided', () => {
+      component.mode = undefined;
+
+      expect(component.mode).toBe('simple');
+    });
+  });
+
+  describe('Model Property', () => {
+    it('should return null when null model is provided', () => {
+      component.model = null;
+
+      expect(component.model).toBeNull();
+    });
+
+    it('should set model and extract field information', () => {
+      component.field = 'country_id';
+      component.model = mockModel as any;
+
+      expect(component.model).toEqual(mockModel);
+      expect(component.label).toBeDefined();
+      expect(component.prepend).toBeDefined();
+    });
+
+    it('should handle model without fields', () => {
+      spyOn(console, 'error');
+      const modelWithoutFields = { ...mockModel, fields: null };
+
+      // Set mode to non-simple to trigger field validation
+      component.mode = 'single';
+      component.model = modelWithoutFields as any;
+
+      expect(console.error).toHaveBeenCalledWith(
+        `Your ${modelWithoutFields.model_name}'s 'fields' field is`,
+        null
+      );
+    });
+
+    it('should handle model with missing field definition', () => {
+      spyOn(console, 'error');
+      const modelWithMissingField = {
+        ...mockModel,
+        fields: {}
+      };
+
+      // Set mode to non-simple to trigger field validation
+      component.mode = 'single';
+      component.field = 'missing_field';
+      component.model = modelWithMissingField as any;
+
+      expect(console.error).toHaveBeenCalledWith(
+        `The ${modelWithMissingField.model_name}'s missing_field field is `,
+        undefined
+      );
+    });
+
+    it('should set required flag from validation rules', () => {
+      component.field = 'country_id';
+      component.model = mockModel as any;
+
+      expect(component.isRequired).toBe(true);
+    });
+
+    it('should set selected model name for fake single select mode', () => {
+      const modelWithName = { ...mockModel, name: 'Test Name' };
+
+      component.field = 'country_id'; // Set field first
+      component.fakeSingleSelect = true;
+      component.model = modelWithName as any;
+
+      expect(component.selectedModelName).toBe('Test Name');
+    });
+
+    it('should handle model without name for fake single select', () => {
+      component.fakeSingleSelect = true;
+      component.model = mockModel as any;
+
+      expect(component.selectedModelName).toBe('');
+    });
+  });
+
+  describe('Field Property', () => {
+    it('should set field correctly', () => {
+      component.field = 'test_field';
+
+      expect(component.field).toBe('test_field');
+    });
+
+    it('should default to id when undefined is provided', () => {
+      component.field = 'undefined';
+
+      expect(component.field).toBe('id');
+    });
+  });
+
+  describe('Items Property', () => {
+    it('should set items when provided', () => {
+      component.items = mockCountries;
+
+      expect(component.items).toBe(mockCountries);
+    });
+
+    it('should return early when null items are provided', () => {
+      const originalItems = component.items;
+
+      component.items = null;
+
+      expect(component.items).toBe(originalItems);
+    });
+  });
+
+  describe('Event Emission', () => {
+    it('should emit selected event', () => {
+      spyOn(component.selected, 'emit');
+      spyOn(component.change, 'emit');
+      const testValue = { test: 'data' };
+
+      component.selectedEmit(testValue);
+
+      expect(component.selected.emit).toHaveBeenCalledWith(testValue);
+      expect(component.change.emit).toHaveBeenCalledWith(testValue);
+    });
+
+    it('should emit selectModel event', () => {
+      spyOn(component.selectModel, 'emit');
+      const testValue = { test: 'data' };
+
+      component.selectModelEmit(testValue);
+
+      expect(component.selectModel.emit).toHaveBeenCalledWith(testValue);
+    });
+  });
+
+  describe('Change Event Specifics', () => {
+    it('selectedEmit should emit both selected and change outputs', () => {
+      spyOn(component.selected, 'emit');
+      spyOn(component.change, 'emit');
+      const value = 42;
+
+      component.selectedEmit(value);
+
+      expect(component.selected.emit).toHaveBeenCalledWith(value);
+      expect(component.change.emit).toHaveBeenCalledWith(value);
+    });
+
+    it('selectModelEmit should not emit change output', () => {
+      spyOn(component.selectModel, 'emit');
+      spyOn(component.change, 'emit');
+      const modelValue = { id: 1 };
+
+      component.selectModelEmit(modelValue);
+
+      expect(component.selectModel.emit).toHaveBeenCalledWith(modelValue);
+      expect(component.change.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Deprecated Flag Toggling After Initialization', () => {
+    it('should toggle fakeSingleSelect and multipleSelect sequentially', () => {
+      // starts simple
+      expect(component.mode).toBe('simple');
+
+      component.fakeSingleSelect = true;
+
+      expect(component.mode).toBe('single');
+      expect(component.fakeSingleSelect).toBeTrue();
+
+      component.multipleSelect = true; // overrides mode
+
+      expect(component.mode).toBe('multiple');
+      expect(component.multipleSelect).toBeTrue();
+    });
+
+    it('should preserve model-derived properties after deprecated flag changes', () => {
+      const fullModel = {
+        country_id: 1,
+        fields: { country_id: { label: 'Country', title: 'Select a country' } },
+        validationRules: { country_id: { required: true } },
+        model_name: 'Address'
+      } as any;
+
+      component.field = 'country_id';
+      component.model = fullModel;
+      const originalLabel = component.label;
+
+      component.fakeSingleSelect = true;
+      component.multipleSelect = true; // switch again
+
+      expect(component.label).toBe(originalLabel);
+      expect(component.isRequired).toBeTrue();
+    });
+  });
+
+  describe('Component Configuration', () => {
+    it('should allow custom CSS classes', () => {
+      component.wrapperClass = 'custom-wrapper';
+      component.labelClass = 'custom-label';
+      component.inputBlockClass = 'custom-input';
+      component.inputBlockExtraClass = 'custom-extra';
+
+      expect(component.wrapperClass).toBe('custom-wrapper');
+      expect(component.labelClass).toBe('custom-label');
+      expect(component.inputBlockClass).toBe('custom-input');
+      expect(component.inputBlockExtraClass).toBe('custom-extra');
+    });
+
+    it('should allow behavior configuration', () => {
+      component.showLabel = false;
+      component.disabledAppearance = true;
+      component.disabled = true;
+      component.addEmptyOption = false;
+
+      expect(component.showLabel).toBe(false);
+      expect(component.disabledAppearance).toBe(true);
+      expect(component.disabled).toBe(true);
+      expect(component.addEmptyOption).toBe(false);
+    });
+
+    it('should allow text configuration', () => {
+      component.text = 'title';
+      component.valueField = 'key';
+      component.unselectedText = 'Pick one';
+
+      expect(component.text).toBe('title');
+      expect(component.valueField).toBe('key');
+      expect(component.unselectedText).toBe('Pick one');
+    });
+
+    it('should allow selected items configuration', () => {
+      component.disableShowSelectedItems = true;
+      component.showIcon = true;
+      component.selectedElementsBlockClass = 'custom-selected';
+      component.selectedElementsBlockExtraClass = 'custom-selected-extra';
+
+      expect(component.disableShowSelectedItems).toBe(true);
+      expect(component.showIcon).toBe(true);
+      expect(component.selectedElementsBlockClass).toBe('custom-selected');
+      expect(component.selectedElementsBlockExtraClass).toBe('custom-selected-extra');
+    });
+  });
+
+  describe('Integration Tests', () => {
+    it('should handle complete workflow for single mode', () => {
+      component.mode = 'single';
+      component.field = 'country_id';
+      component.model = mockModel as any;
+      component.items = mockCountries;
+
+      spyOn(component.selected, 'emit');
+      spyOn(component.selectModel, 'emit');
+
+      component.selectedEmit(1);
+      component.selectModelEmit(mockCountry1);
+
+      expect(component.selected.emit).toHaveBeenCalledWith(1);
+      expect(component.selectModel.emit).toHaveBeenCalledWith(mockCountry1);
+    });
+
+    it('should handle complete workflow for multiple mode', () => {
+      component.mode = 'multiple';
+      component.field = 'countries';
+      component.model = { countries: [] } as any;
+      component.items = mockCountries;
+
+      spyOn(component.selected, 'emit');
+      spyOn(component.selectModel, 'emit');
+
+      component.selectedEmit([1, 2]);
+      component.selectModelEmit([mockCountry1, mockCountry2]);
+
+      expect(component.selected.emit).toHaveBeenCalledWith([1, 2]);
+      expect(component.selectModel.emit).toHaveBeenCalledWith([mockCountry1, mockCountry2]);
+    });
+
+    it('should handle mode changes during runtime', () => {
+      // Start as simple
+      expect(component.mode).toBe('simple');
+
+      // Change to single
+      component.mode = 'single';
+
+      expect(component.mode).toBe('single');
+      expect(component.fakeSingleSelect).toBe(true);
+
+      // Change to multiple
+      component.mode = 'multiple';
+
+      expect(component.mode).toBe('multiple');
+      expect(component.multipleSelect).toBe(true);
+
+      // Change back to simple
+      component.mode = 'simple';
+
+      expect(component.mode).toBe('simple');
+      expect(component.fakeSingleSelect).toBe(false);
+      expect(component.multipleSelect).toBe(false);
+    });
+  });
+
+  describe('Edge Cases and Error Handling', () => {
+    it('should handle missing helper service gracefully', () => {
+      component.model = mockModel as any;
+      component.field = 'country_id';
+
+      // Component should be created without errors
+      expect(component).toBeTruthy();
+    });
+
+    it('should handle model with undefined validation rules', () => {
+      const modelWithoutValidation = {
+        ...mockModel,
+        validationRules: undefined
+      };
+
+      component.field = 'country_id';
+
+      expect(() => (component.model = modelWithoutValidation as any)).not.toThrow();
+    });
+
+    it('should handle model with empty validation rules', () => {
+      const modelWithEmptyValidation = {
+        ...mockModel,
+        validationRules: {}
+      };
+
+      component.field = 'country_id';
+
+      expect(() => (component.model = modelWithEmptyValidation as any)).not.toThrow();
+    });
+
+    it('should handle multiple rapid mode changes', () => {
+      const modes = ['single', 'multiple', 'simple', 'single', 'multiple'];
+
+      modes.forEach((mode) => {
+        component.mode = mode as any;
+
+        expect(component.mode).toBe(mode);
+      });
+    });
+
+    it('should handle invalid mode values gracefully', () => {
+      (component as any).mode = 'invalid_mode';
+
+      expect(component.mode).toBe('invalid_mode');
+    });
+  });
+
+  describe('Required Field Detection', () => {
+    it('should detect required status from model validation rules', () => {
+      const modelWithRequired = {
+        country_id: 1,
+        fields: {
+          country_id: {
+            label: 'Country',
+            title: 'Select a country'
+          }
+        },
+        validationRules: {
+          country_id: ['required', 'integer']
+        },
+        model_name: 'Address'
+      } as any;
+
+      // Set field first, then model to trigger the setter logic properly
+      component.field = 'country_id';
+      fixture.detectChanges();
+
+      component.model = modelWithRequired;
+      fixture.detectChanges();
+
+      expect(component.isRequired).toBe(true);
+    });
+
+    it('should detect non-required status when validation rules do not include required', () => {
+      const modelWithoutRequired = {
+        country_id: 1,
+        fields: {
+          country_id: {
+            label: 'Country',
+            title: 'Select a country'
+          }
+        },
+        validationRules: {
+          country_id: ['integer']
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = modelWithoutRequired;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(false);
+    });
+
+    it('should handle missing validation rules gracefully', () => {
+      const modelWithoutValidationRules = {
+        country_id: 1,
+        fields: {
+          country_id: {
+            label: 'Country',
+            title: 'Select a country'
+          }
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = modelWithoutValidationRules;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(false);
+    });
+
+    it('should recalculate isRequired when field is changed after model set', () => {
+      const model = {
+        country_id: 1,
+        lang_id: 2,
+        fields: {
+          country_id: { label: 'Country', title: 'Country title' },
+          lang_id: { label: 'Nyelv', title: 'Language' }
+        },
+        validationRules: {
+          country_id: ['integer'],
+          lang_id: ['required', 'integer']
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = model;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(false, 'country_id should not be required');
+
+      component.field = 'lang_id';
+
+      expect(component.isRequired).toBe(true, 'lang_id should be required after field change');
+    });
+
+    it('should reset isRequired to false when switching to field without validation rule', () => {
+      const model = {
+        country_id: 1,
+        foo_id: 9,
+        fields: {
+          country_id: { label: 'Country', title: 'Country title' },
+          foo_id: { label: 'Foo', title: 'Foo title' }
+        },
+        validationRules: {
+          country_id: ['required']
+        },
+        model_name: 'Address'
+      } as any;
+
+      component.model = model;
+      component.field = 'country_id';
+
+      expect(component.isRequired).toBe(true, 'country_id should be required');
+
+      component.field = 'foo_id';
+
+      expect(component.isRequired).toBe(
+        false,
+        'foo_id has no validation rule so required must reset'
+      );
+    });
+  });
+});

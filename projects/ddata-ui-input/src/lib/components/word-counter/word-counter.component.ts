@@ -1,13 +1,11 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-
 @Component({
-    selector: 'app-word-counter',
-    templateUrl: './word-counter.component.html',
-    styleUrls: ['./word-counter.component.scss'],
-    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
-    changeDetection: ChangeDetectionStrategy.Default,
-    standalone: false
+  selector: 'dd-word-counter',
+  templateUrl: './word-counter.component.html',
+  styleUrls: ['./word-counter.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class WordCounterComponent {
   @Input() maxLength = 0;
@@ -26,11 +24,20 @@ export class WordCounterComponent {
 
   constructor() {}
 
-  wordsNumber(): number {
-    if (this._currentLength.length === 0) {
+  static countWords(value: unknown): number {
+    if (typeof value !== 'string' || value.length === 0) {
       return 0;
     }
-    const wordsCount = this._currentLength.split(',').length;
+
+    return value.split(',').length;
+  }
+
+  wordsNumber(): number {
+    const wordsCount = WordCounterComponent.countWords(this._currentLength);
+
+    if (wordsCount === 0) {
+      return 0;
+    }
 
     this.maxLengthReached.emit(this.maxLength > 0 && wordsCount > this.maxLength);
 

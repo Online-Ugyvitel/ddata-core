@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { Paginate } from '../../models/paginate/paginate.model';
 
 export abstract class DataServiceAbstract<T> {
-
-  constructor(
-    public model: T,
-  ) { }
+  constructor(public model: T) {}
 
   /**
    * Create a new PaginateInterface object with returned datas. This function will be convert datas to living
@@ -29,8 +28,8 @@ export abstract class DataServiceAbstract<T> {
    *
    * @param data any JSON object
    */
-  hydrateArray(data: any[]): T[] {
-    const models: T[] = [];
+  hydrateArray(data: Array<any>): Array<T> {
+    const models: Array<T> = [];
 
     data.forEach((item: any) => {
       // to deep clone we need to clear this.model's arrays
@@ -39,15 +38,13 @@ export abstract class DataServiceAbstract<T> {
           this.model[key] = [];
         }
       }
-
       // copy `this.model` into a clone object
       const newModel = this.hydrate(this.model, this.model);
-
-      // initialize the new model with the instance of datas
-      newModel.init(item);
+      // initialize the new model with the instance of datas, the model's own `init` result is preferred
+      const initializedModel = newModel.init(item);
 
       // push new model into the initialized, clone models array
-      models.push(newModel);
+      models.push(initializedModel ?? newModel);
     });
 
     return models;
@@ -60,6 +57,5 @@ export abstract class DataServiceAbstract<T> {
    * @param datas datas what you want to put into the clone object
    */
   hydrate = (fromModel: any, datas: any): any =>
-    Object.assign( Object.create( Object.getPrototypeOf(fromModel)), datas)
-
+    Object.assign(Object.create(Object.getPrototypeOf(fromModel)), datas);
 }

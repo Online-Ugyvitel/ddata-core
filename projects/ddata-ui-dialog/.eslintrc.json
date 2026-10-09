@@ -1,0 +1,31 @@
+{
+  "extends": "../../.eslintrc.json",
+  "rules": {
+    "import/no-extraneous-dependencies": "off",
+    "@angular-eslint/component-selector": [
+      "error",
+      {
+        "prefix": "dd",
+        "style": "kebab-case",
+        "type": "element"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/test.ts", "**/*.spec.ts"],
+      "rules": {
+        "import/no-extraneous-dependencies": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/await-thenable": "off",
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/unbound-method": "off"
+      },
+      "env": {
+        "browser": true,
+        "node": true
+      }
+    }
+  ]
+}

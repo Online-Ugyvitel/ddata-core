@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
 import { Observable, Subject } from 'rxjs';
 import { ID } from '../../models/base/base-data.type';
 import { BaseModelInterface } from '../../models/base/base-model.model';
@@ -11,31 +13,30 @@ import pluralize from 'pluralize';
 import { Injectable } from '@angular/core';
 
 // @dynamic
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class LocalDataService<T extends BaseModelInterface<T>>
   extends DataServiceAbstract<T>
-  implements LocalDataServiceInterface<T> {
+  implements LocalDataServiceInterface<T>
+{
+  private readonly storageService: StorageServiceInterface = new StorageService();
+  private readonly sorterService: SorterServiceInterface<T> = new SorterService<T>();
+  private readonly storageSubject = new Subject<boolean>();
+  private readonly localStorageItemName: string = '';
+  private db: Array<T> = [];
+  private readonly copyOfModel: T;
 
-  private storageService: StorageServiceInterface = new StorageService();
-  private sorterService: SorterServiceInterface<T> = new SorterService<T>();
-  private storageSubject = new Subject<boolean>();
-  private localStorageItemName = '';
-  private db: T[] = [];
-  private copyOfModel: T;
-
-  constructor(
-    model: T,
-  ) {
+  constructor(model: T) {
     super(model);
     this.localStorageItemName = this.convertTitleCaseToSnakeCase(pluralize(model.model_name));
     this.allFromLocal();
-    this.copyOfModel = {...model};
+    // the prototype is kept, otherwise the copy loses the methods of the model (e.g. init)
+    this.copyOfModel = Object.assign(Object.create(Object.getPrototypeOf(model)), model);
   }
 
   private convertTitleCaseToSnakeCase(str: string): string {
-    return str
-      .replace(/\.?([A-Z]+)/g, (x, y) => '_' + y.toLowerCase())
-      .replace(/^_/, '');
+    return str.replace(/\.?([A-Z]+)/g, (x, y) => `_${y.toLowerCase()}`).replace(/^_/, '');
   }
 
   watch(): Observable<any> {
@@ -45,8 +46,14 @@ export class LocalDataService<T extends BaseModelInterface<T>>
   /**
    * Get all items from localStorage as T[]
    */
-  allFromLocal(): T[] {
-    const data = JSON.parse( localStorage.getItem(this.localStorageItemName) ) || [];
+  allFromLocal(): Array<T> {
+    let data: Array<T> = [];
+
+    try {
+      data = JSON.parse(localStorage.getItem(this.localStorageItemName)) || [];
+    } catch {
+      // damaged localStorage content is handled as an empty database
+    }
 
     this.db = this.hydrateArray(data);
 
@@ -65,15 +72,18 @@ export class LocalDataService<T extends BaseModelInterface<T>>
     if (!model) {
       return false;
     }
-
     const index = this.db.indexOf(model);
-    this.db.splice(index, 1);
+
+    if (index > -1) {
+      this.db.splice(index, 1);
+    }
+
     this.updateLocalstorage(this.db);
 
     return true;
   }
 
-  updateLocalstorage(data: T[]): void {
+  updateLocalstorage(data: Array<T>): void {
     this.storageService.setItem(this.localStorageItemName, JSON.stringify(data));
     this.allFromLocal();
     this.storageSubject.next(true);
@@ -84,7 +94,7 @@ export class LocalDataService<T extends BaseModelInterface<T>>
    *
    * @param fieldName string
    */
-  allFromLocalSortedBy(fieldName: string): T[] {
+  allFromLocalSortedBy(fieldName: string): Array<T> {
     return this.sorterService.sortBy(this.db, fieldName);
   }
 
@@ -93,7 +103,7 @@ export class LocalDataService<T extends BaseModelInterface<T>>
    *
    * @param fieldName string
    */
-  allFromLocalSortedByDesc(fieldName: string): T[] {
+  allFromLocalSortedByDesc(fieldName: string): Array<T> {
     return this.sorterService.sortByDesc(this.db, fieldName);
   }
 
@@ -103,7 +113,7 @@ export class LocalDataService<T extends BaseModelInterface<T>>
    * @param id unique ID of item
    */
   findById(id: number): T {
-    return this.db.find(item => item.id === Number(id)) || this.copyOfModel.init();
+    return this.db.find((item) => item.id === Number(id)) || this.copyOfModel.init();
   }
 
   /**
@@ -113,7 +123,7 @@ export class LocalDataService<T extends BaseModelInterface<T>>
    * @param value the value what search in the given field.
    */
   findByField(field: string, value: any): T {
-    return this.db.find( obj => obj[field] === value) || null;
+    return this.db.find((obj) => obj[field] === value) || null;
   }
 
   /**
@@ -122,8 +132,8 @@ export class LocalDataService<T extends BaseModelInterface<T>>
    * @param field field name where search the expression.
    * @param value the value what search in the given field.
    */
-  filterByField(field: string, value: any): T[] {
-    return this.db.filter( obj => obj[field] === value) || null;
+  filterByField(field: string, value: any): Array<T> {
+    return this.db.filter((obj) => obj[field] === value) || null;
   }
 
   /**
@@ -138,7 +148,7 @@ export class LocalDataService<T extends BaseModelInterface<T>>
       this.db.push(model);
       this.updateLocalstorage(this.db);
     } else {
-      const oldModel = this.db.find(m => m.id === model.id);
+      const oldModel = this.db.find((m) => m.id === model.id);
       const index = this.db.indexOf(oldModel);
 
       this.db[index] = model;
