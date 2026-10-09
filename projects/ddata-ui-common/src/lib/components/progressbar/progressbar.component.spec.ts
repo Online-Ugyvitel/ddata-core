@@ -1,6 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DebugElement } from '@angular/core';
-import { By } from '@angular/platform-browser';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DdataUiProgressbarComponent } from './progressbar.component';
 
@@ -9,12 +7,11 @@ describe('DdataUiProgressbarComponent', () => {
   let fixture: ComponentFixture<DdataUiProgressbarComponent>;
   let debugElement: DebugElement;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ DdataUiProgressbarComponent ]
-    })
-    .compileComponents();
-  });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [DdataUiProgressbarComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(DdataUiProgressbarComponent);
