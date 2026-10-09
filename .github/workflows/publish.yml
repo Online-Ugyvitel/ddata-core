@@ -96,6 +96,11 @@ jobs:
         npm run build:ui-input
         npm run build:ui-file
 
+    # A package that a consumer project cannot install and import is never published.
+    - name: Verify consumer installation
+      if: steps.detect.outputs.packages != ''
+      run: npm run verify:consumer
+
     - name: Publish packages
       if: steps.detect.outputs.packages != ''
       env:
