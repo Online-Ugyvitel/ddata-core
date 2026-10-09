@@ -1,3 +1,5 @@
+import { Injector } from '@angular/core';
+import { DdataCoreModule } from '../../ddata-core.module';
 import { HelperFactoryService } from './helper-service.factory';
 import { HelperService } from './helper.service';
 import { HelperServiceInterface } from './helper-service.interface';
@@ -15,6 +17,7 @@ class MockModel extends BaseModel implements BaseModelInterface<MockModel> {
     if (data) {
       Object.assign(this, data);
     }
+
     return this;
   }
 
@@ -34,6 +37,7 @@ class AnotherMockModel extends BaseModel implements BaseModelInterface<AnotherMo
     if (data) {
       Object.assign(this, data);
     }
+
     return this;
   }
 
@@ -46,6 +50,7 @@ describe('HelperFactoryService', () => {
   let factory: HelperFactoryService<MockModel>;
 
   beforeEach(() => {
+    DdataCoreModule.InjectorInstance = { get: () => ({}) };
     factory = new HelperFactoryService<MockModel>();
   });
 
@@ -59,6 +64,7 @@ describe('HelperFactoryService', () => {
     it('should create instance without any parameters', () => {
       // This test ensures the empty constructor works properly
       const newFactory = new HelperFactoryService<MockModel>();
+
       expect(newFactory).toBeTruthy();
       expect(newFactory).toBeInstanceOf(HelperFactoryService);
     });
@@ -80,6 +86,7 @@ describe('HelperFactoryService', () => {
       expect(result).toBeInstanceOf(HelperService);
       // The HelperService should have been created with a MockModel instance
       const modelInstance = (result as any).instance;
+
       expect(modelInstance).toBeInstanceOf(MockModel);
     });
 
@@ -91,7 +98,7 @@ describe('HelperFactoryService', () => {
       expect(result1).toBeInstanceOf(HelperService);
       expect(result2).toBeInstanceOf(HelperService);
       expect(result1).not.toBe(result2); // Different HelperService instances
-      
+
       // Each should also have different model instances
       expect((result1 as any).instance).not.toBe((result2 as any).instance);
     });
@@ -101,14 +108,14 @@ describe('HelperFactoryService', () => {
       const result = factory.get(MockModel);
 
       expect(result).toBeInstanceOf(HelperService);
-      
       // Access the private instance to verify it's properly initialized
       const modelInstance = (result as any).instance;
+
       expect(modelInstance).toBeInstanceOf(MockModel);
       expect(modelInstance.model_name).toBe('MockModel');
       expect(modelInstance.api_endpoint).toBe('/test/mock');
       expect(modelInstance.use_localstorage).toBe(false);
-      expect(modelInstance.id).toBe(0 as ID);
+      expect(modelInstance.id).toBe(0);
     });
 
     it('should work with different model constructors', () => {
@@ -117,26 +124,26 @@ describe('HelperFactoryService', () => {
       const result = anotherFactory.get(AnotherMockModel);
 
       expect(result).toBeInstanceOf(HelperService);
-      
       const modelInstance = (result as any).instance;
+
       expect(modelInstance).toBeInstanceOf(AnotherMockModel);
       expect(modelInstance.model_name).toBe('AnotherMockModel');
       expect(modelInstance.api_endpoint).toBe('/test/another');
       expect(modelInstance.use_localstorage).toBe(true);
-      expect(modelInstance.id).toBe(1 as ID);
+      expect(modelInstance.id).toBe(1);
     });
 
     it('should call the constructor of the provided newable class', () => {
       // This test specifically validates that line 10 calls the constructor
       // We'll test this by ensuring the model has the expected default values
       const result = factory.get(MockModel);
-      
+
       expect(result).toBeInstanceOf(HelperService);
-      
       // Verify that a new instance was created with default values
       const modelInstance = (result as any).instance;
+
       expect(modelInstance).toBeInstanceOf(MockModel);
-      expect(modelInstance.id).toBe(0 as ID);
+      expect(modelInstance.id).toBe(0);
       expect(modelInstance.model_name).toBe('MockModel');
       expect(modelInstance.api_endpoint).toBe('/test/mock');
       expect(modelInstance.use_localstorage).toBe(false);
@@ -164,11 +171,11 @@ describe('HelperFactoryService', () => {
     it('should pass the created instance to HelperService constructor', () => {
       // This test ensures line 12 passes the instance correctly
       const result = factory.get(MockModel);
-      
+
       expect(result).toBeInstanceOf(HelperService);
-      
       // Verify the HelperService has the instance we expect
       const helperInstance = (result as any).instance;
+
       expect(helperInstance).toBeInstanceOf(MockModel);
       expect(helperInstance.model_name).toBe('MockModel');
     });
@@ -179,12 +186,13 @@ describe('HelperFactoryService', () => {
       // Test with first model type
       const mockFactory = new HelperFactoryService<MockModel>();
       const mockResult = mockFactory.get(MockModel);
+
       expect(mockResult).toBeInstanceOf(HelperService);
       expect((mockResult as any).instance).toBeInstanceOf(MockModel);
-
       // Test with second model type
       const anotherFactory = new HelperFactoryService<AnotherMockModel>();
       const anotherResult = anotherFactory.get(AnotherMockModel);
+
       expect(anotherResult).toBeInstanceOf(HelperService);
       expect((anotherResult as any).instance).toBeInstanceOf(AnotherMockModel);
 
@@ -199,7 +207,6 @@ describe('HelperFactoryService', () => {
       const factory2 = new HelperFactoryService<MockModel>();
 
       expect(factory1).not.toBe(factory2);
-
       // Each should work independently
       const result1 = factory1.get(MockModel);
       const result2 = factory2.get(MockModel);
@@ -213,7 +220,7 @@ describe('HelperFactoryService', () => {
       // This test ensures the factory works with the BaseModelInterface constraint
       const result = factory.get(MockModel);
       const modelInstance = (result as any).instance;
-      
+
       // Verify it has the BaseModelInterface properties
       expect(typeof modelInstance.init).toBe('function');
       expect(typeof modelInstance.prepareToSave).toBe('function');
