@@ -1,5 +1,3 @@
-/* eslint-disable max-classes-per-file */
-
 /* eslint-disable jasmine/prefer-toHaveBeenCalledWith */
 
 import 'zone.js/testing';
