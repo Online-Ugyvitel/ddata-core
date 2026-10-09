@@ -100,7 +100,19 @@ export class DdataMultipleSelectComponent {
   }
 
   get selectedModelName(): string {
-    return this.model[this.getObjectFieldName()][this.text];
+    const objectField = this.getObjectFieldName();
+    const stored = this.model[objectField];
+
+    // field without `_id` suffix: the field holds the value itself, look the item up
+    if (stored === null || typeof stored !== 'object') {
+      const item = (this.items ?? []).find(
+        (element) => element[this.valueField] === this.model[this.field]
+      );
+
+      return item ? item[this.text] : '';
+    }
+
+    return stored[this.text];
   }
 
   showModal(): void {
@@ -128,8 +140,12 @@ export class DdataMultipleSelectComponent {
     record.is_selected = true;
 
     if (this.mode === 'single') {
-      this.model[this.getObjectFieldName()] = record;
-      this.model[this.field] = record.id;
+      // only fields with `_id` suffix have a companion object property
+      if (this.getObjectFieldName() !== this.field) {
+        this.model[this.getObjectFieldName()] = record;
+      }
+
+      this.model[this.field] = record[this.valueField] ?? record.id;
     }
 
     if (this.mode === 'multiple') {
