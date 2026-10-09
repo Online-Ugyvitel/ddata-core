@@ -336,7 +336,7 @@ ddata-ui-input is the **presentation layer** that sits on top of ddata-core's **
 │  │ BaseModel   │ │ Validation  │       │
 │  │ ProxyService│ │ LocalStorage│       │
 │  └─────────────┘ └─────────────┘       │
-└──────────────────────────────────────────┘
+└─────────────────────────────────────────┘
 ```
 
 ### **Model-Driven Architecture**
