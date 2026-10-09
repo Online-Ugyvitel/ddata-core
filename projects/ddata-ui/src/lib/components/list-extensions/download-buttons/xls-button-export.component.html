@@ -1,4 +1,18 @@
-<a href="/api{{ model?.api_endpoint }}/download/xls?token={{ token }}" class="btn btn-light ml-1" *ngIf="isXlsEnabled()">XLS letöltése</a>
-<a href="/api{{ model?.api_endpoint }}/download/csv?token={{ token }}" class="btn btn-light"  *ngIf="isCsvEnabled()">CSV letöltése</a>
-<a href="/api{{ model?.api_endpoint }}/download/pdf?token={{ token }}" class="btn btn-light" *ngIf="isPdfEnabled()">PDF letöltése</a>
-<a href="/api{{ model?.api_endpoint }}/download/pdf?token={{ token }}" class="btn btn-light" *ngIf="isCertificatePdfEnabled()">Kiszedési lista nyomtatása</a>
+<a
+  href="/api{{ model?.api_endpoint }}/download/xls?token={{ token }}"
+  class="btn btn-light ml-1"
+  *ngIf="isXlsEnabled()"
+  >XLS letöltése</a
+>
+<a
+  href="/api{{ model?.api_endpoint }}/download/csv?token={{ token }}"
+  class="btn btn-light"
+  *ngIf="isCsvEnabled()"
+  >CSV letöltése</a
+>
+<a
+  href="/api{{ model?.api_endpoint }}/download/pdf?token={{ token }}"
+  class="btn btn-light"
+  *ngIf="isPdfEnabled()"
+  >PDF letöltése</a
+>
