@@ -4,8 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { Observable, of, throwError } from 'rxjs';
 import { ProxyService } from './proxy.service';
 import { BaseModel, BaseModelInterface } from '../../models/base/base-model.model';
-import { ID } from '../../models/base/base-data.type';
-import { NotificationType } from '../../models/base/base-data.type';
+import { ID, NotificationType } from '../../models/base/base-data.type';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { Paginate } from '../../models/paginate/paginate.model';
 import { FileUploadProcessInterface } from '../../models/file/file-upload-process.interface';
@@ -30,18 +29,20 @@ class TestModel extends BaseModel implements TestModelInterface {
   name: string;
   use_localstorage = false;
 
-  init(data?: any): TestModelInterface {
-    data = !!data ? data : {};
-    this.id = !!data.id ? data.id : 0 as ID;
+  init(initData?: any): TestModelInterface {
+    const data = !!initData ? initData : {};
+
+    this.id = !!data.id ? data.id : (0 as ID);
     this.name = !!data.name ? data.name : '';
     this.use_localstorage = !!data.use_localstorage ? data.use_localstorage : false;
+
     return this;
   }
 
   prepareToSave(): any {
     return {
       id: this.id,
-      name: this.name,
+      name: this.name
     };
   }
 
@@ -88,9 +89,7 @@ describe('ProxyService', () => {
     ]);
 
     TestBed.configureTestingModule({
-      providers: [
-        ProxyService,
-      ]
+      providers: [ProxyService]
     });
 
     testModel = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
@@ -105,7 +104,7 @@ describe('ProxyService', () => {
     });
 
     service = new ProxyService<TestModelInterface>(testModel);
-    
+
     // Replace the services with mocks
     (service as any).notificationService = mockNotificationService;
     (service as any).localStorageService = mockLocalDataService;
@@ -121,11 +120,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
+
       mockLocalDataService.findById.and.returnValue(mockItem);
 
-      service.getOne(1).subscribe(result => {
+      service.getOne(1).subscribe((result) => {
         expect(result).toEqual(mockItem);
         expect(mockLocalDataService.findById).toHaveBeenCalledWith(1);
       });
@@ -135,11 +134,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
-      
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
+
       mockRemoteDataService.getOne.and.returnValue(of(mockItem));
 
-      service.getOne(1).subscribe(result => {
+      service.getOne(1).subscribe((result) => {
         expect(result).toEqual(mockItem);
         expect(mockRemoteDataService.getOne).toHaveBeenCalledWith(1);
       });
@@ -151,11 +150,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockLocalDataService.allFromLocal.and.returnValue(mockItems);
 
-      service.getAll().subscribe(result => {
+      service.getAll().subscribe((result) => {
         expect(result).toBeInstanceOf(Paginate);
         expect(result.data).toEqual(mockItems);
         expect(mockLocalDataService.allFromLocal).toHaveBeenCalled();
@@ -166,10 +165,10 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
-      
+
       mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
 
-      service.getAll(1).subscribe(result => {
+      service.getAll(1).subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockRemoteDataService.getAll).toHaveBeenCalledWith(1);
       });
@@ -179,10 +178,10 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
-      
+
       mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
 
-      service.getAll().subscribe(result => {
+      service.getAll().subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockRemoteDataService.getAll).toHaveBeenCalledWith(0);
       });
@@ -194,11 +193,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockLocalDataService.allFromLocal.and.returnValue(mockItems);
 
-      service.getAllWithoutPaginate().subscribe(result => {
+      service.getAllWithoutPaginate().subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockLocalDataService.allFromLocal).toHaveBeenCalled();
       });
@@ -208,11 +207,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockRemoteDataService.getAllWithoutPaginate.and.returnValue(of(mockItems));
 
-      service.getAllWithoutPaginate().subscribe(result => {
+      service.getAllWithoutPaginate().subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockRemoteDataService.getAllWithoutPaginate).toHaveBeenCalled();
       });
@@ -224,11 +223,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockLocalDataService.allFromLocalSortedBy.and.returnValue(mockItems);
 
-      service.getAllSortedBy('name').subscribe(result => {
+      service.getAllSortedBy('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockLocalDataService.allFromLocalSortedBy).toHaveBeenCalledWith('name');
       });
@@ -238,11 +237,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockLocalDataService.allFromLocalSortedBy.and.returnValue(mockItems);
 
-      service.getAllSortedBy().subscribe(result => {
+      service.getAllSortedBy().subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockLocalDataService.allFromLocalSortedBy).toHaveBeenCalledWith('name');
       });
@@ -252,11 +251,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockRemoteDataService.getAllWithoutPaginate.and.returnValue(of(mockItems));
 
-      service.getAllSortedBy('name').subscribe(result => {
+      service.getAllSortedBy('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockRemoteDataService.getAllWithoutPaginate).toHaveBeenCalled();
       });
@@ -268,11 +267,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockLocalDataService.allFromLocalSortedByDesc.and.returnValue(mockItems);
 
-      service.getAllSortedByDesc('name').subscribe(result => {
+      service.getAllSortedByDesc('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockLocalDataService.allFromLocalSortedByDesc).toHaveBeenCalledWith('name');
       });
@@ -282,11 +281,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockLocalDataService.allFromLocalSortedByDesc.and.returnValue(mockItems);
 
-      service.getAllSortedByDesc().subscribe(result => {
+      service.getAllSortedByDesc().subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockLocalDataService.allFromLocalSortedByDesc).toHaveBeenCalledWith('name');
       });
@@ -296,11 +295,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockRemoteDataService.getAllWithoutPaginate.and.returnValue(of(mockItems));
 
-      service.getAllSortedByDesc('name').subscribe(result => {
+      service.getAllSortedByDesc('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockRemoteDataService.getAllWithoutPaginate).toHaveBeenCalled();
       });
@@ -312,10 +311,10 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
-      
+
       mockRemoteDataService.getPage.and.returnValue(of(testPaginate));
 
-      service.getPage(1).subscribe(result => {
+      service.getPage(1).subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockRemoteDataService.getPage).toHaveBeenCalledWith(1);
       });
@@ -324,8 +323,8 @@ describe('ProxyService', () => {
     it('should handle local storage case (TODO implementation)', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
-      
       const result = service.getPage(1);
+
       expect(result).toBeUndefined();
     });
   });
@@ -333,9 +332,10 @@ describe('ProxyService', () => {
   describe('getUri', () => {
     it('should make GET request to URI', () => {
       const mockResponse = { data: 'test' };
+
       mockRemoteDataService.getUri.and.returnValue(of(mockResponse));
 
-      service.getUri('/test-uri').subscribe(result => {
+      service.getUri('/test-uri').subscribe((result) => {
         expect(result).toEqual(mockResponse);
         expect(mockRemoteDataService.getUri).toHaveBeenCalledWith('/test-uri', undefined);
       });
@@ -346,11 +346,16 @@ describe('ProxyService', () => {
     it('should make POST request to URI', () => {
       const mockData = { name: 'test' };
       const mockResponse = { success: true };
+
       mockRemoteDataService.postUri.and.returnValue(of(mockResponse));
 
-      service.postUri(mockData, '/test-uri').subscribe(result => {
+      service.postUri(mockData, '/test-uri').subscribe((result) => {
         expect(result).toEqual(mockResponse);
-        expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(mockData, '/test-uri', undefined);
+        expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(
+          mockData,
+          '/test-uri',
+          undefined
+        );
       });
     });
   });
@@ -360,11 +365,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
+
       mockLocalDataService.findById.and.returnValue(mockItem);
 
-      service.findById(1).subscribe(result => {
+      service.findById(1).subscribe((result) => {
         expect(result).toEqual(mockItem);
         expect(mockLocalDataService.findById).toHaveBeenCalledWith(1);
       });
@@ -373,8 +378,8 @@ describe('ProxyService', () => {
     it('should handle remote storage case (TODO implementation)', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
-      
       const result = service.findById(1);
+
       expect(result).toBeUndefined();
     });
   });
@@ -384,11 +389,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
+
       mockLocalDataService.findByField.and.returnValue(mockItem);
 
-      service.findByField('name', 'Test Item').subscribe(result => {
+      service.findByField('name', 'Test Item').subscribe((result) => {
         expect(result).toEqual(mockItem);
         expect(mockLocalDataService.findByField).toHaveBeenCalledWith('name', 'Test Item');
       });
@@ -397,8 +402,8 @@ describe('ProxyService', () => {
     it('should handle remote storage case (TODO implementation)', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
-      
       const result = service.findByField('name', 'Test Item');
+
       expect(result).toBeUndefined();
     });
   });
@@ -408,11 +413,11 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).localStorageService = mockLocalDataService;
-      
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
+
       mockLocalDataService.filterByField.and.returnValue(mockItems);
 
-      service.filterByField('name', 'Test').subscribe(result => {
+      service.filterByField('name', 'Test').subscribe((result) => {
         expect(result).toEqual(mockItems);
         expect(mockLocalDataService.filterByField).toHaveBeenCalledWith('name', 'Test');
       });
@@ -421,8 +426,8 @@ describe('ProxyService', () => {
     it('should handle remote storage case (TODO implementation)', () => {
       testModel.use_localstorage = false;
       service = new ProxyService<TestModelInterface>(testModel);
-      
       const result = service.filterByField('name', 'Test');
+
       expect(result).toBeUndefined();
     });
   });
@@ -437,9 +442,10 @@ describe('ProxyService', () => {
 
     it('should search with page number', () => {
       const searchData = { name: 'test' };
+
       mockRemoteDataService.postUri.and.returnValue(of(testPaginate));
 
-      service.search(searchData, 1).subscribe(result => {
+      service.search(searchData, 1).subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(searchData, '/search?page=1');
         expect((service as any).getNewPaginateObject).toHaveBeenCalledWith(TestModel, testPaginate);
@@ -448,9 +454,10 @@ describe('ProxyService', () => {
 
     it('should search without page number', () => {
       const searchData = { name: 'test' };
+
       mockRemoteDataService.postUri.and.returnValue(of(testPaginate));
 
-      service.search(searchData).subscribe(result => {
+      service.search(searchData).subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(searchData, '/search');
         expect((service as any).getNewPaginateObject).toHaveBeenCalledWith(TestModel, testPaginate);
@@ -466,11 +473,16 @@ describe('ProxyService', () => {
     it('should search without pagination', () => {
       const searchData = { name: 'test' };
       const mockItems = [testModel];
+
       mockRemoteDataService.postUri.and.returnValue(of(mockItems));
 
-      service.searchWithoutPaginate(searchData).subscribe(result => {
+      service.searchWithoutPaginate(searchData).subscribe((result) => {
         expect(result).toEqual(mockItems);
-        expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(searchData, '/search?paginate=off');
+        expect(mockRemoteDataService.postUri).toHaveBeenCalledWith(
+          searchData,
+          '/search?paginate=off'
+        );
+
         expect(service.hydrateArray).toHaveBeenCalledWith(mockItems);
       });
     });
@@ -482,13 +494,13 @@ describe('ProxyService', () => {
     });
 
     it('should return 0 when model is null', () => {
-      service.save(null).subscribe(result => {
+      service.save(null).subscribe((result) => {
         expect(result).toBe(0);
       });
     });
 
     it('should return 0 when model is undefined', () => {
-      service.save(undefined).subscribe(result => {
+      service.save(undefined).subscribe((result) => {
         expect(result).toBe(0);
       });
     });
@@ -496,10 +508,11 @@ describe('ProxyService', () => {
     it('should save to both remote and local when use_localstorage is true', () => {
       testModel.use_localstorage = true;
       const savedId = 123;
+
       mockRemoteDataService.save.and.returnValue(of(savedId));
       mockLocalDataService.save.and.returnValue(undefined);
 
-      service.save(testModel).subscribe(result => {
+      service.save(testModel).subscribe((result) => {
         expect(result).toBe(savedId);
         expect(mockRemoteDataService.save).toHaveBeenCalledWith(testModel);
         expect(mockLocalDataService.save).toHaveBeenCalledWith(testModel, savedId);
@@ -510,9 +523,10 @@ describe('ProxyService', () => {
     it('should save only to remote when use_localstorage is false', () => {
       testModel.use_localstorage = false;
       const savedId = 123;
+
       mockRemoteDataService.save.and.returnValue(of(savedId));
 
-      service.save(testModel).subscribe(result => {
+      service.save(testModel).subscribe((result) => {
         expect(result).toBe(savedId);
         expect(mockRemoteDataService.save).toHaveBeenCalledWith(testModel);
         expect(mockLocalDataService.save).not.toHaveBeenCalled();
@@ -523,13 +537,13 @@ describe('ProxyService', () => {
 
   describe('delete', () => {
     it('should return paginate when model is null', () => {
-      service.delete(null, testPaginate).subscribe(result => {
+      service.delete(null, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
       });
     });
 
     it('should return paginate when model is undefined', () => {
-      service.delete(undefined, testPaginate).subscribe(result => {
+      service.delete(undefined, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
       });
     });
@@ -546,7 +560,7 @@ describe('ProxyService', () => {
         to: 1
       });
 
-      service.delete(modelWithZeroId, paginate).subscribe(result => {
+      service.delete(modelWithZeroId, paginate).subscribe((result) => {
         expect(result).toBe(paginate);
         expect(paginate.data.length).toBe(0);
       });
@@ -559,7 +573,7 @@ describe('ProxyService', () => {
       mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
       mockLocalDataService.delete.and.returnValue(undefined);
 
-      service.delete(testModel, testPaginate).subscribe(result => {
+      service.delete(testModel, testPaginate).subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockRemoteDataService.delete).toHaveBeenCalledWith(testModel);
         expect(mockLocalDataService.delete).toHaveBeenCalledWith(testModel);
@@ -572,7 +586,7 @@ describe('ProxyService', () => {
       testModel.id = 1 as ID;
       mockRemoteDataService.delete.and.returnValue(of(1));
 
-      service.delete(testModel, testPaginate).subscribe(result => {
+      service.delete(testModel, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
         expect(mockRemoteDataService.delete).toHaveBeenCalledWith(testModel);
         expect(mockLocalDataService.delete).not.toHaveBeenCalled();
@@ -583,9 +597,9 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       testModel.id = 1 as ID;
       mockRemoteDataService.delete.and.returnValue(of(0));
-
       const originalDataLength = testPaginate.data.length;
-      service.delete(testModel, testPaginate).subscribe(result => {
+
+      service.delete(testModel, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
         expect(testPaginate.data.length).toBe(originalDataLength);
       });
@@ -594,13 +608,13 @@ describe('ProxyService', () => {
 
   describe('deleteMultiple', () => {
     it('should return paginate when models is null', () => {
-      service.deleteMultiple(null, testPaginate).subscribe(result => {
+      service.deleteMultiple(null, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
       });
     });
 
     it('should return paginate when models is undefined', () => {
-      service.deleteMultiple(undefined, testPaginate).subscribe(result => {
+      service.deleteMultiple(undefined, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
       });
     });
@@ -621,7 +635,7 @@ describe('ProxyService', () => {
       mockRemoteDataService.deleteMultiple.and.returnValue(of(true));
 
       // The method should process the models and remove ones with id 0
-      service.deleteMultiple(models, paginate).subscribe(result => {
+      service.deleteMultiple(models, paginate).subscribe((result) => {
         expect(result).toBeDefined();
       });
     });
@@ -629,11 +643,12 @@ describe('ProxyService', () => {
     it('should delete multiple from both remote and local, then fetch all when use_localstorage is true', () => {
       testModel.use_localstorage = true;
       const models = [testModel];
+
       mockRemoteDataService.deleteMultiple.and.returnValue(of(true));
       mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
       mockLocalDataService.delete.and.returnValue(undefined);
 
-      service.deleteMultiple(models, testPaginate).subscribe(result => {
+      service.deleteMultiple(models, testPaginate).subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockRemoteDataService.deleteMultiple).toHaveBeenCalledWith(models);
         expect(mockLocalDataService.delete).toHaveBeenCalledWith(testModel);
@@ -644,9 +659,10 @@ describe('ProxyService', () => {
     it('should delete multiple only from remote when use_localstorage is false', () => {
       testModel.use_localstorage = false;
       const models = [testModel];
+
       mockRemoteDataService.deleteMultiple.and.returnValue(of(true));
 
-      service.deleteMultiple(models, testPaginate).subscribe(result => {
+      service.deleteMultiple(models, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
         expect(mockRemoteDataService.deleteMultiple).toHaveBeenCalledWith(models);
         expect(mockLocalDataService.delete).not.toHaveBeenCalled();
@@ -656,10 +672,11 @@ describe('ProxyService', () => {
     it('should not delete from local when remote delete fails', () => {
       testModel.use_localstorage = true;
       const models = [testModel];
+
       mockRemoteDataService.deleteMultiple.and.returnValue(of(false));
       mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
 
-      service.deleteMultiple(models, testPaginate).subscribe(result => {
+      service.deleteMultiple(models, testPaginate).subscribe((result) => {
         expect(result).toEqual(testPaginate);
         expect(mockLocalDataService.delete).not.toHaveBeenCalled();
       });
@@ -670,7 +687,7 @@ describe('ProxyService', () => {
     it('should return watch observable from local storage service', () => {
       mockLocalDataService.watch.and.returnValue(of(true));
 
-      service.watch().subscribe(result => {
+      service.watch().subscribe((result) => {
         expect(result).toBe(true);
         expect(mockLocalDataService.watch).toHaveBeenCalled();
       });
@@ -680,13 +697,14 @@ describe('ProxyService', () => {
   describe('registerObserver', () => {
     it('should register observer with default sort field', () => {
       const target = [];
+
       spyOn(service, 'watch').and.returnValue(of(true));
       spyOn(service, 'getAllSortedBy').and.returnValue(of([testModel]));
 
       service.registerObserver(target);
 
       expect(service.watch).toHaveBeenCalled();
-      
+
       // Test the subscription behavior
       service.watch().subscribe(() => {
         expect(service.getAllSortedBy).toHaveBeenCalledWith('name');
@@ -695,13 +713,14 @@ describe('ProxyService', () => {
 
     it('should register observer with custom sort field', () => {
       const target = [];
+
       spyOn(service, 'watch').and.returnValue(of(true));
       spyOn(service, 'getAllSortedBy').and.returnValue(of([testModel]));
 
       service.registerObserver(target, 'id');
 
       expect(service.watch).toHaveBeenCalled();
-      
+
       // Test the subscription behavior
       service.watch().subscribe(() => {
         expect(service.getAllSortedBy).toHaveBeenCalledWith('id');
@@ -713,10 +732,11 @@ describe('ProxyService', () => {
     it('should send files with data', () => {
       const fileSet = new Set<File>([new File([''], 'test.txt')]);
       const data = { name: 'test' };
-      const mockUploadProcess: Observable<FileUploadProcessInterface>[] = [of({} as FileUploadProcessInterface)];
-      
-      mockRemoteDataService.sendFiles.and.returnValue(mockUploadProcess);
+      const mockUploadProcess: Array<Observable<FileUploadProcessInterface>> = [
+        of({} as FileUploadProcessInterface)
+      ];
 
+      mockRemoteDataService.sendFiles.and.returnValue(mockUploadProcess);
       const result = service.sendFiles('/upload', 1, fileSet, data);
 
       expect(result).toBe(mockUploadProcess);
@@ -725,10 +745,11 @@ describe('ProxyService', () => {
 
     it('should send files without data', () => {
       const fileSet = new Set<File>([new File([''], 'test.txt')]);
-      const mockUploadProcess: Observable<FileUploadProcessInterface>[] = [of({} as FileUploadProcessInterface)];
-      
-      mockRemoteDataService.sendFiles.and.returnValue(mockUploadProcess);
+      const mockUploadProcess: Array<Observable<FileUploadProcessInterface>> = [
+        of({} as FileUploadProcessInterface)
+      ];
 
+      mockRemoteDataService.sendFiles.and.returnValue(mockUploadProcess);
       const result = service.sendFiles('/upload', 1, fileSet);
 
       expect(result).toBe(mockUploadProcess);
