@@ -1,5 +1,4 @@
 // tslint:disable: max-line-length
-/* eslint-disable max-classes-per-file */
 
 /* eslint-disable jasmine/no-spec-dupes */
 
