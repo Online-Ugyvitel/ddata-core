@@ -9,8 +9,8 @@
     "@fortawesome/angular-fontawesome": "^0.7.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
-    "ddata-core": "^0.0.2",
-    "ddata-ui-input": "^1.0.0",
+    "@netdjw/ddata-core": "^0.3.17",
+    "@netdjw/ddata-ui-input": "^1.0.0",
     "@dhutaryan/ngx-mat-timepicker": "^21.0.0",
     "tslib": "^2.0.0"
   }
