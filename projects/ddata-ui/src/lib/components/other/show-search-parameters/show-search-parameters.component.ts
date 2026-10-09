@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FieldContainerInterface } from 'ddata-core';
+import { FieldContainerInterface } from '@netdjw/ddata-core';
 import { LangInterface } from 'src/app/models/lang/lang.interface';
 import { Lang } from 'src/app/models/lang/lang.model';
 import { NameInterface } from 'src/app/models/name/name.interface';

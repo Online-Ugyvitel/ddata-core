@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { BaseModel } from 'ddata-core';
+import { BaseModel } from '@netdjw/ddata-core';
 
 @Component({
   selector: 'dd-xls-button-export',

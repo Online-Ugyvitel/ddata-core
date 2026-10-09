@@ -6,7 +6,7 @@ import {
   ID,
   URI,
   ValidationRuleInterface
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import { FolderInterface, FolderUIFieldsInterface } from './folder.interface';
 import {
   parent_id,

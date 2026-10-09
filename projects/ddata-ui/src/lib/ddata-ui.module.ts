@@ -2,7 +2,7 @@ import { NgModule, ModuleWithProviders, Injector } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 // services
-import { ProxyService } from 'ddata-core';
+import { ProxyService } from '@netdjw/ddata-core';
 
 // module configuration
 import { ModuleConfigurationInterface } from './models/module-configuration/module-configuration.interface';
@@ -14,7 +14,7 @@ import { FileModel } from 'projects/ddata-ui-file/src/lib/models/file/file.model
 import { CommonModule } from '@angular/common';
 import { DdataUiFileListComponent } from 'projects/ddata-ui-file/src/lib/components/file-list/file-list.component';
 import { DdataUiFileUploadComponent } from 'projects/ddata-ui-file/src/lib/components/file-upload/file-upload.component';
-import { DdataUiNoDataComponent } from 'ddata-ui-common';
+import { DdataUiNoDataComponent } from '@netdjw/ddata-ui-common';
 
 @NgModule({
   declarations: [DdataUiFileListComponent, DdataUiFileUploadComponent, DdataUiNoDataComponent],
