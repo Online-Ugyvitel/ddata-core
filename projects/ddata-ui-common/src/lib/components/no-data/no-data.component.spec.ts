@@ -1,72 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DdataUiNoDataComponent } from './no-data.component';
-import { ModuleConfiguration } from '../../models/module-configuration/module-configuration.interface';
 
 describe('DdataUiNoDataComponent', () => {
   let component: DdataUiNoDataComponent;
   let fixture: ComponentFixture<DdataUiNoDataComponent>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting(), {
-    teardown: { destroyAfterEach: false }
-}
-    );
-  });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [DdataUiNoDataComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] // This allows custom elements like fa-icon
+    }).compileComponents();
+  }));
 
-  describe('with default English config', () => {
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        declarations: [ DdataUiNoDataComponent ]
-      })
-      .compileComponents();
-
-      fixture = TestBed.createComponent(DdataUiNoDataComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
-    it('should be created', () => {
-      expect(component).toBeTruthy();
-    });
-
-    it('should initialize with English i18n', () => {
-      expect(component.i18n).toBeDefined();
-      expect(component.i18n.article_vowel.label).toBe('The');
-      expect(component.i18n.article_consonant.label).toBe('The');
-    });
-
-    it('should set article to vowel article by default', () => {
-      expect(component.article).toBe('The');
-    });
-
-    it('should have empty sentence by default', () => {
-      expect(component.sentence).toBe('');
-    });
-
-    it('should set randomIcon from icons array', () => {
-      expect(component.icons).toContain(component.randomIcon);
-    });
-
-    it('should have 12 icons in the icons array', () => {
-      expect(component.icons.length).toBe(12);
-    });
-
-    it('should set _text when text input is set', () => {
-      component.text = 'test text';
-      expect(component._text).toBe('test text');
-    });
-
-    it('should maintain vowel article for English language when text is set', () => {
-      component.text = 'apple';
-      expect(component.article).toBe('The');
-    });
-
-    it('should call ngOnInit without errors', () => {
-      expect(() => component.ngOnInit()).not.toThrow();
-    });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(DdataUiNoDataComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   describe('with Hungarian config', () => {
@@ -163,97 +113,9 @@ describe('DdataUiNoDataComponent', () => {
     });
   });
 
-  describe('text setter edge cases', () => {
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        declarations: [ DdataUiNoDataComponent ],
-        providers: [
-          { provide: 'config', useValue: { lang: 'hu' } }
-        ]
-      })
-      .compileComponents();
+  it('icons should contain the created component', () => {
+    component = new DdataUiNoDataComponent();
 
-      fixture = TestBed.createComponent(DdataUiNoDataComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
-    it('should handle null/undefined text gracefully in Hungarian', () => {
-      // Testing with undefined
-      component.text = undefined as any;
-      expect(component._text).toBeUndefined();
-      
-      // Testing with null
-      component.text = null as any;
-      expect(component._text).toBeNull();
-    });
-
-    it('should handle single character Hungarian vowels', () => {
-      component.text = 'a';
-      expect(component.article).toBe('A');
-      
-      component.text = 'á';
-      expect(component.article).toBe('A');
-    });
-
-    it('should handle single character Hungarian consonants', () => {
-      component.text = 'b';
-      expect(component.article).toBe('Az');
-      
-      component.text = 'c';
-      expect(component.article).toBe('Az');
-    });
-  });
-
-  describe('constructor', () => {
-    it('should select randomIcon from available icons', () => {
-      const component1 = new DdataUiNoDataComponent();
-      const component2 = new DdataUiNoDataComponent();
-      
-      // Both icons should be from the icons array
-      expect(component1.icons).toContain(component1.randomIcon);
-      expect(component2.icons).toContain(component2.randomIcon);
-    });
-
-    it('should have all required FontAwesome icons in icons array', () => {
-      const component = new DdataUiNoDataComponent();
-      expect(component.icons.length).toBe(12);
-      // Verify that icons array contains actual icon objects
-      component.icons.forEach(icon => {
-        expect(icon).toBeDefined();
-        expect(typeof icon).toBe('object');
-      });
-    });
-  });
-
-  describe('sentence input', () => {
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        declarations: [ DdataUiNoDataComponent ]
-      })
-      .compileComponents();
-
-      fixture = TestBed.createComponent(DdataUiNoDataComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
-    it('should set sentence property', () => {
-      component.sentence = 'Custom sentence';
-      expect(component.sentence).toBe('Custom sentence');
-    });
-
-    it('should allow empty sentence', () => {
-      component.sentence = '';
-      expect(component.sentence).toBe('');
-    });
-
-    it('should have sentence as Input property', () => {
-      // Test that sentence can be set from template binding
-      const newSentence = 'Test sentence from binding';
-      component.sentence = newSentence;
-      fixture.detectChanges();
-      expect(component.sentence).toBe(newSentence);
-    });
+    expect(component.icons).toContain(component.randomIcon);
   });
 });

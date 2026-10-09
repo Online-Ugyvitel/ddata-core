@@ -1,12 +1,52 @@
 import { BaseSearch } from './base-search.model';
-import { Search } from './search.model';
+import { Search } from './search-concrete.model';
 import { SearchInterface } from './search.interface';
-import { faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
+
+declare let window: any;
 
 describe('Search Model', () => {
   let model: BaseSearch;
 
   beforeEach(() => {
+    // Create proper mock for DdataCoreModule.InjectorInstance
+    Object.defineProperty(window, 'DdataCoreModule', {
+      value: {
+        InjectorInstance: {
+          get: jasmine.createSpy('get').and.callFake((serviceName: string) => {
+            if (serviceName === 'InputHelperService') {
+              return {
+                validateFieldValue: jasmine.createSpy('validateFieldValue').and.returnValue(true),
+                createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('test-id'),
+                randChars: jasmine.createSpy('randChars').and.returnValue('rand123'),
+                getTitle: jasmine
+                  .createSpy('getTitle')
+                  .and.callFake((modelParam: unknown, field: string) => `${field} title`),
+                getLabel: jasmine
+                  .createSpy('getLabel')
+                  .and.callFake((modelParam: unknown, field: string) => `${field} label`),
+                getPlaceholder: jasmine
+                  .createSpy('getPlaceholder')
+                  .and.callFake((modelParam: unknown, field: string) => `${field} placeholder`),
+                getPrepend: jasmine
+                  .createSpy('getPrepend')
+                  .and.callFake((modelParam: unknown, field: string) => `${field} prepend`),
+                getAppend: jasmine
+                  .createSpy('getAppend')
+                  .and.callFake((modelParam: unknown, field: string) => `${field} append`),
+                isRequired: jasmine.createSpy('isRequired').and.returnValue(false),
+                validateField: jasmine.createSpy('validateField').and.returnValue(true)
+              };
+            }
+
+            return null;
+          })
+        }
+      },
+      writable: true,
+      configurable: true
+    });
+
     model = new BaseSearch();
   });
 
@@ -24,6 +64,7 @@ describe('Search Model', () => {
     it('should implement SearchInterface', () => {
       // Type checking - this will fail at compile time if interface is not implemented
       const searchInterface: SearchInterface = model;
+
       expect(searchInterface).toBeTruthy();
     });
   });
@@ -47,35 +88,35 @@ describe('Search Model', () => {
     });
 
     it('should have searchText property', () => {
-      expect(model.hasOwnProperty('searchText') || model.searchText !== undefined).toBe(true);
+      expect('searchText' in model).toBe(true);
     });
 
     it('should have id property', () => {
-      expect(model.hasOwnProperty('id') || model.id !== undefined).toBe(true);
+      expect('id' in model).toBe(true);
     });
 
     it('should have name property', () => {
-      expect(model.hasOwnProperty('name') || model.name !== undefined).toBe(true);
+      expect('name' in model).toBe(true);
     });
 
     it('should have description property', () => {
-      expect(model.hasOwnProperty('description') || model.description !== undefined).toBe(true);
+      expect('description' in model).toBe(true);
     });
 
     it('should have type property', () => {
-      expect(model.hasOwnProperty('type') || model.type !== undefined).toBe(true);
+      expect('type' in model).toBe(true);
     });
 
     it('should have found_model_name property', () => {
-      expect(model.hasOwnProperty('found_model_name') || model.found_model_name !== undefined).toBe(true);
+      expect('found_model_name' in model).toBe(true);
     });
 
     it('should have icon property', () => {
-      expect(model.hasOwnProperty('icon') || model.icon !== undefined).toBe(true);
+      expect('icon' in model).toBe(true);
     });
 
     it('should have url property', () => {
-      expect(model.hasOwnProperty('url') || model.url !== undefined).toBe(true);
+      expect('url' in model).toBe(true);
     });
 
     it('should have icons property', () => {
@@ -139,14 +180,16 @@ describe('Search Model', () => {
 
     it('should return SearchInterface', () => {
       const result = model.init();
+
       expect(result).toBe(model);
       expect(result).toEqual(jasmine.any(BaseSearch));
     });
 
     it('should initialize with empty object when no data provided', () => {
       const result = model.init();
+
       expect(result.searchText).toBe('');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.name).toBe('');
       expect(result.description).toBe('');
       expect(result.type).toBe('');
@@ -155,8 +198,9 @@ describe('Search Model', () => {
 
     it('should initialize with undefined data', () => {
       const result = model.init(undefined);
+
       expect(result.searchText).toBe('');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.name).toBe('');
       expect(result.description).toBe('');
       expect(result.type).toBe('');
@@ -165,8 +209,9 @@ describe('Search Model', () => {
 
     it('should initialize with null data', () => {
       const result = model.init(null);
+
       expect(result.searchText).toBe('');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.name).toBe('');
       expect(result.description).toBe('');
       expect(result.type).toBe('');
@@ -182,10 +227,10 @@ describe('Search Model', () => {
         type: 'user_profile',
         found_model_name: 'UserProfile'
       };
-
       const result = model.init(testData);
+
       expect(result.searchText).toBe('search term');
-      expect(result.id).toBe(456 as any);
+      expect(result.id).toBe(456);
       expect(result.name).toBe('Test Name');
       expect(result.description).toBe('Test Description');
       expect(result.type).toBe('user_profile');
@@ -197,11 +242,11 @@ describe('Search Model', () => {
         searchText: 'partial search',
         name: 'Partial Name'
       };
-
       const result = model.init(partialData);
+
       expect(result.searchText).toBe('partial search');
       expect(result.name).toBe('Partial Name');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.description).toBe('');
       expect(result.type).toBe('');
       expect(result.found_model_name).toBe('');
@@ -210,18 +255,21 @@ describe('Search Model', () => {
     it('should set icon based on type', () => {
       const testData = { type: 'test_type' };
       const result = model.init(testData);
+
       expect(result.icon).toBe(faCog); // Should default to cog icon
     });
 
     it('should set url based on type', () => {
       const testData = { type: 'user_profile' };
       const result = model.init(testData);
+
       expect(result.url).toBe('user/profile');
     });
 
     it('should handle empty type for url', () => {
       const testData = { type: '' };
       const result = model.init(testData);
+
       expect(result.url).toBe('');
     });
 
@@ -233,8 +281,8 @@ describe('Search Model', () => {
         type: undefined,
         found_model_name: { test: 'object' }
       };
-
       const result = model.init(testData);
+
       expect(result.searchText).toBe('123');
       expect(result.name).toBe('true');
       expect(result.description).toBe('');
@@ -244,59 +292,59 @@ describe('Search Model', () => {
   });
 
   describe('prepareToSave() method', () => {
-    it('should exist', () => {
+    it('should exist as a function', () => {
       expect(typeof model.prepareToSave).toBe('function');
     });
 
     it('should return object with term property', () => {
       model.init({ searchText: 'test search' });
       const result = model.prepareToSave();
-      
+
       expect(result).toBeDefined();
       expect(typeof result).toBe('object');
-      expect(result.hasOwnProperty('term')).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(result, 'term')).toBe(true);
     });
 
     it('should return term with searchText value', () => {
       model.init({ searchText: 'my search term' });
       const result = model.prepareToSave();
-      
-      expect(result.term).toBe('my search term');
+
+      expect((result as { term: unknown }).term).toBe('my search term');
     });
 
     it('should return empty string when searchText is empty', () => {
       model.init({ searchText: '' });
       const result = model.prepareToSave();
-      
-      expect(result.term).toBe('');
+
+      expect((result as { term: unknown }).term).toBe('');
     });
 
     it('should return empty string when searchText is null', () => {
       model.searchText = null;
       const result = model.prepareToSave();
-      
-      expect(result.term).toBe('');
+
+      expect((result as { term: unknown }).term).toBe('');
     });
 
     it('should return empty string when searchText is undefined', () => {
       model.searchText = undefined;
       const result = model.prepareToSave();
-      
-      expect(result.term).toBe('');
+
+      expect((result as { term: unknown }).term).toBe('');
     });
 
     it('should return empty string when searchText is falsy', () => {
       model.searchText = false as any;
       const result = model.prepareToSave();
-      
-      expect(result.term).toBe('');
+
+      expect((result as { term: unknown }).term).toBe('');
     });
 
     it('should preserve whitespace in searchText', () => {
       model.init({ searchText: '  spaced search  ' });
       const result = model.prepareToSave();
-      
-      expect(result.term).toBe('  spaced search  ');
+
+      expect((result as { term: unknown }).term).toBe('  spaced search  ');
     });
   });
 
@@ -310,12 +358,11 @@ describe('Search Model', () => {
         found_model_name: 'SuperModel',
         searchText: 'super search'
       };
-
       const result = model.init(testData);
-      
+
       // Verify that both Search and SearchModelFunctions init logic was executed
       expect(result.searchText).toBe('super search'); // From Search.init
-      expect(result.id).toBe(789 as any); // From SearchModelFunctions.init
+      expect(result.id).toBe(789); // From SearchModelFunctions.init
       expect(result.name).toBe('Super Test'); // From SearchModelFunctions.init
       expect(result.url).toBe('super/type'); // From SearchModelFunctions.init
       expect(result.icon).toBe(faCog); // From SearchModelFunctions.init
@@ -326,26 +373,31 @@ describe('Search Model', () => {
     describe('setUrl functionality', () => {
       it('should replace underscores with slashes in type', () => {
         model.init({ type: 'user_profile_settings' });
+
         expect(model.url).toBe('user/profile/settings');
       });
 
       it('should handle single underscore', () => {
         model.init({ type: 'user_data' });
+
         expect(model.url).toBe('user/data');
       });
 
       it('should handle no underscores', () => {
         model.init({ type: 'profile' });
+
         expect(model.url).toBe('profile');
       });
 
       it('should handle multiple consecutive underscores', () => {
         model.init({ type: 'user__profile' });
+
         expect(model.url).toBe('user//profile');
       });
 
       it('should handle empty type', () => {
         model.init({ type: '' });
+
         expect(model.url).toBe('');
       });
     });
@@ -353,26 +405,31 @@ describe('Search Model', () => {
     describe('setIcon functionality', () => {
       it('should return cog icon when type is empty', () => {
         model.init({ type: '' });
+
         expect(model.icon).toBe(faCog);
       });
 
       it('should return cog icon when type is null', () => {
         model.init({ type: null });
+
         expect(model.icon).toBe(faCog);
       });
 
       it('should return cog icon when type is undefined', () => {
         model.init({ type: undefined });
+
         expect(model.icon).toBe(faCog);
       });
 
       it('should return cog icon for unknown type', () => {
         model.init({ type: 'unknown_type' });
+
         expect(model.icon).toBe(faCog);
       });
 
       it('should return cog icon when type exists but not in icons', () => {
         model.init({ type: 'custom_type' });
+
         expect(model.icon).toBe(faCog);
       });
     });
@@ -393,7 +450,7 @@ describe('Search Model', () => {
   describe('Edge cases and error handling', () => {
     it('should handle complex data structures in init', () => {
       const complexData = {
-        searchText: { toString: () => 'complex search' },
+        searchText: { toString: (): string => 'complex search' },
         id: '999',
         name: ['array', 'name'],
         nested: {
@@ -402,17 +459,17 @@ describe('Search Model', () => {
           }
         }
       };
-
       const result = model.init(complexData);
+
       expect(result.searchText).toBe('complex search');
-      expect(result.id).toBe(999 as any);
+      expect(result.id).toBe(999);
       expect(result.name).toBe('array,name');
     });
 
     it('should maintain object reference integrity', () => {
       const result1 = model.init();
       const result2 = model.init();
-      
+
       expect(result1).toBe(model);
       expect(result2).toBe(model);
       expect(result1).toBe(result2);
@@ -421,13 +478,15 @@ describe('Search Model', () => {
     it('should handle boolean searchText in prepareToSave', () => {
       model.searchText = true as any;
       const result = model.prepareToSave();
-      expect(result.term).toBe(true); // The method returns the original value, not string conversion
+
+      expect((result as { term: unknown }).term).toBe(true); // The method returns the original value, not string conversion
     });
 
     it('should handle numeric searchText in prepareToSave', () => {
       model.searchText = 12345 as any;
       const result = model.prepareToSave();
-      expect(result.term).toBe(12345); // The method returns the original value, not string conversion
+
+      expect((result as { term: unknown }).term).toBe(12345); // The method returns the original value, not string conversion
     });
   });
 });
