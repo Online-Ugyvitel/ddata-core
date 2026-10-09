@@ -81,7 +81,7 @@ export class InputHelperService implements InputHelperServiceInterface {
       return '';
     }
 
-    return model.fields[field].title;
+    return model.fields[field].placeholder;
   }
 
   getPrepend(model: BaseModelInterface<unknown> & FieldsInterface<unknown>, field: string): string {

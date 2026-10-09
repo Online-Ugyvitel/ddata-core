@@ -91,7 +91,7 @@ export class DdataInputDateComponent implements OnInit {
       this._label = this.helperService.getLabel(this._model, this._field);
     }
 
-    if (!!this._model && !!this._model.validationRules[this._field]) {
+    if (!!this._model && !!this._model.validationRules?.[this._field]) {
       this._isRequired = this.helperService.isRequired(this._model, this._field);
     }
   }
@@ -155,7 +155,7 @@ export class DdataInputDateComponent implements OnInit {
     }
 
     if (this.autoFocus) {
-      this.inputBox.nativeElement.focus();
+      this.inputBox?.nativeElement.focus();
     }
   }
 

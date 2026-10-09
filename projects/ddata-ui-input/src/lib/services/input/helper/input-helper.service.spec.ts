@@ -382,12 +382,10 @@ describe('InputHelperService', () => {
       );
     });
 
-    it('should return the title when everything is valid (bug: returns title instead of placeholder)', () => {
+    it('should return the placeholder when everything is valid', () => {
       const result = service.getPlaceholder(mockModel, 'testField');
 
-      // Note: This tests the current implementation which has a bug - it returns title instead of placeholder
-      // The correct implementation should return model.fields[field].placeholder instead of model.fields[field].title
-      expect(result).toBe('Test Field Title'); // Should be 'Test Field Placeholder' when bug is fixed
+      expect(result).toBe('Test Field Placeholder');
     });
   });
 
