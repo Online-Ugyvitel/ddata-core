@@ -1,7 +1,10 @@
 import 'zone.js/testing';
 import { Injector, ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { DdataInputCheckboxComponent } from './checkbox.component';
@@ -15,11 +18,8 @@ describe('DdataInputCheckboxComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DdataInputCheckboxComponent],
       imports: [FontAwesomeModule],
-      providers: [
-        Injector,
-      ]
-    })
-      .compileComponents();
+      providers: [Injector]
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -29,6 +29,7 @@ describe('DdataInputCheckboxComponent', () => {
       // Fallback for compatibility
       DdataCoreModule.InjectorInstance = TestBed as any;
     }
+
     fixture = TestBed.createComponent(DdataInputCheckboxComponent);
     component = fixture.componentInstance;
   });
@@ -53,6 +54,7 @@ describe('DdataInputCheckboxComponent', () => {
   describe('ngOnInit', () => {
     it('should set iterable to a random number between 0 and 100', () => {
       component.ngOnInit();
+
       expect(component.iterable).toBeGreaterThanOrEqual(0);
       expect(component.iterable).toBeLessThanOrEqual(100);
     });
@@ -61,18 +63,22 @@ describe('DdataInputCheckboxComponent', () => {
   describe('model property', () => {
     it('should set model to be instance of BaseModel when null', () => {
       component.model = null;
+
       expect(component._model).toBeInstanceOf(BaseModel);
     });
 
     it('should accept and set a valid model', () => {
       const testModel = new BaseModel();
+
       testModel.isValid = true;
       component.model = testModel;
+
       expect(component._model).toBe(testModel);
     });
 
     it('should set label from model fields when model has fields', () => {
       const testModel = new BaseModel();
+
       testModel.fields = {
         isValid: {
           label: 'Test Label',
@@ -80,29 +86,35 @@ describe('DdataInputCheckboxComponent', () => {
         }
       };
       component.model = testModel;
+
       expect(component._label).toBe('Test Label');
     });
 
     it('should set label to empty string when model fields do not have label', () => {
       const testModel = new BaseModel();
+
       testModel.fields = {
         isValid: {
           title: 'Test Title'
         }
       };
       component.model = testModel;
+
       expect(component._label).toBe('');
     });
 
     it('should handle model without fields property', () => {
       const testModel = new BaseModel();
+
       component.model = testModel;
+
       expect(component._model).toBe(testModel);
       expect(component._label).toBe('');
     });
 
     it('should handle model with fields but without the current field', () => {
       const testModel = new BaseModel();
+
       testModel.fields = {
         otherField: {
           label: 'Other Label',
@@ -110,13 +122,16 @@ describe('DdataInputCheckboxComponent', () => {
         }
       };
       component.model = testModel;
+
       expect(component._model).toBe(testModel);
       expect(component._label).toBe('');
     });
 
     it('should return the current model', () => {
       const testModel = new BaseModel();
+
       component._model = testModel;
+
       expect(component.model).toBe(testModel);
     });
   });
@@ -124,21 +139,25 @@ describe('DdataInputCheckboxComponent', () => {
   describe('field property', () => {
     it('should set field to "isValid" when value is "undefined"', () => {
       component.field = 'undefined';
+
       expect(component._field).toBe('isValid');
     });
 
     it('should set field to the provided value when it is not "undefined"', () => {
       component.field = 'customField';
+
       expect(component._field).toBe('customField');
     });
 
     it('should return the current field', () => {
       component._field = 'testField';
+
       expect(component.field).toBe('testField');
     });
 
     it('should update label when field changes and model has fields', () => {
       const testModel = new BaseModel();
+
       testModel.fields = {
         customField: {
           label: 'Custom Label',
@@ -147,6 +166,7 @@ describe('DdataInputCheckboxComponent', () => {
       };
       component.model = testModel;
       component.field = 'customField';
+
       expect(component._label).toBe('Custom Label');
     });
   });
@@ -156,6 +176,7 @@ describe('DdataInputCheckboxComponent', () => {
       component.disabled = false;
       component.model.isValid = false;
       component.clicked();
+
       expect(component.model.isValid).toBe(true);
     });
 
@@ -163,6 +184,7 @@ describe('DdataInputCheckboxComponent', () => {
       component.disabled = true;
       component.model.isValid = false;
       component.clicked();
+
       expect(component.model.isValid).toBe(false);
     });
 
@@ -171,6 +193,7 @@ describe('DdataInputCheckboxComponent', () => {
       component.disabled = false;
       component.model.isValid = false;
       component.clicked();
+
       expect(component.changed.emit).toHaveBeenCalledWith(true);
     });
 
@@ -179,6 +202,7 @@ describe('DdataInputCheckboxComponent', () => {
       component.disabled = true;
       component.model.isValid = false;
       component.clicked();
+
       expect(component.changed.emit).not.toHaveBeenCalled();
     });
 
@@ -187,6 +211,7 @@ describe('DdataInputCheckboxComponent', () => {
       component.disabled = false;
       (component.model as any)['customField'] = false;
       component.clicked();
+
       expect((component.model as any)['customField']).toBe(true);
     });
   });
@@ -194,41 +219,50 @@ describe('DdataInputCheckboxComponent', () => {
   describe('getIcon method', () => {
     it('should return iconOff when model field is false', () => {
       component.model.isValid = false;
+
       expect(component.getIcon()).toBe(component.iconOff);
     });
 
     it('should return iconOn when model field is true', () => {
       component.model.isValid = true;
+
       expect(component.getIcon()).toBe(component.iconOn);
     });
 
     it('should return iconOff when model field is null or undefined', () => {
       (component.model as any).isValid = null;
+
       expect(component.getIcon()).toBe(component.iconOff);
-      
+
       (component.model as any).isValid = undefined;
+
       expect(component.getIcon()).toBe(component.iconOff);
     });
 
     it('should work with custom field names', () => {
       component.field = 'customField';
       (component.model as any)['customField'] = true;
+
       expect(component.getIcon()).toBe(component.iconOn);
-      
+
       (component.model as any)['customField'] = false;
+
       expect(component.getIcon()).toBe(component.iconOff);
     });
 
     it('should work with custom icons', () => {
       const customIconOn = faCheckSquare;
       const customIconOff = faSquare;
+
       component.iconOn = customIconOn;
       component.iconOff = customIconOff;
-      
+
       component.model.isValid = true;
+
       expect(component.getIcon()).toBe(customIconOn);
-      
+
       component.model.isValid = false;
+
       expect(component.getIcon()).toBe(customIconOff);
     });
   });
@@ -236,38 +270,47 @@ describe('DdataInputCheckboxComponent', () => {
   describe('input properties', () => {
     it('should accept disabled input', () => {
       component.disabled = true;
+
       expect(component.disabled).toBe(true);
     });
 
     it('should accept showLabel input', () => {
       component.showLabel = false;
+
       expect(component.showLabel).toBe(false);
     });
 
     it('should accept showLabelAfter input', () => {
       component.showLabelAfter = false;
+
       expect(component.showLabelAfter).toBe(false);
     });
 
     it('should accept labelClass input', () => {
       component.labelClass = 'custom-class';
+
       expect(component.labelClass).toBe('custom-class');
     });
 
     it('should accept wrapperClass input', () => {
       component.wrapperClass = 'custom-wrapper';
+
       expect(component.wrapperClass).toBe('custom-wrapper');
     });
 
     it('should accept iconOn input', () => {
       const customIcon = faCheckSquare;
+
       component.iconOn = customIcon;
+
       expect(component.iconOn).toBe(customIcon);
     });
 
     it('should accept iconOff input', () => {
       const customIcon = faSquare;
+
       component.iconOff = customIcon;
+
       expect(component.iconOff).toBe(customIcon);
     });
   });
@@ -275,6 +318,7 @@ describe('DdataInputCheckboxComponent', () => {
   describe('constructor', () => {
     it('should initialize with default values', () => {
       const newComponent = new DdataInputCheckboxComponent();
+
       expect(newComponent._model).toBeInstanceOf(BaseModel);
       expect(newComponent._field).toBe('isValid');
       expect(newComponent._label).toBe('');
