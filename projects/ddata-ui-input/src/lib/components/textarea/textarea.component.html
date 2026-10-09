@@ -21,18 +21,21 @@
       [disabled]="disabled"
       (keyup)="validateField()"
       #inputBox
-    >
-      <ng-container *ngIf="enableCharacterCounter">
-        <character-counter [currentLength]="model[_field]?.length || 0" [maxLength]="maxLength"></character-counter>
-      </ng-container>
-      <ng-container *ngIf="enableWordCounter">
-        <app-word-counter
-        [currentLength]="model[_field]"
+    ></textarea>
+
+    <ng-container *ngIf="!isViewOnly && enableCharacterCounter">
+      <character-counter
+        [currentLength]="_model[_field]"
+        [maxLength]="maxLength"
+      ></character-counter>
+    </ng-container>
+    <ng-container *ngIf="!isViewOnly && enableWordCounter">
+      <dd-word-counter
+        [currentLength]="_model[_field]"
         [maxLength]="maxWords"
-        (maxLentghReached)="showWordCounterWarning = $event"
-      ></app-word-counter>
-      </ng-container>
-    </textarea>
+        (maxLengthReached)="setWordCounterWarning($event)"
+      ></dd-word-counter>
+    </ng-container>
 
     <div *ngIf="isViewOnly" [id]="field" [title]="_title" [class]="viewOnlyClass">
       {{ _model[_field] }}
@@ -42,7 +45,7 @@
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-  <div *ngIf="displayWordCounterWarning && wordCounterWarningMessage !== ''" class="d-flex pb-2">
+  <div *ngIf="isWordLimitExceeded && wordCounterWarningMessage !== ''" class="d-flex pb-2">
     <div class="col-12 col-md-7 offset-md-3 bg-warning p-2 rounded">
       {{ wordCounterWarningMessage }}
     </div>
