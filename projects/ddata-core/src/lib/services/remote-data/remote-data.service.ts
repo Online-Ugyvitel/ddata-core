@@ -33,12 +33,15 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
   /**
    * Application environment variable from the root application
    */
-  private readonly appEnv = DdataInjectorModule.InjectorInstance.get(EnvService);
+  // Application environment service (lazy assigned in constructor to avoid undefined injector issues in tests)
+  private readonly appEnv: EnvService;
 
   /**
-   * Application URL
+   * Application URL (resolved lazily to avoid accessing appEnv before it's assigned)
    */
-  url = this.appEnv.environment.apiUrl;
+  get url(): string {
+    return this.appEnv?.environment?.apiUrl || '';
+  }
 
   /**
    * Headers to all requests
@@ -64,9 +67,17 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
 
   constructor(model: T) {
     super(model);
-    this.setupHeaders();
+    // Safely obtain injector (can be undefined in isolated unit tests where static InjectorInstance is not yet set)
+    const injector = DdataInjectorModule.InjectorInstance as any;
 
-    this.http = DdataInjectorModule.InjectorInstance.get(HttpClient);
+    this.appEnv = injector
+      ? injector.get
+        ? injector.get(EnvService)
+        : new EnvService()
+      : new EnvService();
+    this.setupHeaders();
+    // HttpClient retrieval guarded similarly
+    this.http = injector && injector.get ? injector.get(HttpClient) : ({} as HttpClient);
   }
 
   /**

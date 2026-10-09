@@ -149,7 +149,7 @@ export class DdataInputSearchComponent implements OnDestroy {
       .subscribe();
   }
 
-  go(model: SearchInterface): void {
+  go(model: SearchResultInterface): void {
     const url = `${model.url}/edit/${model.id}`;
 
     this.close();

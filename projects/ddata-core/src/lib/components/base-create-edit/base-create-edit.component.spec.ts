@@ -1,8 +1,7 @@
 /* eslint-disable max-classes-per-file */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/naming-convention */
+
 /* eslint-disable jasmine/prefer-toHaveBeenCalledWith */
-/* eslint-disable @angular-eslint/prefer-on-push-component-change-detection */
+
 import 'zone.js/testing';
 import { Component, EventEmitter, Injector } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';

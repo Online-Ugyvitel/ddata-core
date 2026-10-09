@@ -167,15 +167,13 @@ describe('SearchModelFunctions', () => {
     });
 
     it('should return cog icon for null type', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = model['setIcon'](null as any);
+      const result = model['setIcon'](null);
 
       expect(result).toBe(faCog);
     });
 
     it('should return cog icon for undefined type', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = model['setIcon'](undefined as any);
+      const result = model['setIcon'](undefined);
 
       expect(result).toBe(faCog);
     });
@@ -195,8 +193,7 @@ describe('SearchModelFunctions', () => {
     });
 
     it('should return cog icon as fallback when type exists but has falsy value', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      model.icons['test'] = null as any;
+      model.icons['test'] = null;
       const result = model['setIcon']('test');
 
       expect(result).toBe(faCog);

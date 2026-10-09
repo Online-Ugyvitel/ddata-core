@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DdataUiLoadingOverlayComponent } from './loading-overlay.component';
 import { SpinnerServiceInterface } from 'ddata-core';
+import { of } from 'rxjs';
 
 describe('DdataUiLoadingOverlayComponent', () => {
   let component: DdataUiLoadingOverlayComponent;
@@ -14,7 +15,7 @@ describe('DdataUiLoadingOverlayComponent', () => {
     mockSpinnerService = {
       spinner$: { subscribe: jasmine.createSpy('subscribe') },
       loadingInProgress$: { subscribe: jasmine.createSpy('subscribe') },
-      watch: jasmine.createSpy('watch'),
+      watch: jasmine.createSpy('watch').and.returnValue(of(false)),
       on: jasmine.createSpy('on'),
       off: jasmine.createSpy('off'),
       getStatus: jasmine.createSpy('getStatus')

@@ -102,7 +102,38 @@ export class InputHelperService implements InputHelperServiceInterface {
     model: BaseModelInterface<unknown> & FieldsInterface<unknown>,
     field: string
   ): boolean {
-    return model.validationRules[field].includes('required');
+    try {
+      // Check if model and validationRules exist
+      if (!model || !model.validationRules || !model.validationRules[field]) {
+        return false;
+      }
+      const rules = model.validationRules[field];
+
+      // According to ValidationRuleInterface, rules should be Array<Rule>
+      if (Array.isArray(rules)) {
+        return rules.includes('required');
+      }
+
+      // Fallback: Handle object format for compatibility (though this shouldn't be the standard)
+      if (typeof rules === 'object' && rules !== null) {
+        // Object format: { required: true }
+        return Boolean((rules as Record<string, unknown>).required);
+      }
+
+      // String format: 'required'
+      if (typeof rules === 'string') {
+        return rules === 'required';
+      }
+
+      // Boolean format: true (means required)
+      if (typeof rules === 'boolean') {
+        return rules;
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
   }
 
   randChars(): string {

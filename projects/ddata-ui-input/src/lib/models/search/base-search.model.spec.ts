@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/dot-notation */
 import { BaseSearch } from './base-search.model';
 import { Search } from './search-concrete.model';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
@@ -152,14 +151,14 @@ describe('BaseSearch', () => {
     });
 
     it('should prepare data for save with null searchText', () => {
-      model.searchText = null as any;
+      model.searchText = null;
       const result = model.prepareToSave();
 
       expect(result).toEqual({ term: '' });
     });
 
     it('should prepare data for save with undefined searchText', () => {
-      model.searchText = undefined as any;
+      model.searchText = undefined;
       const result = model.prepareToSave();
 
       expect(result).toEqual({ term: '' });

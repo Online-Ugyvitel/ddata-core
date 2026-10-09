@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable newline-per-chained-call */
-/* eslint-disable @typescript-eslint/naming-convention */
 /* tslint:disable variable-name */
 import { BaseModelInterface, ValidationRuleInterface } from '../../models/base/base-model.model';
 import { ID, ISODate } from '../../models/base/base-data.type';

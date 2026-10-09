@@ -20,12 +20,6 @@ describe('ViewKanbanComponent', () => {
   let component: ViewKanbanComponent;
   let fixture: ComponentFixture<ViewKanbanComponent>;
 
-  beforeAll(() => {
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-      teardown: { destroyAfterEach: false }
-    });
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ViewKanbanComponent],
