@@ -81,3 +81,19 @@ and time picker if you need.
 - [Select Component](src/doc/select-component)
 - [Textarea Component](src/doc/textarea-component)
 - [Time Component](src/doc/time-component)
+
+## Custom rendering of selected items
+
+In `mode="multiple"` the selected items are shown as tags by default. Pass an
+`ng-template` as `selectedItemTemplate` to render them your way (images, color samples, ...).
+The template context has the item (`let-item`) and a `remove` function:
+
+```html
+<dd-select mode="multiple" [model]="product" field="colors" [items]="colors"
+  [dialogSettings]="colorDialogSettings" [selectedItemTemplate]="colorTpl"></dd-select>
+
+<ng-template #colorTpl let-color let-remove="remove">
+  <span class="me-2" [style.background]="color.hex" style="display:inline-block;width:24px;height:24px"
+    (click)="remove()"></span>
+</ng-template>
+```

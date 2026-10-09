@@ -4,13 +4,19 @@ import {
   Component,
   EventEmitter,
   Input,
-  Output
+  Output,
+  TemplateRef
 } from '@angular/core';
 import { BaseModelInterface, DdataCoreModule, FieldsInterface } from '@netdjw/ddata-core';
 import { DialogContentWithOptionsInterface } from '../../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
 import { SelectType } from '../select.type';
+
+export interface SelectedItemTemplateContext {
+  $implicit: unknown;
+  remove: () => void;
+}
 
 @Component({
   selector: 'dd-multiple-select',
@@ -25,6 +31,12 @@ export class DdataMultipleSelectComponent {
   @Input() inputBlockClass = 'col-12 d-flex px-0';
   @Input() inputBlockExtraClass = 'col-md-9';
   @Input() unselectedText = 'Válassz';
+
+  /**
+   * Custom template to render each selected item in multiple mode instead of the default tag.
+   * Context: `$implicit` is the selected item, `remove` is a function that removes it.
+   */
+  @Input() selectedItemTemplate: TemplateRef<SelectedItemTemplateContext> | null = null;
 
   // behavior
   @Input() mode: SelectType = 'multiple';
@@ -166,6 +178,10 @@ export class DdataMultipleSelectComponent {
 
   getObjectFieldName(): string {
     return this.field.split('_id')[0];
+  }
+
+  getSelectedItemContext(item: BaseModelInterface<unknown>): SelectedItemTemplateContext {
+    return { $implicit: item, remove: () => this.deleteFromMultipleSelectedList(item) };
   }
 
   trackByFn(index: number, item: unknown): unknown {

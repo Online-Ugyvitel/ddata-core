@@ -418,6 +418,21 @@ describe('DdataMultipleSelectComponent', () => {
       expect(component.selectedModelName).toBe('Primary Tag');
     });
 
+    it('should build template context with item and remove callback', () => {
+      const item = { id: 1, name: 'A' };
+
+      component.field = 'tags';
+      component.model = { tags: [item] } as unknown as MockModel;
+
+      const context = component.getSelectedItemContext(item as never);
+
+      expect(context.$implicit).toBe(item);
+
+      context.remove();
+
+      expect(component.model['tags'].length).toBe(0);
+    });
+
     it('showModal should log error and not open when dialogSettings missing', () => {
       spyOn(console, 'error');
       // Force internal dialog settings to undefined
