@@ -42,8 +42,9 @@ All models needs to define the `api_endpoint` field where you can define the mod
 | `getAllWithoutPaginate()`                                          | `Observable<T[]>`                          | Send HTTP GET request to the API endpoint where can get the all items of requested resource without PaginateInterface. |
 | `getPage(pageNumber: number, uniqueUrl?: string)`                  | `Observable<PaginateInterface>`            | Send a HTTP GET request to the API endpoint to get a PaginateInterface object belongs to the model.                    |
 | `getOne(id: number)`                                               | `Observable<T>`                            | Send HTTP GET request to the API endpoint where can get one instance of requested resource.                            |
-| `getUri(uri: string)`                                              | `Observable<T>`                            | Send HTTP GET request to the API endpoint's unique URI.                                                                |
-| `postUri(resource: any, uri: string)`                              | `Observable<any>`                          | Send HTTP POST request to the API endpoint's unique URI.                                                               |
+| `getUri(uri: string, headers?: RequestHeaders)`                    | `Observable<any>`                          | Send HTTP GET to a URI relative to the API URL. |
+| `postUri(resource: any, uri: string, headers?: RequestHeaders)`     | `Observable<any>`                          | Send HTTP POST to a URI relative to the model's endpoint. |
+| `putUri(resource: any, uri: string, headers?: RequestHeaders)`      | `Observable<any>`                          | Send HTTP PUT to a URI relative to the model's endpoint. |
 | `save(data: T)`                                                    | `Observable<number | boolean>`             | Send HTTP POST or PUT request to the API endpoint to create a new instance or update an existing one.                  |
 | `delete(model: T)`                                                 | `Observable<number>`                       | Send HTTP DELETE request to the API endpoint to delete an instance.                                                    |
 | `deleteMultiple(models: T[])`                                      | `Observable<{}>`                           | Send HTTP POST request to the API endpoint to delete multiple instances.                                               |
@@ -164,59 +165,79 @@ Returns Observable, initialized model of `T` type object.
 ```
 
 
-### `getUri()`
+### `getUri(uri, headers?)`
 
-Send HTTP GET request to the API endpoint's unique URI
+Send a GET request to `environment.apiUrl + uri`. The model's API endpoint is not added.
+For example, `getUri('/users/active')` with API URL `http://www.yourdomain.com/api`
+requests `http://www.yourdomain.com/api/users/active`.
 
-The requested URL will be constructed like this: `{environment.apiUrl}/{uri}`
+| Name | Type | Description |
+| --- | --- | --- |
+| uri | string | URI relative to the API URL, including the leading slash |
+| headers | RequestHeaders (optional) | Headers for this request |
 
-If the ApiUrl is `http://www.yourdomain.com/api` and the custom URI is "my/custom/uri", then your
-url will be `http://www.yourdomain.com/api/my/custom/uri`
-
-| Name | Type   | Description       |
-|------|--------|-------------------|
-| uri  | string | unique URI string |
-
-Returns Observabe, any.
+Returns `Observable<any>` with the unmodified response.
 
 ```typescript
-  constructor(
-    private myRemoteStorageService: RemoteStorageService<Post>,
-  ) {}
-
-  load() {
-    const uri = '/filter/by/user/42';
-    this.myRemotStorageService.getUri(uri).subscribe();
-  }
+remoteService.getUri('/users/active', { 'X-Request-Id': 'request-42' }).subscribe();
 ```
 
+### `postUri(resource, uri, headers?)`
 
-### `postUri()`
+Send a POST request to `environment.apiUrl + model.api_endpoint + uri`.
+For example, with API URL `http://www.yourdomain.com/api` and model endpoint `/users`,
+`postUri({ active: true }, '/filter')` requests `http://www.yourdomain.com/api/users/filter`.
+The resource is serialized as JSON, matching the existing behavior.
 
-Send HTTP POST request to the API endpoint's unique URI
+| Name | Type | Description |
+| --- | --- | --- |
+| resource | any | Data to serialize as JSON |
+| uri | string | URI relative to the model's endpoint, including the leading slash |
+| headers | RequestHeaders (optional) | Headers for this request |
 
-The requested URL will be constructed like this: `{environment.apiUrl}/{uri}`
-
-If the ApiUrl is `http://www.yourdomain.com/api` and the custom URI is `my/custom/uri`, then your
-url will be `http://www.yourdomain.com/api/my/custom/uri`
-
-| Name     | Type   | Description                    |
-|----------|--------|--------------------------------|
-| resource | object | any data what you want to send |
-| uri      | string | unique URI string              |
-
-Returns Observabe, any.
+Returns `Observable<any>` with the unmodified response.
 
 ```typescript
-  constructor(
-    private myRemoteStorageService: RemoteStorageService<Post>,
-  ) {}
-
-  load() {
-    const uri = '/filter/by/user/42';
-    this.myRemotStorageService.getUri(uri).subscribe();
-  }
+remoteService.postUri({ active: true }, '/filter', { 'X-Request-Id': 'request-42' }).subscribe();
 ```
+
+### `putUri(resource, uri, headers?)`
+
+Send a PUT request using the same parameter order, URL construction and JSON serialization as
+`postUri`: `environment.apiUrl + model.api_endpoint + uri`.
+For API URL `http://www.yourdomain.com/api` and model endpoint `/users`, the following request
+updates `http://www.yourdomain.com/api/users/42`:
+
+```typescript
+remoteService.putUri({ name: 'Updated name' }, '/42', { 'X-Request-Id': 'request-42' }).subscribe();
+```
+
+The parameters have the same types as `postUri`. Returns `Observable<any>` with the unmodified response.
+HTTP errors propagate to the subscriber, as with `getUri` and `postUri`.
+
+### Headers for custom URI requests
+
+All three methods accept an optional `RequestHeaders` parameter, exported by `ddata-core`:
+
+```typescript
+import { HttpHeaders } from '@angular/common/http';
+import { RequestHeaders } from 'ddata-core';
+
+const headers: RequestHeaders = new HttpHeaders({
+  'X-Request-Id': 'request-42',
+  'X-Tag': ['first', 'second']
+});
+remoteService.getUri('/users/active', headers).subscribe();
+```
+
+A plain object with string or string-array values is also accepted. Headers are merged over the
+current defaults (`Authorization`, `Content-Type`, and `Accepted-Encoding`). Matching names are
+overridden case-insensitively for that request; unspecified defaults remain. The authentication
+token is refreshed from local storage for each call. The supplied object or `HttpHeaders` instance
+is not mutated, and custom headers do not affect later requests.
+
+Omitting the parameter or passing empty headers preserves the defaults. Existing calls and URL
+construction remain unchanged. [ProxyService](service-proxy.md) supports the same parameters and behavior.
 
 
 ### `save()`
