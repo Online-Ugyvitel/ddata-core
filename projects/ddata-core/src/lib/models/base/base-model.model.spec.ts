@@ -8,11 +8,13 @@ import { ID, ISODate } from './base-data.type';
 
 describe('BaseModel', () => {
   let model: BaseModel;
-  let mockValidatorService: jasmine.SpyObj<ValidatorService>;
+  let mockValidatorService: any;
 
   beforeEach(() => {
     // Create a spy object for ValidatorService
-    mockValidatorService = jasmine.createSpyObj('ValidatorService', ['validateObject']);
+    mockValidatorService = {
+      validateObject: vi.fn().mockName('ValidatorService.validateObject')
+    };
 
     TestBed.configureTestingModule({
       imports: [],
@@ -22,7 +24,7 @@ describe('BaseModel', () => {
     const injector = TestBed.inject(ValidatorService);
 
     DdataCoreModule.InjectorInstance = {
-      get: jasmine.createSpy('get').and.returnValue(mockValidatorService)
+      get: vi.fn().mockName('get').mockReturnValue(mockValidatorService)
     };
 
     model = new BaseModel();
@@ -222,10 +224,10 @@ describe('BaseModel', () => {
   describe('validate method', () => {
     it('should call ValidatorService.validateObject with correct parameters', () => {
       // Setup mock to return valid result
-      mockValidatorService.validateObject.and.returnValue([true, []]);
+      mockValidatorService.validateObject.mockReturnValue([true, []]);
 
       // Mock prepareToSave to avoid error
-      spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
+      vi.spyOn(model, 'prepareToSave').mockReturnValue({ id: 1 });
 
       model.validate();
 
@@ -240,8 +242,8 @@ describe('BaseModel', () => {
     it('should set isValid and validationErrors from ValidatorService result', () => {
       const mockErrors = ['field1', 'field2'];
 
-      mockValidatorService.validateObject.and.returnValue([false, mockErrors]);
-      spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
+      mockValidatorService.validateObject.mockReturnValue([false, mockErrors]);
+      vi.spyOn(model, 'prepareToSave').mockReturnValue({ id: 1 });
 
       model.validate();
 
@@ -250,7 +252,7 @@ describe('BaseModel', () => {
     });
 
     it('should use preparedData parameter when provided', () => {
-      mockValidatorService.validateObject.and.returnValue([true, []]);
+      mockValidatorService.validateObject.mockReturnValue([true, []]);
       const preparedData = { id: 123, name: 'test' };
 
       model.validate(preparedData);
@@ -270,9 +272,11 @@ describe('BaseModel', () => {
         invalids: errorInvalids
       });
 
-      mockValidatorService.validateObject.and.throwError(validationError);
-      spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
-      spyOn(model, 'getValidatedErrorFields').and.returnValue(['Error 1', 'Error 2']);
+      mockValidatorService.validateObject.mockImplementation(() => {
+        throw validationError;
+      });
+      vi.spyOn(model, 'prepareToSave').mockReturnValue({ id: 1 });
+      vi.spyOn(model, 'getValidatedErrorFields').mockReturnValue(['Error 1', 'Error 2']);
 
       expect(() => model.validate()).toThrowError(ValidationError);
       expect(model.validationErrors).toEqual(errorInvalids);
@@ -282,8 +286,10 @@ describe('BaseModel', () => {
     it('should rethrow non-ValidationError errors', () => {
       const genericError = new Error('Generic error');
 
-      mockValidatorService.validateObject.and.throwError(genericError);
-      spyOn(model, 'prepareToSave').and.returnValue({ id: 1 });
+      mockValidatorService.validateObject.mockImplementation(() => {
+        throw new Error(genericError as unknown as string);
+      });
+      vi.spyOn(model, 'prepareToSave').mockReturnValue({ id: 1 });
 
       expect(() => model.validate()).toThrowError('Generic error');
     });
@@ -306,7 +312,7 @@ describe('BaseModel', () => {
 
     it('should return field name for non-existing fields', () => {
       model.validationErrors = ['field1', 'nonexistent'];
-      spyOn(console, 'error'); // Suppress console error for test
+      vi.spyOn(console, 'error').mockReturnValue(undefined); // Suppress console error for test
       const result = model.getValidatedErrorFields();
 
       expect(result).toEqual(['Field One', 'nonexistent']);
@@ -314,7 +320,7 @@ describe('BaseModel', () => {
 
     it('should log error for non-existing fields', () => {
       model.validationErrors = ['nonexistent'];
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       model.getValidatedErrorFields();
 
       expect(console.error).toHaveBeenCalledWith(
@@ -619,7 +625,7 @@ describe('BaseModel', () => {
 
   describe('initModelOrNull method', () => {
     it('should initialize model fields with init method when available', () => {
-      const mockModel = { init: jasmine.createSpy('init').and.returnValue('initialized') };
+      const mockModel = { init: vi.fn().mockName('init').mockReturnValue('initialized') };
       const fields = { field1: mockModel };
       const data = { field1: { id: 1 } };
 
@@ -639,7 +645,7 @@ describe('BaseModel', () => {
     });
 
     it('should handle missing data properties', () => {
-      const mockModel = { init: jasmine.createSpy('init').and.returnValue('initialized') };
+      const mockModel = { init: vi.fn().mockName('init').mockReturnValue('initialized') };
       const fields = { field1: mockModel };
       const data = {};
 
@@ -652,7 +658,7 @@ describe('BaseModel', () => {
 
   describe('initAsBoolean method', () => {
     it('should call fieldAsBoolean for each field', () => {
-      spyOn(model, 'fieldAsBoolean');
+      vi.spyOn(model, 'fieldAsBoolean').mockReturnValue(undefined);
       const fields = { field1: true, field2: false };
       const data = { field1: false, field2: true };
 
@@ -665,7 +671,7 @@ describe('BaseModel', () => {
 
   describe('initAsBooleanWithDefaults method', () => {
     it('should call fieldAsBoolean with false default for each field', () => {
-      spyOn(model, 'fieldAsBoolean');
+      vi.spyOn(model, 'fieldAsBoolean').mockReturnValue(undefined);
       const fields = ['field1', 'field2'];
       const data = { field1: true };
 
@@ -712,7 +718,7 @@ describe('BaseModel', () => {
 
   describe('initAsString method', () => {
     it('should call fieldAsString for each field', () => {
-      spyOn(model, 'fieldAsString');
+      vi.spyOn(model, 'fieldAsString').mockReturnValue(undefined);
       const fields = { field1: 'default1', field2: 'default2' };
       const data = { field1: 'value1', field2: 'value2' };
 
@@ -725,7 +731,7 @@ describe('BaseModel', () => {
 
   describe('initAsStringWithDefaults method', () => {
     it('should call fieldAsString with empty string default for each field', () => {
-      spyOn(model, 'fieldAsString');
+      vi.spyOn(model, 'fieldAsString').mockReturnValue(undefined);
       const fields = ['field1', 'field2'];
       const data = { field1: 'value1' };
 
@@ -772,7 +778,7 @@ describe('BaseModel', () => {
 
   describe('initAsNumber method', () => {
     it('should call fieldAsNumber for each field', () => {
-      spyOn(model, 'fieldAsNumber');
+      vi.spyOn(model, 'fieldAsNumber').mockReturnValue(undefined);
       const fields = { field1: 10, field2: 20 };
       const data = { field1: 100, field2: 200 };
 
@@ -785,7 +791,7 @@ describe('BaseModel', () => {
 
   describe('initAsNumberWithDefaults method', () => {
     it('should call fieldAsNumber with 0 default for each field', () => {
-      spyOn(model, 'fieldAsNumber');
+      vi.spyOn(model, 'fieldAsNumber').mockReturnValue(undefined);
       const fields = ['field1', 'field2'];
       const data = { field1: 100 };
 

@@ -66,7 +66,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
     });
 
     it('should emit choosed event when chooseSelect is called', () => {
-      spyOn(component.choosed, 'emit');
+      vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
       component.chooseSelect();
 
@@ -88,7 +88,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
     });
 
     it('should emit choosed event multiple times when chooseSelect is called multiple times', () => {
-      spyOn(component.choosed, 'emit');
+      vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
 
       component.chooseSelect();
       component.chooseSelect();
@@ -144,7 +144,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
     });
 
     it('should call chooseSelect method when button is clicked', () => {
-      spyOn(component, 'chooseSelect');
+      vi.spyOn(component, 'chooseSelect').mockReturnValue(undefined);
       const buttonElement = compiled.querySelector('button');
 
       expect(buttonElement).toBeTruthy();
@@ -156,7 +156,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
     });
 
     it('should emit choosed event when button is clicked', () => {
-      spyOn(component.choosed, 'emit');
+      vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
       const buttonElement = compiled.querySelector('button');
 
       expect(buttonElement).toBeTruthy();
@@ -167,7 +167,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
     });
 
     it('should trigger click event using DebugElement', () => {
-      spyOn(component, 'chooseSelect');
+      vi.spyOn(component, 'chooseSelect').mockReturnValue(undefined);
       const buttonDebugElement = debugElement.query(By.css('button'));
 
       expect(buttonDebugElement).toBeTruthy();
@@ -178,7 +178,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
     });
 
     it('should handle multiple button clicks correctly', () => {
-      spyOn(component.choosed, 'emit');
+      vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
       const buttonElement = compiled.querySelector('button');
 
       expect(buttonElement).toBeTruthy();
@@ -223,7 +223,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
 
       expect(component.multipleSelectEnabled).toBe(false);
 
-      spyOn(component.choosed, 'emit');
+      vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
       component.chooseSelect();
 
       expect(component.choosed.emit).toHaveBeenCalled();

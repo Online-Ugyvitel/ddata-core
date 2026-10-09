@@ -1,25 +1,29 @@
+import type { Mock } from 'vitest';
 import { Router } from '@angular/router';
 import { UnauthorizedError } from './unauthorized-error';
 import { StorageService } from '../storage/storage.service';
 
 describe('UnauthorizedError', () => {
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockStorageService: jasmine.SpyObj<StorageService>;
+  let mockRouter: any;
+  let mockStorageService: any;
   let originalError: any;
-  let consoleErrorSpy: jasmine.Spy;
+  let consoleErrorSpy: Mock;
 
   beforeEach(() => {
     // Create mock objects
-    mockRouter = jasmine.createSpyObj('Router', ['navigate'], {
+    mockRouter = {
+      navigate: vi.fn().mockName('Router.navigate'),
       url: '/some-page'
-    });
-    mockStorageService = jasmine.createSpyObj('StorageService', ['clear']);
+    };
+    mockStorageService = {
+      clear: vi.fn().mockName('StorageService.clear')
+    };
 
     // Mock console.error
-    consoleErrorSpy = spyOn(console, 'error');
+    consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
 
     // Mock document.getElementById
-    spyOn(document, 'getElementById').and.returnValue(null);
+    vi.spyOn(document, 'getElementById').mockReturnValue(null);
 
     // Sample original error
     originalError = {
@@ -96,7 +100,7 @@ describe('UnauthorizedError', () => {
   });
 
   describe('4. DOM Element Interactions - Logout Element', () => {
-    let mockLogoutElement: jasmine.SpyObj<HTMLElement>;
+    let mockLogoutElement: any;
 
     beforeEach(() => {
       // Ensure router URL is not /login to trigger the flow
@@ -105,11 +109,13 @@ describe('UnauthorizedError', () => {
         configurable: true
       });
 
-      mockLogoutElement = jasmine.createSpyObj('HTMLElement', ['click']);
+      mockLogoutElement = {
+        click: vi.fn().mockName('HTMLElement.click')
+      };
     });
 
     it('should click logout element when it exists', () => {
-      (document.getElementById as jasmine.Spy).and.callFake((id: string) => {
+      (document.getElementById as Mock).mockImplementation((id: string) => {
         if (id === 'nav-logout') {
           return mockLogoutElement;
         }
@@ -126,7 +132,7 @@ describe('UnauthorizedError', () => {
   });
 
   describe('5. DOM Element Interactions - Login Element', () => {
-    let mockLoginElement: jasmine.SpyObj<HTMLElement>;
+    let mockLoginElement: any;
 
     beforeEach(() => {
       // Ensure router URL is not /login to trigger the flow
@@ -135,11 +141,13 @@ describe('UnauthorizedError', () => {
         configurable: true
       });
 
-      mockLoginElement = jasmine.createSpyObj('HTMLElement', ['click']);
+      mockLoginElement = {
+        click: vi.fn().mockName('HTMLElement.click')
+      };
     });
 
     it('should click login element when logout does not exist but login exists', () => {
-      (document.getElementById as jasmine.Spy).and.callFake((id: string) => {
+      (document.getElementById as Mock).mockImplementation((id: string) => {
         if (id === 'nav-logout') {
           return null; // No logout element
         }
@@ -170,7 +178,7 @@ describe('UnauthorizedError', () => {
     });
 
     it('should navigate to /login when neither logout nor login elements exist', () => {
-      (document.getElementById as jasmine.Spy).and.returnValue(null);
+      (document.getElementById as Mock).mockReturnValue(null);
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
 
@@ -182,14 +190,16 @@ describe('UnauthorizedError', () => {
 
   describe('7. Complete Flow Integration Tests', () => {
     it('should execute complete flow for non-login URL with logout element', () => {
-      const mockLogoutElement = jasmine.createSpyObj('HTMLElement', ['click']);
+      const mockLogoutElement = {
+        click: vi.fn().mockName('HTMLElement.click')
+      };
 
       Object.defineProperty(mockRouter, 'url', {
         get: () => '/profile',
         configurable: true
       });
 
-      (document.getElementById as jasmine.Spy).and.callFake((id: string) => {
+      (document.getElementById as Mock).mockImplementation((id: string) => {
         return id === 'nav-logout' ? mockLogoutElement : null;
       });
 
@@ -205,14 +215,16 @@ describe('UnauthorizedError', () => {
     });
 
     it('should execute complete flow for non-login URL with login element only', () => {
-      const mockLoginElement = jasmine.createSpyObj('HTMLElement', ['click']);
+      const mockLoginElement = {
+        click: vi.fn().mockName('HTMLElement.click')
+      };
 
       Object.defineProperty(mockRouter, 'url', {
         get: () => '/settings',
         configurable: true
       });
 
-      (document.getElementById as jasmine.Spy).and.callFake((id: string) => {
+      (document.getElementById as Mock).mockImplementation((id: string) => {
         return id === 'nav-login' ? mockLoginElement : null;
       });
 
@@ -233,7 +245,7 @@ describe('UnauthorizedError', () => {
         configurable: true
       });
 
-      (document.getElementById as jasmine.Spy).and.returnValue(null);
+      (document.getElementById as Mock).mockReturnValue(null);
 
       new UnauthorizedError(mockRouter, originalError, mockStorageService);
 
@@ -371,7 +383,7 @@ describe('UnauthorizedError', () => {
       // Mock getElementById to return a non-HTMLElement that doesn't have click method
       const fakeElement = { notAClickMethod: () => {} };
 
-      (document.getElementById as jasmine.Spy).and.returnValue(fakeElement as any);
+      (document.getElementById as Mock).mockReturnValue(fakeElement as any);
 
       expect(() => {
         new UnauthorizedError(mockRouter, originalError, mockStorageService);

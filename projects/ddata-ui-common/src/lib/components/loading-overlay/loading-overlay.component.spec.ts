@@ -1,4 +1,3 @@
-import 'zone.js/testing';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -14,12 +13,14 @@ import { DdataUiCommonModule } from '../../ddata-ui-common.module';
 describe('DdataUiLoadingOverlayComponent', () => {
   let component: DdataUiLoadingOverlayComponent;
   let fixture: ComponentFixture<DdataUiLoadingOverlayComponent>;
-  let mockSpinnerService: jasmine.SpyObj<SpinnerServiceInterface>;
+  let mockSpinnerService: any;
 
   beforeEach(async () => {
     // Create mock spinner service
-    mockSpinnerService = jasmine.createSpyObj('SpinnerService', ['watch']);
-    mockSpinnerService.watch.and.returnValue(of(false));
+    mockSpinnerService = {
+      watch: vi.fn().mockName('SpinnerService.watch')
+    };
+    mockSpinnerService.watch.mockReturnValue(of(false));
 
     await TestBed.configureTestingModule({
       declarations: [DdataUiLoadingOverlayComponent],
@@ -44,8 +45,8 @@ describe('DdataUiLoadingOverlayComponent', () => {
     expect(component.subscriptions).toBeInstanceOf(Subscription);
     expect(component.spinner$).toBeInstanceOf(BehaviorSubject);
     expect(component.loadingInProgress$).toBeInstanceOf(BehaviorSubject);
-    expect(component.spinner$.value).toBeFalse();
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.spinner$.value).toBe(false);
+    expect(component.loadingInProgress$.value).toBe(false);
     expect(component.icon.spinner).toEqual(faSpinner);
   });
 
@@ -53,40 +54,40 @@ describe('DdataUiLoadingOverlayComponent', () => {
     // Test setting true
     component.loadingInProgress = true;
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
 
     // Test setting false
     component.loadingInProgress = false;
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     // Test setting truthy value
     component.loadingInProgress = 'truthy' as any;
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
 
     // Test setting falsy value
     component.loadingInProgress = null;
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
   });
 
   it('should set spinner through input setter', () => {
     // Test setting true
     component.spinner = true;
 
-    expect(component.spinner$.value).toBeTrue();
+    expect(component.spinner$.value).toBe(true);
 
     // Test setting false
     component.spinner = false;
 
-    expect(component.spinner$.value).toBeFalse();
+    expect(component.spinner$.value).toBe(false);
   });
 
   it('should subscribe to spinner service on ngOnInit', () => {
     const mockLoadingValue = true;
 
-    mockSpinnerService.watch.and.returnValue(of(mockLoadingValue));
+    mockSpinnerService.watch.mockReturnValue(of(mockLoadingValue));
 
     component.ngOnInit();
 
@@ -96,24 +97,24 @@ describe('DdataUiLoadingOverlayComponent', () => {
 
   it('should handle spinner service subscription with different values', () => {
     // Test with false value
-    mockSpinnerService.watch.and.returnValue(of(false));
+    mockSpinnerService.watch.mockReturnValue(of(false));
     component.ngOnInit();
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     // Reset component for next test
     component.ngOnDestroy();
     component.subscriptions = new Subscription();
 
     // Test with true value
-    mockSpinnerService.watch.and.returnValue(of(true));
+    mockSpinnerService.watch.mockReturnValue(of(true));
     component.ngOnInit();
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
   });
 
   it('should add subscription to subscriptions collection', () => {
-    spyOn(component.subscriptions, 'add').and.callThrough();
+    vi.spyOn(component.subscriptions, 'add');
 
     component.ngOnInit();
 
@@ -121,7 +122,7 @@ describe('DdataUiLoadingOverlayComponent', () => {
   });
 
   it('should unsubscribe on ngOnDestroy', () => {
-    spyOn(component.subscriptions, 'unsubscribe');
+    vi.spyOn(component.subscriptions, 'unsubscribe').mockReturnValue(undefined);
 
     component.ngOnDestroy();
 
@@ -133,13 +134,13 @@ describe('DdataUiLoadingOverlayComponent', () => {
     component.ngOnInit();
 
     // Check that subscription is active
-    expect(component.subscriptions.closed).toBeFalse();
+    expect(component.subscriptions.closed).toBe(false);
 
     // Destroy component
     component.ngOnDestroy();
 
     // Check that subscription is closed
-    expect(component.subscriptions.closed).toBeTrue();
+    expect(component.subscriptions.closed).toBe(true);
   });
 
   it('should have icon property with spinner icon', () => {
@@ -150,22 +151,22 @@ describe('DdataUiLoadingOverlayComponent', () => {
   it('should update loadingInProgress$ when spinner service emits', () => {
     const loadingSubject = new BehaviorSubject<boolean>(false);
 
-    mockSpinnerService.watch.and.returnValue(loadingSubject.asObservable());
+    mockSpinnerService.watch.mockReturnValue(loadingSubject.asObservable());
 
     component.ngOnInit();
 
     // Initial value should be false
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     // Emit true
     loadingSubject.next(true);
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
 
     // Emit false
     loadingSubject.next(false);
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
   });
 
   it('should handle multiple subscription cleanup properly', () => {
@@ -176,11 +177,11 @@ describe('DdataUiLoadingOverlayComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.subscriptions.closed).toBeFalse();
+    expect(component.subscriptions.closed).toBe(false);
 
     component.ngOnDestroy();
 
-    expect(component.subscriptions.closed).toBeTrue();
+    expect(component.subscriptions.closed).toBe(true);
   });
 
   it('should have a constructor', () => {
@@ -213,78 +214,78 @@ describe('DdataUiLoadingOverlayComponent', () => {
     // Test various falsy values
     component.loadingInProgress = 0 as any;
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     component.loadingInProgress = '' as any;
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     component.loadingInProgress = undefined;
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     component.loadingInProgress = NaN as any;
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
   });
 
   it('should handle truthy values correctly in loadingInProgress setter', () => {
     // Test various truthy values
     component.loadingInProgress = 1 as any;
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
 
     component.loadingInProgress = 'string' as any;
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
 
     component.loadingInProgress = {} as any;
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
 
     component.loadingInProgress = [] as any;
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
   });
 
   it('should properly handle subscription lifecycle', () => {
     // Verify subscription starts empty
-    expect(component.subscriptions.closed).toBeFalse();
+    expect(component.subscriptions.closed).toBe(false);
 
     // Initialize component
     component.ngOnInit();
 
     // Verify subscription is active
-    expect(component.subscriptions.closed).toBeFalse();
+    expect(component.subscriptions.closed).toBe(false);
 
     // Verify cleanup
     component.ngOnDestroy();
 
-    expect(component.subscriptions.closed).toBeTrue();
+    expect(component.subscriptions.closed).toBe(true);
   });
 
   it('should handle spinner service observable properly', () => {
     const loadingSubject = new BehaviorSubject<boolean>(true);
 
-    mockSpinnerService.watch.and.returnValue(loadingSubject.asObservable());
+    mockSpinnerService.watch.mockReturnValue(loadingSubject.asObservable());
 
     // Start with false
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     // Initialize - should update to true
     component.ngOnInit();
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
 
     // Change to false
     loadingSubject.next(false);
 
-    expect(component.loadingInProgress$.value).toBeFalse();
+    expect(component.loadingInProgress$.value).toBe(false);
 
     // Change back to true
     loadingSubject.next(true);
 
-    expect(component.loadingInProgress$.value).toBeTrue();
+    expect(component.loadingInProgress$.value).toBe(true);
   });
 
   it('should have the correct icon configuration', () => {

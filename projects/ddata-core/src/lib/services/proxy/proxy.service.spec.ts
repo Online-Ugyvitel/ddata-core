@@ -1,5 +1,4 @@
 // tslint:disable: variable-name
-import 'zone.js/testing';
 import { TestBed } from '@angular/core/testing';
 import { Observable, of, throwError } from 'rxjs';
 import { ProxyService } from './proxy.service';
@@ -54,39 +53,41 @@ class TestModel extends BaseModel implements TestModelInterface {
 
 describe('ProxyService', () => {
   let service: ProxyService<TestModelInterface>;
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let mockLocalDataService: jasmine.SpyObj<LocalDataService<TestModelInterface>>;
-  let mockRemoteDataService: jasmine.SpyObj<RemoteDataService<TestModelInterface>>;
+  let mockNotificationService: any;
+  let mockLocalDataService: any;
+  let mockRemoteDataService: any;
   let testModel: TestModelInterface;
   let testPaginate: PaginateInterface;
 
   beforeEach(() => {
     // Create spies for all dependencies
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
-    mockLocalDataService = jasmine.createSpyObj('LocalDataService', [
-      'findById',
-      'allFromLocal',
-      'allFromLocalSortedBy',
-      'allFromLocalSortedByDesc',
-      'findByField',
-      'filterByField',
-      'save',
-      'delete',
-      'watch'
-    ]);
-    mockRemoteDataService = jasmine.createSpyObj('RemoteDataService', [
-      'getOne',
-      'getAll',
-      'getAllWithoutPaginate',
-      'getPage',
-      'getUri',
-      'postUri',
-      'putUri',
-      'save',
-      'delete',
-      'deleteMultiple',
-      'sendFiles'
-    ]);
+    mockNotificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
+    mockLocalDataService = {
+      findById: vi.fn().mockName('LocalDataService.findById'),
+      allFromLocal: vi.fn().mockName('LocalDataService.allFromLocal'),
+      allFromLocalSortedBy: vi.fn().mockName('LocalDataService.allFromLocalSortedBy'),
+      allFromLocalSortedByDesc: vi.fn().mockName('LocalDataService.allFromLocalSortedByDesc'),
+      findByField: vi.fn().mockName('LocalDataService.findByField'),
+      filterByField: vi.fn().mockName('LocalDataService.filterByField'),
+      save: vi.fn().mockName('LocalDataService.save'),
+      delete: vi.fn().mockName('LocalDataService.delete'),
+      watch: vi.fn().mockName('LocalDataService.watch')
+    };
+    mockRemoteDataService = {
+      getOne: vi.fn().mockName('RemoteDataService.getOne'),
+      getAll: vi.fn().mockName('RemoteDataService.getAll'),
+      getAllWithoutPaginate: vi.fn().mockName('RemoteDataService.getAllWithoutPaginate'),
+      getPage: vi.fn().mockName('RemoteDataService.getPage'),
+      getUri: vi.fn().mockName('RemoteDataService.getUri'),
+      postUri: vi.fn().mockName('RemoteDataService.postUri'),
+      putUri: vi.fn().mockName('RemoteDataService.putUri'),
+      save: vi.fn().mockName('RemoteDataService.save'),
+      delete: vi.fn().mockName('RemoteDataService.delete'),
+      deleteMultiple: vi.fn().mockName('RemoteDataService.deleteMultiple'),
+      sendFiles: vi.fn().mockName('RemoteDataService.sendFiles')
+    };
 
     TestBed.configureTestingModule({
       providers: [ProxyService]
@@ -122,7 +123,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
 
-      mockLocalDataService.findById.and.returnValue(mockItem);
+      mockLocalDataService.findById.mockReturnValue(mockItem);
 
       service.getOne(1).subscribe((result) => {
         expect(result).toEqual(mockItem);
@@ -136,7 +137,7 @@ describe('ProxyService', () => {
       (service as any).remoteStorageService = mockRemoteDataService;
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
 
-      mockRemoteDataService.getOne.and.returnValue(of(mockItem));
+      mockRemoteDataService.getOne.mockReturnValue(of(mockItem));
 
       service.getOne(1).subscribe((result) => {
         expect(result).toEqual(mockItem);
@@ -152,7 +153,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockLocalDataService.allFromLocal.and.returnValue(mockItems);
+      mockLocalDataService.allFromLocal.mockReturnValue(mockItems);
 
       service.getAll().subscribe((result) => {
         expect(result).toBeInstanceOf(Paginate);
@@ -166,7 +167,7 @@ describe('ProxyService', () => {
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
 
-      mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
+      mockRemoteDataService.getAll.mockReturnValue(of(testPaginate));
 
       service.getAll(1).subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -179,7 +180,7 @@ describe('ProxyService', () => {
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
 
-      mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
+      mockRemoteDataService.getAll.mockReturnValue(of(testPaginate));
 
       service.getAll().subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -195,7 +196,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockLocalDataService.allFromLocal.and.returnValue(mockItems);
+      mockLocalDataService.allFromLocal.mockReturnValue(mockItems);
 
       service.getAllWithoutPaginate().subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -209,7 +210,7 @@ describe('ProxyService', () => {
       (service as any).remoteStorageService = mockRemoteDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockRemoteDataService.getAllWithoutPaginate.and.returnValue(of(mockItems));
+      mockRemoteDataService.getAllWithoutPaginate.mockReturnValue(of(mockItems));
 
       service.getAllWithoutPaginate().subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -225,7 +226,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockLocalDataService.allFromLocalSortedBy.and.returnValue(mockItems);
+      mockLocalDataService.allFromLocalSortedBy.mockReturnValue(mockItems);
 
       service.getAllSortedBy('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -239,7 +240,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockLocalDataService.allFromLocalSortedBy.and.returnValue(mockItems);
+      mockLocalDataService.allFromLocalSortedBy.mockReturnValue(mockItems);
 
       service.getAllSortedBy().subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -253,7 +254,7 @@ describe('ProxyService', () => {
       (service as any).remoteStorageService = mockRemoteDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockRemoteDataService.getAllWithoutPaginate.and.returnValue(of(mockItems));
+      mockRemoteDataService.getAllWithoutPaginate.mockReturnValue(of(mockItems));
 
       service.getAllSortedBy('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -269,7 +270,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockLocalDataService.allFromLocalSortedByDesc.and.returnValue(mockItems);
+      mockLocalDataService.allFromLocalSortedByDesc.mockReturnValue(mockItems);
 
       service.getAllSortedByDesc('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -283,7 +284,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockLocalDataService.allFromLocalSortedByDesc.and.returnValue(mockItems);
+      mockLocalDataService.allFromLocalSortedByDesc.mockReturnValue(mockItems);
 
       service.getAllSortedByDesc().subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -297,7 +298,7 @@ describe('ProxyService', () => {
       (service as any).remoteStorageService = mockRemoteDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockRemoteDataService.getAllWithoutPaginate.and.returnValue(of(mockItems));
+      mockRemoteDataService.getAllWithoutPaginate.mockReturnValue(of(mockItems));
 
       service.getAllSortedByDesc('name').subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -312,7 +313,7 @@ describe('ProxyService', () => {
       service = new ProxyService<TestModelInterface>(testModel);
       (service as any).remoteStorageService = mockRemoteDataService;
 
-      mockRemoteDataService.getPage.and.returnValue(of(testPaginate));
+      mockRemoteDataService.getPage.mockReturnValue(of(testPaginate));
 
       service.getPage(1).subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -333,7 +334,7 @@ describe('ProxyService', () => {
     it('should make GET request to URI', () => {
       const mockResponse = { data: 'test' };
 
-      mockRemoteDataService.getUri.and.returnValue(of(mockResponse));
+      mockRemoteDataService.getUri.mockReturnValue(of(mockResponse));
 
       service.getUri('/test-uri').subscribe((result) => {
         expect(result).toEqual(mockResponse);
@@ -347,7 +348,7 @@ describe('ProxyService', () => {
       const mockData = { name: 'test' };
       const mockResponse = { success: true };
 
-      mockRemoteDataService.postUri.and.returnValue(of(mockResponse));
+      mockRemoteDataService.postUri.mockReturnValue(of(mockResponse));
 
       service.postUri(mockData, '/test-uri').subscribe((result) => {
         expect(result).toEqual(mockResponse);
@@ -367,7 +368,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
 
-      mockLocalDataService.findById.and.returnValue(mockItem);
+      mockLocalDataService.findById.mockReturnValue(mockItem);
 
       service.findById(1).subscribe((result) => {
         expect(result).toEqual(mockItem);
@@ -391,7 +392,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItem = new TestModel().init({ id: 1 as ID, name: 'Test Item' });
 
-      mockLocalDataService.findByField.and.returnValue(mockItem);
+      mockLocalDataService.findByField.mockReturnValue(mockItem);
 
       service.findByField('name', 'Test Item').subscribe((result) => {
         expect(result).toEqual(mockItem);
@@ -415,7 +416,7 @@ describe('ProxyService', () => {
       (service as any).localStorageService = mockLocalDataService;
       const mockItems = [new TestModel().init({ id: 1 as ID, name: 'Test Item' })];
 
-      mockLocalDataService.filterByField.and.returnValue(mockItems);
+      mockLocalDataService.filterByField.mockReturnValue(mockItems);
 
       service.filterByField('name', 'Test').subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -436,14 +437,14 @@ describe('ProxyService', () => {
     beforeEach(() => {
       // Set up type property for search method
       (service as any).type = TestModel;
-      spyOn<any>(service, 'getNewPaginateObject').and.returnValue(testPaginate);
-      spyOn(service, 'hydrateArray').and.returnValue([testModel]);
+      vi.spyOn(service as any, 'getNewPaginateObject').mockReturnValue(testPaginate);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([testModel]);
     });
 
     it('should search with page number', () => {
       const searchData = { name: 'test' };
 
-      mockRemoteDataService.postUri.and.returnValue(of(testPaginate));
+      mockRemoteDataService.postUri.mockReturnValue(of(testPaginate));
 
       service.search(searchData, 1).subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -455,7 +456,7 @@ describe('ProxyService', () => {
     it('should search without page number', () => {
       const searchData = { name: 'test' };
 
-      mockRemoteDataService.postUri.and.returnValue(of(testPaginate));
+      mockRemoteDataService.postUri.mockReturnValue(of(testPaginate));
 
       service.search(searchData).subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -467,14 +468,14 @@ describe('ProxyService', () => {
 
   describe('searchWithoutPaginate', () => {
     beforeEach(() => {
-      spyOn(service, 'hydrateArray').and.returnValue([testModel]);
+      vi.spyOn(service, 'hydrateArray').mockReturnValue([testModel]);
     });
 
     it('should search without pagination', () => {
       const searchData = { name: 'test' };
       const mockItems = [testModel];
 
-      mockRemoteDataService.postUri.and.returnValue(of(mockItems));
+      mockRemoteDataService.postUri.mockReturnValue(of(mockItems));
 
       service.searchWithoutPaginate(searchData).subscribe((result) => {
         expect(result).toEqual(mockItems);
@@ -490,7 +491,7 @@ describe('ProxyService', () => {
 
   describe('save', () => {
     beforeEach(() => {
-      spyOn<any>(service, 'successNotify');
+      vi.spyOn(service as any, 'successNotify').mockReturnValue(undefined);
     });
 
     it('should return 0 when model is null', () => {
@@ -509,8 +510,8 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       const savedId = 123;
 
-      mockRemoteDataService.save.and.returnValue(of(savedId));
-      mockLocalDataService.save.and.returnValue(undefined);
+      mockRemoteDataService.save.mockReturnValue(of(savedId));
+      mockLocalDataService.save.mockReturnValue(undefined);
 
       service.save(testModel).subscribe((result) => {
         expect(result).toBe(savedId);
@@ -524,7 +525,7 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       const savedId = 123;
 
-      mockRemoteDataService.save.and.returnValue(of(savedId));
+      mockRemoteDataService.save.mockReturnValue(of(savedId));
 
       service.save(testModel).subscribe((result) => {
         expect(result).toBe(savedId);
@@ -569,9 +570,9 @@ describe('ProxyService', () => {
     it('should delete from both remote and local, then fetch all when use_localstorage is true', () => {
       testModel.use_localstorage = true;
       testModel.id = 1 as ID;
-      mockRemoteDataService.delete.and.returnValue(of(1));
-      mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
-      mockLocalDataService.delete.and.returnValue(undefined);
+      mockRemoteDataService.delete.mockReturnValue(of(1));
+      mockRemoteDataService.getAll.mockReturnValue(of(testPaginate));
+      mockLocalDataService.delete.mockReturnValue(undefined);
 
       service.delete(testModel, testPaginate).subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -584,7 +585,7 @@ describe('ProxyService', () => {
     it('should delete only from remote when use_localstorage is false', () => {
       testModel.use_localstorage = false;
       testModel.id = 1 as ID;
-      mockRemoteDataService.delete.and.returnValue(of(1));
+      mockRemoteDataService.delete.mockReturnValue(of(1));
 
       service.delete(testModel, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
@@ -596,7 +597,7 @@ describe('ProxyService', () => {
     it('should not remove from paginate when remote delete fails', () => {
       testModel.use_localstorage = false;
       testModel.id = 1 as ID;
-      mockRemoteDataService.delete.and.returnValue(of(0));
+      mockRemoteDataService.delete.mockReturnValue(of(0));
       const originalDataLength = testPaginate.data.length;
 
       service.delete(testModel, testPaginate).subscribe((result) => {
@@ -632,7 +633,7 @@ describe('ProxyService', () => {
         to: 1
       });
 
-      mockRemoteDataService.deleteMultiple.and.returnValue(of(true));
+      mockRemoteDataService.deleteMultiple.mockReturnValue(of(true));
 
       // The method should process the models and remove ones with id 0
       service.deleteMultiple(models, paginate).subscribe((result) => {
@@ -644,9 +645,9 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       const models = [testModel];
 
-      mockRemoteDataService.deleteMultiple.and.returnValue(of(true));
-      mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
-      mockLocalDataService.delete.and.returnValue(undefined);
+      mockRemoteDataService.deleteMultiple.mockReturnValue(of(true));
+      mockRemoteDataService.getAll.mockReturnValue(of(testPaginate));
+      mockLocalDataService.delete.mockReturnValue(undefined);
 
       service.deleteMultiple(models, testPaginate).subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -660,7 +661,7 @@ describe('ProxyService', () => {
       testModel.use_localstorage = false;
       const models = [testModel];
 
-      mockRemoteDataService.deleteMultiple.and.returnValue(of(true));
+      mockRemoteDataService.deleteMultiple.mockReturnValue(of(true));
 
       service.deleteMultiple(models, testPaginate).subscribe((result) => {
         expect(result).toBe(testPaginate);
@@ -673,8 +674,8 @@ describe('ProxyService', () => {
       testModel.use_localstorage = true;
       const models = [testModel];
 
-      mockRemoteDataService.deleteMultiple.and.returnValue(of(false));
-      mockRemoteDataService.getAll.and.returnValue(of(testPaginate));
+      mockRemoteDataService.deleteMultiple.mockReturnValue(of(false));
+      mockRemoteDataService.getAll.mockReturnValue(of(testPaginate));
 
       service.deleteMultiple(models, testPaginate).subscribe((result) => {
         expect(result).toEqual(testPaginate);
@@ -685,7 +686,7 @@ describe('ProxyService', () => {
 
   describe('watch', () => {
     it('should return watch observable from local storage service', () => {
-      mockLocalDataService.watch.and.returnValue(of(true));
+      mockLocalDataService.watch.mockReturnValue(of(true));
 
       service.watch().subscribe((result) => {
         expect(result).toBe(true);
@@ -698,8 +699,8 @@ describe('ProxyService', () => {
     it('should register observer with default sort field', () => {
       const target = [];
 
-      spyOn(service, 'watch').and.returnValue(of(true));
-      spyOn(service, 'getAllSortedBy').and.returnValue(of([testModel]));
+      vi.spyOn(service, 'watch').mockReturnValue(of(true));
+      vi.spyOn(service, 'getAllSortedBy').mockReturnValue(of([testModel]));
 
       service.registerObserver(target);
 
@@ -714,8 +715,8 @@ describe('ProxyService', () => {
     it('should register observer with custom sort field', () => {
       const target = [];
 
-      spyOn(service, 'watch').and.returnValue(of(true));
-      spyOn(service, 'getAllSortedBy').and.returnValue(of([testModel]));
+      vi.spyOn(service, 'watch').mockReturnValue(of(true));
+      vi.spyOn(service, 'getAllSortedBy').mockReturnValue(of([testModel]));
 
       service.registerObserver(target, 'id');
 
@@ -736,7 +737,7 @@ describe('ProxyService', () => {
         of({} as FileUploadProcessInterface)
       ];
 
-      mockRemoteDataService.sendFiles.and.returnValue(mockUploadProcess);
+      mockRemoteDataService.sendFiles.mockReturnValue(mockUploadProcess);
       const result = service.sendFiles('/upload', 1, fileSet, data);
 
       expect(result).toBe(mockUploadProcess);
@@ -749,7 +750,7 @@ describe('ProxyService', () => {
         of({} as FileUploadProcessInterface)
       ];
 
-      mockRemoteDataService.sendFiles.and.returnValue(mockUploadProcess);
+      mockRemoteDataService.sendFiles.mockReturnValue(mockUploadProcess);
       const result = service.sendFiles('/upload', 1, fileSet);
 
       expect(result).toBe(mockUploadProcess);

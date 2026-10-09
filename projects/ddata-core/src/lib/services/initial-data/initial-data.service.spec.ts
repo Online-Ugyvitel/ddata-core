@@ -1,5 +1,4 @@
-import 'zone.js/testing';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
@@ -17,16 +16,27 @@ import { EnvService } from '../env/env.service';
 import { InitialData } from '../../models/initial-data/initial-data.model';
 
 describe('InitialDataService', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
   let service: InitialDataService;
-  let storageServiceSpy: jasmine.SpyObj<StorageService>;
-  let spinnerServiceSpy: jasmine.SpyObj<SpinnerService>;
+  let storageServiceSpy: any;
+  let spinnerServiceSpy: any;
   let httpMock: HttpTestingController;
   let envServiceMock: any;
 
   beforeEach(() => {
     // Create spies for dependencies
-    const storageServiceSpyObj = jasmine.createSpyObj('StorageService', ['setItem']);
-    const spinnerServiceSpyObj = jasmine.createSpyObj('SpinnerService', ['on', 'off']);
+    const storageServiceSpyObj = {
+      setItem: vi.fn().mockName('StorageService.setItem')
+    };
+    const spinnerServiceSpyObj = {
+      on: vi.fn().mockName('SpinnerService.on'),
+      off: vi.fn().mockName('SpinnerService.off')
+    };
 
     envServiceMock = { environment: { apiUrl: 'http://dummy.test/api', debug: false } };
 
@@ -52,12 +62,12 @@ describe('InitialDataService', () => {
     };
 
     service = TestBed.inject(InitialDataService);
-    storageServiceSpy = TestBed.inject(StorageService) as jasmine.SpyObj<StorageService>;
-    spinnerServiceSpy = TestBed.inject(SpinnerService) as jasmine.SpyObj<SpinnerService>;
+    storageServiceSpy = TestBed.inject(StorageService) as any;
+    spinnerServiceSpy = TestBed.inject(SpinnerService) as any;
     httpMock = TestBed.inject(HttpTestingController);
 
     // Set up localStorage mock token for authentication headers
-    spyOn(Storage.prototype, 'getItem').and.returnValue('test-token');
+    vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('test-token');
   });
 
   afterEach(() => {
@@ -77,7 +87,7 @@ describe('InitialDataService', () => {
   });
 
   describe('refresh()', () => {
-    it('should call spinner on/off and make HTTP request to /init endpoint', fakeAsync(() => {
+    it('should call spinner on/off and make HTTP request to /init endpoint', async () => {
       const mockResponse = {
         users: [
           { id: 1, name: 'John' },
@@ -105,7 +115,7 @@ describe('InitialDataService', () => {
 
       // Flush the response
       req.flush(mockResponse);
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Verify that storage service was called for each key in the response
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(3);
@@ -129,9 +139,9 @@ describe('InitialDataService', () => {
 
       // Verify that the observable returns true
       expect(observableResult).toBe(true);
-    }));
+    });
 
-    it('should handle empty response object correctly', fakeAsync(() => {
+    it('should handle empty response object correctly', async () => {
       const mockResponse = {};
       let observableResult: boolean | undefined;
 
@@ -148,7 +158,7 @@ describe('InitialDataService', () => {
 
       // Flush empty response
       req.flush(mockResponse);
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Verify that storage service was not called since response is empty
       expect(storageServiceSpy.setItem).not.toHaveBeenCalled();
@@ -158,9 +168,9 @@ describe('InitialDataService', () => {
 
       // Verify the observable returns true
       expect(observableResult).toBe(true);
-    }));
+    });
 
-    it('should handle response with single key-value pair', fakeAsync(() => {
+    it('should handle response with single key-value pair', async () => {
       const mockResponse = {
         singleKey: 'singleValue'
       };
@@ -179,7 +189,7 @@ describe('InitialDataService', () => {
 
       // Flush the response
       req.flush(mockResponse);
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Verify storage service was called once
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(1);
@@ -193,9 +203,9 @@ describe('InitialDataService', () => {
 
       // Verify the observable returns true
       expect(observableResult).toBe(true);
-    }));
+    });
 
-    it('should handle complex nested objects in response', fakeAsync(() => {
+    it('should handle complex nested objects in response', async () => {
       const mockResponse = {
         complexData: {
           nested: {
@@ -222,7 +232,7 @@ describe('InitialDataService', () => {
 
       // Flush the response
       req.flush(mockResponse);
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Verify storage service was called with proper JSON stringification
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(1);
@@ -236,9 +246,9 @@ describe('InitialDataService', () => {
 
       // Verify the observable returns true
       expect(observableResult).toBe(true);
-    }));
+    });
 
-    it('should handle response with null and undefined values', fakeAsync(() => {
+    it('should handle response with null and undefined values', async () => {
       const mockResponse = {
         nullValue: null,
         undefinedValue: undefined,
@@ -261,7 +271,7 @@ describe('InitialDataService', () => {
 
       // Flush the response
       req.flush(mockResponse);
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Verify storage service was called for each key (including falsy values)
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(5);
@@ -280,9 +290,9 @@ describe('InitialDataService', () => {
 
       // Verify the observable returns true
       expect(observableResult).toBe(true);
-    }));
+    });
 
-    it('should handle HTTP error and propagate it correctly', fakeAsync(() => {
+    it('should handle HTTP error and propagate it correctly', async () => {
       let errorOccurred = false;
       let observableResult: boolean | undefined;
 
@@ -306,7 +316,7 @@ describe('InitialDataService', () => {
 
       // Flush an error response
       req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Verify that error was propagated
       expect(errorOccurred).toBe(true);
@@ -317,9 +327,9 @@ describe('InitialDataService', () => {
 
       // Note: spinner.off would not be called in error scenarios since the map operator wouldn't execute
       // This is the actual behavior of the service - it only calls spinner.off on success
-    }));
+    });
 
-    it('should be idempotent - multiple calls should work correctly', fakeAsync(() => {
+    it('should be idempotent - multiple calls should work correctly', async () => {
       const mockResponse1 = { data1: 'value1' };
       const mockResponse2 = { data2: 'value2' };
 
@@ -328,24 +338,24 @@ describe('InitialDataService', () => {
       let req = httpMock.expectOne('http://dummy.test/api/init');
 
       req.flush(mockResponse1);
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Reset spy call counts
-      storageServiceSpy.setItem.calls.reset();
-      (service as any).spinner.on.calls.reset();
-      (service as any).spinner.off.calls.reset();
+      storageServiceSpy.setItem.mockClear();
+      (service as any).spinner.on.mockClear();
+      (service as any).spinner.off.mockClear();
 
       // Second call
       service.refresh().subscribe();
       req = httpMock.expectOne('http://dummy.test/api/init');
       req.flush(mockResponse2);
-      tick();
+      await vi.advanceTimersByTimeAsync(0);
 
       // Verify second call worked correctly
       expect(storageServiceSpy.setItem).toHaveBeenCalledTimes(1);
       expect(storageServiceSpy.setItem).toHaveBeenCalledWith('data2', JSON.stringify('value2'));
       expect((service as any).spinner.on).toHaveBeenCalledWith('dashboard-init');
       expect((service as any).spinner.off).toHaveBeenCalledWith('dashboard-init');
-    }));
+    });
   });
 });

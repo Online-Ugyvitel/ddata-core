@@ -1,7 +1,7 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
-import { Injector, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Injector, ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClient, HttpHandler } from '@angular/common/http';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
@@ -24,25 +24,38 @@ const paginateOf = (data: Array<unknown>): Paginate =>
   Object.assign(new Paginate(BaseSearchResult), { data });
 
 describe('DdataInputSearchComponent', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
   let component: DdataInputSearchComponent;
   let fixture: ComponentFixture<DdataInputSearchComponent>;
   let router: Router;
   let mockElementRef: ElementRef;
-  let mockSpinnerService: jasmine.SpyObj<SpinnerService>;
-  let mockProxyService: jasmine.SpyObj<any>;
+  let mockSpinnerService: any;
+  let mockProxyService: any;
 
   beforeEach(() => {
-    mockSpinnerService = jasmine.createSpyObj('SpinnerService', ['on', 'off']);
-    mockProxyService = jasmine.createSpyObj('ProxyService', ['search', 'getPage']);
+    mockSpinnerService = {
+      on: vi.fn().mockName('SpinnerService.on'),
+      off: vi.fn().mockName('SpinnerService.off')
+    };
+    mockProxyService = {
+      search: vi.fn().mockName('ProxyService.search'),
+      getPage: vi.fn().mockName('ProxyService.getPage')
+    };
     mockElementRef = {
       nativeElement: {
-        contains: jasmine.createSpy('contains').and.returnValue(false)
+        contains: vi.fn().mockName('contains').mockReturnValue(false)
       }
     };
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes([])],
       declarations: [DdataInputSearchComponent],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         ProxyFactoryService,
         HttpClient,
@@ -112,8 +125,8 @@ describe('DdataInputSearchComponent', () => {
 
   describe('clickout', () => {
     it('should close when clicking outside the component', () => {
-      spyOn(component, 'close');
-      mockElementRef.nativeElement.contains.and.returnValue(false);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
+      mockElementRef.nativeElement.contains.mockReturnValue(false);
       const mockEvent = { target: document.createElement('div') };
 
       component.clickout(mockEvent);
@@ -122,8 +135,8 @@ describe('DdataInputSearchComponent', () => {
     });
 
     it('should not close when clicking inside the component', () => {
-      spyOn(component, 'close');
-      mockElementRef.nativeElement.contains.and.returnValue(true);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
+      mockElementRef.nativeElement.contains.mockReturnValue(true);
       const mockEvent = { target: document.createElement('div') };
 
       component.clickout(mockEvent);
@@ -161,43 +174,43 @@ describe('DdataInputSearchComponent', () => {
       expect(result.subscribe).toBeDefined();
     });
 
-    it('should trigger search service with correct parameters', fakeAsync(() => {
+    it('should trigger search service with correct parameters', async () => {
       const mockPaginate = paginateOf([new BaseSearchResult()]);
       const results: Array<unknown> = [];
 
-      mockProxyService.search.and.returnValue(of(mockPaginate));
+      mockProxyService.search.mockReturnValue(of(mockPaginate));
       component.model.searchText = 'test';
       component.pageNumber = 1;
 
       component.search().subscribe((result) => results.push(result));
       mockSearchInput.dispatchEvent(new Event('keyup'));
-      tick(500);
+      await vi.advanceTimersByTimeAsync(500);
 
       expect(mockProxyService.search).toHaveBeenCalledWith(component.model.prepareToSave(), 1);
       expect(mockSpinnerService.on).toHaveBeenCalledWith('search');
       expect(results.length).toBe(1);
-    }));
+    });
 
-    it('should handle search service error', fakeAsync(() => {
+    it('should handle search service error', async () => {
       let receivedError: unknown;
 
-      mockProxyService.search.and.returnValue(throwError(() => 'Search error'));
+      mockProxyService.search.mockReturnValue(throwError(() => 'Search error'));
       component.model.searchText = 'test';
 
       component.search().subscribe({ error: (error) => (receivedError = error) });
       mockSearchInput.dispatchEvent(new Event('keyup'));
-      tick(500);
+      await vi.advanceTimersByTimeAsync(500);
 
       expect(receivedError).toBe('Search error');
       expect(mockSpinnerService.off).toHaveBeenCalledWith('search');
-    }));
+    });
   });
 
   describe('changePage', () => {
     it('should call service.getPage with correct page number', () => {
       const mockPaginate = paginateOf([new BaseSearchResult()]);
 
-      mockProxyService.getPage.and.returnValue(of(mockPaginate));
+      mockProxyService.getPage.mockReturnValue(of(mockPaginate));
 
       component.changePage(2);
 
@@ -207,7 +220,7 @@ describe('DdataInputSearchComponent', () => {
     it('should turn on and off spinner during page change', () => {
       const mockPaginate = paginateOf([new BaseSearchResult()]);
 
-      mockProxyService.getPage.and.returnValue(of(mockPaginate));
+      mockProxyService.getPage.mockReturnValue(of(mockPaginate));
 
       component.changePage(1);
 
@@ -218,8 +231,8 @@ describe('DdataInputSearchComponent', () => {
     it('should call setResult with paginate response', () => {
       const mockPaginate = paginateOf([new BaseSearchResult()]);
 
-      mockProxyService.getPage.and.returnValue(of(mockPaginate));
-      spyOn(component as any, 'setResult');
+      mockProxyService.getPage.mockReturnValue(of(mockPaginate));
+      vi.spyOn(component as any, 'setResult').mockReturnValue(undefined);
 
       component.changePage(1);
 
@@ -227,8 +240,8 @@ describe('DdataInputSearchComponent', () => {
     });
 
     it('should handle getPage service error', () => {
-      spyOn(console, 'error');
-      mockProxyService.getPage.and.returnValue(throwError(() => 'Page error'));
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
+      mockProxyService.getPage.mockReturnValue(throwError(() => 'Page error'));
 
       component.changePage(1);
 
@@ -243,8 +256,8 @@ describe('DdataInputSearchComponent', () => {
       mockModel.url = '/test';
       mockModel.id = '123';
 
-      spyOn(router, 'navigateByUrl');
-      spyOn(component, 'close');
+      vi.spyOn(router, 'navigateByUrl').mockReturnValue(undefined);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
 
       component.go(mockModel);
 
@@ -257,8 +270,8 @@ describe('DdataInputSearchComponent', () => {
       mockModel.url = '/test';
       mockModel.id = '123';
 
-      spyOn(router, 'navigateByUrl');
-      spyOn(component, 'close');
+      vi.spyOn(router, 'navigateByUrl').mockReturnValue(undefined);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
 
       component.go(mockModel);
 
@@ -281,14 +294,14 @@ describe('DdataInputSearchComponent', () => {
 
       (component as any).setResult(fakePaginate);
 
-      expect(component.models).toEqual([jasmine.any(BaseSearchResult)]);
+      expect(component.models).toEqual([expect.any(BaseSearchResult)]);
     });
 
     it('should process each item in result data', () => {
       const searchResultData = { id: '1', name: 'Test' };
       const fakePaginate = paginateOf([searchResultData]);
 
-      spyOn(BaseSearchResult.prototype, 'init').and.returnValue(new BaseSearchResult());
+      vi.spyOn(BaseSearchResult.prototype, 'init').mockReturnValue(new BaseSearchResult());
 
       (component as any).setResult(fakePaginate);
 
@@ -346,8 +359,8 @@ describe('DdataInputSearchComponent', () => {
     });
 
     it('should handle null/undefined clickout event target', () => {
-      spyOn(component, 'close');
-      mockElementRef.nativeElement.contains.and.returnValue(false);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
+      mockElementRef.nativeElement.contains.mockReturnValue(false);
       const mockEventWithNullTarget = { target: null };
 
       component.clickout(mockEventWithNullTarget);
@@ -389,8 +402,8 @@ describe('DdataInputSearchComponent', () => {
     });
 
     it('should handle go method with null model', () => {
-      spyOn(router, 'navigateByUrl');
-      spyOn(component, 'close');
+      vi.spyOn(router, 'navigateByUrl').mockReturnValue(undefined);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
       const nullModel = null as any;
 
       expect(() => component.go(nullModel)).toThrow();
@@ -399,7 +412,7 @@ describe('DdataInputSearchComponent', () => {
     it('should handle changePage with negative page number', () => {
       const mockPaginate = paginateOf([]);
 
-      mockProxyService.getPage.and.returnValue(of(mockPaginate));
+      mockProxyService.getPage.mockReturnValue(of(mockPaginate));
 
       component.changePage(-1);
 

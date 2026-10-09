@@ -62,7 +62,7 @@ describe('ListDropdownComponent', () => {
   it('createCertificate() should create certificate', () => {
     component = new ListDropdownComponent();
 
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
     component.createCertificate(1);
 
     expect(console.error).toHaveBeenCalledWith('Missing company data.');
@@ -71,24 +71,19 @@ describe('ListDropdownComponent', () => {
     component.company.id = 11 as ID;
     let newCertificate: CertificationInterface;
 
-    spyOn(console, 'log');
+    vi.spyOn(console, 'log').mockReturnValue(undefined);
 
     component.createCertificate(11);
     fixture.detectChanges();
-
-    // eslint-disable-next-line no-console
     expect(console.log).toHaveBeenCalledWith('Model hiba');
 
     component.createCertificate(17);
     fixture.detectChanges();
-
-    // eslint-disable-next-line no-console
     expect(console.log).toHaveBeenCalledWith('Model hiba');
 
     component.createCertificate(18);
     fixture.detectChanges();
 
-    // eslint-disable-next-line no-console
     expect(console.log).toHaveBeenCalledWith('Model hiba');
 
     component.createCertificate(1);
@@ -96,7 +91,7 @@ describe('ListDropdownComponent', () => {
 
     expect(console.error).toHaveBeenCalledWith('Certificate_id (', 1, ') is not valid.');
 
-    spyOn(component.showModal, 'emit');
+    vi.spyOn(component.showModal, 'emit').mockReturnValue(undefined);
 
     component.createCertificate(2);
     fixture.detectChanges();

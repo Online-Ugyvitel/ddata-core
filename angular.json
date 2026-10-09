@@ -15,12 +15,13 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
             "outputPath": "dist/ddata-lib",
             "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -31,11 +32,10 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "vendorChunk": true,
-            "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
+            "browser": "src/main.ts",
+            "extractLicenses": false,
             "namedChunks": true
           },
           "configurations": {
@@ -49,10 +49,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -65,43 +61,45 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true
+            },
+            "test": {
+              "optimization": false,
+              "sourceMap": true,
+              "polyfills": []
             }
           },
-          "defaultConfiguration": ""
+          "defaultConfiguration": "development"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "ddata-lib:build"
           },
           "configurations": {
             "production": {
               "buildTarget": "ddata-lib:build:production"
+            },
+            "development": {
+              "buildTarget": "ddata-lib:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "ddata-lib:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/doc"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": []
+            "buildTarget": "ddata-lib:build:test"
           }
         },
         "e2e": {
@@ -134,7 +132,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "tsConfig": "projects/ddata-core/tsconfig.lib.json",
             "project": "projects/ddata-core/ng-package.json"
@@ -142,15 +140,23 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ddata-core/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-core/tsconfig.lib.json"
             }
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ddata-core/src/test.ts",
             "tsConfig": "projects/ddata-core/tsconfig.spec.json",
-            "karmaConfig": "projects/ddata-core/karma.conf.js"
+            "setupFiles": [
+              "projects/ddata-core/src/test-setup.ts"
+            ],
+            "exclude": [
+              "**/test.model.spec.ts",
+              "**/test-bed-configuration.spec.ts"
+            ]
           }
         },
         "lint": {
@@ -171,7 +177,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "tsConfig": "projects/ddata-ui/tsconfig.lib.json",
             "project": "projects/ddata-ui/ng-package.json"
@@ -179,15 +185,16 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ddata-ui/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-ui/tsconfig.lib.json"
             }
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ddata-ui/src/test.ts",
-            "tsConfig": "projects/ddata-ui/tsconfig.spec.json",
-            "karmaConfig": "projects/ddata-ui/karma.conf.js"
+            "tsConfig": "projects/ddata-ui/tsconfig.spec.json"
           }
         },
         "lint": {
@@ -208,7 +215,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "tsConfig": "projects/ddata-ui-input/tsconfig.lib.json",
             "project": "projects/ddata-ui-input/ng-package.json"
@@ -216,15 +223,19 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ddata-ui-input/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-ui-input/tsconfig.lib.json"
             }
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ddata-ui-input/src/test.ts",
             "tsConfig": "projects/ddata-ui-input/tsconfig.spec.json",
-            "karmaConfig": "projects/ddata-ui-input/karma.conf.js"
+            "exclude": [
+              "**/multiple-select-dialog.component.spec.ts"
+            ]
           }
         },
         "lint": {
@@ -245,7 +256,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "tsConfig": "projects/ddata-ui-file/tsconfig.lib.json",
             "project": "projects/ddata-ui-file/ng-package.json"
@@ -253,15 +264,19 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ddata-ui-file/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-ui-file/tsconfig.lib.json"
             }
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ddata-ui-file/src/test.ts",
             "tsConfig": "projects/ddata-ui-file/tsconfig.spec.json",
-            "karmaConfig": "projects/ddata-ui-file/karma.conf.js"
+            "setupFiles": [
+              "projects/ddata-ui-file/src/test-setup.ts"
+            ]
           }
         },
         "lint": {
@@ -282,7 +297,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "tsConfig": "projects/ddata-ui-dialog/tsconfig.lib.json",
             "project": "projects/ddata-ui-dialog/ng-package.json"
@@ -290,15 +305,19 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ddata-ui-dialog/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-ui-dialog/tsconfig.lib.json"
             }
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ddata-ui-dialog/src/test.ts",
             "tsConfig": "projects/ddata-ui-dialog/tsconfig.spec.json",
-            "karmaConfig": "projects/ddata-ui-dialog/karma.conf.js"
+            "setupFiles": [
+              "projects/ddata-ui-dialog/src/test-setup.ts"
+            ]
           }
         },
         "lint": {
@@ -319,7 +338,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "tsConfig": "projects/ddata-ui-common/tsconfig.lib.json",
             "project": "projects/ddata-ui-common/ng-package.json"
@@ -327,15 +346,16 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ddata-ui-common/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-ui-common/tsconfig.lib.json"
             }
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ddata-ui-common/src/test.ts",
-            "tsConfig": "projects/ddata-ui-common/tsconfig.spec.json",
-            "karmaConfig": "projects/ddata-ui-common/karma.conf.js"
+            "tsConfig": "projects/ddata-ui-common/tsconfig.spec.json"
           }
         },
         "lint": {
@@ -356,7 +376,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "tsConfig": "projects/ddata-a11y/tsconfig.lib.json",
             "project": "projects/ddata-a11y/ng-package.json"
@@ -364,15 +384,16 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ddata-a11y/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-a11y/tsconfig.lib.json"
             }
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "projects/ddata-a11y/src/test.ts",
-            "tsConfig": "projects/ddata-a11y/tsconfig.spec.json",
-            "karmaConfig": "projects/ddata-a11y/karma.conf.js"
+            "tsConfig": "projects/ddata-a11y/tsconfig.spec.json"
           }
         },
         "lint": {

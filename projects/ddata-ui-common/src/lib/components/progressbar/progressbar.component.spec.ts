@@ -83,7 +83,7 @@ describe('DdataUiProgressbarComponent', () => {
   });
 
   it('should call calculateProgress during ngOnInit', () => {
-    const spy = spyOn<any>(component, 'calculateProgress');
+    const spy = vi.spyOn(component as any, 'calculateProgress').mockReturnValue(undefined);
 
     component.ngOnInit();
 
@@ -91,7 +91,7 @@ describe('DdataUiProgressbarComponent', () => {
   });
 
   it('should call calculateProgress when max setter is used', () => {
-    const spy = spyOn<any>(component, 'calculateProgress');
+    const spy = vi.spyOn(component as any, 'calculateProgress').mockReturnValue(undefined);
 
     component.max = 50;
 
@@ -99,7 +99,7 @@ describe('DdataUiProgressbarComponent', () => {
   });
 
   it('should call calculateProgress when current setter is used', () => {
-    const spy = spyOn<any>(component, 'calculateProgress');
+    const spy = vi.spyOn(component as any, 'calculateProgress').mockReturnValue(undefined);
 
     component.current = 25;
 

@@ -28,7 +28,8 @@ export class DdataUiFileListComponent {
 
   private readonly helper: FileAndFolderHelperServiceInterface = new FileAndFolderHelperService();
 
-  i18n = fileText[this.config.lang];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  i18n: Record<string, any> = fileText[this.config.lang];
   fileUploadDialogContent: DialogContentItem = new DialogContentItem(
     DdataUiFileUploadComponent,
     {}

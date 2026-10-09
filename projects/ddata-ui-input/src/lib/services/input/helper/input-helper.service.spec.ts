@@ -1,5 +1,4 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models and options
-import 'zone.js/testing';
 import { TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -164,7 +163,7 @@ describe('InputHelperService', () => {
     // Mock the DdataCoreModule.InjectorInstance
     mockValidatorService = new MockValidatorService();
     DdataCoreModule.InjectorInstance = {
-      get: jasmine.createSpy('get').and.returnValue(mockValidatorService)
+      get: vi.fn().mockName('get').mockReturnValue(mockValidatorService)
     };
 
     service = TestBed.inject(InputHelperService);
@@ -178,7 +177,7 @@ describe('InputHelperService', () => {
 
   describe('validateField', () => {
     it('should return false and log error when validation rule is missing', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const result = service.validateField(mockModel, 'nonExistentField');
 
       expect(result).toBe(false);
@@ -194,7 +193,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return true when field is valid and not in validation errors', () => {
-      spyOn(mockValidatorService, 'validate').and.returnValue(true);
+      vi.spyOn(mockValidatorService, 'validate').mockReturnValue(true);
       mockModel.validationErrors = [];
       const result = service.validateField(mockModel, 'testField');
 
@@ -203,7 +202,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return false and add field to validation errors when validation fails', () => {
-      spyOn(mockValidatorService, 'validate').and.returnValue(false);
+      vi.spyOn(mockValidatorService, 'validate').mockReturnValue(false);
       mockModel.validationErrors = [];
       const result = service.validateField(mockModel, 'testField');
 
@@ -212,7 +211,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return false and not add field to validation errors when validation fails and field is already in errors', () => {
-      spyOn(mockValidatorService, 'validate').and.returnValue(false);
+      vi.spyOn(mockValidatorService, 'validate').mockReturnValue(false);
       mockModel.validationErrors = ['testField'];
       const result = service.validateField(mockModel, 'testField');
 
@@ -221,7 +220,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return true and remove field from validation errors when field becomes valid', () => {
-      spyOn(mockValidatorService, 'validate').and.returnValue(true);
+      vi.spyOn(mockValidatorService, 'validate').mockReturnValue(true);
       mockModel.validationErrors = ['testField'];
       const result = service.validateField(mockModel, 'testField');
 
@@ -232,7 +231,7 @@ describe('InputHelperService', () => {
 
   describe('getTitle', () => {
     it('should return empty string and log error when model is null', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const result = service.getTitle(null, 'testField');
 
       expect(result).toBe('');
@@ -242,7 +241,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields is null', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const modelWithNullFields = { ...mockModel };
 
       modelWithNullFields.fields = null;
@@ -255,7 +254,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields[field] is missing', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const result = service.getTitle(mockModel, 'nonExistentField');
 
       expect(result).toBe('');
@@ -265,7 +264,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields[field].title is missing', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
 
       delete mockModel.fields.testField.title;
       const result = service.getTitle(mockModel, 'testField');
@@ -285,7 +284,7 @@ describe('InputHelperService', () => {
 
   describe('getLabel', () => {
     it('should return empty string and log error when model is null', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const result = service.getLabel(null, 'testField');
 
       expect(result).toBe('');
@@ -295,7 +294,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields is null', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const modelWithNullFields = { ...mockModel };
 
       modelWithNullFields.fields = null;
@@ -308,7 +307,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields[field] is missing', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const result = service.getLabel(mockModel, 'nonExistentField');
 
       expect(result).toBe('');
@@ -318,7 +317,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields[field].label is missing', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
 
       delete mockModel.fields.testField.label;
       const result = service.getLabel(mockModel, 'testField');
@@ -338,7 +337,7 @@ describe('InputHelperService', () => {
 
   describe('getPlaceholder', () => {
     it('should return empty string and log error when model is null', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const result = service.getPlaceholder(null, 'testField');
 
       expect(result).toBe('');
@@ -348,7 +347,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields is null', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const modelWithNullFields = { ...mockModel };
 
       modelWithNullFields.fields = null;
@@ -361,7 +360,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields[field] is missing', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
       const result = service.getPlaceholder(mockModel, 'nonExistentField');
 
       expect(result).toBe('');
@@ -371,7 +370,7 @@ describe('InputHelperService', () => {
     });
 
     it('should return empty string and log error when model.fields[field].placeholder is missing', () => {
-      const consoleSpy = spyOn(console, 'error');
+      const consoleSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
 
       delete mockModel.fields.testField.placeholder;
       const result = service.getPlaceholder(mockModel, 'testField');

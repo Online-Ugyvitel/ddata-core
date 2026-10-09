@@ -1,6 +1,5 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
 import { EventEmitter, Injector, ElementRef, ChangeDetectorRef } from '@angular/core';
-import 'zone.js/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -196,7 +195,7 @@ describe('InputBoxComponent', () => {
   // Test ngAfterViewInit lifecycle hook
   it('should focus input element when autoFocus is true in ngAfterViewInit', () => {
     component.autoFocus = true;
-    const mockElement = { focus: jasmine.createSpy('focus') };
+    const mockElement = { focus: vi.fn().mockName('focus') };
 
     component.inputBox = { nativeElement: mockElement } as ElementRef;
 
@@ -207,7 +206,7 @@ describe('InputBoxComponent', () => {
 
   it('should not focus input element when autoFocus is false in ngAfterViewInit', () => {
     component.autoFocus = false;
-    const mockElement = { focus: jasmine.createSpy('focus') };
+    const mockElement = { focus: vi.fn().mockName('focus') };
 
     component.inputBox = { nativeElement: mockElement } as ElementRef;
 
@@ -218,8 +217,8 @@ describe('InputBoxComponent', () => {
 
   // Test validateField method
   it('should call validateField and emit changed event when validation passes', () => {
-    spyOn(component.changed, 'emit');
-    spyOn(component.helperService, 'validateField').and.returnValue(true);
+    vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+    vi.spyOn(component.helperService, 'validateField').mockReturnValue(true);
     component._model = new FakeModel();
     component._field = 'textField';
 
@@ -234,8 +233,8 @@ describe('InputBoxComponent', () => {
   });
 
   it('should call validateField and not emit changed event when validation fails', () => {
-    spyOn(component.changed, 'emit');
-    spyOn(component.helperService, 'validateField').and.returnValue(false);
+    vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+    vi.spyOn(component.helperService, 'validateField').mockReturnValue(false);
     component._model = new FakeModel();
     component._field = 'textField';
 
@@ -273,7 +272,7 @@ describe('InputBoxComponent', () => {
 
   // Test model setter comprehensive error scenarios
   it('should log error and return early when model is null', () => {
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
     const originalModel = component._model;
 
     component.model = null;
@@ -283,7 +282,7 @@ describe('InputBoxComponent', () => {
   });
 
   it('should log error and return early when model fields is undefined', () => {
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
     const modelWithoutFields = new BaseModel();
 
     modelWithoutFields.fields = undefined;
@@ -297,7 +296,7 @@ describe('InputBoxComponent', () => {
   });
 
   it('should log error and return early when model field is undefined', () => {
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
     const model = new FakeModel();
 
     component._field = 'nonExistentField';
@@ -311,12 +310,12 @@ describe('InputBoxComponent', () => {
   });
 
   it('should set helper service values when model and field are valid', () => {
-    spyOn(component.helperService, 'getTitle').and.returnValue('Test Title');
-    spyOn(component.helperService, 'getPlaceholder').and.returnValue('Test Placeholder');
-    spyOn(component.helperService, 'getPrepend').and.returnValue('Test Prepend');
-    spyOn(component.helperService, 'getAppend').and.returnValue('Test Append');
-    spyOn(component.helperService, 'getLabel').and.returnValue('Test Label');
-    spyOn(component.helperService, 'isRequired').and.returnValue(true);
+    vi.spyOn(component.helperService, 'getTitle').mockReturnValue('Test Title');
+    vi.spyOn(component.helperService, 'getPlaceholder').mockReturnValue('Test Placeholder');
+    vi.spyOn(component.helperService, 'getPrepend').mockReturnValue('Test Prepend');
+    vi.spyOn(component.helperService, 'getAppend').mockReturnValue('Test Append');
+    vi.spyOn(component.helperService, 'getLabel').mockReturnValue('Test Label');
+    vi.spyOn(component.helperService, 'isRequired').mockReturnValue(true);
     const model = new FakeModel();
 
     component._field = 'textField';
@@ -338,7 +337,7 @@ describe('InputBoxComponent', () => {
   });
 
   it('should not call isRequired when validationRules field is missing', () => {
-    spyOn(component.helperService, 'isRequired');
+    vi.spyOn(component.helperService, 'isRequired').mockReturnValue(undefined);
     const model = new FakeModel();
 
     delete model.validationRules['textField'];
@@ -424,7 +423,7 @@ describe('InputBoxComponent', () => {
   // Test helperService initialization
   it('should initialize helperService', () => {
     expect(component.helperService).toBeDefined();
-    expect(component.helperService).toEqual(jasmine.any(InputHelperService));
+    expect(component.helperService).toEqual(expect.any(InputHelperService));
   });
 
   // Test model setter when fields exist but validationRules don't exist for field
@@ -444,7 +443,7 @@ describe('InputBoxComponent', () => {
 
   // Test model setter when validationRules exist but field doesn't exist in validationRules
   it('should not call isRequired when validationRules field does not exist', () => {
-    spyOn(component.helperService, 'isRequired');
+    vi.spyOn(component.helperService, 'isRequired').mockReturnValue(undefined);
     const model = new FakeModel();
 
     component._field = 'nonExistentValidationField';
@@ -456,7 +455,7 @@ describe('InputBoxComponent', () => {
 
   // Test edge case where model and fields exist but _field is empty
   it('should handle model setter when _field is empty', () => {
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
     const model = new FakeModel();
 
     component._field = '';

@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { ErrorMessageFromApi } from './error-message-from-api-error';
 import { DdataCoreError } from './ddata-core-error';
@@ -5,15 +6,17 @@ import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 describe('ErrorMessageFromApi', () => {
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let consoleErrorSpy: jasmine.Spy;
+  let mockNotificationService: any;
+  let consoleErrorSpy: Mock;
 
   beforeEach(() => {
     // Create a spy object for NotificationService
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
+    mockNotificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
 
     // Spy on console.error
-    consoleErrorSpy = spyOn(console, 'error');
+    consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
 
     TestBed.configureTestingModule({
       providers: [{ provide: NotificationService, useValue: mockNotificationService }]
@@ -22,7 +25,7 @@ describe('ErrorMessageFromApi', () => {
 
   afterEach(() => {
     // Clean up spies
-    consoleErrorSpy.and.stub();
+    consoleErrorSpy.mockImplementation(() => {});
   });
 
   describe('Constructor', () => {
@@ -207,7 +210,7 @@ describe('ErrorMessageFromApi', () => {
       const originalError = { error: 'Test error' };
 
       new ErrorMessageFromApi(originalError, mockNotificationService);
-      const callArgs = mockNotificationService.add.calls.argsFor(0);
+      const callArgs = vi.mocked(mockNotificationService.add).mock.calls[0];
 
       expect(callArgs[2]).toBe('danger' as NotificationType);
     });
@@ -217,7 +220,9 @@ describe('ErrorMessageFromApi', () => {
     it('should handle NotificationService throwing error', () => {
       const originalError = { error: 'Test error' };
 
-      mockNotificationService.add.and.throwError('Notification service error');
+      mockNotificationService.add.mockImplementation(() => {
+        throw new Error('Notification service error');
+      });
 
       expect(() => new ErrorMessageFromApi(originalError, mockNotificationService)).toThrowError(
         'Notification service error'
@@ -231,7 +236,7 @@ describe('ErrorMessageFromApi', () => {
       // Override console.error temporarily
       const originalConsoleError = console.error;
 
-      console.error = jasmine.createSpy('overridden-console-error');
+      console.error = vi.fn().mockName('overridden-console-error');
 
       new ErrorMessageFromApi(originalError, mockNotificationService);
 

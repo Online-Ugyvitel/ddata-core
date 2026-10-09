@@ -2,7 +2,7 @@
 // tslint:disable: max-line-length
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
@@ -69,34 +69,42 @@ const detectChangesOf = (fixture: ComponentFixture<unknown>): void => {
 };
 
 describe('DdataInputDateComponent', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
   let component: DdataInputDateComponent;
   let fixture: ComponentFixture<DdataInputDateComponent>;
-  let mockHelperService: jasmine.SpyObj<InputHelperService>;
-  let mockChangeDetector: jasmine.SpyObj<ChangeDetectorRef>;
+  let mockHelperService: any;
+  let mockChangeDetector: any;
 
   beforeEach(async () => {
-    mockHelperService = jasmine.createSpyObj('InputHelperService', [
-      'getTitle',
-      'getLabel',
-      'getPlaceholder',
-      'getPrepend',
-      'getAppend',
-      'isRequired',
-      'validateField',
-      'randChars'
-    ]);
+    mockHelperService = {
+      getTitle: vi.fn().mockName('InputHelperService.getTitle'),
+      getLabel: vi.fn().mockName('InputHelperService.getLabel'),
+      getPlaceholder: vi.fn().mockName('InputHelperService.getPlaceholder'),
+      getPrepend: vi.fn().mockName('InputHelperService.getPrepend'),
+      getAppend: vi.fn().mockName('InputHelperService.getAppend'),
+      isRequired: vi.fn().mockName('InputHelperService.isRequired'),
+      validateField: vi.fn().mockName('InputHelperService.validateField'),
+      randChars: vi.fn().mockName('InputHelperService.randChars')
+    };
 
-    mockChangeDetector = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    mockChangeDetector = {
+      detectChanges: vi.fn().mockName('ChangeDetectorRef.detectChanges')
+    };
 
     // Set up default return values
-    mockHelperService.getTitle.and.returnValue('Test Title');
-    mockHelperService.getLabel.and.returnValue('Test Label');
-    mockHelperService.getPlaceholder.and.returnValue('Test Placeholder');
-    mockHelperService.getPrepend.and.returnValue('$');
-    mockHelperService.getAppend.and.returnValue('USD');
-    mockHelperService.isRequired.and.returnValue(false);
-    mockHelperService.validateField.and.returnValue(true);
-    mockHelperService.randChars.and.returnValue('randomstring123');
+    mockHelperService.getTitle.mockReturnValue('Test Title');
+    mockHelperService.getLabel.mockReturnValue('Test Label');
+    mockHelperService.getPlaceholder.mockReturnValue('Test Placeholder');
+    mockHelperService.getPrepend.mockReturnValue('$');
+    mockHelperService.getAppend.mockReturnValue('USD');
+    mockHelperService.isRequired.mockReturnValue(false);
+    mockHelperService.validateField.mockReturnValue(true);
+    mockHelperService.randChars.mockReturnValue('randomstring123');
 
     await TestBed.configureTestingModule({
       imports: [DdataUiInputModule, DdataCoreModule],
@@ -111,23 +119,33 @@ describe('DdataInputDateComponent', () => {
         },
         {
           provide: ValidatorService,
-          useValue: jasmine.createSpyObj('ValidatorService', ['validate'])
+          useValue: {
+            validate: vi.fn().mockName('ValidatorService.validate')
+          }
         },
         {
           provide: Router,
-          useValue: jasmine.createSpyObj('Router', ['navigate'])
+          useValue: {
+            navigate: vi.fn().mockName('Router.navigate')
+          }
         },
         {
           provide: ActivatedRoute,
-          useValue: jasmine.createSpyObj('ActivatedRoute', ['queryParams'])
+          useValue: {
+            queryParams: vi.fn().mockName('ActivatedRoute.queryParams')
+          }
         },
         {
           provide: 'env',
-          useValue: jasmine.createSpyObj('EnvService', ['get'])
+          useValue: {
+            get: vi.fn().mockName('EnvService.get')
+          }
         },
         {
           provide: HttpClient,
-          useValue: jasmine.createSpyObj('HttpClient', ['get'])
+          useValue: {
+            get: vi.fn().mockName('HttpClient.get')
+          }
         }
       ]
     })
@@ -249,7 +267,7 @@ describe('DdataInputDateComponent', () => {
         const testModel = new MockModel().init({ requiredDate: '2023-01-01' });
 
         component._field = 'requiredDate';
-        mockHelperService.isRequired.and.returnValue(true);
+        mockHelperService.isRequired.mockReturnValue(true);
         component.model = testModel;
 
         expect(mockHelperService.isRequired).toHaveBeenCalledWith(testModel, 'requiredDate');
@@ -260,7 +278,7 @@ describe('DdataInputDateComponent', () => {
         const testModel = new MockModel().init({});
 
         component._field = 'nonexistentField';
-        mockHelperService.getTitle.calls.reset();
+        mockHelperService.getTitle.mockClear();
         component.model = testModel;
 
         expect(mockHelperService.getTitle).not.toHaveBeenCalled();
@@ -339,7 +357,7 @@ describe('DdataInputDateComponent', () => {
       // Mock inputBox ElementRef
       component.inputBox = {
         nativeElement: {
-          focus: jasmine.createSpy('focus')
+          focus: vi.fn().mockName('focus')
         }
       } as any;
     });
@@ -431,8 +449,8 @@ describe('DdataInputDateComponent', () => {
     });
 
     it('should emit changed event when validation passes', () => {
-      spyOn(component.changed, 'emit');
-      mockHelperService.validateField.and.returnValue(true);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      mockHelperService.validateField.mockReturnValue(true);
 
       component.change(mockNgbDate);
 
@@ -440,8 +458,8 @@ describe('DdataInputDateComponent', () => {
     });
 
     it('should not emit changed event when validation fails', () => {
-      spyOn(component.changed, 'emit');
-      mockHelperService.validateField.and.returnValue(false);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      mockHelperService.validateField.mockReturnValue(false);
 
       component.change(mockNgbDate);
 
@@ -484,12 +502,12 @@ describe('DdataInputDateComponent', () => {
   });
 
   describe('Integration Tests', () => {
-    it('should handle complete workflow with valid date', fakeAsync(() => {
+    it('should handle complete workflow with valid date', async () => {
       const testModel = new MockModel().init({ date: '2022-02-19' });
 
       component._model = testModel;
       component._field = 'date';
-      spyOn(component.changed, 'emit');
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
 
       detectChangesOf(fixture);
       const newDate = '2022-12-12';
@@ -498,15 +516,15 @@ describe('DdataInputDateComponent', () => {
       component.typeChange(event);
 
       expect(component._model['date']).toEqual(newDate);
-    }));
+    });
 
     it('should handle NgbDate change with validation', () => {
       const testModel = new MockModel().init({ date: '' });
 
       component._model = testModel;
       component._field = 'date';
-      spyOn(component.changed, 'emit');
-      mockHelperService.validateField.and.returnValue(true);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      mockHelperService.validateField.mockReturnValue(true);
       const ngbDate = { year: 2023, month: 8, day: 20 } as NgbDate;
 
       component.change(ngbDate);
@@ -589,7 +607,7 @@ describe('DdataInputDateComponent', () => {
       // Mock inputBox for template tests
       component.inputBox = {
         nativeElement: {
-          focus: jasmine.createSpy('focus')
+          focus: vi.fn().mockName('focus')
         }
       } as any;
     });

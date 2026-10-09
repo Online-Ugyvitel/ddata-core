@@ -1,4 +1,3 @@
-import 'zone.js/testing';
 import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -21,11 +20,13 @@ describe('SelectableListComponent', () => {
   let testModel2: TestModel;
   let testModel3: TestModel;
   let mockHelperService: MockHelperService;
-  let mockActivatedRoute: jasmine.SpyObj<ActivatedRoute>;
+  let mockActivatedRoute: any;
 
   beforeEach(async () => {
     mockHelperService = new MockHelperService();
-    mockActivatedRoute = jasmine.createSpyObj('ActivatedRoute', ['snapshot']);
+    mockActivatedRoute = {
+      snapshot: vi.fn().mockName('ActivatedRoute.snapshot')
+    };
 
     await TestBed.configureTestingModule({
       declarations: [TestSelectableListComponent],
@@ -38,15 +39,18 @@ describe('SelectableListComponent', () => {
 
     // Mock DdataCoreModule.InjectorInstance
     DdataCoreModule.InjectorInstance = {
-      get: jasmine.createSpy('get').and.callFake((token: any) => {
-        if (token === ActivatedRoute) return mockActivatedRoute;
+      get: vi
+        .fn()
+        .mockName('get')
+        .mockImplementation((token: any) => {
+          if (token === ActivatedRoute) return mockActivatedRoute;
 
-        return mockHelperService;
-      })
+          return mockHelperService;
+        })
     };
 
     // Mock HelperFactoryService
-    spyOn(HelperFactoryService.prototype, 'get').and.returnValue(mockHelperService);
+    vi.spyOn(HelperFactoryService.prototype, 'get').mockReturnValue(mockHelperService);
 
     fixture = TestBed.createComponent(TestSelectableListComponent);
     component = fixture.componentInstance;
@@ -185,7 +189,7 @@ describe('SelectableListComponent', () => {
 
   describe('toggleSelect method', () => {
     it('should add model to selection when not already selected', () => {
-      spyOn(component.setSelection, 'emit');
+      vi.spyOn(component.setSelection, 'emit').mockReturnValue(undefined);
 
       component.toggleSelect(testModel1);
 
@@ -196,7 +200,7 @@ describe('SelectableListComponent', () => {
     it('should remove model from selection when already selected', () => {
       // First add the model to selection
       component['selectedElementsSet'].add(testModel1);
-      spyOn(component.removeSelection, 'emit');
+      vi.spyOn(component.removeSelection, 'emit').mockReturnValue(undefined);
 
       component.toggleSelect(testModel1);
 
@@ -208,7 +212,7 @@ describe('SelectableListComponent', () => {
       // Add multiple items to selection
       component['selectedElementsSet'].add(testModel1);
       component['selectedElementsSet'].add(testModel2);
-      spyOn(component.removeSelection, 'emit');
+      vi.spyOn(component.removeSelection, 'emit').mockReturnValue(undefined);
 
       component.toggleSelect(testModel1);
 
@@ -220,19 +224,19 @@ describe('SelectableListComponent', () => {
     it('should emit correct array when adding to existing selection', () => {
       // Add one item to selection
       component['selectedElementsSet'].add(testModel1);
-      spyOn(component.setSelection, 'emit');
+      vi.spyOn(component.setSelection, 'emit').mockReturnValue(undefined);
 
       component.toggleSelect(testModel2);
 
       expect(component['selectedElementsSet'].has(testModel2)).toBe(true);
       expect(component.setSelection.emit).toHaveBeenCalledWith(
-        jasmine.arrayContaining([testModel1, testModel2])
+        expect.arrayContaining([testModel1, testModel2])
       );
     });
 
     it('should handle the same model being toggled multiple times', () => {
-      spyOn(component.setSelection, 'emit');
-      spyOn(component.removeSelection, 'emit');
+      vi.spyOn(component.setSelection, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.removeSelection, 'emit').mockReturnValue(undefined);
 
       // Toggle to add
       component.toggleSelect(testModel1);
@@ -256,8 +260,8 @@ describe('SelectableListComponent', () => {
 
   describe('chooseSelect method', () => {
     it('should emit empty array when no elements are selected', () => {
-      spyOn(component.select, 'next');
-      spyOn(component.emitSelected, 'emit');
+      vi.spyOn(component.select, 'next').mockReturnValue(undefined);
+      vi.spyOn(component.emitSelected, 'emit').mockReturnValue(undefined);
 
       component.chooseSelect();
 
@@ -268,24 +272,24 @@ describe('SelectableListComponent', () => {
     it('should emit selected elements array when elements are selected', () => {
       component['selectedElementsSet'].add(testModel1);
       component['selectedElementsSet'].add(testModel3);
-      spyOn(component.select, 'next');
-      spyOn(component.emitSelected, 'emit');
+      vi.spyOn(component.select, 'next').mockReturnValue(undefined);
+      vi.spyOn(component.emitSelected, 'emit').mockReturnValue(undefined);
 
       component.chooseSelect();
 
       expect(component.select.next).toHaveBeenCalledWith(
-        jasmine.arrayContaining([testModel1, testModel3])
+        expect.arrayContaining([testModel1, testModel3])
       );
 
       expect(component.emitSelected.emit).toHaveBeenCalledWith(
-        jasmine.arrayContaining([testModel1, testModel3])
+        expect.arrayContaining([testModel1, testModel3])
       );
     });
 
     it('should emit the same array to both select BehaviorSubject and emitSelected EventEmitter', () => {
       component['selectedElementsSet'].add(testModel2);
-      spyOn(component.select, 'next');
-      spyOn(component.emitSelected, 'emit');
+      vi.spyOn(component.select, 'next').mockReturnValue(undefined);
+      vi.spyOn(component.emitSelected, 'emit').mockReturnValue(undefined);
 
       component.chooseSelect();
       const expectedArray = [testModel2];
@@ -323,10 +327,10 @@ describe('SelectableListComponent', () => {
 
   describe('Integration tests', () => {
     it('should handle complete workflow: set selection, toggle, choose', () => {
-      spyOn(component.setSelection, 'emit');
-      spyOn(component.removeSelection, 'emit');
-      spyOn(component.emitSelected, 'emit');
-      spyOn(component.select, 'next');
+      vi.spyOn(component.setSelection, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.removeSelection, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.emitSelected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.select, 'next').mockReturnValue(undefined);
 
       // Set initial selection
       component.selectedElements = [testModel1];
@@ -337,7 +341,7 @@ describe('SelectableListComponent', () => {
       component.toggleSelect(testModel2);
 
       expect(component.setSelection.emit).toHaveBeenCalledWith(
-        jasmine.arrayContaining([testModel1, testModel2])
+        expect.arrayContaining([testModel1, testModel2])
       );
 
       // Remove a model via toggle

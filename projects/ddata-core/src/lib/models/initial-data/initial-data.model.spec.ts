@@ -18,7 +18,7 @@ describe('InitialData', () => {
     });
 
     it('should implement InitialDataInterface', () => {
-      expect(model).toEqual(jasmine.any(Object));
+      expect(model).toEqual(expect.any(Object));
       // Check if it has all required interface properties
       expect(model.api_endpoint).toBeDefined();
       expect(model.model_name).toBeDefined();

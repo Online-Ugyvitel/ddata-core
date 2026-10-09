@@ -1,5 +1,4 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
-import 'zone.js/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -135,7 +134,7 @@ describe('DdataUiConfirmDialogComponent', () => {
     });
 
     it('should emit pressed event with false', () => {
-      spyOn(component.pressed, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
       component.cancel();
 
       expect(component.pressed.emit).toHaveBeenCalledWith(false);
@@ -143,7 +142,7 @@ describe('DdataUiConfirmDialogComponent', () => {
 
     it('should set showDialog to false and emit pressed with false in one call', () => {
       component.showDialog = true;
-      spyOn(component.pressed, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
 
       component.cancel();
 
@@ -154,7 +153,7 @@ describe('DdataUiConfirmDialogComponent', () => {
 
   describe('confirmModal method', () => {
     it('should emit pressed event with true', () => {
-      spyOn(component.pressed, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
       component.confirmModal();
 
       expect(component.pressed.emit).toHaveBeenCalledWith(true);
@@ -168,7 +167,7 @@ describe('DdataUiConfirmDialogComponent', () => {
     });
 
     it('should emit confirm event', () => {
-      spyOn(component.confirm, 'emit');
+      vi.spyOn(component.confirm, 'emit').mockReturnValue(undefined);
       component.confirmModal();
 
       expect(component.confirm.emit).toHaveBeenCalled();
@@ -176,8 +175,8 @@ describe('DdataUiConfirmDialogComponent', () => {
 
     it('should emit pressed, set showDialog false, and emit confirm in one call', () => {
       component.showDialog = true;
-      spyOn(component.pressed, 'emit');
-      spyOn(component.confirm, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.confirm, 'emit').mockReturnValue(undefined);
 
       component.confirmModal();
 
@@ -190,7 +189,7 @@ describe('DdataUiConfirmDialogComponent', () => {
   describe('clickOnOverlay method', () => {
     it('should call cancel when overlayClickCloseDialog is true', () => {
       component.overlayClickCloseDialog = true;
-      spyOn(component, 'cancel');
+      vi.spyOn(component, 'cancel').mockReturnValue(undefined);
 
       component.clickOnOverlay();
 
@@ -199,7 +198,7 @@ describe('DdataUiConfirmDialogComponent', () => {
 
     it('should not call cancel when overlayClickCloseDialog is false', () => {
       component.overlayClickCloseDialog = false;
-      spyOn(component, 'cancel');
+      vi.spyOn(component, 'cancel').mockReturnValue(undefined);
 
       component.clickOnOverlay();
 
@@ -208,7 +207,7 @@ describe('DdataUiConfirmDialogComponent', () => {
 
     it('should emit pressed with false when overlayClickCloseDialog is true', () => {
       component.overlayClickCloseDialog = true;
-      spyOn(component.pressed, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
 
       component.clickOnOverlay();
 
@@ -217,8 +216,8 @@ describe('DdataUiConfirmDialogComponent', () => {
 
     it('should not emit any events when overlayClickCloseDialog is false', () => {
       component.overlayClickCloseDialog = false;
-      spyOn(component.pressed, 'emit');
-      spyOn(component.confirm, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.confirm, 'emit').mockReturnValue(undefined);
 
       component.clickOnOverlay();
 
@@ -230,19 +229,19 @@ describe('DdataUiConfirmDialogComponent', () => {
   describe('Event Emitters', () => {
     it('should have confirm output EventEmitter', () => {
       expect(component.confirm).toBeDefined();
-      expect(component.confirm.emit).toEqual(jasmine.any(Function));
+      expect(component.confirm.emit).toEqual(expect.any(Function));
     });
 
     it('should have pressed output EventEmitter', () => {
       expect(component.pressed).toBeDefined();
-      expect(component.pressed.emit).toEqual(jasmine.any(Function));
+      expect(component.pressed.emit).toEqual(expect.any(Function));
     });
   });
 
   describe('Integration scenarios', () => {
     it('should handle full dialog confirmation flow', () => {
-      spyOn(component.pressed, 'emit');
-      spyOn(component.confirm, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.confirm, 'emit').mockReturnValue(undefined);
 
       // Setup dialog
       component.showDialog = true;
@@ -258,8 +257,8 @@ describe('DdataUiConfirmDialogComponent', () => {
     });
 
     it('should handle dialog cancellation flow', () => {
-      spyOn(component.pressed, 'emit');
-      spyOn(component.confirm, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.confirm, 'emit').mockReturnValue(undefined);
 
       // Setup dialog
       component.showDialog = true;
@@ -275,7 +274,7 @@ describe('DdataUiConfirmDialogComponent', () => {
     });
 
     it('should handle overlay click when enabled', () => {
-      spyOn(component.pressed, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
 
       // Setup dialog with overlay click enabled
       component.showDialog = true;
@@ -289,7 +288,7 @@ describe('DdataUiConfirmDialogComponent', () => {
     });
 
     it('should ignore overlay click when disabled', () => {
-      spyOn(component.pressed, 'emit');
+      vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
 
       // Setup dialog with overlay click disabled
       component.showDialog = true;
