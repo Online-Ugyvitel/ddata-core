@@ -1,24 +1,23 @@
 import { DdataCoreError } from './ddata-core-error';
 
 describe('DdataCoreError', () => {
-
   describe('Model Creation', () => {
-    it('should throw error when created with no parameters', () => {
+    it('should not throw error when created with no parameters', () => {
       expect(() => {
         new DdataCoreError();
-      }).toThrow('Cannot read properties of undefined (reading \'error\')');
+      }).not.toThrow();
     });
 
-    it('should throw error when created with undefined originalError', () => {
+    it('should not throw error when created with undefined originalError', () => {
       expect(() => {
         new DdataCoreError(undefined);
-      }).toThrow('Cannot read properties of undefined (reading \'error\')');
+      }).not.toThrow();
     });
 
-    it('should throw error when created with null originalError', () => {
+    it('should not throw error when created with null originalError', () => {
       expect(() => {
         new DdataCoreError(null);
-      }).toThrow('Cannot read properties of null (reading \'error\')');
+      }).not.toThrow();
     });
 
     it('should create an instance with valid originalError', () => {
@@ -28,7 +27,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(DdataCoreError);
     });
@@ -38,7 +37,7 @@ describe('DdataCoreError', () => {
     it('should initialize msg property to empty string', () => {
       const originalError = { error: {} };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
       expect(typeof error.msg).toBe('string');
     });
@@ -46,27 +45,27 @@ describe('DdataCoreError', () => {
     it('should have originalError property accessible', () => {
       const originalError = { test: 'value', error: {} };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.originalError).toBe(originalError);
     });
   });
 
   describe('Constructor Logic - No Error Processing', () => {
-    it('should throw error when originalError is undefined', () => {
+    it('should not throw error when originalError is undefined', () => {
       expect(() => {
         new DdataCoreError(undefined);
-      }).toThrow('Cannot read properties of undefined (reading \'error\')');
+      }).not.toThrow();
     });
 
-    it('should throw error when originalError is null', () => {
+    it('should not throw error when originalError is null', () => {
       expect(() => {
         new DdataCoreError(null);
-      }).toThrow('Cannot read properties of null (reading \'error\')');
+      }).not.toThrow();
     });
 
     it('should not process when originalError is empty object', () => {
       const error = new DdataCoreError({});
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -75,7 +74,7 @@ describe('DdataCoreError', () => {
         error: undefined
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -84,7 +83,7 @@ describe('DdataCoreError', () => {
         error: null
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -93,7 +92,7 @@ describe('DdataCoreError', () => {
         error: false
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -102,7 +101,7 @@ describe('DdataCoreError', () => {
         error: ''
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -111,7 +110,7 @@ describe('DdataCoreError', () => {
         error: 0
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
   });
@@ -124,7 +123,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -135,7 +134,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -146,7 +145,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -157,7 +156,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -168,7 +167,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
   });
@@ -181,7 +180,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
   });
@@ -199,7 +198,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -215,7 +214,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -231,7 +230,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -247,7 +246,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -263,7 +262,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
   });
@@ -281,7 +280,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -297,7 +296,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -313,7 +312,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
 
@@ -329,7 +328,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
   });
@@ -347,7 +346,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('app/Http/Controllers/TestController.php:123');
     });
 
@@ -363,7 +362,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('app/Http/Controllers/Admin/UserController.php:456');
     });
 
@@ -379,7 +378,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('/var/www/html/app/Http/Controllers/ApiController.php:789');
     });
 
@@ -395,7 +394,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('C:\\projects\\myapp\\app\\Http\\Controllers\\HomeController.php:101');
     });
   });
@@ -417,8 +416,10 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
-      expect(error.msg).toBe('app/Http/Controllers/FirstController.php:123app/Http/Controllers/SecondController.php:456');
+
+      expect(error.msg).toBe(
+        'app/Http/Controllers/FirstController.php:123app/Http/Controllers/SecondController.php:456'
+      );
     });
 
     it('should process only matching trace items from mixed array', () => {
@@ -445,8 +446,10 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
-      expect(error.msg).toBe('app/Http/Controllers/TestController.php:123app/Http/Controllers/AnotherController.php:456');
+
+      expect(error.msg).toBe(
+        'app/Http/Controllers/TestController.php:123app/Http/Controllers/AnotherController.php:456'
+      );
     });
 
     it('should handle trace items with missing properties in mixed array', () => {
@@ -473,13 +476,15 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
-      expect(error.msg).toBe('app/Http/Controllers/FirstController.php:123app/Http/Controllers/ThirdController.php:789');
+
+      expect(error.msg).toBe(
+        'app/Http/Controllers/FirstController.php:123app/Http/Controllers/ThirdController.php:789'
+      );
     });
   });
 
   describe('Constructor Logic - Edge Cases', () => {
-    it('should throw error when trace item has non-string file', () => {
+    it('should not throw error when trace item has non-string file', () => {
       const originalError = {
         error: {
           trace: [
@@ -490,13 +495,13 @@ describe('DdataCoreError', () => {
           ]
         }
       };
-      
+
       expect(() => {
         new DdataCoreError(originalError);
-      }).toThrow('trace.file.match is not a function');
+      }).not.toThrow();
     });
 
-    it('should throw error when trace item has null file', () => {
+    it('should not throw error when trace item has null file', () => {
       const originalError = {
         error: {
           trace: [
@@ -507,13 +512,13 @@ describe('DdataCoreError', () => {
           ]
         }
       };
-      
+
       expect(() => {
         new DdataCoreError(originalError);
-      }).toThrow('Cannot read properties of null');
+      }).not.toThrow();
     });
 
-    it('should throw error when trace item has object file', () => {
+    it('should not throw error when trace item has object file', () => {
       const originalError = {
         error: {
           trace: [
@@ -524,13 +529,13 @@ describe('DdataCoreError', () => {
           ]
         }
       };
-      
+
       expect(() => {
         new DdataCoreError(originalError);
-      }).toThrow('trace.file.match is not a function');
+      }).not.toThrow();
     });
 
-    it('should throw error when trace item has array file', () => {
+    it('should not throw error when trace item has array file', () => {
       const originalError = {
         error: {
           trace: [
@@ -541,13 +546,13 @@ describe('DdataCoreError', () => {
           ]
         }
       };
-      
+
       expect(() => {
         new DdataCoreError(originalError);
-      }).toThrow('trace.file.match is not a function');
+      }).not.toThrow();
     });
 
-    it('should throw error when trace item has boolean file', () => {
+    it('should not throw error when trace item has boolean file', () => {
       const originalError = {
         error: {
           trace: [
@@ -558,10 +563,10 @@ describe('DdataCoreError', () => {
           ]
         }
       };
-      
+
       expect(() => {
         new DdataCoreError(originalError);
-      }).toThrow('trace.file.match is not a function');
+      }).not.toThrow();
     });
 
     it('should handle trace item with non-number line', () => {
@@ -576,7 +581,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('app/Http/Controllers/TestController.php:not-a-number');
     });
 
@@ -592,7 +597,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('app/Http/Controllers/TestController.php:0');
     });
 
@@ -608,21 +613,21 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('app/Http/Controllers/TestController.php:-5');
     });
 
-    it('should throw error when trace array that is not an array', () => {
+    it('should not throw error when trace array that is not an array', () => {
       const originalError = {
         error: {
           trace: 'not-an-array'
         }
       };
-      
+
       // This should throw an error since forEach is called on a non-array
       expect(() => {
         new DdataCoreError(originalError);
-      }).toThrow('originalError.error.trace.forEach is not a function');
+      }).not.toThrow();
     });
 
     it('should handle trace array with non-object items', () => {
@@ -640,7 +645,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       // Only the valid object should be processed
       expect(error.msg).toBe('app/Http/Controllers/TestController.php:123');
     });
@@ -650,23 +655,22 @@ describe('DdataCoreError', () => {
     it('should have msg property of string type', () => {
       const originalError = { error: {} };
       const error = new DdataCoreError(originalError);
-      
+
       expect(typeof error.msg).toBe('string');
     });
 
     it('should have originalError property accessible', () => {
       const originalError = { test: 'value', error: {} };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.originalError).toBe(originalError);
       expect(error.hasOwnProperty('originalError') || 'originalError' in error).toBe(true);
     });
 
-    it('should not allow originalError to be undefined in successful construction', () => {
-      // Since undefined originalError throws an error, we test that it doesn't allow undefined
+    it('should accept an undefined originalError', () => {
       expect(() => {
         new DdataCoreError(undefined);
-      }).toThrow();
+      }).not.toThrow();
     });
   });
 
@@ -702,8 +706,10 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
-      expect(error.msg).toBe('/var/www/html/app/Http/Controllers/Api/UserController.php:42/var/www/html/app/Http/Controllers/Admin/AdminController.php:78');
+
+      expect(error.msg).toBe(
+        '/var/www/html/app/Http/Controllers/Api/UserController.php:42/var/www/html/app/Http/Controllers/Admin/AdminController.php:78'
+      );
     });
 
     it('should handle realistic error with no controller traces', () => {
@@ -731,7 +737,7 @@ describe('DdataCoreError', () => {
         }
       };
       const error = new DdataCoreError(originalError);
-      
+
       expect(error.msg).toBe('');
     });
   });
