@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NotificationType } from '../../models/base/base-data.type';
 import { BaseModelInterface } from '../../models/base/base-model.model';
@@ -9,7 +8,6 @@ import { NotificationService } from './notification.service';
 describe('NotificationService', () => {
   let service: NotificationService;
   let emissions: Array<Array<NotificationInterface>>;
-
   const success = 'success' as NotificationType;
   const warning = 'warning' as NotificationType;
   const lastEmission = (): Array<NotificationInterface> => emissions[emissions.length - 1];
@@ -48,7 +46,10 @@ describe('NotificationService', () => {
       service.add('Title 2', 'Text 2', warning);
 
       expect(emissions.map((emission) => emission.length)).toEqual([1, 2]);
-      expect(lastEmission().map((notification) => notification.title)).toEqual(['Title 1', 'Title 2']);
+      expect(lastEmission().map((notification) => notification.title)).toEqual([
+        'Title 1',
+        'Title 2'
+      ]);
       tick(7000);
     }));
 
@@ -90,7 +91,10 @@ describe('NotificationService', () => {
 
       service.delete(1);
 
-      expect(lastEmission().map((notification) => notification.title)).toEqual(['Title 1', 'Title 3']);
+      expect(lastEmission().map((notification) => notification.title)).toEqual([
+        'Title 1',
+        'Title 3'
+      ]);
       tick(7000);
     }));
 
@@ -126,7 +130,9 @@ describe('NotificationService', () => {
       service.showValidationError(modelWith(['Single Field']));
 
       expect(lastEmission()[0].text).toBe('A következő mezők rosszul lettek kitöltve:<br>');
-      expect(lastEmission()[1].text).toBe('A következő mezők rosszul lettek kitöltve:<br>Single Field');
+      expect(lastEmission()[1].text).toBe(
+        'A következő mezők rosszul lettek kitöltve:<br>Single Field'
+      );
       tick(7000);
     }));
   });
