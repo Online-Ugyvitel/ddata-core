@@ -434,20 +434,20 @@ export class User extends BaseModel {
 ## Dependencies
 
 **Core Dependencies:**
-- **@netdjw/ddata-core** (^0.3.8) - **REQUIRED** - Provides BaseModel, validation, field definitions, and data management
-- **@angular/common** (>=13.2.3) - Angular common module for directives and pipes
-- **@angular/core** (>=13.2.3) - Angular core framework
+- **@netdjw/ddata-core** (^0.3.17) - **REQUIRED** - Provides BaseModel, validation, field definitions, and data management
+- **@angular/common** (>=22.1.1 <23) - Angular common module for directives and pipes
+- **@angular/core** (>=22.1.1 <23) - Angular core framework
 
 **UI Enhancement Dependencies:**
 - **@fortawesome/angular-fontawesome** (>=0.7.0) - Icon components (used in checkbox, buttons)
 - **@fortawesome/fontawesome-svg-core** (>=1.2.30) - FontAwesome core library
 - **@fortawesome/free-solid-svg-icons** (>=5.14.0) - Solid icon set (check, square, calendar, clock icons)
 - **@ng-bootstrap/ng-bootstrap** (>=12.0.0) - Bootstrap components (date picker integration)
-- **ngx-color-picker** (^10.0.1) - Advanced color picker with palettes and formats
-- **ngx-material-timepicker** (^5.5.3) - Material Design time picker component
+- **ngx-color-picker** (^20.0.0) - Advanced color picker with palettes and formats
+- **@dhutaryan/ngx-mat-timepicker** (^21.0.0) - Material Design time picker (replaces ngx-material-timepicker)
 
 **Utility Dependencies:**
-- **@netdjw/ddata-ui-common** (^0.1.17) - Shared UI utilities and base components
+- **@netdjw/ddata-ui-common** (^0.1.20) - Shared UI utilities and base components
 - **moment** (^2.27.0) - Date/time manipulation and formatting
 - **@angular/localize** (>=12.2.11) - Internationalization support
 - **pluralize** (^8.0.0) - English pluralization rules (for word counters)
@@ -458,7 +458,7 @@ export class User extends BaseModel {
 - **FontAwesome**: Provides consistent iconography across all input components
 - **ng-bootstrap**: Powers the professional date picker experience
 - **ngx-color-picker**: Enables advanced color selection with RGB, HSL, HEX support  
-- **ngx-material-timepicker**: Provides intuitive time selection with 12/24 hour formats
+- **@dhutaryan/ngx-mat-timepicker**: Provides intuitive time selection with 12/24 hour formats
 - **moment**: Handles complex date operations and formatting consistently
 - **pluralize**: Enables intelligent word counting (e.g., "1 word" vs "2 words")
 
@@ -468,11 +468,7 @@ export class User extends BaseModel {
 import { DdataUiInputModule } from '@netdjw/ddata-ui-input';
 
 @NgModule({
-  imports: [
-    DdataUiInputModule,
-    // If using standalone components:
-    DdataUiInputModule.forRoot()
-  ]
+  imports: [DdataUiInputModule] // NgModule-based; there is NO forRoot() and no standalone components
 })
 export class AppModule { }
 ```
@@ -2630,4 +2626,123 @@ export class User extends BaseModel {
 }
 ```
 
-This comprehensive documentation provides everything needed to understand, implement, and troubleshoot ddata-ui-input components effectively, with real-world examples demonstrating the significant benefits over custom implementations.
+---
+
+## Public API Index (machine-readable summary)
+
+Unless noted otherwise, the symbols below are exported from `@netdjw/ddata-ui-input` (`projects/ddata-ui-input/src/public-api.ts`). The library is **NgModule-based**: all components are declared in `DdataUiInputModule` (`standalone: false`); there is no `forRoot()`.
+
+| Symbol | Kind | Selector / Notes | Exported by NgModule |
+|--------|------|------------------|----------------------|
+| `DdataUiInputModule` | NgModule | import once where inputs are used; provides `provideNativeDateTimeAdapter()` | - |
+| `DdataInputComponent` | component | `dd-input` | yes |
+| `DdataInputCheckboxComponent` | component | `dd-input-checkbox` | yes |
+| `DdataInputColorComponent` | component | `dd-input-color` | yes |
+| `DdataInputDateComponent` | component | `dd-input-date` | yes |
+| `DdataInputTimeComponent` | component | `dd-input-time` | yes |
+| `DdataTextareaComponent` | component | `dd-textarea` | yes |
+| `DdataSelectComponent` | component | `dd-select` (wrapper, delegates by `mode`) | yes |
+| `DdataSimpleSelectComponent` | component | `dd-simple-select` | yes |
+| `DdataAutocompleteSelectComponent` | component | `dd-autocomplete-select` | yes |
+| `DdataMultipleSelectComponent` | component | `dd-multiple-select` | yes |
+| `DdataMultipleSelectDialogComponent` | component | `dd-multiple-select-dialog` | yes |
+| `DdataInputSearchComponent` | component | `dd-search` | yes |
+| `CharacterCounterComponent` | component | `character-counter` (element selector) | yes |
+| `WordCounterComponent` | component | `dd-word-counter`; declared in the module but **neither exported by the module nor by `public-api.ts`** (internal; used by `dd-input`/`dd-textarea`) | no |
+| `DescriptionPipe` | pipe | see DescriptionPipe section | yes |
+| `InputHelperService` / `InputHelperServiceInterface` | service / interface | see InputHelperService section | - |
+| `SelectType` | type | `'simple' \| 'single' \| 'multiple' \| 'autocomplete'` | - |
+| `DialogContentItem`, `DialogContentWithOptions`, `DialogContentInterface`, `OptionsInterface`, `DialogContentWithOptionsInterface` | models | dialog configuration | - |
+| `IconSetInterface` | interface | `{ [key: string]: IconDefinition }` | - |
+| `SearchInterface`, `SearchUIFieldsInterface`, `SearchModel`, `SearchResultInterface`, `SearchResultModel` | models | used by `dd-search` | - |
+
+Note: `ComponentRendererService` (`lib/services/select/component-renderer.service.ts`) is **not** in `public-api.ts`; it is internal to the multiple-select dialog.
+
+## Select Sub-Components
+
+`dd-select` renders one of the sub-components according to `mode: SelectType`. They can also be used directly. Shared inputs (all four select components): `wrapperClass='d-flex flex-wrap'`, `inputBlockClass='col-12 d-flex px-0'`, `inputBlockExtraClass='col-md-9'`, `labelClass='col-12 col-md-3 px-0 col-form-label'`, `showLabel=true`, `labelText=''`, `prepend=''`, `append=''`, `isRequired=false`, `disabled=false`, `disabledAppearance=false`, `addEmptyOption=true`, `model`, `field='id'`, `items: Array<unknown>=[]`, `text='name'`, `valueField='id'`. Shared outputs: `selected: EventEmitter<unknown>`, `selectModel: EventEmitter<unknown>`.
+
+| Component | Extra inputs | Extra outputs/methods | `unselectedText` default |
+|-----------|--------------|-----------------------|--------------------------|
+| `DdataSimpleSelectComponent` | - | `selectItem(): void` | `'Válassz'` |
+| `DdataAutocompleteSelectComponent` | - | `onInputFocus()`, `onInput(event)`, `onKeydown(event: KeyboardEvent)` (arrow/enter navigation), `selectItem(item, index?)`, `getOptionId(index)`, `getActiveDescendant()`; closes on outside click (`onClickOutside`) | `'Válassz vagy írj...'` |
+| `DdataMultipleSelectComponent` | `mode: SelectType='multiple'`, `disableShowSelectedItems=false`, `showIcon=false`, `selectedElementsBlockClass`, `selectedElementsBlockExtraClass`, `dialogSettings: DialogContentWithOptionsInterface` | `showModal()`, `hideModal()`, `deleteFromMultipleSelectedList(item)`, `getObjectFieldName()` | `'Válassz'` |
+| `DdataMultipleSelectDialogComponent` | `settings`, `method: 'create-edit' \| 'list'='list'`, `mode`, `model`, `field`, `text`, `valueField`, `items`, `modalTitle='Dialog'` | output `selectionFinished`; `hideModal()` | - |
+
+```html
+<dd-autocomplete-select [model]="user" field="countryId" [items]="countries" text="name" valueField="id"
+  (selected)="onCountry($event)"></dd-autocomplete-select>
+
+<dd-multiple-select [model]="user" field="roles" [items]="roles" mode="multiple"
+  [dialogSettings]="dialogSettings"></dd-multiple-select>
+```
+
+```typescript
+import { DialogContentWithOptionsInterface } from '@netdjw/ddata-ui-input';
+
+dialogSettings: DialogContentWithOptionsInterface = {
+  listComponent: RoleListComponent,          // component rendered in the dialog
+  listOptions: {
+    multipleSelectEnabled: true,
+    isSelectionList: true,
+    loadData: true,                           // false => use `models` below
+    filter: { active: true },
+    models: []                                // only used when loadData === false
+  },
+  createEditComponent: RoleEditComponent,     // optional, for method='create-edit'
+  createEditOptions: { isModal: true }
+};
+```
+
+### Dialog models
+
+```typescript
+interface OptionsInterface {
+  saveModel?: Observable<unknown>; select?: Observable<unknown>; isModal?: boolean;
+  multipleSelectEnabled?: boolean; isSelectionList?: boolean; selectedElements?: Array<unknown>;
+  models?: Array<unknown>; loadData?: boolean; filter?: unknown; datasArrived?: BehaviorSubject<number>;
+}
+interface DialogContentInterface extends OptionsInterface { component: unknown; data: unknown; }
+interface DialogContentWithOptionsInterface {
+  createEditComponent?: Type<unknown>; createEditOptions?: OptionsInterface;
+  listComponent?: Type<unknown>; listOptions?: OptionsInterface;
+}
+class DialogContentItem { constructor(public component: Type<unknown>, public data: unknown) {} }
+class DialogContentWithOptions { constructor(public component: Type<unknown>, public options: unknown) {} }
+```
+
+A component used as `listComponent`/`createEditComponent` should implement the `OptionsInterface` fields it relies on (`selectedElements`, `models`, `datasArrived`, ...), because the renderer sets them on the created instance.
+
+### ComponentRendererService (internal)
+
+Fluent API (every setter returns the service): `setMethod('create-edit' | 'list' = 'list')`, `setSettings(settings)`, `setDialogHost(viewContainerRef)` (logs error on falsy), `setComponentRef(ref)`, `render(): DialogContentInterface | undefined` (clears host, creates component, sets `model` if present, for `list` applies `multipleSelectEnabled`, `isSelectionList`, `loadData`, `filter ?? {}`, preset `models` + `datasArrived.next(Math.random())` when `loadData` is falsy; always sets `isModal = true`), `getSelectedModels()` (`[]` if no instance), `setSelectedModels(models)` (`null` -> `[]`), `resetSelectedModels()`. Constructed with `new ComponentRendererService(changeDetectorRef)`.
+
+## Counter Components
+
+`CharacterCounterComponent` (`<character-counter>`): inputs `maxLength: number = 0`, `currentLength: string | null | undefined` (setter; falsy -> `''`; despite its name it receives the **text**, not a number).
+
+`WordCounterComponent` (`<dd-word-counter>`, OnPush): inputs `maxLength = 0`, `currentLength: string | null | undefined` (setter; falsy values are ignored, so the previous text stays); output `maxLengthReached: EventEmitter<boolean>`; `static countWords(value: unknown): number` (returns `0` for non-strings/empty, otherwise `value.split(',').length` — words are **comma separated**, i.e. it counts tags/keywords); `wordsNumber(): number` (emits `maxLengthReached` with `maxLength > 0 && count > maxLength`). Normally enabled via `[enableCharacterCounter]` / `[enableWordCounter]` on `dd-input` and `dd-textarea` rather than used directly.
+
+## Search and Icon Models
+
+```typescript
+interface SearchUIFieldsInterface { searchText: string; name: string; description: string; type: string; found_model_name: string; url: string; }
+interface SearchInterface extends SearchUIFieldsInterface, BaseModelInterface<SearchInterface>, BaseModelWithoutTypeDefinitionInterface { id: ID; icon: IconDefinition; }
+interface SearchResultInterface {
+  id: ID; name: string; description: string;
+  type: string;              // table the result comes from
+  found_model_name: string;
+  icon: IconDefinition;      // FontAwesome icon shown before the result
+  url: string;               // result is rendered as a link to this URL
+  init(data?: unknown): SearchResultInterface;
+}
+interface IconSetInterface { [key: string]: IconDefinition; }
+```
+
+## Development Notes for Agents
+
+- Source: `projects/ddata-ui-input/src`; per-component docs: `projects/ddata-ui-input/src/doc/*.md`; testing rules: `.github/instructions/ddata-ui-input-testing.instructions.md`.
+- Every new public symbol must be exported from `public-api.ts`, declared (and, if usable by consumers, exported) in `ddata-ui-input.module.ts`, and have a `*.spec.ts`.
+- Components are `standalone: false`; do not add `imports` to `@Component`.
+- Peer dependencies are in `projects/ddata-ui-input/package.json` (Angular `>=22.1.1 <23`); bump the package version when publishing changes.
+- Build/test: `ng build ddata-ui-input`, `ng test ddata-ui-input --watch=false --browsers=ChromeHeadless`.
