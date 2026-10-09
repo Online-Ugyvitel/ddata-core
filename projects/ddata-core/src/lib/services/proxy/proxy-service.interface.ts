@@ -4,6 +4,7 @@ import { BaseModelInterface } from '../../models/base/base-model.model';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { FileUploadProcessInterface } from '../../models/file/file-upload-process.interface';
 import { DataServiceAbstractInterface } from '../data/data-service-abstract.interface';
+import { RequestHeaders } from '../remote-data/request-headers.type';
 
 export interface ProxyServiceInterface<T extends BaseModelInterface<T>>
   extends DataServiceAbstractInterface<T> {
@@ -13,7 +14,7 @@ export interface ProxyServiceInterface<T extends BaseModelInterface<T>>
   getAllSortedByDesc(fieldName: string): Observable<Array<T>>;
   getAllWithoutPaginate(): Observable<Array<T>>;
   getPage(pageNumber: number): Observable<PaginateInterface>;
-  getUri(uri: string): Observable<any>;
+  getUri(uri: string, headers?: RequestHeaders): Observable<any>;
 
   findById(id: number): Observable<T>;
   findByField(fieldName: string, value: any): Observable<T>;
@@ -21,7 +22,8 @@ export interface ProxyServiceInterface<T extends BaseModelInterface<T>>
   search(data: any, pageNumber: number): Observable<PaginateInterface>;
   searchWithoutPaginate(data: any): Observable<Array<T>>;
 
-  postUri(data: any, uri: string): Observable<any>;
+  postUri(data: any, uri: string, headers?: RequestHeaders): Observable<any>;
+  putUri(data: any, uri: string, headers?: RequestHeaders): Observable<any>;
 
   save(model: T): Observable<number>;
 

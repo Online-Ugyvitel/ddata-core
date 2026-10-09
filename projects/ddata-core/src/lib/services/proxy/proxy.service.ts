@@ -15,6 +15,7 @@ import { NotificationServiceInterface } from '../notification/notification-servi
 import { NotificationService } from '../notification/notification.service';
 import { RemoteDataServiceInterface } from '../remote-data/remote-data-service.interface';
 import { RemoteDataService } from '../remote-data/remote-data.service';
+import { RequestHeaders } from '../remote-data/request-headers.type';
 
 // @dynamic
 @Injectable({
@@ -95,12 +96,16 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     }
   }
 
-  getUri(uri: string): Observable<any> {
-    return this.remoteStorageService.getUri(uri).pipe(map((result: any) => result));
+  getUri(uri: string, headers?: RequestHeaders): Observable<any> {
+    return this.remoteStorageService.getUri(uri, headers).pipe(map((result: any) => result));
   }
 
-  postUri(data: any, uri: string): Observable<any> {
-    return this.remoteStorageService.postUri(data, uri).pipe(map((result: any) => result));
+  postUri(data: any, uri: string, headers?: RequestHeaders): Observable<any> {
+    return this.remoteStorageService.postUri(data, uri, headers).pipe(map((result: any) => result));
+  }
+
+  putUri(data: any, uri: string, headers?: RequestHeaders): Observable<any> {
+    return this.remoteStorageService.putUri(data, uri, headers).pipe(map((result: any) => result));
   }
 
   findById(id: number): Observable<T> {

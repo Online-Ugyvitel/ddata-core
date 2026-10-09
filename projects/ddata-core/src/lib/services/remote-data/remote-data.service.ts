@@ -24,6 +24,7 @@ import { DataServiceAbstract } from '../data/data-service.abstract';
 import { EnvService } from '../env/env.service';
 import { DdataCoreError } from '../error-handler/ddata-core-error';
 import { RemoteDataServiceInterface } from './remote-data-service.interface';
+import { RequestHeaders } from './request-headers.type';
 
 // @dynamic
 export class RemoteDataService<T extends BaseModelInterface<T>>
@@ -235,6 +236,7 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    * url will be "http://www.yourdomain.com/api/my/custom/uri"
    *
    * @param uri unique URI string
+   * @param headers optional request headers, merged over the default headers
    * @returns Observabe, any
    *
    * @example
@@ -247,27 +249,28 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    *   this.myRemotStorageService.getUri(uri).subscribe();
    * }
    */
-  getUri(uri: string): Observable<any> {
-    this.setupHeaders();
+  getUri(uri: string, headers?: RequestHeaders): Observable<any> {
+    const options = this.getUriOptions(headers);
     const url = this.url + uri;
 
     if (!!this.appEnv.environment.debug) {
       console.log('URL - getUri()', url);
     }
 
-    return this.http.get(url, this.options).pipe(map((result: any) => result));
+    return this.http.get(url, options).pipe(map((result: any) => result));
   }
 
   /**
-   * Send HTTP POST request to the API endpoint's unique URI
+   * Send HTTP POST request to the model's API endpoint and a custom URI.
    *
-   * The requested URL will be constructed like this: {environment.apiUrl}/{uri}
+   * The requested URL is {environment.apiUrl}{model.api_endpoint}{uri}.
    *
-   * If the ApiUrl is "http://www.yourdomain.com/api" and the custom URI is "my/custom/uri", then your
-   * url will be "http://www.yourdomain.com/api/my/custom/uri"
+   * For apiUrl "http://www.yourdomain.com/api", model endpoint "/post" and URI "/filter",
+   * the URL is "http://www.yourdomain.com/api/post/filter".
    *
    * @param resource any data
    * @param uri unique URI string
+   * @param headers optional request headers, merged over the default headers
    * @returns Observabe, any
    *
    * @example
@@ -277,11 +280,11 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    *
    * load() {
    *   const uri = '/filter/by/user/42';
-   *   this.myRemotStorageService.getUri(uri).subscribe();
+   *   this.myRemotStorageService.postUri({ active: true }, uri).subscribe();
    * }
    */
-  postUri(resource: any, uri: string): Observable<any> {
-    this.setupHeaders();
+  postUri(resource: any, uri: string, headers?: RequestHeaders): Observable<any> {
+    const options = this.getUriOptions(headers);
     const url = this.url + this.model.api_endpoint + uri;
 
     if (!!this.appEnv.environment.debug) {
@@ -289,8 +292,39 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
     }
 
     return this.http
-      .post(url, JSON.stringify(resource), this.options)
+      .post(url, JSON.stringify(resource), options)
       .pipe(map((result: any) => result));
+  }
+
+  /**
+   * Send a PUT request to {environment.apiUrl}{model.api_endpoint}{uri}.
+   *
+   * @param resource data to serialize as JSON
+   * @param uri URI relative to the model's API endpoint
+   * @param headers optional request headers, merged over the default headers
+   * @returns Observable of the unmodified response
+   */
+  putUri(resource: any, uri: string, headers?: RequestHeaders): Observable<any> {
+    const options = this.getUriOptions(headers);
+    const url = this.url + this.model.api_endpoint + uri;
+
+    if (!!this.appEnv.environment.debug) {
+      console.log('URL - putUri()', url);
+    }
+
+    return this.http.put(url, JSON.stringify(resource), options).pipe(map((result: any) => result));
+  }
+
+  private getUriOptions(headers?: RequestHeaders): { headers: HttpHeaders; responseType: 'json' } {
+    this.setupHeaders();
+    const customHeaders = headers instanceof HttpHeaders ? headers : new HttpHeaders(headers);
+    let requestHeaders: HttpHeaders = this.headers;
+
+    for (const name of customHeaders.keys()) {
+      requestHeaders = requestHeaders.set(name, customHeaders.getAll(name));
+    }
+
+    return { ...this.options, headers: requestHeaders };
   }
 
   /**
