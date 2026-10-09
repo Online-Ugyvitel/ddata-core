@@ -19,12 +19,13 @@ import {
   SpinnerService,
   SpinnerServiceInterface
 } from 'ddata-core';
-import { BehaviorSubject, fromEvent, Observable } from 'rxjs';
+import { BehaviorSubject, EMPTY, fromEvent, Observable } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
   finalize,
   map,
+  skip,
   switchMap,
   take,
   takeUntil,
@@ -94,6 +95,10 @@ export class DdataInputSearchComponent implements OnDestroy {
     // close previous connection
     this.isActive.next(false);
 
+    if (!this.searchInput) {
+      return EMPTY;
+    }
+
     return fromEvent(this.searchInput.nativeElement, 'keyup').pipe(
       // run after 500 ms of last keyup
       debounceTime(500),
@@ -102,7 +107,7 @@ export class DdataInputSearchComponent implements OnDestroy {
       distinctUntilChanged(),
 
       // run only if search input is still active and value is not empty string
-      takeUntil(this.isActive),
+      takeUntil(this.isActive.pipe(skip(1))),
 
       // switch on spinner
       tap(() => this.spinner.on('search')),
@@ -128,7 +133,7 @@ export class DdataInputSearchComponent implements OnDestroy {
       .getPage(turnToPage)
       .pipe(
         // run only if search input is still active and value is not empty string
-        takeUntil(this.isActive),
+        takeUntil(this.isActive.pipe(skip(1))),
 
         // take only last result
         take(1),
@@ -146,7 +151,9 @@ export class DdataInputSearchComponent implements OnDestroy {
         // switch off spinner
         finalize(() => this.spinner.off('global-search-change-page'))
       )
-      .subscribe();
+      .subscribe({
+        error: (error: unknown) => console.error('Changing the page of the search result failed', error)
+      });
   }
 
   go(model: SearchResultInterface): void {
