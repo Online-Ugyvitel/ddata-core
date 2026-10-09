@@ -1,4 +1,4 @@
-import { Injector } from '@angular/core';
+import { Injector, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -15,7 +15,8 @@ describe('DdataUiFileListComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [Injector],
-      declarations: [DdataUiFileListComponent]
+      declarations: [DdataUiFileListComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
@@ -77,6 +78,6 @@ describe('DdataUiFileListComponent', () => {
     ];
     component.setPrimaryImage(new FileModel().init({ file_name_slug: 'b' }));
 
-    expect(component.model.files[1].is_primary).toBeTrue();
+    expect(component.model.files[1].is_primary).toBe(true);
   });
 });

@@ -1,15 +1,18 @@
+import type { Mock } from 'vitest';
 import { BadRequest } from './bad-request-error';
 import { DdataCoreError } from './ddata-core-error';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 describe('BadRequest', () => {
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let consoleErrorSpy: jasmine.Spy;
+  let mockNotificationService: any;
+  let consoleErrorSpy: Mock;
 
   beforeEach(() => {
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['add']);
-    consoleErrorSpy = spyOn(console, 'error');
+    mockNotificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
+    consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   describe('Constructor', () => {
@@ -103,7 +106,7 @@ describe('BadRequest', () => {
       const originalError = { error: { message: 'Test error' } };
 
       new BadRequest(originalError, mockNotificationService);
-      const [title, message, type] = mockNotificationService.add.calls.argsFor(0);
+      const [title, message, type] = vi.mocked(mockNotificationService.add).mock.calls[0];
 
       expect(title).toBe('Hiba');
       expect(message).toBe('Valami hiba történt a szerveren!<br>Kérlek próbáld meg később');

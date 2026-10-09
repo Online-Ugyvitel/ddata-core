@@ -17,18 +17,21 @@ describe('DdataAutocompleteSelectComponent', () => {
     Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
       writable: true,
       value: {
-        get: jasmine.createSpy('get').and.returnValue({
-          validateFieldValue: jasmine.createSpy('validateFieldValue'),
-          createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('unique-id-123'),
-          randChars: jasmine.createSpy('randChars').and.returnValue('random-123'),
-          getTitle: jasmine.createSpy('getTitle').and.returnValue('Test Title'),
-          getLabel: jasmine.createSpy('getLabel').and.returnValue('Test Label'),
-          getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue('Test Placeholder'),
-          getPrepend: jasmine.createSpy('getPrepend').and.returnValue(''),
-          getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
-          isRequired: jasmine.createSpy('isRequired').and.returnValue(false),
-          validateField: jasmine.createSpy('validateField').and.returnValue([])
-        })
+        get: vi
+          .fn()
+          .mockName('get')
+          .mockReturnValue({
+            validateFieldValue: vi.fn().mockName('validateFieldValue'),
+            createUniqueId: vi.fn().mockName('createUniqueId').mockReturnValue('unique-id-123'),
+            randChars: vi.fn().mockName('randChars').mockReturnValue('random-123'),
+            getTitle: vi.fn().mockName('getTitle').mockReturnValue('Test Title'),
+            getLabel: vi.fn().mockName('getLabel').mockReturnValue('Test Label'),
+            getPlaceholder: vi.fn().mockName('getPlaceholder').mockReturnValue('Test Placeholder'),
+            getPrepend: vi.fn().mockName('getPrepend').mockReturnValue(''),
+            getAppend: vi.fn().mockName('getAppend').mockReturnValue(''),
+            isRequired: vi.fn().mockName('isRequired').mockReturnValue(false),
+            validateField: vi.fn().mockName('validateField').mockReturnValue([])
+          })
       }
     });
   });
@@ -36,13 +39,13 @@ describe('DdataAutocompleteSelectComponent', () => {
   beforeEach(async () => {
     // Create mock input element
     mockInputElement = document.createElement('input');
-    mockInputElement.blur = jasmine.createSpy('blur');
+    mockInputElement.blur = vi.fn().mockName('blur');
 
     // Create mock ElementRef
     mockElementRef = {
       nativeElement: {
-        contains: jasmine.createSpy('contains').and.returnValue(false),
-        querySelector: jasmine.createSpy('querySelector').and.returnValue(mockInputElement)
+        contains: vi.fn().mockName('contains').mockReturnValue(false),
+        querySelector: vi.fn().mockName('querySelector').mockReturnValue(mockInputElement)
       }
     } as ElementRef;
 
@@ -206,7 +209,9 @@ describe('DdataAutocompleteSelectComponent', () => {
     });
 
     it('should handle input event and filter items', () => {
-      const event = { target: { value: 'ap' } } as Event & { target: HTMLInputElement };
+      const event = { target: { value: 'ap' } } as Event & {
+        target: HTMLInputElement;
+      };
 
       component.onInput(event);
 
@@ -218,7 +223,9 @@ describe('DdataAutocompleteSelectComponent', () => {
     });
 
     it('should handle empty input value', () => {
-      const event = { target: { value: '' } } as Event & { target: HTMLInputElement };
+      const event = { target: { value: '' } } as Event & {
+        target: HTMLInputElement;
+      };
 
       component.onInput(event);
 
@@ -235,7 +242,7 @@ describe('DdataAutocompleteSelectComponent', () => {
     it('should handle ArrowDown key', () => {
       const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
 
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       component.onKeydown(event);
 
@@ -247,7 +254,7 @@ describe('DdataAutocompleteSelectComponent', () => {
       component.selectedIndex = 1;
       const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
 
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       component.onKeydown(event);
 
@@ -259,8 +266,8 @@ describe('DdataAutocompleteSelectComponent', () => {
       component.selectedIndex = 1;
       const event = new KeyboardEvent('keydown', { key: 'Enter' });
 
-      spyOn(event, 'preventDefault');
-      spyOn(component, 'selectItem');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
+      vi.spyOn(component, 'selectItem').mockReturnValue(undefined);
 
       component.onKeydown(event);
 
@@ -270,12 +277,12 @@ describe('DdataAutocompleteSelectComponent', () => {
 
     it('should handle Escape key', () => {
       // Ensure the blur spy is properly set up for this test
-      const blur = jasmine.createSpy('blur');
+      const blur = vi.fn().mockName('blur');
 
       component.inputBox.nativeElement.blur = blur;
       const event = new KeyboardEvent('keydown', { key: 'Escape' });
 
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
       component.onKeydown(event);
 
       expect(event.preventDefault).toHaveBeenCalledWith();
@@ -362,8 +369,8 @@ describe('DdataAutocompleteSelectComponent', () => {
 
   describe('Item Selection', () => {
     it('should select item and emit events', () => {
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
       const testItem = { id: 1, name: 'Apple' };
 
       component.selectItem(testItem);
@@ -388,7 +395,7 @@ describe('DdataAutocompleteSelectComponent', () => {
       component.isOpen = true;
       component.selectedIndex = 1;
       component.filteredItems = component.items;
-      spyOn(component, 'selectItem');
+      vi.spyOn(component, 'selectItem').mockReturnValue(undefined);
 
       (component as any).selectCurrentItem();
 
@@ -398,7 +405,7 @@ describe('DdataAutocompleteSelectComponent', () => {
     it('should not select item when dropdown closed', () => {
       component.isOpen = false;
       component.selectedIndex = 1;
-      spyOn(component, 'selectItem');
+      vi.spyOn(component, 'selectItem').mockReturnValue(undefined);
 
       (component as any).selectCurrentItem();
 
@@ -408,7 +415,7 @@ describe('DdataAutocompleteSelectComponent', () => {
     it('should not select item when no item selected', () => {
       component.isOpen = true;
       component.selectedIndex = -1;
-      spyOn(component, 'selectItem');
+      vi.spyOn(component, 'selectItem').mockReturnValue(undefined);
 
       (component as any).selectCurrentItem();
 
@@ -419,7 +426,7 @@ describe('DdataAutocompleteSelectComponent', () => {
       component.isOpen = true;
       component.selectedIndex = 999;
       component.filteredItems = component.items;
-      spyOn(component, 'selectItem');
+      vi.spyOn(component, 'selectItem').mockReturnValue(undefined);
 
       (component as any).selectCurrentItem();
 
@@ -515,7 +522,7 @@ describe('DdataAutocompleteSelectComponent', () => {
       component.isOpen = true;
       const event = { target: document.body } as any;
 
-      mockElementRef.nativeElement.contains = jasmine.createSpy('contains').and.returnValue(false);
+      mockElementRef.nativeElement.contains = vi.fn().mockName('contains').mockReturnValue(false);
       (component as any).elementRef = mockElementRef;
 
       component.onClickOutside(event);
@@ -527,7 +534,7 @@ describe('DdataAutocompleteSelectComponent', () => {
       component.isOpen = true;
       const event = { target: document.body } as any;
 
-      mockElementRef.nativeElement.contains = jasmine.createSpy('contains').and.returnValue(true);
+      mockElementRef.nativeElement.contains = vi.fn().mockName('contains').mockReturnValue(true);
       (component as any).elementRef = mockElementRef;
 
       component.onClickOutside(event);
@@ -567,7 +574,7 @@ describe('DdataAutocompleteSelectComponent', () => {
 
   describe('Mouse Events', () => {
     it('should select item on click', () => {
-      spyOn(component, 'selectItem');
+      vi.spyOn(component, 'selectItem').mockReturnValue(undefined);
       const testItem = { id: 1, name: 'Apple' };
 
       // Simulate click event from template

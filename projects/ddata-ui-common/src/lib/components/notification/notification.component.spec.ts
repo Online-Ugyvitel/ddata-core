@@ -7,8 +7,8 @@ import { DdataUiNotificationComponent } from './notification.component';
 describe('DdataUiNotificationComponent', () => {
   let component: DdataUiNotificationComponent;
   let fixture: ComponentFixture<DdataUiNotificationComponent>;
-  let mockNotificationService: jasmine.SpyObj<NotificationService>;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
+  let mockNotificationService: any;
+  let mockChangeDetectorRef: any;
   let notificationSubject: Subject<Array<NotificationInterface>>;
   const mockNotifications: Array<NotificationInterface> = [
     {
@@ -28,9 +28,12 @@ describe('DdataUiNotificationComponent', () => {
   beforeEach(() => {
     notificationSubject = new Subject<Array<NotificationInterface>>();
 
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['watch', 'delete']);
+    mockNotificationService = {
+      watch: vi.fn().mockName('NotificationService.watch'),
+      delete: vi.fn().mockName('NotificationService.delete')
+    };
 
-    mockNotificationService.watch.and.returnValue(notificationSubject.asObservable());
+    mockNotificationService.watch.mockReturnValue(notificationSubject.asObservable());
 
     TestBed.configureTestingModule({
       declarations: [DdataUiNotificationComponent],
@@ -40,9 +43,12 @@ describe('DdataUiNotificationComponent', () => {
     fixture = TestBed.createComponent(DdataUiNotificationComponent);
     component = fixture.componentInstance;
     // the component receives the change detector of its own view, so the method is spied on that instance
-    mockChangeDetectorRef = (component as unknown as { ref: jasmine.SpyObj<ChangeDetectorRef> })
-      .ref;
-    spyOn(mockChangeDetectorRef, 'detectChanges');
+    mockChangeDetectorRef = (
+      component as unknown as {
+        ref: any;
+      }
+    ).ref;
+    vi.spyOn(mockChangeDetectorRef, 'detectChanges').mockReturnValue(undefined);
   });
 
   it('should create', () => {
@@ -79,7 +85,7 @@ describe('DdataUiNotificationComponent', () => {
     component.ngOnInit();
     const subscription = component.subscription;
 
-    spyOn(subscription, 'unsubscribe');
+    vi.spyOn(subscription, 'unsubscribe').mockReturnValue(undefined);
 
     component.ngOnDestroy();
 

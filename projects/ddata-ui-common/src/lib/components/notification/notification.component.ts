@@ -43,7 +43,7 @@ export class DdataUiNotificationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.subscription?.unsubscribe();
   }
 
   close(index: number): void {

@@ -1,14 +1,11 @@
-/* eslint-disable jasmine/no-disabled-tests */
-
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injector } from '@angular/core';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import 'zone.js/testing';
+import { TestBed } from '@angular/core/testing';
 import { StorageService } from './storage.service';
 
-xdescribe('StorageService', () => {
-  beforeEach(waitForAsync(() => {
+describe.skip('StorageService', () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: [
@@ -18,7 +15,7 @@ xdescribe('StorageService', () => {
         provideHttpClientTesting()
       ]
     });
-  }));
+  });
 
   beforeEach(() => {
     TestBed.inject(StorageService);

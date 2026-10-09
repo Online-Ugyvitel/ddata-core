@@ -1,24 +1,15 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/spec",
     "types": [
-      "jasmine"
+      "vitest/globals"
     ],
-    "skipLibCheck": true,
-    "typeRoots": [
-      "../../node_modules/@types"
-    ]
+    "skipLibCheck": true
   },
-  "files": [
-    "src/test.ts"
-  ],
   "include": [
     "**/*.spec.ts",
-    "**/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules/@angular/core/*.d.d.ts"
+    "**/*.d.ts",
+    "src/test-setup.ts"
   ]
 }

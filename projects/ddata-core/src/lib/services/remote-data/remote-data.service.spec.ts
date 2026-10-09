@@ -1,11 +1,9 @@
 /* eslint-disable no-param-reassign */
-/* eslint-disable jasmine/no-disabled-tests */
 
 // tslint:disable: variable-name
-import 'zone.js/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injector } from '@angular/core';
-import { waitForAsync, fakeAsync, inject, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
@@ -52,7 +50,7 @@ class DummyData extends BaseModel implements DummyDataInterface {
   }
 }
 
-xdescribe('RemoteDataService', () => {
+describe.skip('RemoteDataService', () => {
   let service: RemoteDataService<any>;
   // create a fake paginate response from server
   const fakePlainObject = {
@@ -68,7 +66,7 @@ xdescribe('RemoteDataService', () => {
   });
 
   // set TestBed before each tests
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: [
@@ -78,293 +76,267 @@ xdescribe('RemoteDataService', () => {
         provideHttpClientTesting()
       ]
     });
-  }));
+  });
 
   beforeEach(() => {
     TestBed.inject(RemoteDataService);
     service = new RemoteDataService<any>(new DummyData());
   });
 
-  it('should request all instances from server and get 1 object in paginate format', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      // call the service
-      service.getAll().subscribe((result: PaginateInterface) => {
-        // after processing server response it must be an istance of Paginate
-        expect(result).toBeInstanceOf(Paginate);
+  it('should request all instances from server and get 1 object in paginate format', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
 
-        // paginate data contains 1 item
-        expect(result.data.length).toBe(1);
+    // call the service
+    service.getAll().subscribe((result: PaginateInterface) => {
+      // after processing server response it must be an istance of Paginate
+      expect(result).toBeInstanceOf(Paginate);
 
-        // paginate data item must be an istance of DummyData
-        expect(result.data[0]).toBeInstanceOf(DummyData);
-      });
-      // set the expectations for the HttpClient mock
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri');
+      // paginate data contains 1 item
+      expect(result.data.length).toBe(1);
 
-      // request was a GET method
-      expect(req.request.method).toEqual('GET');
+      // paginate data item must be an istance of DummyData
+      expect(result.data[0]).toBeInstanceOf(DummyData);
+    });
+    // set the expectations for the HttpClient mock
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri');
 
-      // request has Authorization in header & it's start with Bearer
-      expect(req.request.headers.has('Authorization')).toBe(true);
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    // request was a GET method
+    expect(req.request.method).toEqual('GET');
 
-      // request has Content-Type in header & it's application/json
-      expect(req.request.headers.has('Content-Type')).toBe(true);
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    // request has Authorization in header & it's start with Bearer
+    expect(req.request.headers.has('Authorization')).toBe(true);
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
 
-      // request has Accepted-Encoding in header & it's application/json
-      expect(req.request.headers.has('Accepted-Encoding')).toBe(true);
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    // request has Content-Type in header & it's application/json
+    expect(req.request.headers.has('Content-Type')).toBe(true);
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
 
-      // set the fake data to be returned by the mock
-      req.flush(fakeResponsePaginate);
-      tick();
+    // request has Accepted-Encoding in header & it's application/json
+    expect(req.request.headers.has('Accepted-Encoding')).toBe(true);
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      // check if there arent any other not handled requests
-      httpMock.verify();
-    })
-  ));
+    // set the fake data to be returned by the mock
+    req.flush(fakeResponsePaginate);
 
-  it('sendFiles() should post a set of file', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      const fileSet = new Set<File>();
-      const fakeFile = new File([], 'fake');
-      const fakeData = {
-        name: 'testfile',
-        hidden: true
-      };
+    // check if there arent any other not handled requests
+    httpMock.verify();
+  });
 
-      fileSet.add(fakeFile);
+  it('sendFiles() should post a set of file', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    const fileSet = new Set<File>();
+    const fakeFile = new File([], 'fake');
+    const fakeData = {
+      name: 'testfile',
+      hidden: true
+    };
 
-      localStorage.setItem('token', 'test1');
+    fileSet.add(fakeFile);
 
-      service.sendFiles('/', 1, fileSet, fakeData).forEach((item) => {
-        item.subscribe((res) => {
-          expect(res).toBeTruthy();
-        });
-      });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/');
+    localStorage.setItem('token', 'test1');
 
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer test1/);
-      expect(req.request.headers.get('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
-
-      req.flush(fileSet);
-      tick();
-
-      httpMock.verify();
-    })
-  ));
-
-  it('deleteMultiple() should post ids of files and make a request to /multiple/delete', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      const fake = [new DummyData().init({ id: 1 as ID }), new DummyData().init({ id: 2 as ID })];
-
-      service.deleteMultiple(fake).subscribe((res) => {
+    service.sendFiles('/', 1, fileSet, fakeData).forEach((item) => {
+      item.subscribe((res) => {
         expect(res).toBeTruthy();
       });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/multiple/delete');
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/');
 
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer test1/);
+    expect(req.request.headers.get('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      req.flush(req.request);
+    req.flush(fileSet);
 
-      tick();
+    httpMock.verify();
+  });
 
-      httpMock.verify();
-    })
-  ));
+  it('deleteMultiple() should post ids of files and make a request to /multiple/delete', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    const fake = [new DummyData().init({ id: 1 as ID }), new DummyData().init({ id: 2 as ID })];
 
-  it('delete() should post id if a file', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      const fake = new DummyData().init({ id: 2 as ID });
+    service.deleteMultiple(fake).subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/multiple/delete');
 
-      service.delete(fake).subscribe((res) => {
-        expect(res).toBeTruthy();
-      });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/2');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      expect(req.request.method).toEqual('DELETE');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    req.flush(req.request);
 
-      req.flush(JSON.stringify(true));
+    httpMock.verify();
+  });
 
-      tick();
+  it('delete() should post id if a file', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    const fake = new DummyData().init({ id: 2 as ID });
 
-      httpMock.verify();
-    })
-  ));
+    service.delete(fake).subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/2');
 
-  it('postUri() should make POST request', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      const fakeDummyData = new DummyData().init({ id: 2 as ID });
+    expect(req.request.method).toEqual('DELETE');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      service.postUri('fake', '/custom-dummy-suburi').subscribe((res) => {
-        expect(res).toBeTruthy();
-      });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/custom-dummy-suburi');
+    req.flush(JSON.stringify(true));
 
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    httpMock.verify();
+  });
 
-      req.flush(fakeDummyData);
+  it('postUri() should make POST request', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    const fakeDummyData = new DummyData().init({ id: 2 as ID });
 
-      tick();
+    service.postUri('fake', '/custom-dummy-suburi').subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/custom-dummy-suburi');
 
-      httpMock.verify();
-    })
-  ));
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-  it('save() should save an instance with a POST request', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      const data = { isValid: true };
-      const fakeDummyData = new DummyData().init(data);
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri');
+    req.flush(fakeDummyData);
 
-      fakeDummyData.validate = () => {
-        return true;
-      };
+    httpMock.verify();
+  });
 
-      service.save(fakeDummyData).subscribe();
+  it('save() should save an instance with a POST request', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    const data = { isValid: true };
+    const fakeDummyData = new DummyData().init(data);
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri');
 
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
-      expect(req.request.body).toEqual(JSON.stringify(fakeDummyData.prepareToSave()));
+    fakeDummyData.validate = () => {
+      return true;
+    };
 
-      tick(2000);
-      req.flush(JSON.stringify(1));
+    service.save(fakeDummyData).subscribe();
 
-      httpMock.verify();
-    })
-  ));
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    expect(req.request.body).toEqual(JSON.stringify(fakeDummyData.prepareToSave()));
 
-  it('save() should update an instance with a PUT request', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      const data = { isValid: true };
-      const fakeDummyData = new DummyData().init({ id: 1 });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/1');
+    req.flush(JSON.stringify(1));
 
-      fakeDummyData.validate = () => {
-        return true;
-      };
+    httpMock.verify();
+  });
 
-      service.save(fakeDummyData).subscribe();
+  it('save() should update an instance with a PUT request', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    const data = { isValid: true };
+    const fakeDummyData = new DummyData().init({ id: 1 });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/1');
 
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    fakeDummyData.validate = () => {
+      return true;
+    };
 
-      req.flush(JSON.stringify(1));
+    service.save(fakeDummyData).subscribe();
 
-      tick();
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      httpMock.verify();
-    })
-  ));
+    req.flush(JSON.stringify(1));
 
-  it('getUri() should make a GET request', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      service.getUri('/custom-dummy-suburi').subscribe((res) => {
-        expect(res).toBeTruthy();
-      });
-      const req = httpMock.expectOne('http://dummy.test/api/custom-dummy-suburi');
+    httpMock.verify();
+  });
 
-      expect(req.request.method).toEqual('GET');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+  it('getUri() should make a GET request', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
 
-      req.flush(req.request);
+    service.getUri('/custom-dummy-suburi').subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/custom-dummy-suburi');
 
-      tick();
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      httpMock.verify();
-    })
-  ));
+    req.flush(req.request);
 
-  it('getOne() should return with a model', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      service.getOne(1).subscribe((res) => {
-        expect(res).toBeTruthy();
-        expect(res).toBeInstanceOf(DummyData);
-        expect(res.id).toBe(1);
-      });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/1');
+    httpMock.verify();
+  });
 
-      expect(req.request.method).toEqual('GET');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+  it('getOne() should return with a model', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
 
-      req.flush(fakePlainObject);
+    service.getOne(1).subscribe((res) => {
+      expect(res).toBeTruthy();
+      expect(res).toBeInstanceOf(DummyData);
+      expect(res.id).toBe(1);
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/1');
 
-      tick();
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      httpMock.verify();
-    })
-  ));
+    req.flush(fakePlainObject);
 
-  it('getAllWithoutPaginate() should request all instances from server', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      const fakeData = [new DummyData().init(), new DummyData().init(), new DummyData().init()];
+    httpMock.verify();
+  });
 
-      service.getAllWithoutPaginate().subscribe((res: Array<DummyDataInterface>) => {
-        expect(res).toBeTruthy();
-        expect(res[0]).toEqual(new DummyData().init());
-        expect(res.length).toBe(3);
-      });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/list');
+  it('getAllWithoutPaginate() should request all instances from server', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
+    const fakeData = [new DummyData().init(), new DummyData().init(), new DummyData().init()];
 
-      expect(req.request.method).toEqual('GET');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    service.getAllWithoutPaginate().subscribe((res: Array<DummyDataInterface>) => {
+      expect(res).toBeTruthy();
+      expect(res[0]).toEqual(new DummyData().init());
+      expect(res.length).toBe(3);
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri/list');
 
-      req.flush(fakeData);
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      tick();
+    req.flush(fakeData);
 
-      httpMock.verify();
-    })
-  ));
+    httpMock.verify();
+  });
 
-  it('getPage() should request a page of a paginate instance', fakeAsync(
-    inject([HttpTestingController, RemoteDataService], (httpMock: HttpTestingController) => {
-      service.getPage(1).subscribe((res: PaginateInterface) => {
-        expect(res).toBeTruthy();
-      });
-      const req = httpMock.expectOne('http://dummy.test/api/dummy-uri?page=1');
+  it('getPage() should request a page of a paginate instance', () => {
+    const httpMock = TestBed.inject(HttpTestingController);
 
-      expect(req.request.method).toEqual('GET');
-      expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
-      expect(req.request.headers.has('Content-Type')).toBeTruthy();
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+    service.getPage(1).subscribe((res: PaginateInterface) => {
+      expect(res).toBeTruthy();
+    });
+    const req = httpMock.expectOne('http://dummy.test/api/dummy-uri?page=1');
 
-      req.flush(new Paginate(DummyData));
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.headers.get('Authorization')).toMatch(/^Bearer /);
+    expect(req.request.headers.has('Content-Type')).toBeTruthy();
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
 
-      tick();
+    req.flush(new Paginate(DummyData));
 
-      httpMock.verify();
-    })
-  ));
+    httpMock.verify();
+  });
 });

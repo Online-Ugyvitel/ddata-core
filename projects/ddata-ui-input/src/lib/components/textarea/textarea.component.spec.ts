@@ -1,5 +1,5 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
@@ -15,39 +15,40 @@ const detectChangesOf = (fixture: ComponentFixture<unknown>): void => {
 describe('DdataTextareaComponent', () => {
   let component: DdataTextareaComponent;
   let fixture: ComponentFixture<DdataTextareaComponent>;
-  let mockHelperService: jasmine.SpyObj<InputHelperService>;
+  let mockHelperService: any;
   let mockModel: any;
 
   beforeEach(async () => {
     // Create spy object for helper service
-    mockHelperService = jasmine.createSpyObj('InputHelperService', [
-      'getTitle',
-      'getLabel',
-      'getPlaceholder',
-      'getPrepend',
-      'getAppend',
-      'isRequired',
-      'randChars',
-      'validateField'
-    ]);
+    mockHelperService = {
+      getTitle: vi.fn().mockName('InputHelperService.getTitle'),
+      getLabel: vi.fn().mockName('InputHelperService.getLabel'),
+      getPlaceholder: vi.fn().mockName('InputHelperService.getPlaceholder'),
+      getPrepend: vi.fn().mockName('InputHelperService.getPrepend'),
+      getAppend: vi.fn().mockName('InputHelperService.getAppend'),
+      isRequired: vi.fn().mockName('InputHelperService.isRequired'),
+      randChars: vi.fn().mockName('InputHelperService.randChars'),
+      validateField: vi.fn().mockName('InputHelperService.validateField')
+    };
 
     // Setup default return values
-    mockHelperService.getTitle.and.returnValue('Test Title');
-    mockHelperService.getLabel.and.returnValue('Test Label');
-    mockHelperService.getPlaceholder.and.returnValue('Test Placeholder');
-    mockHelperService.getPrepend.and.returnValue('$');
-    mockHelperService.getAppend.and.returnValue('%');
-    mockHelperService.isRequired.and.returnValue(true);
-    mockHelperService.randChars.and.returnValue('abc123');
-    mockHelperService.validateField.and.returnValue(true);
+    mockHelperService.getTitle.mockReturnValue('Test Title');
+    mockHelperService.getLabel.mockReturnValue('Test Label');
+    mockHelperService.getPlaceholder.mockReturnValue('Test Placeholder');
+    mockHelperService.getPrepend.mockReturnValue('$');
+    mockHelperService.getAppend.mockReturnValue('%');
+    mockHelperService.isRequired.mockReturnValue(true);
+    mockHelperService.randChars.mockReturnValue('abc123');
+    mockHelperService.validateField.mockReturnValue(true);
 
     // Mock DdataCoreModule.InjectorInstance
     DdataCoreModule.InjectorInstance = {
-      get: jasmine.createSpy('get').and.returnValue(mockHelperService)
+      get: vi.fn().mockName('get').mockReturnValue(mockHelperService)
     } as never;
 
     await TestBed.configureTestingModule({
       declarations: [DdataTextareaComponent],
+      schemas: [NO_ERRORS_SCHEMA],
       imports: [FormsModule]
     }).compileComponents();
 
@@ -117,21 +118,21 @@ describe('DdataTextareaComponent', () => {
 
   describe('Model Input Setter', () => {
     it('should handle null model', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       component.model = null;
 
       expect(console.error).toHaveBeenCalledWith('The input-box component get undefined model');
     });
 
     it('should handle undefined model', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       component.model = undefined;
 
       expect(console.error).toHaveBeenCalledWith('The input-box component get undefined model');
     });
 
     it('should handle model without fields', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       const modelWithoutFields = { model_name: 'TestModel', fields: null };
 
       component.model = modelWithoutFields as any;
@@ -140,7 +141,7 @@ describe('DdataTextareaComponent', () => {
     });
 
     it('should handle model with missing field', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       component._field = 'missingField';
       component.model = mockModel;
 
@@ -248,7 +249,7 @@ describe('DdataTextareaComponent', () => {
   describe('Lifecycle Methods', () => {
     it('should focus input on ngAfterViewInit when autoFocus is true', () => {
       component.autoFocus = true;
-      component.inputBox = { nativeElement: { focus: jasmine.createSpy('focus') } } as any;
+      component.inputBox = { nativeElement: { focus: vi.fn().mockName('focus') } } as any;
 
       component.ngAfterViewInit();
 
@@ -257,7 +258,7 @@ describe('DdataTextareaComponent', () => {
 
     it('should not focus input on ngAfterViewInit when autoFocus is false', () => {
       component.autoFocus = false;
-      component.inputBox = { nativeElement: { focus: jasmine.createSpy('focus') } } as any;
+      component.inputBox = { nativeElement: { focus: vi.fn().mockName('focus') } } as any;
 
       component.ngAfterViewInit();
 
@@ -278,8 +279,8 @@ describe('DdataTextareaComponent', () => {
     });
 
     it('should emit changed event when validation passes', () => {
-      spyOn(component.changed, 'emit');
-      mockHelperService.validateField.and.returnValue(true);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      mockHelperService.validateField.mockReturnValue(true);
 
       component.validateField();
 
@@ -287,8 +288,8 @@ describe('DdataTextareaComponent', () => {
     });
 
     it('should not emit changed event when validation fails', () => {
-      spyOn(component.changed, 'emit');
-      mockHelperService.validateField.and.returnValue(false);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      mockHelperService.validateField.mockReturnValue(false);
 
       component.validateField();
 
@@ -463,7 +464,7 @@ describe('DdataTextareaComponent', () => {
     });
 
     it('should call validateField on keyup event', () => {
-      spyOn(component, 'validateField');
+      vi.spyOn(component, 'validateField').mockReturnValue(undefined);
       const textarea = fixture.debugElement.query(By.css('textarea'));
 
       textarea.nativeElement.dispatchEvent(new KeyboardEvent('keyup'));

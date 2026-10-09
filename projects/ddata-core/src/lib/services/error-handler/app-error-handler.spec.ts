@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 /**
  * Comprehensive test suite for DdataCoreErrorHandler
  *
@@ -13,7 +14,7 @@
  *    - console.error call with original error parameter
  *    - All status code conditions:
  *      * 400 -> BadRequest
- *      * 401 -> UnauthorizedError  
+ *      * 401 -> UnauthorizedError
  *      * 403 -> ForbiddenError
  *      * 404 -> NotFoundError
  *      * 405 -> MethodNotAllowedError
@@ -37,7 +38,6 @@
  * Coverage achieved: 100% - All lines, branches, and conditions tested
  */
 
-import 'zone.js/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
@@ -63,16 +63,25 @@ import { AppValidationError } from './validation-error';
 
 describe('DdataCoreErrorHandler', () => {
   let errorHandler: DdataCoreErrorHandler;
-  let storageService: jasmine.SpyObj<StorageService>;
-  let spinnerService: jasmine.SpyObj<SpinnerService>;
-  let notificationService: jasmine.SpyObj<NotificationService>;
-  let router: jasmine.SpyObj<Router>;
+  let storageService: any;
+  let spinnerService: any;
+  let notificationService: any;
+  let router: any;
 
   beforeEach(() => {
-    const storageServiceSpy = jasmine.createSpyObj('StorageService', ['clear']);
-    const spinnerServiceSpy = jasmine.createSpyObj('SpinnerService', ['off']);
-    const notificationServiceSpy = jasmine.createSpyObj('NotificationService', ['add']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate'], { url: '/some-url' });
+    const storageServiceSpy = {
+      clear: vi.fn().mockName('StorageService.clear')
+    };
+    const spinnerServiceSpy = {
+      off: vi.fn().mockName('SpinnerService.off')
+    };
+    const notificationServiceSpy = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
+    const routerSpy = {
+      navigate: vi.fn().mockName('Router.navigate'),
+      url: '/some-url'
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -85,20 +94,18 @@ describe('DdataCoreErrorHandler', () => {
     });
 
     errorHandler = TestBed.inject(DdataCoreErrorHandler);
-    storageService = TestBed.inject(StorageService) as jasmine.SpyObj<StorageService>;
-    spinnerService = TestBed.inject(SpinnerService) as jasmine.SpyObj<SpinnerService>;
-    notificationService = TestBed.inject(
-      NotificationService
-    ) as jasmine.SpyObj<NotificationService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    storageService = TestBed.inject(StorageService) as any;
+    spinnerService = TestBed.inject(SpinnerService) as any;
+    notificationService = TestBed.inject(NotificationService) as any;
+    router = TestBed.inject(Router) as any;
 
     // Mock the DdataInjectorModule.InjectorInstance.get method
     DdataInjectorModule.InjectorInstance = {
-      get: jasmine.createSpy('get').and.returnValue(router)
+      get: vi.fn().mockName('get').mockReturnValue(router)
     };
 
     // Spy on console.error
-    spyOn(console, 'error');
+    vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   describe('Constructor', () => {
@@ -117,8 +124,8 @@ describe('DdataCoreErrorHandler', () => {
   describe('handleError method', () => {
     beforeEach(() => {
       // Reset all spies before each test
-      spinnerService.off.calls.reset();
-      (console.error as jasmine.Spy).calls.reset();
+      spinnerService.off.mockClear();
+      (console.error as Mock).mockClear();
     });
 
     it('should handle error with status 400 (Bad Request)', () => {
@@ -505,7 +512,7 @@ describe('DdataCoreErrorHandler', () => {
         error: { message: 'Unauthorized' }
       };
 
-      spyOn(UnauthorizedError.prototype.constructor, 'call');
+      vi.spyOn(UnauthorizedError.prototype.constructor, 'call').mockReturnValue(undefined);
       const result = errorHandler.handleError(mockError);
 
       result.subscribe({

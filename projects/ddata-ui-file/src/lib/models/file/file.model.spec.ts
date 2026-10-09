@@ -1,6 +1,7 @@
+import type { Assertion } from 'vitest';
 import { FileModel } from './file.model';
 // The branded field types (ID, FileSizeInByte, ...) are not assignable from plain literals, so the matchers are untyped.
-const expectLoose = (actual: unknown): jasmine.Matchers<any> => expect(actual as any);
+const expectLoose = (actual: unknown): Assertion<any> => expect(actual as any);
 
 describe('FileModel', () => {
   let model: FileModel;
@@ -205,7 +206,7 @@ describe('FileModel', () => {
       imageTypes.forEach((mimetype) => {
         const result = model.init({ mimetype });
 
-        expectLoose(result.is_image).toBe(true, `Should detect ${mimetype} as image`);
+        expectLoose(result.is_image).toBe(true);
       });
     });
 
@@ -222,7 +223,7 @@ describe('FileModel', () => {
       nonImageTypes.forEach((mimetype) => {
         const result = model.init({ mimetype });
 
-        expectLoose(result.is_image).toBe(false, `Should detect ${mimetype} as non-image`);
+        expectLoose(result.is_image).toBe(false);
       });
     });
 
@@ -233,7 +234,7 @@ describe('FileModel', () => {
       truthyValues.forEach((value) => {
         const result = model.init({ is_primary: value });
 
-        expectLoose(result.is_primary).toBe(true, `${value} should convert to true`);
+        expectLoose(result.is_primary).toBe(true);
       });
       // Test falsy values
       const falsyValues = [false, 0, '', null, undefined];
@@ -241,7 +242,7 @@ describe('FileModel', () => {
       falsyValues.forEach((value) => {
         const result = model.init({ is_primary: value });
 
-        expectLoose(result.is_primary).toBe(false, `${value} should convert to false`);
+        expectLoose(result.is_primary).toBe(false);
       });
     });
   });

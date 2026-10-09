@@ -1,5 +1,4 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
-import 'zone.js/testing';
 import { Injector, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -83,13 +82,13 @@ describe('DdataInputColorComponent', () => {
     it('should set _model to new BaseModel when value is null', () => {
       component.model = null;
 
-      expect(component._model).toEqual(jasmine.any(BaseModel));
+      expect(component._model).toEqual(expect.any(BaseModel));
     });
 
     it('should set _model to new BaseModel when value is undefined', () => {
       component.model = undefined;
 
-      expect(component._model).toEqual(jasmine.any(BaseModel));
+      expect(component._model).toEqual(expect.any(BaseModel));
     });
 
     it('should set _model and update field properties when model has fields', () => {
@@ -332,12 +331,12 @@ describe('DdataInputColorComponent', () => {
       expect(component._prepend).toBe('');
       expect(component._append).toBe('');
       expect(component._isRequired).toBe(false);
-      expect(component._model).toEqual(jasmine.any(BaseModel));
+      expect(component._model).toEqual(expect.any(BaseModel));
     });
 
     it('should inject InputHelperService through constructor', () => {
       expect(component.helperService).toBeDefined();
-      expect(component.helperService).toEqual(jasmine.any(InputHelperService));
+      expect(component.helperService).toEqual(expect.any(InputHelperService));
     });
   });
 
@@ -356,14 +355,14 @@ describe('DdataInputColorComponent', () => {
 
     it('should have validatorService instance from DdataCoreModule', () => {
       expect(component.validatorService).toBeDefined();
-      expect(component.validatorService).toEqual(jasmine.any(ValidatorService));
+      expect(component.validatorService).toEqual(expect.any(ValidatorService));
     });
   });
 
   describe('ngOnInit', () => {
     it('should focus input element when autoFocus is true', () => {
       component.autoFocus = true;
-      spyOn(component.inputBox.nativeElement, 'focus');
+      vi.spyOn(component.inputBox.nativeElement, 'focus').mockReturnValue(undefined);
 
       component.ngOnInit();
 
@@ -372,7 +371,7 @@ describe('DdataInputColorComponent', () => {
 
     it('should not focus input element when autoFocus is false', () => {
       component.autoFocus = false;
-      spyOn(component.inputBox.nativeElement, 'focus');
+      vi.spyOn(component.inputBox.nativeElement, 'focus').mockReturnValue(undefined);
 
       component.ngOnInit();
 
@@ -387,8 +386,8 @@ describe('DdataInputColorComponent', () => {
       component._model = mockModel;
       component._field = 'color';
 
-      spyOn(component.helperService, 'validateField').and.returnValue(true);
-      spyOn(component.changed, 'emit');
+      vi.spyOn(component.helperService, 'validateField').mockReturnValue(true);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
 
       component.validateField();
 
@@ -402,8 +401,8 @@ describe('DdataInputColorComponent', () => {
       component._model = mockModel;
       component._field = 'color';
 
-      spyOn(component.helperService, 'validateField').and.returnValue(false);
-      spyOn(component.changed, 'emit');
+      vi.spyOn(component.helperService, 'validateField').mockReturnValue(false);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
 
       component.validateField();
 

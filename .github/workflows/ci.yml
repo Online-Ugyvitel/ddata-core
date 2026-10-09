@@ -51,19 +51,19 @@ jobs:
     # ddata-ui is not tested yet: it still imports files of the consuming application
     # and private FontAwesome Pro packages that are not available in CI.
     - name: Test ddata-core
-      run: npx ng test ddata-core --no-watch --browsers=ChromeHeadless
+      run: npx ng test ddata-core --no-watch
 
     - name: Test ddata-ui-input
-      run: npx ng test ddata-ui-input --no-watch --browsers=ChromeHeadless
+      run: npx ng test ddata-ui-input --no-watch
 
     - name: Test ddata-ui-file
-      run: npx ng test ddata-ui-file --no-watch --browsers=ChromeHeadless
+      run: npx ng test ddata-ui-file --no-watch
 
     - name: Test ddata-ui-dialog
-      run: npx ng test ddata-ui-dialog --no-watch --browsers=ChromeHeadless
+      run: npx ng test ddata-ui-dialog --no-watch
 
     - name: Test ddata-ui-common
-      run: npx ng test ddata-ui-common --no-watch --browsers=ChromeHeadless
+      run: npx ng test ddata-ui-common --no-watch
 
     - name: Test ddata-a11y
-      run: npx ng test ddata-a11y --no-watch --browsers=ChromeHeadless
+      run: npx ng test ddata-a11y --no-watch

@@ -1,3 +1,4 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -13,7 +14,8 @@ describe('DdataUiNoDataComponent', () => {
   describe('with default English config', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        declarations: [DdataUiNoDataComponent]
+        declarations: [DdataUiNoDataComponent],
+        schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
 
       fixture = TestBed.createComponent(DdataUiNoDataComponent);
@@ -68,6 +70,7 @@ describe('DdataUiNoDataComponent', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         declarations: [DdataUiNoDataComponent],
+        schemas: [NO_ERRORS_SCHEMA],
         providers: [{ provide: 'config', useValue: { lang: 'hu' } }]
       }).compileComponents();
 
@@ -173,6 +176,7 @@ describe('DdataUiNoDataComponent', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         declarations: [DdataUiNoDataComponent],
+        schemas: [NO_ERRORS_SCHEMA],
         providers: [{ provide: 'config', useValue: { lang: 'hu' } }]
       }).compileComponents();
 
@@ -239,7 +243,8 @@ describe('DdataUiNoDataComponent', () => {
   describe('sentence input', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        declarations: [DdataUiNoDataComponent]
+        declarations: [DdataUiNoDataComponent],
+        schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
 
       fixture = TestBed.createComponent(DdataUiNoDataComponent);

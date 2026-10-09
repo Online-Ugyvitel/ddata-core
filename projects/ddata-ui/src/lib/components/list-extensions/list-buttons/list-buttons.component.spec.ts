@@ -27,7 +27,7 @@ describe('ListButtonsComponent', () => {
   });
 
   it('select()', () => {
-    const spyEmit = spyOn(component.emitSelected, 'emit').and.callThrough();
+    const spyEmit = vi.spyOn(component.emitSelected, 'emit');
 
     component.select();
 
@@ -35,10 +35,15 @@ describe('ListButtonsComponent', () => {
   });
 
   it('create()', () => {
-    const routerInstance = (component as unknown as { router: { navigateByUrl: () => void } })
-      .router;
-    const spy = spyOn(routerInstance, 'navigateByUrl').and.callThrough();
-    const spyEmit = spyOn(component.addNew, 'emit').and.callThrough();
+    const routerInstance = (
+      component as unknown as {
+        router: {
+          navigateByUrl: () => void;
+        };
+      }
+    ).router;
+    const spy = vi.spyOn(routerInstance, 'navigateByUrl');
+    const spyEmit = vi.spyOn(component.addNew, 'emit');
 
     component.create();
 
@@ -47,7 +52,7 @@ describe('ListButtonsComponent', () => {
   });
 
   it('delete()', () => {
-    const spy = spyOn(component.deleteSelected, 'emit').and.callThrough();
+    const spy = vi.spyOn(component.deleteSelected, 'emit');
 
     component.delete();
 

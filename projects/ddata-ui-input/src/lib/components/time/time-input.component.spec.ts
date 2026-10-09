@@ -1,5 +1,5 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
-import { Injector, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Injector, ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -14,46 +14,47 @@ describe('DdataInputTimeComponent', () => {
   let fixture: ComponentFixture<DdataInputTimeComponent>;
   let debugElement: any;
   let element: any;
-  let helperServiceSpy: jasmine.SpyObj<InputHelperService>;
+  let helperServiceSpy: any;
 
   beforeEach(() => {
-    const spy = jasmine.createSpyObj('InputHelperService', [
-      'validateField',
-      'getTitle',
-      'getLabel',
-      'getPlaceholder',
-      'getPrepend',
-      'getAppend',
-      'isRequired',
-      'randChars'
-    ]);
+    const spy = {
+      validateField: vi.fn().mockName('InputHelperService.validateField'),
+      getTitle: vi.fn().mockName('InputHelperService.getTitle'),
+      getLabel: vi.fn().mockName('InputHelperService.getLabel'),
+      getPlaceholder: vi.fn().mockName('InputHelperService.getPlaceholder'),
+      getPrepend: vi.fn().mockName('InputHelperService.getPrepend'),
+      getAppend: vi.fn().mockName('InputHelperService.getAppend'),
+      isRequired: vi.fn().mockName('InputHelperService.isRequired'),
+      randChars: vi.fn().mockName('InputHelperService.randChars')
+    };
 
     TestBed.configureTestingModule({
       declarations: [DdataInputTimeComponent],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [{ provide: InputHelperService, useValue: spy }]
     }).compileComponents();
 
-    helperServiceSpy = TestBed.inject(InputHelperService) as jasmine.SpyObj<InputHelperService>;
+    helperServiceSpy = TestBed.inject(InputHelperService) as any;
   });
 
   beforeEach(() => {
     DdataCoreModule.InjectorInstance = {
       get: (token: never) => TestBed.inject(token)
     };
-    helperServiceSpy.randChars.and.returnValue('random123');
+    helperServiceSpy.randChars.mockReturnValue('random123');
     fixture = TestBed.createComponent(DdataInputTimeComponent);
     component = fixture.componentInstance;
     debugElement = fixture.debugElement;
     element = debugElement.nativeElement;
 
     // Setup default spy returns
-    helperServiceSpy.getTitle.and.returnValue('Test Title');
-    helperServiceSpy.getLabel.and.returnValue('Test Label');
-    helperServiceSpy.getPlaceholder.and.returnValue('Test Placeholder');
-    helperServiceSpy.getPrepend.and.returnValue('Prepend');
-    helperServiceSpy.getAppend.and.returnValue('Append');
-    helperServiceSpy.isRequired.and.returnValue(true);
-    helperServiceSpy.validateField.and.returnValue(true);
+    helperServiceSpy.getTitle.mockReturnValue('Test Title');
+    helperServiceSpy.getLabel.mockReturnValue('Test Label');
+    helperServiceSpy.getPlaceholder.mockReturnValue('Test Placeholder');
+    helperServiceSpy.getPrepend.mockReturnValue('Prepend');
+    helperServiceSpy.getAppend.mockReturnValue('Append');
+    helperServiceSpy.isRequired.mockReturnValue(true);
+    helperServiceSpy.validateField.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -93,14 +94,14 @@ describe('DdataInputTimeComponent', () => {
   describe('Input Property Setters', () => {
     describe('model setter', () => {
       it('should handle null/undefined model', () => {
-        spyOn(console, 'error');
+        vi.spyOn(console, 'error').mockReturnValue(undefined);
         component.model = null;
 
         expect(console.error).toHaveBeenCalledWith('The input-box component get undefined model');
       });
 
       it('should handle model without fields', () => {
-        spyOn(console, 'error');
+        vi.spyOn(console, 'error').mockReturnValue(undefined);
         const invalidModel = new BaseModel();
 
         invalidModel.fields = null;
@@ -113,7 +114,7 @@ describe('DdataInputTimeComponent', () => {
       });
 
       it('should handle model without specific field', () => {
-        spyOn(console, 'error');
+        vi.spyOn(console, 'error').mockReturnValue(undefined);
         const model = new BaseModel();
 
         component._field = 'nonexistent';
@@ -213,7 +214,7 @@ describe('DdataInputTimeComponent', () => {
     describe('ngAfterViewInit', () => {
       it('should focus input when autoFocus is true', () => {
         component.autoFocus = true;
-        const mockElement = { focus: jasmine.createSpy('focus') };
+        const mockElement = { focus: vi.fn().mockName('focus') };
 
         component.inputBox = { nativeElement: mockElement } as ElementRef;
 
@@ -224,7 +225,7 @@ describe('DdataInputTimeComponent', () => {
 
       it('should not focus input when autoFocus is false', () => {
         component.autoFocus = false;
-        const mockElement = { focus: jasmine.createSpy('focus') };
+        const mockElement = { focus: vi.fn().mockName('focus') };
 
         component.inputBox = { nativeElement: mockElement } as ElementRef;
 
@@ -244,8 +245,8 @@ describe('DdataInputTimeComponent', () => {
 
   describe('validateField Method', () => {
     it('should call helper service validateField and emit changed event when valid', () => {
-      spyOn(component.changed, 'emit');
-      helperServiceSpy.validateField.and.returnValue(true);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      helperServiceSpy.validateField.mockReturnValue(true);
       const model = new BaseModel();
 
       component._model = model;
@@ -258,8 +259,8 @@ describe('DdataInputTimeComponent', () => {
     });
 
     it('should call helper service validateField but not emit when invalid', () => {
-      spyOn(component.changed, 'emit');
-      helperServiceSpy.validateField.and.returnValue(false);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      helperServiceSpy.validateField.mockReturnValue(false);
       const model = new BaseModel();
 
       component._model = model;
@@ -274,7 +275,7 @@ describe('DdataInputTimeComponent', () => {
 
   describe('setTime Method', () => {
     it('should set time value on model field and validate', () => {
-      spyOn(component, 'validateField');
+      vi.spyOn(component, 'validateField').mockReturnValue(undefined);
       const model = new BaseModel();
 
       component._model = model;
@@ -287,7 +288,7 @@ describe('DdataInputTimeComponent', () => {
     });
 
     it('should handle empty time string', () => {
-      spyOn(component, 'validateField');
+      vi.spyOn(component, 'validateField').mockReturnValue(undefined);
       const model = new BaseModel();
 
       component._model = model;
@@ -300,7 +301,7 @@ describe('DdataInputTimeComponent', () => {
     });
 
     it('should handle null time', () => {
-      spyOn(component, 'validateField');
+      vi.spyOn(component, 'validateField').mockReturnValue(undefined);
       const model = new BaseModel();
 
       component._model = model;
@@ -359,8 +360,8 @@ describe('DdataInputTimeComponent', () => {
       model.validationRules = { testTime: ['required'] };
       component.field = 'testTime';
 
-      spyOn(component.changed, 'emit');
-      helperServiceSpy.validateField.and.returnValue(true);
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
+      helperServiceSpy.validateField.mockReturnValue(true);
 
       component.model = model;
       component.setTime('14:30');
@@ -376,7 +377,7 @@ describe('DdataInputTimeComponent', () => {
     });
 
     it('should handle edge cases with model setter', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
 
       // Test null model
       component.model = null;
@@ -420,7 +421,7 @@ describe('DdataInputTimeComponent', () => {
     });
 
     it('should handle model with validation rules but no field definitions', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       const model = new BaseModel();
 
       model.fields = {}; // No fields defined
@@ -436,7 +437,7 @@ describe('DdataInputTimeComponent', () => {
     });
 
     it('should not call helper methods when model field does not exist', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       const model = new BaseModel();
 
       model.fields = {};
@@ -474,7 +475,7 @@ describe('DdataInputTimeComponent', () => {
 
   describe('Edge Cases and Error Handling', () => {
     it('should handle setTime with various data types', () => {
-      spyOn(component, 'validateField');
+      vi.spyOn(component, 'validateField').mockReturnValue(undefined);
       const model = new BaseModel();
 
       component._model = model;

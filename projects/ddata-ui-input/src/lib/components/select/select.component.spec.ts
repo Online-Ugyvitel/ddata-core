@@ -31,53 +31,65 @@ describe('DdataSelectComponent', () => {
     Object.defineProperty(DdataCoreModule, 'InjectorInstance', {
       writable: true,
       value: {
-        get: jasmine.createSpy('get').and.returnValue({
-          validateFieldValue: jasmine.createSpy('validateFieldValue'),
-          createUniqueId: jasmine.createSpy('createUniqueId').and.returnValue('unique-id-123'),
-          randChars: jasmine.createSpy('randChars').and.returnValue('random-123'),
-          getTitle: jasmine.createSpy('getTitle').and.callFake((model, field) => {
-            if (field === 'country_id' && model?.fields?.country_id?.title) {
-              return model.fields.country_id.title;
-            }
+        get: vi
+          .fn()
+          .mockName('get')
+          .mockReturnValue({
+            validateFieldValue: vi.fn().mockName('validateFieldValue'),
+            createUniqueId: vi.fn().mockName('createUniqueId').mockReturnValue('unique-id-123'),
+            randChars: vi.fn().mockName('randChars').mockReturnValue('random-123'),
+            getTitle: vi
+              .fn()
+              .mockName('getTitle')
+              .mockImplementation((model, field) => {
+                if (field === 'country_id' && model?.fields?.country_id?.title) {
+                  return model.fields.country_id.title;
+                }
 
-            return 'Test Title';
-          }),
-          getLabel: jasmine.createSpy('getLabel').and.callFake((model, field) => {
-            if (field === 'country_id' && model?.fields?.country_id?.label) {
-              return model.fields.country_id.label;
-            }
+                return 'Test Title';
+              }),
+            getLabel: vi
+              .fn()
+              .mockName('getLabel')
+              .mockImplementation((model, field) => {
+                if (field === 'country_id' && model?.fields?.country_id?.label) {
+                  return model.fields.country_id.label;
+                }
 
-            return 'Test Label';
-          }),
-          getPlaceholder: jasmine.createSpy('getPlaceholder').and.returnValue('Test Placeholder'),
-          getPrepend: jasmine.createSpy('getPrepend').and.returnValue(''),
-          getAppend: jasmine.createSpy('getAppend').and.returnValue(''),
-          isRequired: jasmine.createSpy('isRequired').and.callFake((model, field) => {
-            try {
-              if (!model?.validationRules || !model.validationRules[field]) {
-                return false;
-              }
-              const validationRule = model.validationRules[field];
+                return 'Test Label';
+              }),
+            getPlaceholder: vi.fn().mockName('getPlaceholder').mockReturnValue('Test Placeholder'),
+            getPrepend: vi.fn().mockName('getPrepend').mockReturnValue(''),
+            getAppend: vi.fn().mockName('getAppend').mockReturnValue(''),
+            isRequired: vi
+              .fn()
+              .mockName('isRequired')
+              .mockImplementation((model, field) => {
+                try {
+                  if (!model?.validationRules || !model.validationRules[field]) {
+                    return false;
+                  }
+                  const validationRule = model.validationRules[field];
 
-              if (Array.isArray(validationRule)) {
-                return validationRule.includes('required');
-              }
+                  if (Array.isArray(validationRule)) {
+                    return validationRule.includes('required');
+                  }
 
-              if (typeof validationRule === 'object' && !!validationRule.required) {
-                return true;
-              }
+                  if (typeof validationRule === 'object' && !!validationRule.required) {
+                    return true;
+                  }
 
-              if (typeof validationRule === 'string') {
-                return validationRule === 'required';
-              }
+                  if (typeof validationRule === 'string') {
+                    return validationRule === 'required';
+                  }
 
-              return false;
-            } catch {
-              return false;
-            }
-          }),
-          validateField: jasmine.createSpy('validateField').and.returnValue([])
-        })
+                  return false;
+                } catch {
+                  return false;
+                }
+              }),
+            validateField: vi.fn().mockName('validateField').mockReturnValue([])
+          })
       }
     });
   });
@@ -176,7 +188,7 @@ describe('DdataSelectComponent', () => {
     });
 
     it('should handle model without fields', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       const modelWithoutFields = { ...mockModel, fields: null };
 
       // Set mode to non-simple to trigger field validation
@@ -190,7 +202,7 @@ describe('DdataSelectComponent', () => {
     });
 
     it('should handle model with missing field definition', () => {
-      spyOn(console, 'error');
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
       const modelWithMissingField = {
         ...mockModel,
         fields: {}
@@ -264,8 +276,8 @@ describe('DdataSelectComponent', () => {
 
   describe('Event Emission', () => {
     it('should emit selected event', () => {
-      spyOn(component.selected, 'emit');
-      spyOn(component.change, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.change, 'emit').mockReturnValue(undefined);
       const testValue = { test: 'data' };
 
       component.selectedEmit(testValue);
@@ -275,7 +287,7 @@ describe('DdataSelectComponent', () => {
     });
 
     it('should emit selectModel event', () => {
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
       const testValue = { test: 'data' };
 
       component.selectModelEmit(testValue);
@@ -286,8 +298,8 @@ describe('DdataSelectComponent', () => {
 
   describe('Change Event Specifics', () => {
     it('selectedEmit should emit both selected and change outputs', () => {
-      spyOn(component.selected, 'emit');
-      spyOn(component.change, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.change, 'emit').mockReturnValue(undefined);
       const value = 42;
 
       component.selectedEmit(value);
@@ -297,8 +309,8 @@ describe('DdataSelectComponent', () => {
     });
 
     it('selectModelEmit should not emit change output', () => {
-      spyOn(component.selectModel, 'emit');
-      spyOn(component.change, 'emit');
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.change, 'emit').mockReturnValue(undefined);
       const modelValue = { id: 1 };
 
       component.selectModelEmit(modelValue);
@@ -316,12 +328,12 @@ describe('DdataSelectComponent', () => {
       component.fakeSingleSelect = true;
 
       expect(component.mode).toBe('single');
-      expect(component.fakeSingleSelect).toBeTrue();
+      expect(component.fakeSingleSelect).toBe(true);
 
       component.multipleSelect = true; // overrides mode
 
       expect(component.mode).toBe('multiple');
-      expect(component.multipleSelect).toBeTrue();
+      expect(component.multipleSelect).toBe(true);
     });
 
     it('should preserve model-derived properties after deprecated flag changes', () => {
@@ -340,7 +352,7 @@ describe('DdataSelectComponent', () => {
       component.multipleSelect = true; // switch again
 
       expect(component.label).toBe(originalLabel);
-      expect(component.isRequired).toBeTrue();
+      expect(component.isRequired).toBe(true);
     });
   });
 
@@ -399,8 +411,8 @@ describe('DdataSelectComponent', () => {
       component.model = mockModel as any;
       component.items = mockCountries;
 
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectedEmit(1);
       component.selectModelEmit(mockCountry1);
@@ -415,8 +427,8 @@ describe('DdataSelectComponent', () => {
       component.model = { countries: [] } as any;
       component.items = mockCountries;
 
-      spyOn(component.selected, 'emit');
-      spyOn(component.selectModel, 'emit');
+      vi.spyOn(component.selected, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component.selectModel, 'emit').mockReturnValue(undefined);
 
       component.selectedEmit([1, 2]);
       component.selectModelEmit([mockCountry1, mockCountry2]);
@@ -581,11 +593,11 @@ describe('DdataSelectComponent', () => {
       component.model = model;
       component.field = 'country_id';
 
-      expect(component.isRequired).toBe(false, 'country_id should not be required');
+      expect(component.isRequired).toBe(false);
 
       component.field = 'lang_id';
 
-      expect(component.isRequired).toBe(true, 'lang_id should be required after field change');
+      expect(component.isRequired).toBe(true);
     });
 
     it('should reset isRequired to false when switching to field without validation rule', () => {
@@ -605,14 +617,11 @@ describe('DdataSelectComponent', () => {
       component.model = model;
       component.field = 'country_id';
 
-      expect(component.isRequired).toBe(true, 'country_id should be required');
+      expect(component.isRequired).toBe(true);
 
       component.field = 'foo_id';
 
-      expect(component.isRequired).toBe(
-        false,
-        'foo_id has no validation rule so required must reset'
-      );
+      expect(component.isRequired).toBe(false);
     });
   });
 });

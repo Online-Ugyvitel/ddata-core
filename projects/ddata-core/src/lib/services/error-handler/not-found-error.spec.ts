@@ -1,19 +1,22 @@
+import type { Mock } from 'vitest';
 import { NotFoundError } from './not-found-error';
 import { DdataCoreError } from './ddata-core-error';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType } from '../../models/base/base-data.type';
 
 describe('NotFoundError', () => {
-  let notificationService: jasmine.SpyObj<NotificationService>;
-  let consoleErrorSpy: jasmine.Spy;
+  let notificationService: any;
+  let consoleErrorSpy: Mock;
   let notFoundError: NotFoundError;
 
   beforeEach(() => {
     // Create a spy object for NotificationService
-    notificationService = jasmine.createSpyObj('NotificationService', ['add']);
+    notificationService = {
+      add: vi.fn().mockName('NotificationService.add')
+    };
 
     // Spy on console.error
-    consoleErrorSpy = spyOn(console, 'error');
+    consoleErrorSpy = vi.spyOn(console, 'error').mockReturnValue(undefined);
   });
 
   describe('constructor', () => {
@@ -290,8 +293,8 @@ describe('NotFoundError', () => {
       };
 
       // Reset call counts
-      consoleErrorSpy.calls.reset();
-      notificationService.add.calls.reset();
+      consoleErrorSpy.mockClear();
+      notificationService.add.mockClear();
 
       notFoundError = new NotFoundError(originalError, notificationService);
 
@@ -311,7 +314,7 @@ describe('NotFoundError', () => {
 
       notFoundError = new NotFoundError(originalError, notificationService);
       // Get the actual call arguments
-      const addCallArgs = notificationService.add.calls.mostRecent().args;
+      const addCallArgs = vi.mocked(notificationService.add).mock.lastCall;
 
       expect(addCallArgs[0]).toBe('Hiba');
       expect(addCallArgs[1]).toBe('A keresett oldal nem található.');
@@ -330,8 +333,8 @@ describe('NotFoundError', () => {
       };
 
       // Reset spies to ensure clean state
-      consoleErrorSpy.calls.reset();
-      notificationService.add.calls.reset();
+      consoleErrorSpy.mockClear();
+      notificationService.add.mockClear();
 
       // Create instance - this should execute every line in the constructor
       notFoundError = new NotFoundError(originalError, notificationService);

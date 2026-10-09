@@ -54,7 +54,8 @@ export class DdataUiFileUploadComponent {
     folder_id: 1
   };
 
-  i18n = fileText[this.config.lang];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  i18n: Record<string, any> = fileText[this.config.lang];
   files: FileList | null = null;
   filesSet: Set<File> = new Set();
   fileData: Array<File> = [];

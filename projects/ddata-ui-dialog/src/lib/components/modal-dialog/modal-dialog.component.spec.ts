@@ -1,6 +1,12 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChangeDetectorRef, ViewContainerRef, Component, EventEmitter } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  ViewContainerRef,
+  Component,
+  EventEmitter,
+  NO_ERRORS_SCHEMA
+} from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { BaseModel } from '@netdjw/ddata-core';
 import { DdataUiNoDataComponent } from '@netdjw/ddata-ui-common';
@@ -46,21 +52,26 @@ class MockDialogComponentWithoutSelect {
 describe('DdataUiModalDialogComponent', () => {
   let component: DdataUiModalDialogComponent;
   let fixture: ComponentFixture<DdataUiModalDialogComponent>;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let mockViewContainerRef: jasmine.SpyObj<ViewContainerRef>;
+  let mockChangeDetectorRef: any;
+  let mockViewContainerRef: any;
   let mockComponentRef: any;
   let mockComponentFactory: any;
 
   beforeEach(async () => {
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    mockViewContainerRef = jasmine.createSpyObj('ViewContainerRef', ['clear', 'createComponent']);
+    mockChangeDetectorRef = {
+      detectChanges: vi.fn().mockName('ChangeDetectorRef.detectChanges')
+    };
+    mockViewContainerRef = {
+      clear: vi.fn().mockName('ViewContainerRef.clear'),
+      createComponent: vi.fn().mockName('ViewContainerRef.createComponent')
+    };
 
     mockComponentRef = {
       instance: new MockDialogComponent()
     };
 
     mockComponentFactory = {};
-    mockViewContainerRef.createComponent.and.returnValue(mockComponentRef);
+    mockViewContainerRef.createComponent.mockReturnValue(mockComponentRef);
 
     await TestBed.configureTestingModule({
       declarations: [
@@ -68,6 +79,7 @@ describe('DdataUiModalDialogComponent', () => {
         MockDialogComponent,
         MockDialogComponentWithoutSelect
       ],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [{ provide: ChangeDetectorRef, useValue: mockChangeDetectorRef }]
     }).compileComponents();
 
@@ -94,21 +106,21 @@ describe('DdataUiModalDialogComponent', () => {
 
   describe('showDialog setter', () => {
     it('should call showModal when value is truthy', () => {
-      spyOn(component, 'showModal');
+      vi.spyOn(component, 'showModal').mockReturnValue(undefined);
       component.showDialog = true;
 
       expect(component.showModal).toHaveBeenCalled();
     });
 
     it('should call close when value is falsy', () => {
-      spyOn(component, 'close');
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
       component.showDialog = false;
 
       expect(component.close).toHaveBeenCalled();
     });
 
     it('should call showModal when value is truthy string', () => {
-      spyOn(component, 'showModal');
+      vi.spyOn(component, 'showModal').mockReturnValue(undefined);
       component.showDialog = 'true' as any;
 
       expect(component.showModal).toHaveBeenCalled();
@@ -117,7 +129,7 @@ describe('DdataUiModalDialogComponent', () => {
 
   describe('close', () => {
     beforeEach(() => {
-      spyOn(component, 'changeModalStatus' as any);
+      vi.spyOn(component, 'changeModalStatus' as any).mockReturnValue(undefined);
     });
 
     it('should call changeModalStatus with false', () => {
@@ -127,7 +139,9 @@ describe('DdataUiModalDialogComponent', () => {
     });
 
     it('should unsubscribe from componentSubscription if it exists', () => {
-      const mockSubscription = jasmine.createSpyObj('Subscription', ['unsubscribe']);
+      const mockSubscription = {
+        unsubscribe: vi.fn().mockName('Subscription.unsubscribe')
+      };
 
       component.componentSubscription = mockSubscription;
 
@@ -143,21 +157,21 @@ describe('DdataUiModalDialogComponent', () => {
     });
 
     it('should emit fail event when emit is true (default)', () => {
-      spyOn(component.fail, 'emit');
+      vi.spyOn(component.fail, 'emit').mockReturnValue(undefined);
       component.close();
 
       expect(component.fail.emit).toHaveBeenCalledWith('close');
     });
 
     it('should emit fail event when emit is explicitly true', () => {
-      spyOn(component.fail, 'emit');
+      vi.spyOn(component.fail, 'emit').mockReturnValue(undefined);
       component.close(true);
 
       expect(component.fail.emit).toHaveBeenCalledWith('close');
     });
 
     it('should not emit fail event when emit is false', () => {
-      spyOn(component.fail, 'emit');
+      vi.spyOn(component.fail, 'emit').mockReturnValue(undefined);
       component.close(false);
 
       expect(component.fail.emit).not.toHaveBeenCalled();
@@ -166,7 +180,7 @@ describe('DdataUiModalDialogComponent', () => {
 
   describe('closeWithoutEmit', () => {
     it('should call close with false parameter', () => {
-      spyOn(component, 'close');
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
       component.closeWithoutEmit();
 
       expect(component.close).toHaveBeenCalledWith(false);
@@ -175,8 +189,8 @@ describe('DdataUiModalDialogComponent', () => {
 
   describe('showModal', () => {
     beforeEach(() => {
-      spyOn(component, 'changeModalStatus' as any);
-      spyOn(component, 'renderComponent');
+      vi.spyOn(component, 'changeModalStatus' as any).mockReturnValue(undefined);
+      vi.spyOn(component, 'renderComponent').mockReturnValue(undefined);
     });
 
     it('should call changeModalStatus with true', () => {
@@ -212,7 +226,9 @@ describe('DdataUiModalDialogComponent', () => {
 
     it('should call detectChanges on ChangeDetectorRef', () => {
       // the component receives the change detector of its own view
-      const detectChanges = spyOn((component as any).changeDetector, 'detectChanges');
+      const detectChanges = vi
+        .spyOn((component as any).changeDetector, 'detectChanges')
+        .mockReturnValue(undefined);
 
       (component as any).changeModalStatus(true);
 
@@ -270,9 +286,9 @@ describe('DdataUiModalDialogComponent', () => {
     it('should subscribe to saveModel observable if it exists', () => {
       const mockSaveModel = new EventEmitter<any>();
 
-      spyOn(mockSaveModel, 'subscribe').and.returnValue({ unsubscribe: () => {} } as any);
+      vi.spyOn(mockSaveModel, 'subscribe').mockReturnValue({ unsubscribe: () => {} } as any);
       mockComponentRef.instance.saveModel = mockSaveModel;
-      spyOn(component, 'save');
+      vi.spyOn(component, 'save').mockReturnValue(undefined);
 
       component.renderComponent();
 
@@ -339,8 +355,8 @@ describe('DdataUiModalDialogComponent', () => {
       const mockSelect = of(testModels);
 
       mockComponentRef.instance.select = mockSelect;
-      spyOn(component.success, 'emit');
-      spyOn(component, 'close');
+      vi.spyOn(component.success, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
       const testData = { someData: 'test' };
 
       component.dialogContent = new DialogContentItem(MockDialogComponent, testData);
@@ -368,8 +384,8 @@ describe('DdataUiModalDialogComponent', () => {
     it('should emit success event with provided model', () => {
       const testModel = { id: 1, name: 'test' };
 
-      spyOn(component.success, 'emit');
-      spyOn(component, 'closeWithoutEmit');
+      vi.spyOn(component.success, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component, 'closeWithoutEmit').mockReturnValue(undefined);
 
       component.save(testModel);
 
@@ -379,7 +395,7 @@ describe('DdataUiModalDialogComponent', () => {
     it('should call closeWithoutEmit', () => {
       const testModel = { id: 1, name: 'test' };
 
-      spyOn(component, 'closeWithoutEmit');
+      vi.spyOn(component, 'closeWithoutEmit').mockReturnValue(undefined);
 
       component.save(testModel);
 
@@ -390,7 +406,7 @@ describe('DdataUiModalDialogComponent', () => {
   describe('clickOnOverlay', () => {
     it('should call closeWithoutEmit when overlayClickCloseDialog is true', () => {
       component.overlayClickCloseDialog = true;
-      spyOn(component, 'closeWithoutEmit');
+      vi.spyOn(component, 'closeWithoutEmit').mockReturnValue(undefined);
 
       component.clickOnOverlay();
 
@@ -399,7 +415,7 @@ describe('DdataUiModalDialogComponent', () => {
 
     it('should not call closeWithoutEmit when overlayClickCloseDialog is false', () => {
       component.overlayClickCloseDialog = false;
-      spyOn(component, 'closeWithoutEmit');
+      vi.spyOn(component, 'closeWithoutEmit').mockReturnValue(undefined);
 
       component.clickOnOverlay();
 
@@ -495,8 +511,8 @@ describe('DdataUiModalDialogComponent', () => {
       const testModel1 = { id: 1, name: 'test1' };
       const testModel2 = { id: 2, name: 'test2' };
 
-      spyOn(component.success, 'emit');
-      spyOn(component, 'closeWithoutEmit');
+      vi.spyOn(component.success, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component, 'closeWithoutEmit').mockReturnValue(undefined);
 
       component.save(testModel1);
       component.save(testModel2);
@@ -521,7 +537,7 @@ describe('DdataUiModalDialogComponent', () => {
 
   describe('Integration tests', () => {
     it('should handle complete show and hide cycle', () => {
-      spyOn(component, 'renderComponent');
+      vi.spyOn(component, 'renderComponent').mockReturnValue(undefined);
 
       // Show modal
       component.showDialog = true;
@@ -541,7 +557,7 @@ describe('DdataUiModalDialogComponent', () => {
 
       mockComponentRef.instance.saveModel = saveModelEmitter;
 
-      spyOn(component, 'save');
+      vi.spyOn(component, 'save').mockReturnValue(undefined);
 
       component.renderComponent();
 
@@ -560,7 +576,7 @@ describe('DdataUiModalDialogComponent', () => {
 
       expect(component.componentSubscription).toBeDefined();
 
-      spyOn(component.componentSubscription, 'unsubscribe');
+      vi.spyOn(component.componentSubscription, 'unsubscribe').mockReturnValue(undefined);
       component.close();
 
       expect(component.componentSubscription.unsubscribe).toHaveBeenCalled();
@@ -575,8 +591,8 @@ describe('DdataUiModalDialogComponent', () => {
 
       mockComponentRef.instance.select = selectEmitter;
 
-      spyOn(component.success, 'emit');
-      spyOn(component, 'close');
+      vi.spyOn(component.success, 'emit').mockReturnValue(undefined);
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
       const testData = { someData: 'test' };
 
       component.dialogContent = new DialogContentItem(MockDialogComponent, testData);

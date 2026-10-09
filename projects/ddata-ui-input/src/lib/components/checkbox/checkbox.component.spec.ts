@@ -1,4 +1,3 @@
-import 'zone.js/testing';
 import { Injector, ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -189,7 +188,7 @@ describe('DdataInputCheckboxComponent', () => {
     });
 
     it('should emit changed event when not disabled', () => {
-      spyOn(component.changed, 'emit');
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
       component.disabled = false;
       component.model.isValid = false;
       component.clicked();
@@ -198,7 +197,7 @@ describe('DdataInputCheckboxComponent', () => {
     });
 
     it('should not emit changed event when disabled', () => {
-      spyOn(component.changed, 'emit');
+      vi.spyOn(component.changed, 'emit').mockReturnValue(undefined);
       component.disabled = true;
       component.model.isValid = false;
       component.clicked();
