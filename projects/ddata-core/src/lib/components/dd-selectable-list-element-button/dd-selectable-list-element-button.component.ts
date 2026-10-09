@@ -10,9 +10,7 @@ import { DdataSelectableListElementButtonComponentInterface } from './dd-selecta
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DdataSelectableListElementButtonComponent
-  implements DdataSelectableListElementButtonComponentInterface
-{
+export class DdataSelectableListElementButtonComponent implements DdataSelectableListElementButtonComponentInterface {
   @Input() model: SelectableInterface = new Selectable();
 
   @Output() readonly choosed: EventEmitter<SelectableInterface> = new EventEmitter();

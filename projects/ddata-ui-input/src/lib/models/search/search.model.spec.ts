@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BaseSearch } from './base-search.model';
 import { Search } from './search-concrete.model';
 import { SearchInterface } from './search.interface';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let window: any;
 
 describe('Search Model', () => {
@@ -191,7 +189,7 @@ describe('Search Model', () => {
       const result = model.init();
 
       expect(result.searchText).toBe('');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.name).toBe('');
       expect(result.description).toBe('');
       expect(result.type).toBe('');
@@ -202,7 +200,7 @@ describe('Search Model', () => {
       const result = model.init(undefined);
 
       expect(result.searchText).toBe('');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.name).toBe('');
       expect(result.description).toBe('');
       expect(result.type).toBe('');
@@ -213,7 +211,7 @@ describe('Search Model', () => {
       const result = model.init(null);
 
       expect(result.searchText).toBe('');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.name).toBe('');
       expect(result.description).toBe('');
       expect(result.type).toBe('');
@@ -232,7 +230,7 @@ describe('Search Model', () => {
       const result = model.init(testData);
 
       expect(result.searchText).toBe('search term');
-      expect(result.id).toBe(456 as any);
+      expect(result.id).toBe(456);
       expect(result.name).toBe('Test Name');
       expect(result.description).toBe('Test Description');
       expect(result.type).toBe('user_profile');
@@ -248,7 +246,7 @@ describe('Search Model', () => {
 
       expect(result.searchText).toBe('partial search');
       expect(result.name).toBe('Partial Name');
-      expect(result.id).toBe(0 as any);
+      expect(result.id).toBe(0);
       expect(result.description).toBe('');
       expect(result.type).toBe('');
       expect(result.found_model_name).toBe('');
@@ -364,7 +362,7 @@ describe('Search Model', () => {
 
       // Verify that both Search and SearchModelFunctions init logic was executed
       expect(result.searchText).toBe('super search'); // From Search.init
-      expect(result.id).toBe(789 as any); // From SearchModelFunctions.init
+      expect(result.id).toBe(789); // From SearchModelFunctions.init
       expect(result.name).toBe('Super Test'); // From SearchModelFunctions.init
       expect(result.url).toBe('super/type'); // From SearchModelFunctions.init
       expect(result.icon).toBe(faCog); // From SearchModelFunctions.init
@@ -464,7 +462,7 @@ describe('Search Model', () => {
       const result = model.init(complexData);
 
       expect(result.searchText).toBe('complex search');
-      expect(result.id).toBe(999 as any);
+      expect(result.id).toBe(999);
       expect(result.name).toBe('array,name');
     });
 
