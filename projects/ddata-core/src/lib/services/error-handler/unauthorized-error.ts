@@ -1,13 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router } from '@angular/router';
 import { DdataCoreError } from './ddata-core-error';
 import { StorageService } from '../storage/storage.service';
 
 export class UnauthorizedError extends DdataCoreError {
-  constructor(
-    router: Router,
-    originalError: any,
-    storageService: StorageService,
-  ) {
+  constructor(router: Router, originalError: any, storageService: StorageService) {
     super(originalError);
 
     console.error('401 - Unauthorized Error');
@@ -16,15 +13,16 @@ export class UnauthorizedError extends DdataCoreError {
 
     if (router.url !== '/login') {
       storageService.clear();
+      const logoutNavbarItem: HTMLElement | null = document.getElementById('nav-logout');
 
-      const logoutNavbarItem: HTMLElement = document.getElementById('nav-logout') as HTMLElement;
-      if (logoutNavbarItem !== null) {
+      if (typeof logoutNavbarItem?.click === 'function') {
         // ha van logout menüpont
         logoutNavbarItem.click();
       } else {
         // ha nincs logout menüpont
-        const loginNavbarItem: HTMLElement = document.getElementById('nav-login') as HTMLElement;
-        if (loginNavbarItem !== null) {
+        const loginNavbarItem: HTMLElement | null = document.getElementById('nav-login');
+
+        if (typeof loginNavbarItem?.click === 'function') {
           // ha van login menüpont
           loginNavbarItem.click();
         } else {
@@ -34,5 +32,4 @@ export class UnauthorizedError extends DdataCoreError {
       }
     }
   }
-
 }

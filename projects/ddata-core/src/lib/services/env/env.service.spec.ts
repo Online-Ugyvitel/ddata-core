@@ -16,10 +16,7 @@ describe('EnvService', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [
-          EnvService,
-          { provide: 'env', useValue: mockEnvironment }
-        ]
+        providers: [EnvService, { provide: 'env', useValue: mockEnvironment }]
       });
       service = TestBed.inject(EnvService);
     });
@@ -49,10 +46,7 @@ describe('EnvService', () => {
   describe('without env provided (undefined)', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [
-          EnvService,
-          { provide: 'env', useValue: undefined }
-        ]
+        providers: [EnvService, { provide: 'env', useValue: undefined }]
       });
       service = TestBed.inject(EnvService);
     });
@@ -69,10 +63,7 @@ describe('EnvService', () => {
   describe('with null env provided', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [
-          EnvService,
-          { provide: 'env', useValue: null }
-        ]
+        providers: [EnvService, { provide: 'env', useValue: null }]
       });
       service = TestBed.inject(EnvService);
     });
@@ -89,10 +80,7 @@ describe('EnvService', () => {
   describe('with empty object env provided', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [
-          EnvService,
-          { provide: 'env', useValue: {} }
-        ]
+        providers: [EnvService, { provide: 'env', useValue: {} }]
       });
       service = TestBed.inject(EnvService);
     });
@@ -120,10 +108,7 @@ describe('EnvService', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [
-          EnvService,
-          { provide: 'env', useValue: complexEnvironment }
-        ]
+        providers: [EnvService, { provide: 'env', useValue: complexEnvironment }]
       });
       service = TestBed.inject(EnvService);
     });
@@ -136,5 +121,4 @@ describe('EnvService', () => {
       expect(service.environment.config.nested.value).toBe('test');
     });
   });
-});
 });

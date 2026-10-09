@@ -12,15 +12,23 @@ export class MockHelperService implements HelperServiceInterface<TestModelInterf
     return of(true);
   }
 
-  save(model: TestModelInterface, isModal: boolean, emitter: EventEmitter<TestModelInterface>, saveBackend?: boolean, navigateAfterSuccess?: string) {
+  save(
+    model: TestModelInterface,
+    isModal: boolean,
+    emitter: EventEmitter<TestModelInterface>,
+    saveBackend?: boolean,
+    navigateAfterSuccess?: string
+  ) {
     if (isModal && !saveBackend) {
       emitter.emit(model);
     }
+
     return of(true);
   }
 
   saveAsNew(model: TestModelInterface) {
     model.id = 0 as ID;
+
     return of(true);
   }
 
@@ -34,23 +42,29 @@ export class MockHelperService implements HelperServiceInterface<TestModelInterf
     if (reference && reference.deleteModel) {
       reference.deleteModel.emit(model);
     }
+
     return of(true);
   }
 
-  deleteMultiple(models: TestModelInterface[], reference: any) {
+  deleteMultiple(models: Array<TestModelInterface>, reference: any) {
     if (reference && reference.deleteMultipleModels) {
       reference.deleteMultipleModels.emit(models);
     }
+
     return of(true);
   }
 
-  stepBack(model: TestModelInterface, isModal: boolean, emitter: EventEmitter<TestModelInterface>): void {
+  stepBack(
+    model: TestModelInterface,
+    isModal: boolean,
+    emitter: EventEmitter<TestModelInterface>
+  ): void {
     if (isModal) {
       emitter.emit(null);
     }
   }
 
-  changeToPage(turnToPage: number, paginate: any, models: TestModelInterface[]) {
+  changeToPage(turnToPage: number, paginate: any, models: Array<TestModelInterface>) {
     return of(true);
   }
 
@@ -58,7 +72,7 @@ export class MockHelperService implements HelperServiceInterface<TestModelInterf
     return of(true);
   }
 
-  getAll(paginate: any, models: TestModelInterface[], isModal?: boolean, pageNumber?: number) {
+  getAll(paginate: any, models: Array<TestModelInterface>, isModal?: boolean, pageNumber?: number) {
     return of(mockPaginateWithData);
   }
 
