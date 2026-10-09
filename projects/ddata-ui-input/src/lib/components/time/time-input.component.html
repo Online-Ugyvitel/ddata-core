@@ -5,17 +5,16 @@
   </label>
 
   <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div class="input-group-prepend" *ngIf=" _prepend != '' ">
+    <div class="input-group-prepend" *ngIf="_prepend !== ''">
       <div class="input-group-text">{{ _prepend }}</div>
     </div>
 
     <ng-container *ngIf="!isViewOnly">
       <input
-        [ngxTimepicker]="timepicker"
-        [format]="format"
+        [matTimepicker]="timepicker"
+        [(ngModel)]="timeValue"
         [class.invalid]="model.validationErrors.includes(_field)"
         [class]="inputClass"
-        [(ngModel)]="_model[_field]"
         [id]="_field + '_' + random"
         [attr.name]="_field + '_' + random"
         [placeholder]="_placeholder"
@@ -23,25 +22,27 @@
         [disabled]="disabled"
         [type]="type"
         [autocomplete]="random"
+        (timeChange)="setTime($event.value)"
         (keyup)="validateField()"
-        #inputBox>
-      </ng-container>
+        #inputBox
+      />
+    </ng-container>
 
-      <ng-container *ngIf="isViewOnly">
+    <ng-container *ngIf="isViewOnly">
       <div
         [id]="_field + '_' + random"
         [class]="viewOnlyClass"
         [attr.name]="_field + '_' + random"
-        [title]="_title">
-          {{ model[_field] }}
+        [title]="_title"
+      >
+        {{ model[_field] }}
       </div>
     </ng-container>
 
-    <div class="input-group-append" *ngIf="_append != ''">
+    <div class="input-group-append" *ngIf="_append !== ''">
       <div class="input-group-text">{{ _append }}</div>
     </div>
   </div>
-
 </div>
 
-<ngx-material-timepicker #timepicker (timeSet)="setTime($event)" ></ngx-material-timepicker>
+<mat-timepicker #timepicker [format]="format === 12 ? '12h' : '24h'"></mat-timepicker>

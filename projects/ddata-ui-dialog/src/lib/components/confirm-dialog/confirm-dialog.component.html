@@ -5,7 +5,6 @@
 <div *ngIf="showDialog" class="modal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-md" role="document">
     <div class="modal-content">
-
       <!-- header -->
       <div class="modal-header">
         <!-- title -->
@@ -15,10 +14,13 @@
 
         <!-- close button -->
         <div class="col-2 text-end">
-          <button type="button" class="btn btn-light close" data-dismiss="modal"
+          <button
+            type="button"
+            class="btn btn-light close"
+            data-dismiss="modal"
             [attr.aria-label]="closeButtonText"
-            (click)="cancel()">
-
+            (click)="cancel()"
+          >
             <fa-icon [icon]="icon.close"></fa-icon>
           </button>
         </div>
@@ -26,8 +28,13 @@
 
       <!-- body -->
       <div class="modal-body d-flex">
-        <div class="icon-container"
-          [ngClass]="{'text-primary': type === 'message' || type === 'warning', 'text-danger': type === 'delete'}">
+        <div
+          class="icon-container"
+          [ngClass]="{
+            'text-primary': type === 'message' || type === 'warning',
+            'text-danger': type === 'delete'
+          }"
+        >
           <!-- alert icon -->
           <div *ngIf="type === 'delete'">
             <fa-icon [icon]="icon.alert"></fa-icon>
@@ -37,30 +44,35 @@
           <div *ngIf="type === 'message'">
             <fa-icon [icon]="icon.info"></fa-icon>
           </div>
-
         </div>
 
         <div class="content-container px-3">
           <p>{{ content }}</p>
         </div>
-
       </div>
 
       <!-- footer -->
       <div class="modal-footer">
         <!-- confirmation button -->
-        <button type="button" class="btn"
-          [ngClass]="{'btn-primary': type === 'message' || type === 'warning', 'btn-danger': type === 'delete'}"
-          (click)="confirmModal()">
-
+        <button
+          type="button"
+          class="btn"
+          [ngClass]="{
+            'btn-primary': type === 'message' || type === 'warning',
+            'btn-danger': type === 'delete'
+          }"
+          (click)="confirmModal()"
+        >
           <span>{{ successButtonText }}</span>
         </button>
 
         <!-- cancel button -->
-        <button type="button" class="btn btn-secondary"
+        <button
+          type="button"
+          class="btn btn-secondary"
           *ngIf="type === 'delete' || type === 'message' || type === 'warning'"
-          (click)="cancel()">
-
+          (click)="cancel()"
+        >
           {{ cancelButtonText }}
         </button>
       </div>
