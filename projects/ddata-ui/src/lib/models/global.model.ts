@@ -1,13 +1,70 @@
 import { Injectable } from '@angular/core';
-import { faCalendar, faChevronDown, faChevronRight, faCircle, faCloudDownloadAlt, faCoins,
-  faDotCircle, faMars, faStar, faSyncAlt, faVenus, faColumns, faStream, faChevronLeft, faLayerGroup,
-  faDownload, faPaperclip, faCheck, faChevronUp, faEllipsisV, faBuilding, faStoreAlt, faCity,
-  faBoxOpen, faBoxes, faCogs, faShield, faPercent, faWarehouse, faClipboardList, faFileImport,
-  faFileExport, faCashRegister, faUniversity, faBriefcase, faUsers, faShoppingCart, faCog,
-  faFilter, faCheckSquare, faSpinner, faFile, faUser } from '@fortawesome/pro-regular-svg-icons';
-import { faCopy, faEye, faEyeSlash, faPencil, faPlus, faSearch, faSearchMinus, faSearchPlus,
-  faTag, faTimes, faTrashAlt, faMinus, faFolderOpen, faBarcodeRead, faExclamationTriangle,
-  faInfoCircle, faStar as fasStar, faFilePlus, faMinusCircle } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faCalendar,
+  faChevronDown,
+  faChevronRight,
+  faCircle,
+  faCloudDownloadAlt,
+  faCoins,
+  faDotCircle,
+  faMars,
+  faStar,
+  faSyncAlt,
+  faVenus,
+  faColumns,
+  faStream,
+  faChevronLeft,
+  faLayerGroup,
+  faDownload,
+  faPaperclip,
+  faCheck,
+  faChevronUp,
+  faEllipsisV,
+  faBuilding,
+  faStoreAlt,
+  faCity,
+  faBoxOpen,
+  faBoxes,
+  faCogs,
+  faShield,
+  faPercent,
+  faWarehouse,
+  faClipboardList,
+  faFileImport,
+  faFileExport,
+  faCashRegister,
+  faUniversity,
+  faBriefcase,
+  faUsers,
+  faShoppingCart,
+  faCog,
+  faFilter,
+  faCheckSquare,
+  faSpinner,
+  faFile,
+  faUser
+} from '@fortawesome/pro-regular-svg-icons';
+import {
+  faCopy,
+  faEye,
+  faEyeSlash,
+  faPencil,
+  faPlus,
+  faSearch,
+  faSearchMinus,
+  faSearchPlus,
+  faTag,
+  faTimes,
+  faTrashAlt,
+  faMinus,
+  faFolderOpen,
+  faBarcodeRead,
+  faExclamationTriangle,
+  faInfoCircle,
+  faStar as fasStar,
+  faFilePlus,
+  faMinusCircle
+} from '@fortawesome/pro-solid-svg-icons';
 
 @Injectable({
   providedIn: 'root'
@@ -82,6 +139,6 @@ export class Global {
     users: faUsers,
     warehouse: faWarehouse,
     warning: faExclamationTriangle,
-    minus_circle: faMinusCircle,
+    minus_circle: faMinusCircle
   };
 }

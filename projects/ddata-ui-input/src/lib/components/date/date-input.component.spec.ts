@@ -1,36 +1,41 @@
 // tslint:disable: max-line-length
 import { HttpClient } from '@angular/common/http';
-import { Injector } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BaseModel, BaseModelInterface, DdataCoreModule, FieldContainerInterface, FieldsInterface, ID, ISODate, ValidatorService } from 'ddata-core';
+import {
+  BaseModel,
+  BaseModelInterface,
+  DdataCoreModule,
+  ID,
+  ISODate,
+  ValidatorService
+} from 'ddata-core';
 import { DdataUiInputModule } from '../../ddata-ui-input.module';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 // import { DdataUiInputModule, InputHelperService } from 'ddata-ui-input';
 import { DdataInputDateComponent } from './date-input.component';
 
-interface MockModelInterace extends BaseModelInterface<MockModelInterace> {
+interface MockModelInterface extends BaseModelInterface<MockModelInterface> {
   // name: string;
   date: ISODate;
 }
 
-class MockModel extends BaseModel implements MockModelInterace {
+class MockModel extends BaseModel implements MockModelInterface {
   id: ID;
   // name: string;
   date: ISODate;
 
-  init(data?: any): this {
-      data = !!data ? data : {};
+  init(data?: unknown): this {
+    const modelData = !!data ? (data as { id?: unknown; date?: unknown }) : {};
 
-      this.id = !!data.id ? data.id : 0;
-      // this.name = !!data.name ? data.name : '';
-      this.date = !!data.date ? data.date : '';
+    this.id = (modelData.id || 0) as ID;
+    // this.name = !!data.name ? data.name : '';
+    this.date = (modelData.date || '') as ISODate;
 
-      return this;
+    return this;
   }
 }
-
 
 describe('DateFieldComponent', () => {
   let component: DdataInputDateComponent;
@@ -64,7 +69,7 @@ describe('DateFieldComponent', () => {
           provide: HttpClient,
           useValue: jasmine.createSpyObj('HttpClient', ['get'])
         }
-      ],
+      ]
     })
       .compileComponents()
       .then(() => {
@@ -80,25 +85,19 @@ describe('DateFieldComponent', () => {
   });
 
   it('type in the field change model value', fakeAsync(() => {
-    component._model = new MockModel().init({date: '2022-02-19'});
+    component._model = new MockModel().init({ date: '2022-02-19' });
     component._field = 'date';
 
     fixture.detectChanges();
-
     const input: HTMLInputElement = fixture.debugElement.query(By.css('input')).nativeElement;
-
     const newDate = '2022-12-12';
+
     input.value = newDate;
-    fixture.debugElement.query(By.css('input')).triggerEventHandler('change', {target: input});
+    fixture.debugElement.query(By.css('input')).triggerEventHandler('change', { target: input });
     fixture.detectChanges();
 
     expect(component._model['date']).toEqual(newDate);
   }));
-
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
 
   // it('ngOnInit() should change selectedValue', () => {
   //   component.model = testModel;
@@ -161,6 +160,4 @@ describe('DateFieldComponent', () => {
 
   // it('labelText input should set _label', () => {});
   // it('labelText input should set _label on falsy to empty string', () => {});
-
-
 });
