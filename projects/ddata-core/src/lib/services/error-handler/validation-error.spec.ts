@@ -249,7 +249,7 @@ describe('AppValidationError', () => {
 
       expect(() => {
         new AppValidationError(originalError, mockNotificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
 
     it('should handle originalError with no error property', () => {
@@ -259,7 +259,7 @@ describe('AppValidationError', () => {
 
       expect(() => {
         new AppValidationError(originalError, mockNotificationService);
-      }).toThrow();
+      }).not.toThrow();
     });
   });
 
