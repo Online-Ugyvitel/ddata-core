@@ -1,246 +1,116 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaginateInterface } from 'ddata-core';
-
+import { firstValueFrom } from 'rxjs';
 import { DdataUiPaginateComponent } from './paginate.component';
 
 describe('DdataUiPaginateComponent', () => {
   let component: DdataUiPaginateComponent;
   let fixture: ComponentFixture<DdataUiPaginateComponent>;
+  const paginateOf = (currentPage: number, lastPage: number): PaginateInterface => ({
+    current_page: currentPage,
+    last_page: lastPage,
+    per_page: 10,
+    total: lastPage * 10,
+    from: 1,
+    to: 10,
+    data: []
+  });
+  const render = (paginate: PaginateInterface): HTMLElement => {
+    component.paginate = paginate;
+    fixture.detectChanges();
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+    return fixture.nativeElement as HTMLElement;
+  };
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [DdataUiPaginateComponent]
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(DdataUiPaginateComponent);
     component = fixture.componentInstance;
-    component.paginate = {
-      current_page: 1,
-      last_page: 5,
-      total: 100,
-      per_page: 20,
-      data: []
-    } as unknown as PaginateInterface;
-
-    fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create with the default texts', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should have default input values', () => {
     expect(component.previousText).toBe('Previous');
     expect(component.nextText).toBe('Next');
     expect(component.paginatorText).toBe('Paginator');
-    expect(component.currentPage).toBe(0);
-  });
-
-  it('should allow custom input values', () => {
-    component.previousText = 'Back';
-    component.nextText = 'Forward';
-    component.paginatorText = 'Navigation';
-    
-    expect(component.previousText).toBe('Back');
-    expect(component.nextText).toBe('Forward');
-    expect(component.paginatorText).toBe('Navigation');
   });
 
   describe('ngOnInit', () => {
-    it('should initialize numbers observable and set currentPage', (done) => {
-      component.ngOnInit();
-      
-      // Subscribe to numbers observable
-      component.numbers.subscribe(numbers => {
-        expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        expect(component.currentPage).toBe(2);
-        done();
-      });
+    it('should list the page numbers and remember the current page', async () => {
+      component.paginate = paginateOf(2, 5);
 
-      // Emit test data
-      paginateSubject.next(mockPaginateData);
+      component.ngOnInit();
+
+      expect(await firstValueFrom(component.numbers)).toEqual([1, 2, 3, 4, 5]);
+      expect(component.currentPage).toBe(2);
     });
 
-    it('should handle single page data correctly', (done) => {
-      component.ngOnInit();
-      
-      component.numbers.subscribe(numbers => {
-        expect(numbers).toEqual([1]);
-        expect(component.currentPage).toBe(1);
-        done();
-      });
+    it('should handle a single page', async () => {
+      component.paginate = paginateOf(1, 1);
 
-      paginateSubject.next(mockSinglePageData);
+      component.ngOnInit();
+
+      expect(await firstValueFrom(component.numbers)).toEqual([1]);
     });
 
-    it('should generate correct numbers array for first page', (done) => {
+    it('should not list pages when there is no last page', async () => {
+      component.paginate = paginateOf(0, 0);
+
       component.ngOnInit();
-      
-      component.numbers.subscribe(numbers => {
-        expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        expect(component.currentPage).toBe(1);
-        done();
-      });
 
-      paginateSubject.next(mockFirstPageData);
-    });
-
-    it('should generate correct numbers array for last page', (done) => {
-      component.ngOnInit();
-      
-      component.numbers.subscribe(numbers => {
-        expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        expect(component.currentPage).toBe(10);
-        done();
-      });
-
-      paginateSubject.next(mockLastPageData);
+      expect(await firstValueFrom(component.numbers)).toEqual([]);
     });
   });
 
   describe('swithPage', () => {
-    beforeEach(() => {
-      component.currentPage = 5;
-      spyOn(component.changePage, 'emit');
-    });
+    it('should emit the next and the previous page number', () => {
+      const pages: Array<number> = [];
 
-    it('should emit next page number when direction is next', () => {
+      component.changePage.subscribe((page: number) => pages.push(page));
+      component.currentPage = 3;
+
       component.swithPage('next');
-      expect(component.changePage.emit).toHaveBeenCalledWith(6);
-    });
-
-    it('should emit previous page number when direction is prev', () => {
       component.swithPage('prev');
-      expect(component.changePage.emit).toHaveBeenCalledWith(4);
-    });
 
-    it('should handle edge case when current page is 1 and direction is prev', () => {
-      component.currentPage = 1;
-      component.swithPage('prev');
-      expect(component.changePage.emit).toHaveBeenCalledWith(0);
-    });
-
-    it('should handle edge case when current page is last and direction is next', () => {
-      component.currentPage = 10;
-      component.swithPage('next');
-      expect(component.changePage.emit).toHaveBeenCalledWith(11);
+      expect(pages).toEqual([4, 2]);
     });
   });
 
-  describe('changePage event emitter', () => {
-    it('should be defined and be an EventEmitter', () => {
-      expect(component.changePage).toBeDefined();
-      expect(component.changePage.emit).toBeDefined();
+  describe('template', () => {
+    it('should render a link for every page and mark the current one', () => {
+      const element = render(paginateOf(2, 3));
+      const items = element.querySelectorAll('li.page-item');
+
+      // previous + 3 pages + next
+      expect(items.length).toBe(5);
+      expect(items[2].classList).toContain('active');
+      expect(items[0].classList).not.toContain('disabled');
+      expect(items[4].classList).not.toContain('disabled');
     });
 
-    it('should emit page number when called directly', () => {
-      spyOn(component.changePage, 'emit');
-      component.changePage.emit(5);
-      expect(component.changePage.emit).toHaveBeenCalledWith(5);
-    });
-  });
+    it('should disable the previous button on the first and the next button on the last page', () => {
+      const first = render(paginateOf(1, 3)).querySelectorAll('li.page-item');
 
-  describe('integration tests', () => {
-    it('should update currentPage when paginate data changes', () => {
-      component.ngOnInit();
-      
-      // Initial state
-      expect(component.currentPage).toBe(0);
-      
-      // Emit first page data
-      paginateSubject.next(mockFirstPageData);
-      expect(component.currentPage).toBe(1);
-      
-      // Emit different page data
-      paginateSubject.next(mockLastPageData);
-      expect(component.currentPage).toBe(10);
+      expect(first[0].classList).toContain('disabled');
+      expect(first[4].classList).not.toContain('disabled');
     });
 
-    it('should handle multiple subscribers to numbers observable', (done) => {
-      component.ngOnInit();
-      
-      let subscription1Called = false;
-      let subscription2Called = false;
-      
-      component.numbers.subscribe(numbers => {
-        subscription1Called = true;
-        expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-      });
-      
-      component.numbers.subscribe(numbers => {
-        subscription2Called = true;
-        expect(numbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        
-        if (subscription1Called && subscription2Called) {
-          done();
-        }
-      });
-
-      paginateSubject.next(mockPaginateData);
+    it('should not render the navigation when there are no pages', () => {
+      expect(render(paginateOf(0, 0)).querySelector('nav')).toBeNull();
     });
 
-    it('should work correctly when paginate subject emits multiple times', () => {
-      component.ngOnInit();
-      
-      // First emission
-      paginateSubject.next(mockFirstPageData);
-      expect(component.currentPage).toBe(1);
-      
-      // Second emission
-      paginateSubject.next(mockPaginateData);
-      expect(component.currentPage).toBe(2);
-      
-      // Third emission
-      paginateSubject.next(mockLastPageData);
-      expect(component.currentPage).toBe(10);
-    });
-  });
+    it('should emit the clicked page number', () => {
+      const pages: Array<number> = [];
 
-  describe('edge cases', () => {
-    it('should handle paginate data with zero last_page', (done) => {
-      const zeroPageData: PaginateInterface = {
-        current_page: 0,
-        per_page: 10,
-        from: 0,
-        to: 0,
-        total: 0,
-        last_page: 0,
-        data: []
-      };
-      
-      component.ngOnInit();
-      
-      component.numbers.subscribe(numbers => {
-        expect(numbers).toEqual([]);
-        expect(component.currentPage).toBe(0);
-        done();
-      });
+      component.changePage.subscribe((page: number) => pages.push(page));
+      const links = render(paginateOf(1, 3)).querySelectorAll<HTMLAnchorElement>('a.page-link');
 
-      paginateSubject.next(zeroPageData);
-    });
+      links[2].click();
 
-    it('should handle paginate data with negative values gracefully', (done) => {
-      const negativePageData: PaginateInterface = {
-        current_page: -1,
-        per_page: 10,
-        from: 0,
-        to: 0,
-        total: 0,
-        last_page: -1,
-        data: []
-      };
-      
-      component.ngOnInit();
-      
-      component.numbers.subscribe(numbers => {
-        expect(numbers).toEqual([]);
-        expect(component.currentPage).toBe(-1);
-        done();
-      });
-
-      paginateSubject.next(negativePageData);
+      expect(pages).toEqual([2]);
     });
   });
 });
