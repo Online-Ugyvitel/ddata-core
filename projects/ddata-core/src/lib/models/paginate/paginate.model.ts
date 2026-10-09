@@ -1,4 +1,6 @@
 // tslint:disable: variable-name
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-param-reassign */
 import { PaginateInterface } from './paginate.interface';
 
 export class Paginate implements PaginateInterface {
@@ -6,7 +8,7 @@ export class Paginate implements PaginateInterface {
   per_page: number;
   from: number;
   to: number;
-  data: any[] = [];
+  data: Array<any> = [];
   total: number;
   last_page: number;
 
@@ -25,7 +27,7 @@ export class Paginate implements PaginateInterface {
     this.last_page = !!data.last_page ? data.last_page : 1;
 
     if (!!data.data) {
-      data.data.forEach( (item: any) => {
+      data.data.forEach((item: any) => {
         this.data.push(new type().init(item));
       });
     }
