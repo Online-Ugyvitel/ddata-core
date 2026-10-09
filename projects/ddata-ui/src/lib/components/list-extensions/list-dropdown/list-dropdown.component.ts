@@ -20,7 +20,7 @@ import { CertificationScrappingProtocol } from 'src/app/models/certification/scr
 import { CertificationTypeInterface } from 'src/app/models/certification/type/certification-type.interface';
 import { CompanyInterface } from 'src/app/models/company/company.interface';
 import { CompanyShopInterface } from 'src/app/models/company/shop/company-shop.interface';
-import { DialogContentItem } from 'ddata-ui-dialog';
+import { DialogContentItem } from '@netdjw/ddata-ui-dialog';
 import { Global } from '../../../models/global.model';
 import { ListDropdownItemInterface } from 'src/app/models/list-dropdown-item/list-dropdown-item.interface';
 import { CertificationCommercialStockUploadCreateEditComponent } from 'src/app/modules/sales/components/commercial/stock/upload/certification-commercial-stock-upload-create-edit/certification-commercial-stock-upload-create-edit.component';
@@ -178,18 +178,18 @@ export class ListDropdownComponent {
 //   4, 'Bizományos visszavétel' 'commercial-return-of-goods-by-one' --- TÖRÖLVE
 //   5, 'Bizományos fogyás' 'commercial-weight-loss'
 //   6, 'Vevői megrendelés' 'customer-order'
-//   7, 'Bejövő szállítólevél' 'incoming-delivery-note'
+//   7, 'Bejövő szállítólevel' 'incoming-delivery-note'
 //   8, 'Garanciális visszavétel' 'incoming-guarantee'
 //   9, 'Bejövő áru számla' 'incoming-invoice'
 //   10, 'Leltár ív' 'inventory-control'
 //   11, 'Raktárak közötti mozgás' 'movement-between-warehouse'
-//   12, 'Kimenő szállítólevél' 'outgoing-delivery-note'
+//   12, 'Kimenő szállítólevel' 'outgoing-delivery-note'
 //   13, 'Garanciális kiküldés' 'outgoing-guarantee'
 //   14, 'Kimenő számla' 'outgoing-invoice'
 //   15, 'Előlegszámla' 'prepayment-invoice'
 //   16, 'Díjbekérő' 'prepayment-request'
 //   17, 'Szétgyártási bizonylat' 'product-explode-note'
 //   18, 'Összeszerelési bizonylat' 'product-implode-note'
-//   19, 'Visszáru vevőtől' 'returned-from-customer'
-//   20, 'Visszáru a gyártónak' 'returned-to-producer'
+//   19, 'Visszwáru vevőtől' 'returned-from-customer'
+//   20, 'Visszwáru a gyártónak' 'returned-to-producer'
 //   21, 'Selejtezési jegyzőkönyv' 'scrapping-protocol'
