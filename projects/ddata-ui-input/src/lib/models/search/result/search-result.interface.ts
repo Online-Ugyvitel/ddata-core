@@ -38,5 +38,5 @@ export interface SearchResultInterface {
    */
   url: string;
 
-  init(data?: any): SearchResultInterface;
+  init(data?: unknown): SearchResultInterface;
 }
