@@ -14,7 +14,7 @@ import {
   BaseModelInterface,
   FieldsInterface,
   FieldContainerInterface
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 // Mock model for testing

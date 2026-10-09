@@ -14,7 +14,7 @@ import {
   DdataCoreModule,
   FieldsInterface,
   ValidatorService
-} from 'ddata-core';
+} from '@netdjw/ddata-core';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 @Component({

@@ -12,7 +12,7 @@ import {
   ViewContainerRef,
   AfterViewInit
 } from '@angular/core';
-import { BaseModelInterface, FieldsInterface } from 'ddata-core';
+import { BaseModelInterface, FieldsInterface } from '@netdjw/ddata-core';
 import { ComponentRendererService } from '../../../../services/select/component-renderer.service';
 import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
