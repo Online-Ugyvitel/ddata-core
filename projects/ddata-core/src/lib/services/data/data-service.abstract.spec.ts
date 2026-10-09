@@ -27,7 +27,7 @@ describe('DataServiceAbstract', () => {
     it('should store reference to the same model instance', () => {
       const anotherModel = new MockModel();
       const anotherService = new TestDataService(anotherModel);
-      
+
       expect(anotherService.model).toBe(anotherModel);
       expect(anotherService.model).not.toBe(mockModel);
     });
@@ -37,9 +37,8 @@ describe('DataServiceAbstract', () => {
     it('should create a clone of the source object', () => {
       const source = { id: 1, name: 'test' };
       const data = { id: 2, name: 'updated', extra: 'field' };
-      
       const result = service.hydrate(source, data);
-      
+
       expect(result).not.toBe(source);
       expect(result).not.toBe(data);
       expect(result.id).toBe(2);
@@ -50,9 +49,8 @@ describe('DataServiceAbstract', () => {
     it('should maintain prototype chain', () => {
       const source = new MockModel();
       const data = { id: 123, name: 'cloned' };
-      
       const result = service.hydrate(source, data);
-      
+
       expect(Object.getPrototypeOf(result)).toBe(Object.getPrototypeOf(source));
       expect(result instanceof MockModel).toBe(true);
     });
@@ -60,9 +58,8 @@ describe('DataServiceAbstract', () => {
     it('should handle empty data object', () => {
       const source = { id: 1, name: 'test' };
       const data = {};
-      
       const result = service.hydrate(source, data);
-      
+
       expect(result).toBeDefined();
       expect(typeof result).toBe('object');
     });
@@ -70,9 +67,8 @@ describe('DataServiceAbstract', () => {
     it('should handle null values', () => {
       const source = { id: 1, name: 'test' };
       const data = { id: null, name: null };
-      
       const result = service.hydrate(source, data);
-      
+
       expect(result.id).toBe(null);
       expect(result.name).toBe(null);
     });
@@ -86,9 +82,8 @@ describe('DataServiceAbstract', () => {
         tags: ['tag1', 'tag2'],
         newProperty: 'new value'
       };
-      
       const result = service.hydrate(source, data);
-      
+
       expect(result.id).toBe(42);
       expect(result.name).toBe('test model');
       expect(result.items).toEqual([1, 2, 3]);
@@ -100,17 +95,17 @@ describe('DataServiceAbstract', () => {
   describe('hydrateArray method', () => {
     it('should return empty array when input is empty', () => {
       const result = service.hydrateArray([]);
-      
+
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBe(0);
     });
 
     it('should hydrate single item', () => {
       const data = [{ id: 1, name: 'item1' }];
+
       spyOn(mockModel, 'init').and.returnValue(new MockModel());
-      
       const result = service.hydrateArray(data);
-      
+
       expect(result.length).toBe(1);
       expect(mockModel.init).toHaveBeenCalledWith({ id: 1, name: 'item1' });
     });
@@ -121,10 +116,10 @@ describe('DataServiceAbstract', () => {
         { id: 2, name: 'item2' },
         { id: 3, name: 'item3' }
       ];
+
       spyOn(mockModel, 'init').and.returnValue(new MockModel());
-      
       const result = service.hydrateArray(data);
-      
+
       expect(result.length).toBe(3);
       expect(mockModel.init).toHaveBeenCalledTimes(3);
       expect(mockModel.init).toHaveBeenCalledWith({ id: 1, name: 'item1' });
@@ -136,12 +131,12 @@ describe('DataServiceAbstract', () => {
       // Set up model with array properties
       mockModel.items = [1, 2, 3];
       mockModel.tags = ['existing', 'tags'];
-      
       const data = [{ id: 1, name: 'item1' }];
+
       spyOn(mockModel, 'init').and.returnValue(new MockModel());
-      
+
       service.hydrateArray(data);
-      
+
       // Arrays should be cleared
       expect(mockModel.items).toEqual([]);
       expect(mockModel.tags).toEqual([]);
@@ -157,9 +152,8 @@ describe('DataServiceAbstract', () => {
         }
       };
       const simpleService = new TestDataService(simpleModel as any);
-      
       const data = [{ id: 1, name: 'item1' }];
-      
+
       // Should not throw error
       expect(() => {
         simpleService.hydrateArray(data);
@@ -173,10 +167,10 @@ describe('DataServiceAbstract', () => {
         { name: 'item3' }, // missing id
         {} // empty object
       ];
+
       spyOn(mockModel, 'init').and.returnValue(new MockModel());
-      
       const result = service.hydrateArray(data);
-      
+
       expect(result.length).toBe(4);
       expect(mockModel.init).toHaveBeenCalledTimes(4);
     });
@@ -186,13 +180,12 @@ describe('DataServiceAbstract', () => {
         { id: 1, name: 'item1' },
         { id: 2, name: 'item2' }
       ];
-      
       const model1 = new MockModel();
       const model2 = new MockModel();
+
       spyOn(mockModel, 'init').and.returnValues(model1, model2);
-      
       const result = service.hydrateArray(data);
-      
+
       expect(result.length).toBe(2);
       expect(result[0]).toBe(model1);
       expect(result[1]).toBe(model2);
@@ -205,10 +198,10 @@ describe('DataServiceAbstract', () => {
         { id: null, name: 'item2' },
         { id: undefined, name: undefined }
       ];
+
       spyOn(mockModel, 'init').and.returnValue(new MockModel());
-      
       const result = service.hydrateArray(data);
-      
+
       expect(result.length).toBe(3);
       expect(mockModel.init).toHaveBeenCalledTimes(3);
     });
@@ -219,17 +212,15 @@ describe('DataServiceAbstract', () => {
         { id: 1, name: 'first' },
         { id: 2, name: 'second' }
       ];
-      
       const models = [
         Object.assign(new MockModel(), { id: 3, name: 'third' }),
         Object.assign(new MockModel(), { id: 1, name: 'first' }),
         Object.assign(new MockModel(), { id: 2, name: 'second' })
       ];
-      
+
       spyOn(mockModel, 'init').and.returnValues(...models);
-      
       const result = service.hydrateArray(data);
-      
+
       expect(result[0]).toBe(models[0]);
       expect(result[1]).toBe(models[1]);
       expect(result[2]).toBe(models[2]);
@@ -256,9 +247,8 @@ describe('DataServiceAbstract', () => {
 
     it('should create a PaginateInterface object', () => {
       spyOn(service, 'hydrateArray').and.returnValue([]);
-      
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
-      
+
       expect(result).toBeDefined();
       expect(typeof result).toBe('object');
     });
@@ -266,35 +256,33 @@ describe('DataServiceAbstract', () => {
     it('should hydrate paginate object with provided data', () => {
       spyOn(service, 'hydrateArray').and.returnValue([]);
       spyOn(service, 'hydrate').and.callThrough();
-      
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
-      
+
       expect(service.hydrate).toHaveBeenCalledWith(jasmine.any(Paginate), mockPaginateData);
     });
 
     it('should call hydrateArray with data property', () => {
       spyOn(service, 'hydrateArray').and.returnValue([]);
-      
+
       service['getNewPaginateObject'](MockModel, mockPaginateData);
-      
+
       expect(service.hydrateArray).toHaveBeenCalledWith(mockPaginateData.data);
     });
 
     it('should set data property with hydrated array', () => {
       const hydratedModels = [new MockModel(), new MockModel()];
+
       spyOn(service, 'hydrateArray').and.returnValue(hydratedModels);
-      
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
-      
+
       expect(result.data).toBe(hydratedModels);
       expect(result.data.length).toBe(2);
     });
 
     it('should preserve paginate metadata', () => {
       spyOn(service, 'hydrateArray').and.returnValue([]);
-      
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
-      
+
       expect(result.current_page).toBe(1);
       expect(result.per_page).toBe(10);
       expect(result.from).toBe(1);
@@ -308,10 +296,10 @@ describe('DataServiceAbstract', () => {
         ...mockPaginateData,
         data: []
       };
+
       spyOn(service, 'hydrateArray').and.returnValue([]);
-      
       const result = service['getNewPaginateObject'](MockModel, emptyPaginateData);
-      
+
       expect(result.data).toEqual([]);
       expect(service.hydrateArray).toHaveBeenCalledWith([]);
     });
@@ -323,18 +311,17 @@ describe('DataServiceAbstract', () => {
         total: 0
         // no data property
       };
+
       spyOn(service, 'hydrateArray').and.returnValue([]);
-      
       const result = service['getNewPaginateObject'](MockModel, noPaginateData);
-      
+
       expect(service.hydrateArray).toHaveBeenCalledWith(undefined);
     });
 
     it('should return object that implements PaginateInterface', () => {
       spyOn(service, 'hydrateArray').and.returnValue([]);
-      
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
-      
+
       // Check that result has all PaginateInterface properties
       expect(result.hasOwnProperty('current_page')).toBe(true);
       expect(result.hasOwnProperty('per_page')).toBe(true);
@@ -361,16 +348,15 @@ describe('DataServiceAbstract', () => {
           { id: 10, name: 'item10' }
         ]
       };
-      
-      const hydratedModels = complexPaginateData.data.map(item => {
+      const hydratedModels = complexPaginateData.data.map((item) => {
         const model = new MockModel();
+
         return model.init(item);
       });
-      
+
       spyOn(service, 'hydrateArray').and.returnValue(hydratedModels);
-      
       const result = service['getNewPaginateObject'](MockModel, complexPaginateData);
-      
+
       expect(result.current_page).toBe(2);
       expect(result.per_page).toBe(5);
       expect(result.data.length).toBe(5);
@@ -392,10 +378,9 @@ describe('DataServiceAbstract', () => {
           { id: 2, name: 'Real Item 2', items: ['c', 'd'], tags: ['normal'] }
         ]
       };
-      
       // Don't mock anything, test the real flow
       const result = service['getNewPaginateObject'](MockModel, paginateData);
-      
+
       expect(result.current_page).toBe(1);
       expect(result.data.length).toBe(2);
       expect(result.data[0].id).toBe(1);
@@ -408,14 +393,12 @@ describe('DataServiceAbstract', () => {
       // Start with contaminated model
       mockModel.items = ['old', 'data'];
       mockModel.tags = ['old', 'tags'];
-      
       const data = [
         { id: 1, name: 'item1', items: ['new1'], tags: ['new1'] },
         { id: 2, name: 'item2', items: ['new2'], tags: ['new2'] }
       ];
-      
       const result = service.hydrateArray(data);
-      
+
       expect(result.length).toBe(2);
       // Arrays should have been cleared during processing
       expect(mockModel.items).toEqual([]);
@@ -427,7 +410,7 @@ describe('DataServiceAbstract', () => {
     it('should handle model without constructor gracefully', () => {
       const plainModel = { id: 0, name: '', init: jasmine.createSpy('init') };
       const plainService = new TestDataService(plainModel as any);
-      
+
       expect(() => {
         plainService.hydrateArray([{ id: 1 }]);
       }).not.toThrow();
@@ -443,16 +426,16 @@ describe('DataServiceAbstract', () => {
           }
         }
       };
-      
       const result = service.hydrate(mockModel, deepObject);
-      
+
       expect(result.level1.level2.level3.value).toBe('deep');
     });
 
     it('should handle circular references in hydrate', () => {
       const circularObject: any = { name: 'circular' };
+
       circularObject.self = circularObject;
-      
+
       // This should not throw an error (Object.assign handles circular refs)
       expect(() => {
         service.hydrate(mockModel, circularObject);
@@ -460,9 +443,9 @@ describe('DataServiceAbstract', () => {
     });
 
     it('should handle undefined and null models', () => {
-      const nullService = new TestDataService(null as any);
-      const undefinedService = new TestDataService(undefined as any);
-      
+      const nullService = new TestDataService(null);
+      const undefinedService = new TestDataService(undefined);
+
       expect(nullService.model).toBe(null);
       expect(undefinedService.model).toBe(undefined);
     });

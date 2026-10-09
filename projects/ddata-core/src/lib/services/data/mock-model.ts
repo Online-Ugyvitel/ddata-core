@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Mock model class for testing DataServiceAbstract
  */
 export class MockModel {
   id: number;
   name: string;
-  items: any[] = [];
-  tags: string[] = [];
+  items: Array<any> = [];
+  tags: Array<string> = [];
 
   constructor() {
     this.id = 0;
@@ -21,6 +22,7 @@ export class MockModel {
       this.items = data.items || [];
       this.tags = data.tags || [];
     }
+
     return this;
   }
 }

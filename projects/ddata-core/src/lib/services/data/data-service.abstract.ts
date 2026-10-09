@@ -40,7 +40,6 @@ export abstract class DataServiceAbstract<T> {
       }
       // copy `this.model` into a clone object
       const newModel = this.hydrate(this.model, this.model);
-
       // initialize the new model with the instance of datas, the model's own `init` result is preferred
       const initializedModel = newModel.init(item);
 
