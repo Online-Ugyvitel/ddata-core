@@ -7,15 +7,9 @@ import { SpinnerService } from './services/spinner/spinner.service';
 // @dynamic
 @NgModule({
   declarations: [],
-  imports: [
-    DdataInjectorModule,
-  ],
-  providers: [
-    { provide: ErrorHandler, useClass: DdataCoreErrorHandler },
-
-    SpinnerService,
-  ],
-  exports: [],
+  imports: [DdataInjectorModule],
+  providers: [{ provide: ErrorHandler, useClass: DdataCoreErrorHandler }, SpinnerService],
+  exports: []
 })
 export class DdataCoreModule {
   static InjectorInstance: Injector;
@@ -24,7 +18,7 @@ export class DdataCoreModule {
     DdataCoreModule.InjectorInstance = injector;
   }
 
-  public static forRoot(environment: any): ModuleWithProviders<DdataCoreModule> {
+  static forRoot(environment: unknown): ModuleWithProviders<DdataCoreModule> {
     return {
       ngModule: DdataCoreModule,
       providers: [

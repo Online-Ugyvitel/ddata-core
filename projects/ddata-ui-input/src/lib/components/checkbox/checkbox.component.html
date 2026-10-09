@@ -1,29 +1,31 @@
 <div [class]="wrapperClass">
-
-  <label *ngIf="showLabel && !showLabelAfter"
+  <label
+    *ngIf="showLabel && !showLabelAfter"
     [class]="labelClass"
     [class.disabled]="disabled"
     [for]="_field + iterable"
-    >
+  >
     {{ _label }}:
   </label>
 
-  <button type="button" class="btn btn-light"
+  <button
+    type="button"
+    class="btn btn-light"
     (click)="clicked()"
     [disabled]="disabled"
     [id]="_field + iterable"
     [name]="_field + iterable"
     [title]="_label"
-    >
+  >
     <fa-icon [icon]="getIcon()"></fa-icon>
   </button>
 
-  <label *ngIf="showLabel && showLabelAfter"
+  <label
+    *ngIf="showLabel && showLabelAfter"
     [class]="labelClass"
     [class.disabled]="disabled"
     [for]="_field + iterable"
-    >
+  >
     {{ _label }}
   </label>
-
 </div>
