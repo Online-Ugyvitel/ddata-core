@@ -8,7 +8,7 @@ In your **app.module.ts**:
 
 ```typescript
 import { Injector, NgModule } from '@angular/core';
-import { DdataCoreModule, NotificationService } from 'ddata-core';
+import { DdataCoreModule, NotificationService } from '@netdjw/ddata-core';
 import { environment } from 'src/environments/environment';
 
 @NgModule({
@@ -99,4 +99,4 @@ this.notificationService.watch().pipe(
 
 ## See also
 
-If you want to use a fully-implemented notifiaction component based on this service, check the `ddata-ui-common` package.
+If you want to use a fully-implemented notifiaction component based on this service, check the `@netdjw/ddata-ui-common` package.
