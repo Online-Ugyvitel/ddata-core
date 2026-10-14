@@ -21,6 +21,9 @@ import { DdataTextareaComponent } from './components/textarea/textarea.component
 import { DdataInputTimeComponent } from './components/time/time-input.component';
 import { CharacterCounterComponent } from './components/character-counter/character-counter.component';
 import { WordCounterComponent } from './components/word-counter/word-counter.component';
+import { AutocompleteBoxComponent } from './components/autocomplete-box/autocomplete-box.component';
+import { MultilanguageNameComponent } from './components/multilanguage-name/multilanguage-name.component';
+import { PasswordStrengthOMeterComponent } from './components/password-strength-o-meter/password-strength-o-meter.component';
 import { DescriptionPipe } from './pipes/description/description.pipe';
 
 @NgModule({
@@ -39,6 +42,9 @@ import { DescriptionPipe } from './pipes/description/description.pipe';
     DdataMultipleSelectDialogComponent,
     CharacterCounterComponent,
     WordCounterComponent,
+    AutocompleteBoxComponent,
+    MultilanguageNameComponent,
+    PasswordStrengthOMeterComponent,
     DescriptionPipe
   ],
   imports: [
@@ -72,6 +78,9 @@ import { DescriptionPipe } from './pipes/description/description.pipe';
     DdataMultipleSelectComponent,
     DdataMultipleSelectDialogComponent,
     CharacterCounterComponent,
+    AutocompleteBoxComponent,
+    MultilanguageNameComponent,
+    PasswordStrengthOMeterComponent,
     DescriptionPipe
   ],
   providers: [provideNativeDateTimeAdapter()]

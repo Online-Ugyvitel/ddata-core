@@ -1,0 +1,87 @@
+<div class="d-flex flex-wrap">
+  @if (showLabel) {
+    <label [class]="labelClass" [for]="id">
+      {{ _label }}:
+      @if (_is_required) {
+        <span aria-hidden="true"> *</span>
+      }
+    </label>
+  }
+  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
+    @if (_prepend !== '') {
+      <div class="input-group-prepend">
+        <div class="input-group-text">{{ _prepend }}</div>
+      </div>
+    }
+
+    <div class="autocomplete-box">
+      @if (model) {
+        <input
+          #inputBox
+          [class]="inputClass"
+          [class.invalid]="isInvalid"
+          [ngModel]="model[_field]"
+          (ngModelChange)="onValueChange($event)"
+          [id]="id"
+          [attr.name]="id"
+          [placeholder]="_placeholder"
+          [title]="_title"
+          [disabled]="disabled"
+          [type]="type"
+          autocomplete="off"
+          [attr.role]="autocomplete ? 'combobox' : null"
+          [attr.aria-autocomplete]="autocomplete ? 'list' : null"
+          [attr.aria-expanded]="autocomplete ? isOpen : null"
+          [attr.aria-controls]="autocomplete ? listboxId : null"
+          [attr.aria-activedescendant]="getActiveDescendant()"
+          [attr.aria-required]="_is_required"
+          [attr.aria-invalid]="isInvalid"
+          [attr.aria-busy]="autocompleteLoading()"
+          (keydown)="onKeydown($event)"
+          (blur)="clearSuggestions()"
+        />
+      }
+
+      @if (autocomplete && autocompleteLoading()) {
+        <div class="autocomplete-list-container" role="status">
+          <div class="autocomplete-list">
+            <div class="autocomplete-list-item text-center small text-muted">
+              <fa-icon [icon]="spinner" animation="spin" aria-hidden="true"></fa-icon>
+              <span class="visually-hidden">{{ loadingText }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (isOpen) {
+        <div
+          class="autocomplete-list-container"
+          [class.autocomplete-spinner-place]="autocompleteLoading()"
+        >
+          <div class="autocomplete-list" role="listbox" [id]="listboxId" [attr.aria-label]="_label">
+            @for (suggestion of autocompleteSuggestions(); track suggestion; let index = $index) {
+              <!-- mousedown is prevented, so the input keeps the focus and the blur doesn't close the list before the click -->
+              <div
+                class="autocomplete-list-item"
+                role="option"
+                [id]="getOptionId(index)"
+                [class.active]="index === autocompleteCursor()"
+                [attr.aria-selected]="index === autocompleteCursor()"
+                (mousedown)="$event.preventDefault()"
+                (click)="setContent(suggestion)"
+              >
+                {{ suggestion.name }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (_append !== '') {
+      <div class="input-group-append">
+        <div class="input-group-text">{{ _append }}</div>
+      </div>
+    }
+  </div>
+</div>
