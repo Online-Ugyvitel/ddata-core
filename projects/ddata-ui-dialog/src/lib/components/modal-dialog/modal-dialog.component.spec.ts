@@ -115,11 +115,19 @@ describe('DdataUiModalDialogComponent', () => {
       expect(component.showModal).toHaveBeenCalled();
     });
 
-    it('should call close when value is falsy', () => {
+    it('should call close when value is falsy and the dialog is open', () => {
+      component.isModalVisible = true;
       vi.spyOn(component, 'close').mockReturnValue(undefined);
       component.showDialog = false;
 
       expect(component.close).toHaveBeenCalled();
+    });
+
+    it('should not call close when value is falsy and the dialog is already closed', () => {
+      vi.spyOn(component, 'close').mockReturnValue(undefined);
+      component.showDialog = false;
+
+      expect(component.close).not.toHaveBeenCalled();
     });
 
     it('should call showModal when value is truthy string', () => {
@@ -642,16 +650,32 @@ class TestListContentComponent {
 }
 
 @Component({
+  selector: 'dd-test-form-content',
+  template: `<div class="form-content">
+    <input name="first" />
+    <input name="disabled" disabled />
+    <input name="skipped" tabindex="-1" />
+    <input name="last" />
+  </div>`
+})
+class TestFormContentComponent {
+  data: any;
+  isModal = false;
+}
+
+@Component({
   selector: 'dd-test-host',
   imports: [DdataUiDialogModule],
-  template: `<dd-modal-dialog
-    [title]="title"
-    [dialogContent]="content"
-    [showDialog]="show"
-    [overlayClickCloseDialog]="overlayClose"
-    (success)="successes.push($event)"
-    (fail)="fails.push($event)"
-  ></dd-modal-dialog>`
+  template: `<button type="button" class="opener">Open</button>
+    <dd-modal-dialog
+      [title]="title"
+      [dialogContent]="content"
+      [showDialog]="show"
+      [overlayClickCloseDialog]="overlayClose"
+      (showDialogChange)="show = $event; showChanges.push($event)"
+      (success)="successes.push($event)"
+      (fail)="fails.push($event)"
+    ></dd-modal-dialog>`
 })
 class TestHostComponent {
   title = 'Edit item';
@@ -663,6 +687,7 @@ class TestHostComponent {
   overlayClose = true;
   successes: Array<any> = [];
   fails: Array<string> = [];
+  showChanges: Array<boolean> = [];
 }
 
 describe('DdataUiModalDialogComponent rendered in a host', () => {
@@ -692,16 +717,13 @@ describe('DdataUiModalDialogComponent rendered in a host', () => {
     ).componentInstance;
   });
 
-  it('should emit fail("close") once for the initial hidden binding (current behaviour)', () => {
-    expect(host.fails).toEqual(['close']);
+  it('should not emit fail or showDialogChange for the initial hidden binding', () => {
+    expect(host.fails).toEqual([]);
     expect(host.successes).toEqual([]);
+    expect(host.showChanges).toEqual([]);
   });
 
   describe('after the initial render', () => {
-    beforeEach(() => {
-      host.fails = [];
-    });
-
     it('should render nothing while hidden', () => {
       expect(query('.modal')).toBeNull();
       expect(query('.modal-overlay').classList.contains('active')).toBe(false);
@@ -919,6 +941,203 @@ describe('DdataUiModalDialogComponent rendered in a host', () => {
       render({ show: true });
 
       expect(query('.modal-header button').getAttribute('aria-label')).toBe('Close');
+    });
+  });
+
+  describe('keyboard, focus and backdrop', () => {
+    const keydown = (key: string, shiftKey = false): KeyboardEvent => {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        shiftKey,
+        bubbles: true,
+        cancelable: true
+      });
+
+      document.activeElement.dispatchEvent(event);
+      hostFixture.detectChanges();
+
+      return event;
+    };
+    const closeButton = (): HTMLElement => query('.modal-header button');
+    const openWithForm = (): void => {
+      query('.opener').focus();
+      render({ content: new DialogContentItem(TestFormContentComponent, {}), show: true });
+      hostFixture.detectChanges();
+    };
+
+    it('should close on Escape like the close button', () => {
+      render({ show: true });
+      const event = keydown('Escape');
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(query('.modal')).toBeNull();
+      expect(host.fails).toEqual(['close']);
+      expect(host.showChanges).toEqual([false]);
+      expect(host.show).toBe(false);
+    });
+
+    it('should accept the legacy "Esc" key name', () => {
+      render({ show: true });
+
+      keydown('Esc');
+
+      expect(query('.modal')).toBeNull();
+    });
+
+    it('should ignore Escape while closed', () => {
+      const event = keydown('Escape');
+
+      expect(event.defaultPrevented).toBe(false);
+      expect(host.fails).toEqual([]);
+      expect(host.showChanges).toEqual([]);
+    });
+
+    it('should ignore other keys', () => {
+      render({ show: true });
+      const event = keydown('Enter');
+
+      expect(event.defaultPrevented).toBe(false);
+      expect(query('.modal')).not.toBeNull();
+    });
+
+    it('should reopen after an internal close because showDialogChange resets the parent value', () => {
+      render({ show: true });
+      keydown('Escape');
+
+      render({ show: true });
+
+      expect(query('.modal')).not.toBeNull();
+      expect(query('.edit-content')).not.toBeNull();
+    });
+
+    it('should move the focus into the dialog on open and restore it on close', () => {
+      const opener = query('.opener');
+
+      opener.focus();
+      render({ show: true });
+
+      expect(document.activeElement).toBe(closeButton());
+
+      closeButton().click();
+      hostFixture.detectChanges();
+
+      expect(document.activeElement).toBe(opener);
+    });
+
+    it('should restore the focus when the parent closes the dialog', () => {
+      const opener = query('.opener');
+
+      opener.focus();
+      render({ show: true });
+      render({ show: false });
+
+      expect(document.activeElement).toBe(opener);
+      expect(host.fails).toEqual(['close']);
+    });
+
+    it('should not move the focus when the dialog is opened again while open', () => {
+      query('.opener').focus();
+      render({ show: true });
+      query('.modal').focus();
+
+      dialog.showModal();
+
+      expect(document.activeElement).toBe(closeButton());
+      dialog.close();
+      expect(document.activeElement).toBe(query('.opener'));
+    });
+
+    it('should wrap Tab from the last focusable element to the first', () => {
+      openWithForm();
+      const inputs = Array.from(element.querySelectorAll<HTMLElement>('.form-content input'));
+
+      inputs[inputs.length - 1].focus();
+      const event = keydown('Tab');
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(document.activeElement).toBe(closeButton());
+    });
+
+    it('should wrap Shift+Tab from the first focusable element to the last', () => {
+      openWithForm();
+      const inputs = Array.from(element.querySelectorAll<HTMLElement>('.form-content input'));
+      const event = keydown('Tab', true);
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(document.activeElement).toBe(inputs[inputs.length - 1]);
+    });
+
+    it('should leave Tab between inner elements to the browser', () => {
+      openWithForm();
+
+      element.querySelector<HTMLElement>('.form-content input').focus();
+      const forward = keydown('Tab');
+      const backward = keydown('Tab', true);
+
+      expect(forward.defaultPrevented).toBe(false);
+      expect(backward.defaultPrevented).toBe(false);
+    });
+
+    it('should skip disabled and tabindex="-1" elements when trapping', () => {
+      openWithForm();
+
+      closeButton().focus();
+      keydown('Tab', true);
+
+      expect(document.activeElement.getAttribute('name')).toBe('last');
+    });
+
+    it('should pull the focus back into the dialog when it is outside', () => {
+      openWithForm();
+
+      query('.opener').focus();
+      keydown('Tab');
+
+      expect(document.activeElement).toBe(closeButton());
+    });
+
+    it('should close on a click on the backdrop area of the dialog', () => {
+      render({ show: true });
+
+      query('.modal').click();
+      hostFixture.detectChanges();
+
+      expect(query('.modal')).toBeNull();
+      expect(host.fails).toEqual([]);
+      expect(host.showChanges).toEqual([false]);
+    });
+
+    it('should stay open on a click inside the dialog box', () => {
+      render({ show: true });
+
+      query('.modal-content').click();
+      hostFixture.detectChanges();
+
+      expect(query('.modal')).not.toBeNull();
+    });
+
+    it('should stay open on a backdrop click when overlayClickCloseDialog is off', () => {
+      render({ show: true, overlayClose: false });
+
+      query('.modal').click();
+      hostFixture.detectChanges();
+
+      expect(query('.modal')).not.toBeNull();
+    });
+
+    it('should give the focus back when it is destroyed while open', () => {
+      const outside = document.createElement('button');
+
+      document.body.appendChild(outside);
+      outside.focus();
+      render({ show: true });
+
+      expect(document.activeElement).toBe(closeButton());
+
+      hostFixture.destroy();
+
+      expect(document.activeElement).toBe(outside);
+      outside.remove();
     });
   });
 });

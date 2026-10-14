@@ -9,6 +9,8 @@
   role="dialog"
   aria-modal="true"
   [attr.aria-labelledby]="titleId"
+  (click)="clickOnBackdrop($event)"
+  #dialogElement
 >
   <div class="modal-dialog modal-dialog-centered modal-md" role="document">
     <div class="modal-content">

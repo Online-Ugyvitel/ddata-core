@@ -9,8 +9,13 @@ import {
   ViewChild,
   ViewContainerRef,
   ChangeDetectionStrategy,
-  ComponentRef
+  ComponentRef,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  inject
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import {
   BaseCreateEditComponent,
@@ -23,6 +28,7 @@ import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';
 import { DialogContentInterface } from '../../models/dialog/content/dialog-content.interface';
+import { DialogFocusHandler } from '../../helpers/dialog-focus-handler';
 let nextModalDialogId = 0;
 
 @Component({
@@ -32,17 +38,22 @@ let nextModalDialogId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false
 })
-export class DdataUiModalDialogComponent {
+export class DdataUiModalDialogComponent implements OnDestroy {
   @Input() title = '';
   @Input() model: BaseModelWithoutTypeDefinitionInterface = new BaseModel();
   @Input() dialogContent: DialogContentItem = new DialogContentItem(DdataUiNoDataComponent, {});
   @Input() overlayClickCloseDialog = true;
   @Input() closeButtonText = 'Close';
 
+  /**
+   * Opens (true) or closes (false) the dialog. Setting false closes only an open dialog, so a
+   * dialog that starts hidden does not emit `fail`. The dialog emits `showDialogChange` with false
+   * whenever it closes, so `[(showDialog)]` keeps the parent's value in sync.
+   */
   @Input() set showDialog(value: boolean) {
     if (!!value) {
       this.showModal();
-    } else {
+    } else if (this.isModalVisible) {
       this.close();
     }
   }
@@ -53,7 +64,13 @@ export class DdataUiModalDialogComponent {
 
   @Output() readonly fail: EventEmitter<string> = new EventEmitter();
 
+  @Output() readonly showDialogChange: EventEmitter<boolean> = new EventEmitter();
+
   @ViewChild('dialogHost', { read: ViewContainerRef }) dialogHost!: ViewContainerRef;
+
+  @ViewChild('dialogElement') dialogElement?: ElementRef<HTMLElement>;
+
+  private readonly focusHandler = new DialogFocusHandler(inject(DOCUMENT));
 
   isModalVisible = false;
   componentSubscription!: Subscription;
@@ -67,9 +84,23 @@ export class DdataUiModalDialogComponent {
 
   constructor(private readonly changeDetector: ChangeDetectorRef) {}
 
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (this.focusHandler.handleKeydown(event, this.dialogElement?.nativeElement)) {
+      this.close();
+    }
+  }
+
   close(emit: boolean = true): void {
+    const wasVisible = this.isModalVisible;
+
     this.changeModalStatus(false);
     this.componentSubscription?.unsubscribe();
+
+    if (wasVisible) {
+      this.focusHandler.close();
+      this.showDialogChange.emit(false);
+    }
 
     if (emit) {
       this.fail.emit('close');
@@ -81,8 +112,10 @@ export class DdataUiModalDialogComponent {
   }
 
   showModal(): void {
+    this.focusHandler.open();
     this.changeModalStatus(true);
     this.renderComponent();
+    this.focusHandler.focusFirst(this.dialogElement?.nativeElement);
   }
 
   renderComponent(): void {
@@ -160,6 +193,18 @@ export class DdataUiModalDialogComponent {
     if (this.overlayClickCloseDialog) {
       this.closeWithoutEmit();
     }
+  }
+
+  /** A click on the full-screen `.modal` element outside of the dialog box acts as an overlay click. */
+  clickOnBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.clickOnOverlay();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.focusHandler.close();
+    this.componentSubscription?.unsubscribe();
   }
 
   private changeModalStatus(isVisible: boolean = false): void {

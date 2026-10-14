@@ -1,5 +1,7 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
@@ -7,6 +9,8 @@ import {
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DdataUiConfirmDialogComponent } from './confirm-dialog.component';
 import { DialogType } from '../../models/dialog/dialog.interface';
+import { DdataUiDialogModule } from '../../ddata-ui-dialog.module';
+import { DdataUiModalDialogComponent } from '../modal-dialog/modal-dialog.component';
 
 describe('DdataUiConfirmDialogComponent', () => {
   let component: DdataUiConfirmDialogComponent;
@@ -513,5 +517,209 @@ describe('DdataUiConfirmDialogComponent', () => {
         expect(query('.modal-header button').getAttribute('aria-label')).toBe('Close');
       });
     });
+  });
+});
+
+@Component({
+  selector: 'dd-test-confirm-host',
+  imports: [DdataUiDialogModule],
+  template: `<button type="button" class="opener">Delete</button>
+    <dd-modal-dialog title="Parent" [showDialog]="showModal"></dd-modal-dialog>
+    <dd-confirm-dialog
+      title="Sure?"
+      [(showDialog)]="show"
+      [overlayClickCloseDialog]="overlayClose"
+      (pressed)="pressed.push($event)"
+      (confirm)="confirms = confirms + 1"
+    ></dd-confirm-dialog>`
+})
+class TestConfirmHostComponent {
+  show = false;
+  showModal = false;
+  overlayClose = true;
+  pressed: Array<boolean> = [];
+  confirms = 0;
+}
+
+describe('DdataUiConfirmDialogComponent rendered in a host', () => {
+  let fixture: ComponentFixture<TestConfirmHostComponent>;
+  let host: TestConfirmHostComponent;
+  let element: HTMLElement;
+  const render = (changes: Partial<TestConfirmHostComponent> = {}): void => {
+    Object.assign(host, changes);
+    fixture.debugElement.injector.get(ChangeDetectorRef).markForCheck();
+    fixture.detectChanges();
+  };
+  const confirmElement = (): HTMLElement =>
+    fixture.debugElement.query(By.directive(DdataUiConfirmDialogComponent)).nativeElement;
+  const modalElement = (): HTMLElement =>
+    fixture.debugElement.query(By.directive(DdataUiModalDialogComponent)).nativeElement;
+  const confirmModal = (): HTMLElement | null => confirmElement().querySelector('.modal');
+  const keydown = (key: string, shiftKey = false): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', { key, shiftKey, bubbles: true, cancelable: true });
+
+    document.activeElement.dispatchEvent(event);
+    fixture.detectChanges();
+
+    return event;
+  };
+  const buttons = (): Array<HTMLElement> =>
+    Array.from(confirmElement().querySelectorAll<HTMLElement>('.modal button'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({ imports: [TestConfirmHostComponent] });
+    fixture = TestBed.createComponent(TestConfirmHostComponent);
+    host = fixture.componentInstance;
+    element = fixture.nativeElement;
+    fixture.detectChanges();
+  });
+
+  it('should close on Escape like the cancel button', () => {
+    render({ show: true });
+    const event = keydown('Escape');
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(confirmModal()).toBeNull();
+    expect(host.pressed).toEqual([false]);
+    expect(host.confirms).toBe(0);
+    expect(host.show).toBe(false);
+  });
+
+  it('should ignore Escape while closed', () => {
+    const event = keydown('Escape');
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(host.pressed).toEqual([]);
+  });
+
+  it('should close only the topmost dialog on Escape', () => {
+    render({ showModal: true });
+    render({ show: true });
+
+    keydown('Escape');
+
+    expect(confirmModal()).toBeNull();
+    expect(modalElement().querySelector('.modal')).not.toBeNull();
+
+    keydown('Escape');
+
+    expect(modalElement().querySelector('.modal')).toBeNull();
+    expect(host.pressed).toEqual([false]);
+  });
+
+  it.each([
+    ['confirm', 1, true],
+    ['cancel', 2, false]
+  ])(
+    'should reopen with [(showDialog)] after %s',
+    (_name: string, buttonIndex: number, result: boolean) => {
+      render({ show: true });
+      buttons()[buttonIndex].click();
+      fixture.detectChanges();
+
+      expect(host.show).toBe(false);
+      expect(confirmModal()).toBeNull();
+
+      render({ show: true });
+
+      expect(confirmModal()).not.toBeNull();
+      expect(host.pressed).toEqual([result]);
+    }
+  );
+
+  it('should keep the focus where it is when it is opened again while open', () => {
+    const dialog = fixture.debugElement.query(
+      By.directive(DdataUiConfirmDialogComponent)
+    ).componentInstance;
+
+    render({ show: true });
+    buttons()[2].focus();
+
+    dialog.showDialog = true;
+
+    expect(document.activeElement).toBe(buttons()[2]);
+    expect(confirmElement().querySelectorAll('.modal').length).toBe(1);
+  });
+
+  it('should not emit showDialogChange when the parent closes the dialog', () => {
+    const dialog = fixture.debugElement.query(
+      By.directive(DdataUiConfirmDialogComponent)
+    ).componentInstance;
+    const changes = vi.fn();
+
+    dialog.showDialogChange.subscribe(changes);
+    render({ show: true });
+    render({ show: false });
+
+    expect(confirmModal()).toBeNull();
+    expect(changes).not.toHaveBeenCalled();
+    expect(host.pressed).toEqual([]);
+  });
+
+  it('should move the focus into the dialog on open and restore it on close', () => {
+    const opener = element.querySelector<HTMLElement>('.opener');
+
+    opener.focus();
+    render({ show: true });
+
+    expect(document.activeElement).toBe(buttons()[0]);
+
+    buttons()[2].click();
+    fixture.detectChanges();
+
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('should keep Tab and Shift+Tab inside the dialog', () => {
+    render({ show: true });
+    const [first, middle, last] = buttons();
+
+    last.focus();
+    expect(keydown('Tab').defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(first);
+
+    expect(keydown('Tab', true).defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(last);
+
+    middle.focus();
+    expect(keydown('Tab').defaultPrevented).toBe(false);
+  });
+
+  it('should close on a click on the backdrop area but not inside the dialog box', () => {
+    render({ show: true });
+
+    confirmElement().querySelector<HTMLElement>('.modal-content').click();
+    fixture.detectChanges();
+
+    expect(confirmModal()).not.toBeNull();
+
+    confirmModal().click();
+    fixture.detectChanges();
+
+    expect(confirmModal()).toBeNull();
+    expect(host.pressed).toEqual([false]);
+    expect(host.show).toBe(false);
+  });
+
+  it('should stay open on a backdrop click when overlayClickCloseDialog is off', () => {
+    render({ show: true, overlayClose: false });
+
+    confirmModal().click();
+    fixture.detectChanges();
+
+    expect(confirmModal()).not.toBeNull();
+    expect(host.pressed).toEqual([]);
+  });
+
+  it('should give the focus back when it is destroyed while open', () => {
+    const outside = document.createElement('button');
+
+    document.body.appendChild(outside);
+    outside.focus();
+    render({ show: true });
+    fixture.destroy();
+
+    expect(document.activeElement).toBe(outside);
+    outside.remove();
   });
 });
