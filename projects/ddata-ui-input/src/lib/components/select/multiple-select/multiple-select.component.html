@@ -63,12 +63,19 @@
         [ngClass]="showLabel ? selectedElementsBlockExtraClass : ''"
       >
         @for (element of model[field]; track trackByFn($index, element)) {
-          <dd-tag
-            [tag]="element"
-            [class]="'d-inline-block pl-2 mb-1 bg-light me-2'"
-            [showIcon]="showIcon"
-            (delete)="deleteFromMultipleSelectedList(element)"
-          ></dd-tag>
+          @if (selectedItemTemplate) {
+            <ng-container
+              [ngTemplateOutlet]="selectedItemTemplate"
+              [ngTemplateOutletContext]="getSelectedItemContext(element)"
+            ></ng-container>
+          } @else {
+            <dd-tag
+              [tag]="element"
+              [class]="'d-inline-block pl-2 mb-1 bg-light me-2'"
+              [showIcon]="showIcon"
+              (delete)="deleteFromMultipleSelectedList(element)"
+            ></dd-tag>
+          }
         }
       </div>
     </div>

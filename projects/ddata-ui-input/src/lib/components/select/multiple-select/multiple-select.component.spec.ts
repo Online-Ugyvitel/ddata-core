@@ -432,6 +432,20 @@ describe('DdataMultipleSelectComponent', () => {
       expect(component.selectedModelName).toBe('Primary Tag');
     });
 
+    it('should build template context with item and remove callback', () => {
+      const item = { id: 1, name: 'A' };
+
+      component.field = 'tags';
+      component.model = { tags: [item] } as unknown as MockModel;
+      const context = component.getSelectedItemContext(item as never);
+
+      expect(context.$implicit).toBe(item);
+
+      context.remove();
+
+      expect(component.model['tags'].length).toBe(0);
+    });
+
     it('should resolve selectedModelName for a field without _id suffix', () => {
       component.field = 'category';
       component.text = 'name';
