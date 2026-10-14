@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DdataInputSearchComponent } from './search.component';
+import { DescriptionPipe } from '../../pipes/description/description.pipe';
 import { ProxyFactoryService, DdataCoreModule, Paginate, SpinnerService } from '@netdjw/ddata-core';
 import { SearchResult } from '../../models/search/result/search-result.model';
 import { BaseSearch } from '../../models/search/base-search.model';
@@ -54,7 +55,7 @@ describe('DdataInputSearchComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes([])],
-      declarations: [DdataInputSearchComponent],
+      declarations: [DdataInputSearchComponent, DescriptionPipe],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         ProxyFactoryService,
@@ -142,6 +143,52 @@ describe('DdataInputSearchComponent', () => {
       component.clickout(mockEvent);
 
       expect(component.close).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('result list', () => {
+    const results = (): NodeListOf<HTMLElement> =>
+      fixture.nativeElement.querySelectorAll('.dropdown-item');
+
+    beforeEach(() => {
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
+    });
+
+    it('should not render the dropdown without results', () => {
+      detectChangesOf(fixture);
+
+      expect(fixture.nativeElement.querySelector('.search-dropdown')).toBeNull();
+    });
+
+    it('should render the results with their formatted description', () => {
+      (component as any).setResult(
+        paginateOf([
+          { id: 1, name: 'Alice', description: 'email:alice@example.com|description:Ügyfél' },
+          { id: 2, name: 'Bob', description: null }
+        ])
+      );
+      detectChangesOf(fixture);
+
+      expect(results().length).toBe(2);
+      expect(results()[0].querySelector('.font-bold').textContent.trim()).toBe('Alice');
+      expect(results()[0].querySelector('a').getAttribute('href')).toBe('mailto:alice@example.com');
+      expect(results()[0].querySelector('span.description').textContent).toBe('Ügyfél');
+      expect(results()[1].querySelector('.text-muted.small').textContent.trim()).toBe('');
+    });
+
+    it('should close the dropdown on a real click outside of the component', () => {
+      (component as any).elementRef = fixture.elementRef;
+      (component as any).setResult(paginateOf([{ id: 1, name: 'Alice', description: '' }]));
+      detectChangesOf(fixture);
+
+      fixture.nativeElement.querySelector('input').click();
+      expect(component.models.length).toBe(1);
+
+      document.body.click();
+      detectChangesOf(fixture);
+
+      expect(component.models).toEqual([]);
+      expect(fixture.nativeElement.querySelector('.search-dropdown')).toBeNull();
     });
   });
 

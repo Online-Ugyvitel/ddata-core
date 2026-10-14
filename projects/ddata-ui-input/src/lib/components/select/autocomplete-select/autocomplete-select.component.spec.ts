@@ -665,4 +665,98 @@ describe('DdataAutocompleteSelectComponent', () => {
       expect(service1).toBe(service2);
     });
   });
+  describe('DOM interaction', () => {
+    const input = (): HTMLInputElement => fixture.nativeElement.querySelector('input');
+    const options = (): Array<HTMLElement> =>
+      Array.from(fixture.nativeElement.querySelectorAll('.autocomplete-option'));
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      component.ngOnInit();
+      fixture.detectChanges();
+    };
+    const type = (value: string): void => {
+      input().value = value;
+      input().dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+    };
+
+    beforeEach(() => {
+      component.inputBox = undefined;
+      fixture.detectChanges();
+    });
+
+    it('should show the no results option for an empty list', () => {
+      render({ items: [], model: new BaseModel(), field: 'id' });
+      input().dispatchEvent(new Event('focus'));
+      fixture.detectChanges();
+
+      expect(options().map((option) => option.textContent.trim())).toEqual(['Nincs találat']);
+    });
+
+    it('should list and select the only item', () => {
+      const model = new BaseModel();
+      const selected = vi.fn();
+
+      component.selected.subscribe(selected);
+      render({ items: [{ id: 5, name: 'Only' }], model, field: 'id' });
+      input().dispatchEvent(new Event('focus'));
+      fixture.detectChanges();
+
+      expect(options().length).toBe(1);
+
+      options()[0].click();
+      fixture.detectChanges();
+
+      expect(model['id']).toBe(5);
+      expect(selected).toHaveBeenCalledExactlyOnceWith(5);
+      expect(input().value).toBe('Only');
+      expect(options().length).toBe(0);
+    });
+
+    it('should filter very many items', () => {
+      const many = Array.from({ length: 2000 }, (_, i) => ({ id: i, name: `Item ${i}` }));
+
+      render({ items: many, model: new BaseModel(), field: 'id' });
+      type('Item 199');
+
+      expect(options().map((option) => option.textContent.trim())).toEqual([
+        'Item 199',
+        'Item 1990',
+        'Item 1991',
+        'Item 1992',
+        'Item 1993',
+        'Item 1994',
+        'Item 1995',
+        'Item 1996',
+        'Item 1997',
+        'Item 1998',
+        'Item 1999'
+      ]);
+    });
+
+    it('should show an empty text for a selected value that is not in the items', () => {
+      const model = new BaseModel();
+
+      (model as unknown as Record<string, unknown>)['id'] = 999;
+      render({ items: [{ id: 1, name: 'Apple' }], model, field: 'id' });
+
+      expect(input().value).toBe('');
+    });
+
+    it('should close the dropdown on a real click outside, but not inside', () => {
+      render({ items: [{ id: 1, name: 'Apple' }], model: new BaseModel(), field: 'id' });
+      input().dispatchEvent(new Event('focus'));
+      fixture.detectChanges();
+
+      input().click();
+
+      expect(component.isOpen).toBe(true);
+
+      document.body.click();
+      fixture.detectChanges();
+
+      expect(component.isOpen).toBe(false);
+      expect(options().length).toBe(0);
+    });
+  });
 });

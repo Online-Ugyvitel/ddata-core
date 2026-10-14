@@ -5,6 +5,8 @@ import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
+import { FormsModule } from '@angular/forms';
+import { ColorPickerDirective } from 'ngx-color-picker';
 import { DdataInputColorComponent } from './color-input.component';
 import {
   BaseModel,
@@ -50,6 +52,7 @@ describe('DdataInputColorComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DdataInputColorComponent],
+      imports: [FormsModule, ColorPickerDirective],
       providers: [Injector, ValidatorService, BaseModel, InputHelperService]
     }).compileComponents();
   });
@@ -517,5 +520,88 @@ describe('DdataInputColorComponent', () => {
     expect(typeof component.random).toBe('string');
     expect(component.random.length).toBe(50);
     expect(component.random).toMatch(/^[A-Za-z0-9]+$/);
+  });
+  describe('rendering', () => {
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+    const input = (): HTMLInputElement => element.querySelector('input');
+
+    it('should render label, required mark, prepend, append and the color preview', () => {
+      render({ field: 'color', model: new MockColorModel() });
+
+      expect(element.querySelector('label').textContent).toContain('Color Field Label:');
+      expect(element.querySelector('label span').textContent).toBe(' *');
+      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe(
+        'Color Prepend'
+      );
+      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('Color Append');
+      expect(element.querySelector('.input-color-container').style.background).toBe(
+        'rgb(255, 0, 0)'
+      );
+
+      render({ prepend: '#', append: 'hex', labelText: 'Szín' });
+
+      expect(element.querySelector('label').textContent).toContain('Szín:');
+      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('#');
+      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('hex');
+    });
+
+    it('should hide the label and the empty prepend and append', () => {
+      const model = new MockColorModel();
+
+      model.fields.color = { title: 'Color', label: 'Color', placeholder: '' };
+      model.validationRules = { color: ['color_code'] };
+      render({ field: 'color', model, showLabel: false });
+
+      expect(element.querySelector('label')).toBeNull();
+      expect(element.querySelector('.input-group-prepend')).toBeNull();
+      expect(element.querySelector('.input-group-append')).toBeNull();
+    });
+
+    it('should show and hide the validation error while typing', async () => {
+      const model = new MockColorModel();
+      const changed = vi.fn();
+
+      component.changed.subscribe(changed);
+      render({ field: 'color', model });
+      await fixture.whenStable();
+
+      model.color = 'red';
+      input().dispatchEvent(new KeyboardEvent('keyup'));
+      fixture.detectChanges();
+
+      expect(model.validationErrors).toEqual(['color']);
+      expect(input().classList).toContain('invalid');
+      expect(changed).not.toHaveBeenCalled();
+
+      model.color = '#00ff00';
+      input().dispatchEvent(new KeyboardEvent('keyup'));
+      fixture.detectChanges();
+
+      expect(model.validationErrors).toEqual([]);
+      expect(input().classList).not.toContain('invalid');
+      expect(changed).toHaveBeenCalledExactlyOnceWith(model);
+    });
+
+    it('should toggle the picker when the preview is clicked', () => {
+      render({ field: 'color', model: new MockColorModel() });
+
+      element.querySelector('.input-color-container').click();
+
+      expect(component.toggle).toBe(true);
+
+      element.querySelector('.input-color-container').click();
+
+      expect(component.toggle).toBe(false);
+    });
+
+    it('should disable the input', async () => {
+      render({ field: 'color', model: new MockColorModel(), disabled: true });
+      await fixture.whenStable();
+
+      expect(input().disabled).toBe(true);
+    });
   });
 });

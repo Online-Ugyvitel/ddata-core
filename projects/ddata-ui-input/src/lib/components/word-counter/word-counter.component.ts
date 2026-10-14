@@ -11,11 +11,7 @@ export class WordCounterComponent {
   @Input() maxLength = 0;
 
   @Input() set currentLength(value: string | undefined | null) {
-    if (!value) {
-      return;
-    }
-
-    this._currentLength = value;
+    this._currentLength = value || '';
   }
 
   @Output() readonly maxLengthReached: EventEmitter<boolean> = new EventEmitter();
@@ -34,10 +30,6 @@ export class WordCounterComponent {
 
   wordsNumber(): number {
     const wordsCount = WordCounterComponent.countWords(this._currentLength);
-
-    if (wordsCount === 0) {
-      return 0;
-    }
 
     this.maxLengthReached.emit(this.maxLength > 0 && wordsCount > this.maxLength);
 

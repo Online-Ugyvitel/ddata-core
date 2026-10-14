@@ -1,5 +1,5 @@
 <div class="input-group-append" title="Kulcsszavak száma">
-  <span class="input-group-text" [class.bg-warning]="wordsNumber() > maxLength">
+  <span class="input-group-text" [class.bg-warning]="maxLength > 0 && wordsNumber() > maxLength">
     {{ wordsNumber() }} / {{ maxLength }}
   </span>
 </div>

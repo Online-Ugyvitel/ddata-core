@@ -525,4 +525,193 @@ describe('DdataInputTimeComponent', () => {
       expect(component.random).toBe('random123');
     });
   });
+  describe('time parsing', () => {
+    const modelWith = (value: unknown): BaseModel => {
+      const model = new BaseModel();
+
+      model.fields = { start: { title: 'Start', label: 'Start' } };
+      model['start'] = value;
+
+      return model;
+    };
+    const parsed = (value: unknown): Date | null => {
+      component.field = 'start';
+      component.model = modelWith(value);
+
+      return component.timeValue;
+    };
+
+    it.each(['00:00', '9:05', '23:59', '12:30'])('should parse the valid time %s', (value) => {
+      const [hours, minutes] = value.split(':').map(Number);
+      const result = parsed(value);
+
+      expect(result).toBeInstanceOf(Date);
+      expect(result.getHours()).toBe(hours);
+      expect(result.getMinutes()).toBe(minutes);
+      expect(result.getSeconds()).toBe(0);
+      expect(result.getMilliseconds()).toBe(0);
+    });
+
+    it.each(['24:00', '12:60', '99:99', '12:5', '123:00', '12-30', 'noon', '', ' 12:30'])(
+      'should reject the invalid time %j',
+      (value) => {
+        expect(parsed(value)).toBeNull();
+      }
+    );
+
+    it.each([null, undefined, 1230, new Date(2024, 1, 29, 10, 0)])(
+      'should reject the non string value %j',
+      (value) => {
+        expect(parsed(value)).toBeNull();
+      }
+    );
+
+    it('should parse the value again when the field changes', () => {
+      const model = modelWith('08:15');
+
+      model.fields['end'] = { title: 'End', label: 'End' };
+      model['end'] = '17:45';
+      component.field = 'start';
+      component.model = model;
+
+      expect(component.timeValue.getHours()).toBe(8);
+
+      component.field = 'end';
+
+      expect(component.timeValue.getHours()).toBe(17);
+      expect(component.timeValue.getMinutes()).toBe(45);
+    });
+
+    it('should store a picked Date as zero padded local HH:mm', () => {
+      const model = modelWith('');
+      const picked = new Date(2024, 1, 29, 7, 5);
+
+      component.field = 'start';
+      component.model = model;
+      component.setTime(picked);
+
+      expect(model['start']).toBe('07:05');
+      expect(component.timeValue).toBe(picked);
+      expect(helperServiceSpy.validateField).toHaveBeenCalledWith(model, 'start');
+    });
+
+    it('should store midnight and the last minute of the day', () => {
+      const model = modelWith('');
+
+      component.field = 'start';
+      component.model = model;
+      component.setTime(new Date(2023, 11, 31, 23, 59));
+
+      expect(model['start']).toBe('23:59');
+
+      component.setTime(new Date(2024, 0, 1, 0, 0));
+
+      expect(model['start']).toBe('00:00');
+    });
+
+    it('should keep a typed string and parse it', () => {
+      const model = modelWith('');
+
+      component.field = 'start';
+      component.model = model;
+      component.setTime('25:00');
+
+      expect(model['start']).toBe('25:00');
+      expect(component.timeValue).toBeNull();
+    });
+  });
+
+  describe('rendering', () => {
+    const createModel = (): BaseModel => {
+      const model = new BaseModel();
+
+      model.fields = { start: { title: 'Start', label: 'Start' } };
+      model.validationRules = { start: ['required'] };
+      model['start'] = '10:00';
+
+      return model;
+    };
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+
+    it('should render label, required mark, prepend and append and follow their changes', () => {
+      render({ field: 'start', model: createModel() });
+
+      expect(element.querySelector('label').textContent).toContain('Test Label:');
+      expect(element.querySelector('label span').textContent).toBe(' *');
+      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('Prepend');
+      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('Append');
+
+      render({ labelText: 'Kezdés', prepend: 'P2', append: 'A2' });
+
+      expect(element.querySelector('label').textContent).toContain('Kezdés:');
+      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('P2');
+      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('A2');
+    });
+
+    it('should hide the optional parts', () => {
+      helperServiceSpy.isRequired.mockReturnValue(false);
+      helperServiceSpy.getPrepend.mockReturnValue('');
+      helperServiceSpy.getAppend.mockReturnValue('');
+      render({ field: 'start', model: createModel(), showLabel: false });
+
+      expect(element.querySelector('label')).toBeNull();
+      expect(element.querySelector('.input-group-prepend')).toBeNull();
+      expect(element.querySelector('.input-group-append')).toBeNull();
+    });
+
+    it('should disable the input', () => {
+      render({ field: 'start', model: createModel(), disabled: true });
+
+      expect(element.querySelector('input').disabled).toBe(true);
+    });
+
+    it('should show the value as text in view only mode', () => {
+      const model = createModel();
+
+      render({ field: 'start', model, isViewOnly: true });
+
+      expect(element.querySelector('input')).toBeNull();
+      expect(element.querySelector('.bg-light').textContent.trim()).toBe('10:00');
+
+      model['start'] = '11:00';
+      render({ model: Object.assign(new BaseModel(), model) });
+
+      expect(element.querySelector('.bg-light').textContent.trim()).toBe('11:00');
+    });
+
+    it('should toggle the invalid class as the validation error appears and disappears', () => {
+      const model = createModel();
+
+      helperServiceSpy.validateField.mockImplementation((m: BaseModel, field: string) => {
+        const valid = m[field] !== '';
+
+        m.validationErrors = valid ? [] : [field];
+
+        return valid;
+      });
+      render({ field: 'start', model });
+      const input = (): HTMLInputElement => element.querySelector('input');
+
+      model['start'] = '';
+      input().dispatchEvent(new KeyboardEvent('keyup'));
+      fixture.detectChanges();
+
+      expect(input().classList).toContain('invalid');
+
+      model['start'] = '12:00';
+      input().dispatchEvent(new KeyboardEvent('keyup'));
+      fixture.detectChanges();
+
+      expect(input().classList).not.toContain('invalid');
+    });
+
+    it('should focus the input on init when autoFocus is set', () => {
+      render({ field: 'start', model: createModel(), autoFocus: true });
+
+      expect(document.activeElement).toBe(element.querySelector('input'));
+    });
+  });
 });

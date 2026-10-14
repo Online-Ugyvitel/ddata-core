@@ -624,4 +624,76 @@ describe('DdataSelectComponent', () => {
       expect(component.isRequired).toBe(false);
     });
   });
+  describe('additional edge cases', () => {
+    it('should keep the current mode when the deprecated flags are set to false', () => {
+      component.mode = 'autocomplete';
+      component.fakeSingleSelect = false;
+      component.multipleSelect = false;
+
+      expect(component.mode).toBe('autocomplete');
+      expect(component.fakeSingleSelect).toBe(false);
+      expect(component.multipleSelect).toBe(false);
+    });
+
+    it('should expose the append text of the field', () => {
+      const helper = (
+        component as unknown as { helperService: { getAppend: ReturnType<typeof vi.fn> } }
+      ).helperService;
+
+      helper.getAppend.mockReturnValueOnce('db');
+      component.field = 'country_id';
+      component.model = { ...mockModel } as never;
+
+      expect(component.append).toBe('db');
+    });
+
+    it('should not set a selected model name in multiple mode', () => {
+      component.mode = 'multiple';
+      component.field = 'country_id';
+      component.model = { ...mockModel, name: 'Home' } as never;
+
+      expect(component.selectedModelName).toBe('');
+    });
+
+    it('should use an empty selected model name for a nameless model in single mode', () => {
+      component.mode = 'single';
+      component.field = 'country_id';
+      component.model = { ...mockModel } as never;
+
+      expect(component.selectedModelName).toBe('');
+    });
+
+    it('should keep the labels when switching to a field without description', () => {
+      component.field = 'country_id';
+      component.model = { ...mockModel } as never;
+
+      expect(component.label).toBe('Country');
+
+      component.field = 'unknown_id';
+
+      expect(component.field).toBe('unknown_id');
+      expect(component.label).toBe('Country');
+      expect(component.isRequired).toBe(false);
+    });
+
+    it.each([
+      ['an empty list', []],
+      ['one item', [mockCountry1]],
+      ['very many items', Array.from({ length: 5000 }, (_, i) => ({ id: i, name: `Item ${i}` }))]
+    ])('should keep %s', (_, items) => {
+      component.items = items;
+
+      expect(component.items).toBe(items);
+      expect(component.items.length).toBe(items.length);
+    });
+
+    it('should keep a selected value that is not in the items', () => {
+      component.items = mockCountries;
+      component.field = 'country_id';
+      component.model = { ...mockModel, country_id: 999 } as never;
+
+      expect((component.model as unknown as { country_id: number }).country_id).toBe(999);
+      expect(component.items).toEqual(mockCountries);
+    });
+  });
 });

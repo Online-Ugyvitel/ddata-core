@@ -587,4 +587,76 @@ describe('DdataTextareaComponent', () => {
       expect(textarea.nativeElement.classList.contains('invalid')).toBeTruthy();
     });
   });
+  describe('optional field without validation rules', () => {
+    it('should not be required and not render the required mark', () => {
+      const model = new BaseModel();
+
+      model.fields = { note: { title: 'Note', label: 'Note' } };
+      model.validationRules = {};
+      fixture.componentRef.setInput('field', 'note');
+      fixture.componentRef.setInput('model', model);
+      fixture.detectChanges();
+
+      expect(mockHelperService.isRequired).not.toHaveBeenCalled();
+      expect(component._isRequired).toBe(false);
+      expect(fixture.nativeElement.querySelector('label span')).toBeNull();
+    });
+
+    it('should not be required when the model has no validation rules at all', () => {
+      const model = new BaseModel();
+
+      model.fields = { note: { title: 'Note', label: 'Note' } };
+      model.validationRules = undefined;
+      component.field = 'note';
+      component.model = model;
+
+      expect(component._isRequired).toBe(false);
+    });
+  });
+  describe('user interaction', () => {
+    const textarea = (): HTMLTextAreaElement => fixture.nativeElement.querySelector('textarea');
+
+    it('should show and hide the validation error as the value changes', async () => {
+      const changed = vi.fn();
+
+      mockHelperService.validateField.mockImplementation((model, field) => {
+        const valid = model[field] !== '';
+
+        model.validationErrors = valid ? [] : [field];
+
+        return valid;
+      });
+      component.changed.subscribe(changed);
+      fixture.componentRef.setInput('field', 'testField');
+      fixture.componentRef.setInput('model', mockModel);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      textarea().value = '';
+      textarea().dispatchEvent(new Event('input'));
+      textarea().dispatchEvent(new KeyboardEvent('keyup'));
+      fixture.detectChanges();
+
+      expect(textarea().classList).toContain('invalid');
+      expect(changed).not.toHaveBeenCalled();
+
+      textarea().value = 'első sor\nmásodik sor';
+      textarea().dispatchEvent(new Event('input'));
+      textarea().dispatchEvent(new KeyboardEvent('keyup'));
+      fixture.detectChanges();
+
+      expect(mockModel.testField).toBe('első sor\nmásodik sor');
+      expect(textarea().classList).not.toContain('invalid');
+      expect(changed).toHaveBeenCalledExactlyOnceWith(mockModel);
+    });
+
+    it('should focus the textarea when autoFocus is set', () => {
+      fixture.componentRef.setInput('field', 'testField');
+      fixture.componentRef.setInput('model', mockModel);
+      fixture.componentRef.setInput('autoFocus', true);
+      fixture.detectChanges();
+
+      expect(document.activeElement).toBe(textarea());
+    });
+  });
 });

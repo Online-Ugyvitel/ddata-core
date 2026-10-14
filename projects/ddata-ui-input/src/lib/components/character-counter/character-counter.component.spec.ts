@@ -80,4 +80,47 @@ describe('CharacterCounterComponent', () => {
 
     expect(text()).toBe('0 / 50');
   });
+  describe('edge cases', () => {
+    const render = (value: string | null | undefined, maxLength = 5): void => {
+      fixture.componentRef.setInput('maxLength', maxLength);
+      fixture.componentRef.setInput('currentLength', value);
+      fixture.detectChanges();
+    };
+
+    it.each([null, undefined, ''])('should render 0 characters for %j', (value) => {
+      render(value);
+
+      expect(text()).toBe('0 / 5');
+    });
+
+    it('should render exactly the max length at the boundary', () => {
+      render('abcde');
+
+      expect(text()).toBe('5 / 5');
+    });
+
+    it('should render a count over the max length on overflow', () => {
+      render('abcdefg');
+
+      expect(text()).toBe('7 / 5');
+    });
+
+    it('should count every space and line break', () => {
+      render('a  b\nc\r\n', 10);
+
+      expect(text()).toBe('8 / 10');
+    });
+
+    it('should count accented letters as one character', () => {
+      render('árvíztűrő', 10);
+
+      expect(text()).toBe('9 / 10');
+    });
+
+    it('should count astral Unicode symbols by their UTF-16 length', () => {
+      render('😀', 10);
+
+      expect(text()).toBe('2 / 10');
+    });
+  });
 });
