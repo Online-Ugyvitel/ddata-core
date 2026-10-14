@@ -50,12 +50,14 @@
           />
 
           <div class="input-group-append">
-            <app-confirm-dialog
-              title="Biztos törölni szeretné?"
-              content="Biztos törölni szeretné a nevet?"
-              type="delete"
-              (confirm)="deleteName(name)"
-            ></app-confirm-dialog>
+            <button
+              type="button"
+              class="btn btn-light"
+              title="Név törlése"
+              (click)="nameToDelete = name"
+            >
+              <fa-icon [icon]="icon.trash"></fa-icon>
+            </button>
           </div>
         </div>
       </div>
@@ -63,14 +65,29 @@
   </ng-container>
 </ng-container>
 
-<button class="btn btn-light btn-sm" title="Új nyelv hozzáadása" (click)="addName()">
+<button type="button" class="btn btn-light btn-sm" title="Új nyelv hozzáadása" (click)="addName()">
   <fa-icon [icon]="icon.plus"></fa-icon>
   Új nyelv hozzáadása
 </button>
 
-<button class="btn btn-light btn-sm" (click)="show = !show" *ngIf="model.names.length > 1">
+<button
+  type="button"
+  class="btn btn-light btn-sm"
+  (click)="show = !show"
+  *ngIf="model.names.length > 1"
+>
   <span *ngIf="show">Nyelvek elrejtése</span>
   <span *ngIf="!show">További elérhető nyelvek száma: {{ getTotal() }}</span>
 </button>
 <br />
 <ng-template #elseBlock></ng-template>
+
+<dd-confirm-dialog
+  title="Biztos törölni szeretné?"
+  content="Biztos törölni szeretné a nevet?"
+  type="delete"
+  successButtonText="Törlés"
+  cancelButtonText="Mégsem"
+  [showDialog]="!!nameToDelete"
+  (pressed)="confirmDelete($event)"
+></dd-confirm-dialog>

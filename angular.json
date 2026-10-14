@@ -194,7 +194,10 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/ddata-ui/tsconfig.spec.json"
+            "tsConfig": "projects/ddata-ui/tsconfig.spec.json",
+            "setupFiles": [
+              "projects/ddata-ui/src/test-setup.ts"
+            ]
           }
         },
         "lint": {

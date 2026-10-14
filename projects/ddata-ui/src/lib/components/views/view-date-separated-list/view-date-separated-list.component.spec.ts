@@ -1,135 +1,126 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AppModule } from 'src/app/app.module';
-import { ID, ISODate } from '@netdjw/ddata-core';
-import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
-import { ViewDateSeparatedList } from 'src/app/models/view/date/separated/list/view-date-spearated-list.interface';
-
-import { ElementRef, Renderer2 } from '@angular/core';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
-import * as moment from 'moment';
+import { ID } from '@netdjw/ddata-core';
+import { BehaviorSubject } from 'rxjs';
+import { DdataUiModule } from '../../../ddata-ui.module';
+import { CasefileInterface } from '../../../models/casefile/casefile.interface';
+import { ViewDateSeparatedList } from '../../../models/view/date-separated-list/view-date-separated-list.model';
 import { ViewDateSeparatedListComponent } from './view-date-separated-list.component';
-
-declare const document: unknown;
 
 describe('ViewDateSeparatedListComponent', () => {
   let component: ViewDateSeparatedListComponent;
   let fixture: ComponentFixture<ViewDateSeparatedListComponent>;
+  const now = new Date('2026-01-15T12:00:00Z');
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [ViewDateSeparatedListComponent],
-      providers: [Renderer2]
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DdataUiModule]
     }).compileComponents();
-  });
-
-  beforeEach(() => {
-    AppModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(ViewDateSeparatedListComponent);
-    fixture.detectChanges();
+    component = fixture.componentInstance;
   });
 
   afterEach(() => {
-    document.body.removeChild(fixture.debugElement.nativeElement);
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
-  it('should create', () => {
-    component = fixture.componentInstance;
+  it('should show the no data component without casefiles', () => {
+    component.data = new BehaviorSubject([]);
+    fixture.detectChanges();
 
-    expect(component).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('dd-no-data')).not.toBeNull();
   });
 
-  it('setHeight() should set the height of the component', () => {
-    component = fixture.componentInstance;
-    component.listContainer = new ElementRef(document.createElement('div'));
-    component.setHeight();
+  it('setListItemName() should describe the deadline relative to now', () => {
+    expect(component.setListItemName('2026-06-15T12:00:00Z', now)).toBe('5 hónap múlva');
+    expect(component.setListItemName('2026-01-16T12:00:00Z', now)).toBe('holnap');
+    expect(component.setListItemName('2026-01-12T12:00:00Z', now)).toBe('3 nappal ezelőtt');
 
-    expect(component.listContainer.nativeElement.style.height).toBe(
-      `${document.documentElement.clientHeight - 189}px`
-    );
+    component.locale = 'en';
+
+    expect(component.setListItemName('2026-01-29T12:00:00Z', now)).toBe('in 2 weeks');
   });
 
-  it('convertToDateSeparatedList should return an array with lists', () => {
-    const fakedata: Array<CasefileInterface> = [
-      {
-        deadline: '2020' as ISODate
-      },
-      {
-        deadline: '2021' as ISODate
-      }
+  it('setListItemName() should return the no deadline text without a valid deadline', () => {
+    expect(component.setListItemName('')).toBe('Határidő nélküli feladatok');
+    expect(component.setListItemName(undefined)).toBe('Határidő nélküli feladatok');
+    expect(component.setListItemName('not a date')).toBe('Határidő nélküli feladatok');
+
+    component.noDeadlineText = 'No deadline';
+
+    expect(component.setListItemName('')).toBe('No deadline');
+  });
+
+  it('convertToDateSeparatedList() should group the casefiles by their deadline', () => {
+    vi.useFakeTimers({ now, toFake: ['Date'] });
+    const casefiles: Array<CasefileInterface> = [
+      { id: 1 as ID, deadline: '2026-06-15T12:00:00Z' },
+      { id: 2 as ID, deadline: '2026-06-15T13:00:00Z' },
+      { id: 3 as ID },
+      { id: 4 as ID, deadline: '2026-01-16T12:00:00Z' }
+    ];
+    const lists = component.convertToDateSeparatedList(casefiles);
+
+    expect(lists.length).toBe(3);
+    expect(lists[0]).toBeInstanceOf(ViewDateSeparatedList);
+    expect(lists.map((list) => list.name)).toEqual([
+      '5 hónap múlva',
+      'Határidő nélküli feladatok',
+      'holnap'
+    ]);
+    expect(lists.map((list) => list.casefiles.map((casefile) => casefile.id))).toEqual([
+      [1, 2],
+      [3],
+      [4]
+    ]);
+  });
+
+  it('setListsName() should name only the lists without a name', () => {
+    vi.useFakeTimers({ now, toFake: ['Date'] });
+    const lists = [
+      new ViewDateSeparatedList().init({ name: 'Named', date: '2026-01-16T12:00:00Z' }),
+      new ViewDateSeparatedList().init({ date: '2026-01-16T12:00:00Z' })
     ];
 
-    component = fixture.componentInstance;
-    const spy = vi.spyOn(component, 'setListItemName');
-    let convertedData = component.convertToDateSeparatedList(fakedata);
+    component.setListsName(lists);
 
-    expect(convertedData.length).toBe(2);
-    expect(convertedData[0]).toBeInstanceOf(ViewDateSeparatedList);
-
-    fakedata[1].deadline = '2020' as ISODate;
-    fakedata[0].deadline = '2020' as ISODate;
-    convertedData = component.convertToDateSeparatedList(fakedata);
-
-    expect(convertedData.length).toBe(1);
-
-    expect(spy).toHaveBeenCalledTimes(5);
+    expect(lists.map((list) => list.name)).toEqual(['Named', 'holnap']);
   });
 
-  it('setListsName() should set list names', () => {
-    const fakedata: Array<ViewDateSeparatedList> = [
-      {
-        name: '',
-        date: '2020-12-1' as ISODate
-      },
-      {
-        name: '',
-        date: '2020-12-3' as ISODate
-      }
-    ];
+  it('should render the casefiles and emit the open and delete events with the original casefile', () => {
+    const casefile: CasefileInterface = {
+      id: 7 as ID,
+      name: 'Casefile',
+      deadline: '2026-01-16T12:00:00Z',
+      company: { name: 'Company', phone: '+361', email: 'info@example.com' },
+      status: { id: 1 as ID, name: 'Open', color: '#ffffff' },
+      responsible_user: { name: 'User' }
+    };
+    const open = vi.fn();
+    const remove = vi.fn();
 
-    component = fixture.componentInstance;
+    component.data = new BehaviorSubject([casefile]);
+    component.openCasefile.subscribe(open);
+    component.deleteCasefile.subscribe(remove);
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
 
-    component.setListsName(fakedata);
+    expect(element.textContent).toContain('Company');
+    expect(element.textContent).toContain('1 ügy');
+    expect(element.querySelector('a[href="mailto:info@example.com"]')).not.toBeNull();
 
-    expect(fakedata[0].name).not.toBe('');
-    expect(fakedata[1].name).not.toBe('');
+    component.open({ id: 7 as ID });
+    component.delete({ id: 7 as ID });
+
+    expect(open).toHaveBeenCalledWith(casefile);
+    expect(remove).toHaveBeenCalledWith(casefile);
   });
 
-  it('setListItemName() should return a string with the reamining time from the deadline', () => {
-    component = fixture.componentInstance;
-    let deadline = component.setListItemName(moment('2020-12-12', 'YYYY-MM-DD').format());
+  it('setHeight() should fit the container to the window', () => {
+    vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(800);
+    component.data = new BehaviorSubject([{ id: 1 as ID }]);
+    fixture.detectChanges();
 
-    expect(deadline).not.toBe('2020-12-12');
-    expect(deadline).toBe('5 hónap múlva');
-
-    deadline = component.setListItemName('');
-
-    expect(deadline).toBe('Határidő nélküli feladatok');
-  });
-
-  it('open() should open a casefile', () => {
-    const fake = { id: 0 as ID } as unknown as CasefileInterface;
-
-    component = fixture.componentInstance;
-    component.originalData.push(fake);
-    const spy = vi.spyOn(component.openCasefile, 'emit').mockReturnValue(undefined);
-
-    component.open(fake);
-
-    expect(spy).toHaveBeenCalledWith(fake);
-  });
-
-  it('delete() should open a casefile', () => {
-    const fake = { id: 0 as ID } as unknown as CasefileInterface;
-
-    component = fixture.componentInstance;
-    component.originalData.push(fake);
-    const spy = vi.spyOn(component.deleteCasefile, 'emit').mockReturnValue(undefined);
-
-    component.delete(fake);
-
-    expect(spy).toHaveBeenCalledWith(fake);
+    expect(component.listContainer.nativeElement.style.height).toBe('611px');
   });
 });

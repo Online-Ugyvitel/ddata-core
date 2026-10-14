@@ -37,6 +37,7 @@ jobs:
         npm run build:ui-dialog
         npm run build:ui-input
         npm run build:ui-file
+        npm run build:ui
 
     # Installs the packed packages into a scratch project and imports them, like a consumer would.
     - name: Verify consumer installation
@@ -48,8 +49,6 @@ jobs:
     - name: Test main app
       run: npm run test
 
-    # ddata-ui is not tested yet: it still imports files of the consuming application
-    # and private FontAwesome Pro packages that are not available in CI.
     - name: Test ddata-core
       run: npx ng test ddata-core --no-watch
 
@@ -67,3 +66,6 @@ jobs:
 
     - name: Test ddata-a11y
       run: npx ng test ddata-a11y --no-watch
+
+    - name: Test ddata-ui
+      run: npx ng test ddata-ui --no-watch

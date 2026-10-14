@@ -10,13 +10,15 @@ import {
   ChangeDetectionStrategy
 } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
-import { CasefileStatusInterface } from 'src/app/models/casefile/status/casefile-status.interface';
-import { KanbanCasefileInterface } from 'src/app/models/kanban/casefile/kanban-casefile.interface';
-import { KanbanStatusInterface } from 'src/app/models/kanban/status/kanban-status.interface';
-import { KanbanStatus } from 'src/app/models/kanban/status/kanban-status.model';
-import { ViewKanbanInterface } from 'src/app/models/view/kanban/view-kanban.interface';
-import { ViewKanban } from 'src/app/models/view/kanban/view-kanban.model';
+import {
+  CasefileInterface,
+  CasefileStatusInterface
+} from '../../../models/casefile/casefile.interface';
+import {
+  KanbanStatus,
+  KanbanStatusInterface
+} from '../../../models/view/kanban/kanban-status.model';
+import { ViewKanban, ViewKanbanInterface } from '../../../models/view/kanban/view-kanban.model';
 
 @Component({
   selector: 'dd-view-kanban',
@@ -45,11 +47,11 @@ export class ViewKanbanComponent implements AfterViewInit {
   @Output() readonly updateCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
   @ViewChild('kanbanStatusContainer') kanbanStatusContainer: ElementRef;
   statusList: Array<CasefileStatusInterface> = [];
-  kanbanData: ViewKanbanInterface;
+  kanbanData: ViewKanbanInterface = new ViewKanban().init();
   originalData: Array<CasefileInterface> = [];
   dragFromStatus: KanbanStatusInterface = null;
   dragOverStatus: KanbanStatusInterface = null;
-  dragOverCasefileContainer: KanbanCasefileInterface = null;
+  dragOverCasefileContainer: CasefileInterface = null;
   dragCasefile: CasefileInterface = null;
 
   constructor(private readonly renderer: Renderer2) {}
@@ -70,7 +72,7 @@ export class ViewKanbanComponent implements AfterViewInit {
     const kanbanDataSet = new ViewKanban().init({ name: this.title });
 
     // set statuses
-    this.statusList.forEach((status: KanbanStatusInterface) => {
+    this.statusList.forEach((status: CasefileStatusInterface) => {
       kanbanDataSet.statuses.push(
         new KanbanStatus().init({
           id: status.id,
@@ -168,26 +170,26 @@ export class ViewKanbanComponent implements AfterViewInit {
     this.dragOverStatus = status;
   }
 
-  dragoverCasefile(casefile: KanbanCasefileInterface): void {
+  dragoverCasefile(casefile: CasefileInterface): void {
     this.dragOverCasefileContainer = casefile;
   }
 
   getEstimatedTimes(status: KanbanStatusInterface): string {
     let allMiliseconds = 0;
 
-    status.casefiles.forEach((casefile: KanbanCasefileInterface) => {
+    status.casefiles.forEach((casefile: CasefileInterface) => {
       allMiliseconds += this.convertToMiliseconds(casefile.estimated_time);
     });
 
     return this.convertToTime(allMiliseconds);
   }
 
-  private findData(casefile: KanbanCasefileInterface): CasefileInterface {
+  private findData(casefile: CasefileInterface): CasefileInterface {
     return this.originalData.find((item) => item.id === casefile.id);
   }
 
-  private convertToMiliseconds(time: string): number {
-    if (time.length === 0) {
+  private convertToMiliseconds(time?: string): number {
+    if (!time) {
       return 0;
     }
 
@@ -219,33 +221,4 @@ export class ViewKanbanComponent implements AfterViewInit {
 
     return text.join(' ');
   }
-
-  // /**
-  //  * Moves an item one index in an array to another.
-  //  * @param array Array in which to move the item.
-  //  * @param fromIndex Starting index of the item.
-  //  * @param toIndex Index to which the item should be moved.
-  //  */
-  // moveItemInArray<T = any>(array: T[], fromIndex: number, toIndex: number): void {
-  //   const from = this.clamp(fromIndex, array.length - 1);
-  //   const to = this.clamp(toIndex, array.length - 1);
-
-  //   if (from === to) {
-  //     return;
-  //   }
-
-  //   const target = array[from];
-  //   const delta = to < from ? -1 : 1;
-
-  //   for (let i = from; i !== to; i += delta) {
-  //     array[i] = array[i + delta];
-  //   }
-
-  //   array[to] = target;
-  // }
-
-  // /** Clamps a number between zero and a maximum. */
-  // clamp(value: number, max: number): number {
-  //   return Math.max(0, Math.min(max, value));
-  // }
 }

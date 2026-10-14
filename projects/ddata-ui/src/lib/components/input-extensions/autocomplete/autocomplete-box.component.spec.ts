@@ -1,126 +1,212 @@
-import { Injector } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
-import { AppModule } from 'src/app/app.module';
+import { BaseModel, ProxyServiceInterface } from '@netdjw/ddata-core';
+import { of } from 'rxjs';
+import { DdataUiModule } from '../../../ddata-ui.module';
 import { AutocompleteBoxComponent } from './autocomplete-box.component';
-import { BaseModel, ValidatorService } from '@netdjw/ddata-core';
-import { Tag } from '../../../../../../../src/app/dd-select-examples/tag.model';
 
-declare const document: unknown;
+class Tag extends BaseModel {
+  name = '';
+  is_inactive = false;
+
+  constructor() {
+    super();
+    this.validationRules = { name: ['required', 'string'], is_inactive: ['boolean'] };
+    this.fields = {
+      name: { label: 'Címke neve', title: 'Címke neve', placeholder: 'Címke neve', append: 'db' },
+      is_inactive: { label: 'Inaktív', title: 'Inaktív', placeholder: 'Inaktív', prepend: '#' }
+    };
+  }
+
+  init(data: Partial<Tag> = {}): Tag {
+    this.name = data.name ?? '';
+
+    return this;
+  }
+}
 
 describe('AutocompleteBoxComponent', () => {
   let component: AutocompleteBoxComponent;
   let fixture: ComponentFixture<AutocompleteBoxComponent>;
-  let debugElement;
-  let element;
+  const keyup = (keyCode: number): KeyboardEvent =>
+    ({ keyCode, preventDefault: vi.fn() }) as unknown as KeyboardEvent;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [AutocompleteBoxComponent],
-      providers: [Injector, ValidatorService, BaseModel]
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DdataUiModule]
     }).compileComponents();
-  });
-
-  beforeEach(() => {
-    AppModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(AutocompleteBoxComponent);
     component = fixture.componentInstance;
-    debugElement = fixture.debugElement;
-    element = debugElement.nativeElement;
   });
 
   afterEach(() => {
-    document.body.removeChild(element);
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it('should create', () => {
+    fixture.detectChanges();
+
     expect(component).toBeTruthy();
   });
 
-  it('model property should not change anything if the value is null', () => {
-    component._model = new BaseModel();
-    component.model = null;
-
-    expect(component._model).toEqual(null);
-
-    component._field = 'is_inactive';
-    component._model = new BaseModel();
+  it('model setter should read the texts and the required flag of the field', () => {
+    component.field = 'name';
     component.model = new Tag().init();
 
-    expect(component._model).toEqual(new Tag().init());
-    expect(component._model.fields[component._field].title).toBe('Inaktív');
-    expect(component._model.fields[component._field].placeholder).toBe('Inaktív');
-    expect(component._model.fields[component._field].label).toBe('Inaktív');
-    expect(component._is_required).toBe(false);
-
-    component._model = new BaseModel();
-    component._field = 'name';
-    component.model = new Tag().init();
-
-    expect(component._model).toEqual(new Tag().init());
-    expect(component._model.fields[component._field].title).toBe('Címke neve');
-    expect(component._model.fields[component._field].placeholder).toBe('Címke neve');
-    expect(component._model.fields[component._field].label).toBe('Címke neve');
+    expect(component._title).toBe('Címke neve');
+    expect(component._label).toBe('Címke neve');
+    expect(component._placeholder).toBe('Címke neve');
+    expect(component._append).toBe('db');
+    expect(component._prepend).toBe('');
     expect(component._is_required).toBe(true);
+
+    component.field = 'is_inactive';
+    component.model = new Tag().init();
+
+    expect(component._label).toBe('Inaktív');
+    expect(component._prepend).toBe('#');
+    expect(component._is_required).toBe(false);
   });
 
-  it("field property should set _field to be 'isValid' when it's undefined or refresh it's value", () => {
-    component._field = '';
+  it('model setter should accept a null model', () => {
+    component.model = null;
+
+    expect(component.model).toBeNull();
+  });
+
+  it("field setter should replace 'undefined' with 'isValid'", () => {
     component.field = 'undefined';
 
     expect(component._field).toBe('isValid');
 
-    component._field = '';
-    component.field = undefined;
-
-    expect(component._field).not.toBe('');
-
-    component._field = '';
     component.field = 'something';
 
     expect(component._field).toBe('something');
   });
 
-  it("append property should set _append to be '' when it's undefined or refresh it's value", () => {
-    component._append = '';
+  it("append and prepend setters should replace 'undefined' with an empty string", () => {
     component.append = 'undefined';
-
-    expect(component._append).toBe('');
-
-    component._append = '';
-    component.append = undefined;
-
-    expect(component._append).not.toBe('');
-
-    component._append = '';
-    component.append = 'something';
-
-    expect(component._append).toBe('something');
-  });
-
-  it("prepend property should set _prepend to be '' when it's undefined or refresh it's value", () => {
-    component._prepend = '';
     component.prepend = 'undefined';
 
+    expect(component._append).toBe('');
     expect(component._prepend).toBe('');
 
-    component._prepend = '';
-    component.prepend = undefined;
+    component.append = 'kg';
+    component.prepend = '$';
 
-    expect(component._prepend).not.toBe('');
-
-    component._prepend = '';
-    component.prepend = 'something';
-
-    expect(component._prepend).toBe('something');
+    expect(component._append).toBe('kg');
+    expect(component._prepend).toBe('$');
   });
 
-  it("randChars() method should return a String which's lenght is 50", () => {
-    expect(component.randChars()).toBeTruthy();
-    expect(component.randChars()).toBeInstanceOf(String);
-    expect(component.randChars().length).toBe(50);
+  it('randChars() should return a random string of 50 characters', () => {
+    const value = component.randChars();
+
+    expect(value).toMatch(/^[A-Za-z0-9]{50}$/);
+    expect(component.randChars()).not.toBe(value);
+  });
+
+  it('validateField() should add and remove the field from the validation errors', () => {
+    const model = new Tag().init();
+
+    component.field = 'name';
+    component.model = model;
+
+    component.validateField();
+
+    expect(model.validationErrors).toEqual(['name']);
+
+    model.name = 'Valid';
+    component.validateField();
+
+    expect(model.validationErrors).toEqual([]);
+  });
+
+  it('validateField() should log an error for a field without validation rule', () => {
+    const spy = vi.spyOn(console, 'error').mockReturnValue(undefined);
+
+    component.field = 'missing';
+    component.model = new Tag().init();
+    component.validateField();
+
+    expect(spy).toHaveBeenCalledWith('Missing validation rule:missing from model: Tag');
+  });
+
+  it('enabledKeyCode() should enable only the keys what change the value', () => {
+    expect(
+      [8, 32, 48, 90, 96, 111, 160, 170, 186, 226, 231].every((code) =>
+        component.enabledKeyCode(code)
+      )
+    ).toBe(true);
+    expect([9, 16, 17, 37, 112, 300].some((code) => component.enabledKeyCode(code))).toBe(false);
+  });
+
+  it('should search for suggestions and handle the keyboard navigation', () => {
+    vi.useFakeTimers();
+    const suggestions = [new Tag().init({ name: 'Alma' }), new Tag().init({ name: 'Almás' })];
+    const service = {
+      searchWithoutPaginate: vi.fn().mockReturnValue(of(suggestions))
+    } as unknown as ProxyServiceInterface<Tag>;
+    const model = new Tag().init({ name: 'Al' });
+
+    component.autocomplete = true;
+    component.autocompleteService = service;
+    component.field = 'name';
+    component.model = model;
+    fixture.detectChanges();
+    component.inputBox.nativeElement.value = 'Al';
+
+    component.keyup(keyup(65));
+    vi.advanceTimersByTime(300);
+
+    expect(service.searchWithoutPaginate).toHaveBeenCalledWith({ term: 'Al' });
+    expect(component.autocompleteSuggestions).toEqual(suggestions);
+    expect(component.autocompleteLoading).toBe(false);
+
+    // DOWN, DOWN, DOWN (stays on the last item), UP
+    [40, 40, 40, 38].forEach((code) => component.keyup(keyup(code)));
+
+    expect(component.autocompleteCursor).toBe(0);
+    expect(model.name).toBe('Alma');
+    // ENTER
+    const enter = keyup(13);
+
+    component.keyup(enter);
+
+    expect(enter.preventDefault).toHaveBeenCalled();
+    expect(component.model).toBe(suggestions[0]);
+    expect(component.autocompleteSuggestions).toEqual([]);
+    expect(component.autocompleteCursor).toBe(-1);
+  });
+
+  it('ESC should clear the suggestions', () => {
+    component.autocomplete = true;
+    component.autocompleteSuggestions = [new Tag().init({ name: 'Alma' })];
+    component.autocompleteCursor = 0;
+
+    component.keyup(keyup(27));
+
+    expect(component.autocompleteSuggestions).toEqual([]);
+    expect(component.autocompleteCursor).toBe(-1);
+  });
+
+  it('should log an error when autocomplete is on without a service', () => {
+    const spy = vi.spyOn(console, 'error').mockReturnValue(undefined);
+
+    component.autocomplete = true;
+    component.field = 'name';
+    component.registerAutocompleteSearch();
+
+    expect(spy).toHaveBeenCalledWith(
+      "Autocomplete is on the 'name' field, but autocompleteService isn't defined."
+    );
+  });
+
+  it('should clear the suggestions on a click outside of the component', () => {
+    component.autocomplete = true;
+    component.autocompleteSuggestions = [new Tag().init({ name: 'Alma' })];
+
+    component.clickout({ target: document.body } as unknown as Event);
+
+    expect(component.autocompleteSuggestions).toEqual([]);
   });
 });

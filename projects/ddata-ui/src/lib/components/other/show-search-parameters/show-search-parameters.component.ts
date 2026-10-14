@@ -1,8 +1,6 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FieldContainerInterface } from '@netdjw/ddata-core';
-import { LangInterface } from 'src/app/models/lang/lang.interface';
-import { Lang } from 'src/app/models/lang/lang.model';
-import { NameInterface } from 'src/app/models/name/name.interface';
+import { LangInterface, NameInterface } from '../../../models/lang/lang.interface';
 
 interface HasFieldContainerInterface {
   fields: FieldContainerInterface<unknown>;
@@ -75,15 +73,11 @@ export class ShowSearchParametersComponent implements OnInit {
           if (!name.name) {
             return;
           }
-          let language = this.langs.find((langVariable) => langVariable.id === name.lang_id);
-
-          if (!language) {
-            language = new Lang().init();
-          }
+          const language = this.langs.find((langVariable) => langVariable.id === name.lang_id);
 
           this.datas.push({
             name: this.internalModel.fields[key].label,
-            value: `(${language.name}) ${name.name}`
+            value: `(${language?.name ?? ''}) ${name.name}`
           });
         });
 

@@ -1,164 +1,160 @@
-import { ElementRef, Injector, Renderer2 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ID } from '@netdjw/ddata-core';
+import { BehaviorSubject } from 'rxjs';
+import { DdataUiModule } from '../../../ddata-ui.module';
 import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
-import { AppModule } from 'src/app/app.module';
-import { ColorHexaCode, ID } from '@netdjw/ddata-core';
-import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
-import { KanbanStatusInterface } from 'src/app/models/kanban/status/kanban-status.interface';
-import { KanbanStatus } from 'src/app/models/kanban/status/kanban-status.model';
-import { KanbanCasefile } from './../../models/kanban/casefile/kanban-casefile.model';
-import { ViewKanban } from './../../models/view/kanban/view-kanban.model';
+  CasefileInterface,
+  CasefileStatusInterface
+} from '../../../models/casefile/casefile.interface';
+import { KanbanStatus } from '../../../models/view/kanban/kanban-status.model';
 import { ViewKanbanComponent } from './view-kanban.component';
-
-declare const document: unknown;
 
 describe('ViewKanbanComponent', () => {
   let component: ViewKanbanComponent;
   let fixture: ComponentFixture<ViewKanbanComponent>;
+  let todo: CasefileStatusInterface;
+  let done: CasefileStatusInterface;
+  let casefiles: Array<CasefileInterface>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [ViewKanbanComponent],
-      providers: [Injector, Renderer2]
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DdataUiModule]
     }).compileComponents();
-  });
-
-  beforeEach(() => {
-    AppModule.InjectorInstance = TestBed;
     fixture = TestBed.createComponent(ViewKanbanComponent);
-    document.body.appendChild(fixture.nativeElement);
+    component = fixture.componentInstance;
+    todo = { id: 1 as ID, name: 'Teendő', color: '#ff0000' };
+    done = { id: 2 as ID, name: 'Kész', color: '#00ff00' };
+    casefiles = [
+      {
+        id: 10 as ID,
+        name: 'First',
+        status_id: 1 as ID,
+        status: { ...todo },
+        estimated_time: '1:30:00'
+      },
+      {
+        id: 11 as ID,
+        name: 'Second',
+        status_id: 1 as ID,
+        status: { ...todo },
+        estimated_time: '2:15:00'
+      },
+      {
+        id: 12 as ID,
+        name: 'Third',
+        status_id: 3 as ID,
+        status: { id: 3 as ID, name: 'Új', color: '#0000ff' }
+      }
+    ];
+    component.statuses = new BehaviorSubject([todo, done]);
+    component.data = new BehaviorSubject(casefiles);
   });
 
   afterEach(() => {
-    document.body.removeChild(fixture.nativeElement);
+    vi.restoreAllMocks();
   });
 
-  it('should create', () => {
-    component = fixture.componentInstance;
-
-    expect(component).toBeTruthy();
+  it('should group the casefiles by status and add the unknown statuses', () => {
+    expect(component.kanbanData.statuses.map((status) => status.name)).toEqual([
+      'Teendő',
+      'Kész',
+      'Új'
+    ]);
+    expect(component.kanbanData.statuses.map((status) => status.casefiles.length)).toEqual([
+      2, 0, 1
+    ]);
   });
 
-  it('setHeight() method should set height', () => {
-    component = fixture.componentInstance;
-    component.kanbanStatusContainer = new ElementRef(document.createElement('div'));
-    component.setHeight();
+  it('should render the statuses and the casefiles', () => {
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
 
-    expect(component.kanbanStatusContainer.nativeElement.style.height).toBe(
-      `${document.documentElement.clientHeight - 189}px`
-    );
+    expect(element.querySelectorAll('.kanban-status').length).toBe(3);
+    expect(element.querySelectorAll('.card').length).toBe(3);
+    expect(element.textContent).toContain('3ó 45p');
   });
 
-  it('convertToKanban() should convert casefiles to kanban', () => {
-    const fakedata = [
-      {
-        id: 1 as ID,
-        status: {
-          id: 1 as ID,
-          name: 'test',
-          color: '#eb4034' as ColorHexaCode
-        }
-      } as unknown as CasefileInterface
-    ];
-
-    fakedata[0].id = 1 as ID;
-    fakedata[0].status.id = 1 as ID;
-    fakedata[0].status.name = 'test';
-    fakedata[0].status.color = '#eb4034' as ColorHexaCode;
-
-    component = fixture.componentInstance;
-    const dataset = component.convertToKanban(fakedata);
-
-    expect(dataset).toBeTruthy();
-    expect(dataset.statuses.length).toBe(1);
-  });
-
-  it('dragstart() method should update classlist', () => {
-    const fakedata = {
-      id: 1 as ID,
-      status: {
-        id: 1 as ID,
-        name: 'test',
-        color: '#eb4034' as ColorHexaCode
-      }
-    } as unknown as CasefileInterface;
-
-    component = fixture.componentInstance;
-    component.kanbanData = new ViewKanban().init();
-    component.kanbanData.statuses = [new KanbanStatus().init()];
-    const element = document.body.firstElementChild;
-
-    element.classList.add('kanban-status');
-
-    component.kanbanStatusContainer = new ElementRef(element);
+  it('should show the no data component without statuses', () => {
+    component.statuses = new BehaviorSubject([]);
+    component.data = new BehaviorSubject([]);
     fixture.detectChanges();
 
-    component.dragstart(fakedata, new KanbanStatus());
-
-    expect(component.dragCasefile).toEqual(fakedata);
-    expect(component.dragFromStatus).toEqual(new KanbanStatus());
-    expect(element.classList).toContain('drag-active');
+    expect(fixture.nativeElement.querySelector('dd-no-data')).not.toBeNull();
   });
 
-  it('dragover() should update is_drag_over property of a kanbanstatus object', () => {
-    component = fixture.componentInstance;
-    component.kanbanData = new ViewKanban().init({
-      statuses: [new KanbanStatus().init(), new KanbanStatus().init(), new KanbanStatus().init()]
+  it('setHeight() should fit the container to the window', () => {
+    vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(800);
+    fixture.detectChanges();
+
+    expect(component.kanbanStatusContainer.nativeElement.style.height).toBe('611px');
+  });
+
+  it('getEstimatedTimes() should sum the estimated times of the casefiles', () => {
+    const status = new KanbanStatus().init({
+      casefiles: [
+        { id: 1 as ID, estimated_time: '2:3:1' },
+        { id: 2 as ID, estimated_time: '3:2:1' },
+        { id: 3 as ID, estimated_time: '1:1:1' },
+        { id: 4 as ID }
+      ]
     });
-    component.dragover(component.kanbanData.statuses[0]);
 
-    expect(component.dragOverStatus.is_drag_over).toBe(true);
+    expect(component.getEstimatedTimes(status)).toBe('6ó 6p');
   });
 
-  it('dragend() method should update casefile', () => {
-    const fakedata = {
-      id: 1 as ID,
-      status_id: 2 as ID,
-      status: new KanbanStatus().init({
-        id: 2 as ID,
-        name: 'test',
-        color: '#eb4034' as ColorHexaCode
-      })
-    } as unknown as CasefileInterface;
+  it('open() should emit the original casefile', () => {
+    const spy = vi.spyOn(component.openCasefile, 'emit');
 
-    component = fixture.componentInstance;
-    const spy = vi.spyOn(component.updateCasefile, 'emit').mockReturnValue(undefined);
+    component.open({ id: 11 as ID });
 
-    component.dragCasefile = fakedata;
-    component.originalData.push(component.dragCasefile);
+    expect(spy).toHaveBeenCalledWith(casefiles[1]);
+  });
 
-    component.dragOverStatus = new KanbanStatus().init({ id: 1 as ID, casefiles: [fakedata] });
-    component.dragFromStatus = new KanbanStatus().init({ id: 1 as ID, casefiles: [fakedata] });
+  it('should move a casefile to another status with drag and drop', () => {
+    fixture.detectChanges();
+    const spy = vi.spyOn(component.updateCasefile, 'emit');
+    const [todoStatus, doneStatus] = component.kanbanData.statuses;
+    const casefile = todoStatus.casefiles[0];
+
+    component.dragstart(casefile, todoStatus);
+
+    expect(component.dragCasefile).toBe(casefile);
+    expect(component.dragFromStatus).toBe(todoStatus);
+    expect(fixture.nativeElement.querySelector('.kanban-status').classList).toContain(
+      'drag-active'
+    );
+
+    component.dragover(todoStatus);
+    component.dragover(doneStatus);
+
+    expect(todoStatus.is_drag_over).toBe(false);
+    expect(doneStatus.is_drag_over).toBe(true);
 
     component.dragend();
 
-    expect(spy).toHaveBeenCalledWith(component.dragCasefile);
+    expect(todoStatus.casefiles.map((item) => item.id)).toEqual([11]);
+    expect(doneStatus.casefiles.map((item) => item.id)).toEqual([10]);
+    expect(casefiles[0].status_id).toBe(2);
+    expect(casefiles[0].status.name).toBe('Kész');
+    expect(spy).toHaveBeenCalledWith(casefiles[0]);
+    expect(fixture.nativeElement.querySelector('.kanban-status').classList).not.toContain(
+      'drag-active'
+    );
   });
 
-  it('getEstimatedTimes() method should return the sum of time estimates of casefiles', () => {
-    component = fixture.componentInstance;
-    const fakekanban: KanbanStatusInterface = new KanbanStatus().init();
+  it('should insert the dragged casefile before the casefile it is dropped on', () => {
+    const [todoStatus] = component.kanbanData.statuses;
+    const third = component.kanbanData.statuses[2].casefiles[0];
 
-    fakekanban.casefiles = [
-      new KanbanCasefile().init({ estimated_time: '2:3:1' }),
-      new KanbanCasefile().init({ estimated_time: '3:2:1' }),
-      new KanbanCasefile().init({ estimated_time: '1:1:1' })
-    ];
-    const times = component.getEstimatedTimes(fakekanban);
+    component.dragstart(third, component.kanbanData.statuses[2]);
+    component.dragover(todoStatus);
+    component.dragoverCasefile(todoStatus.casefiles[1]);
 
-    expect(times).toBe('6ó 6p');
-  });
+    expect(component.dragOverCasefileContainer).toBe(todoStatus.casefiles[1]);
 
-  it('dragoverCasefile() method should update dragOverCasefileContainer', () => {
-    component = fixture.componentInstance;
-    const fakeCase = new KanbanCasefile();
+    component.dragend();
 
-    component.dragoverCasefile(fakeCase);
-
-    expect(component.dragOverCasefileContainer).toBeTruthy();
-    expect(component.dragOverCasefileContainer).toEqual(fakeCase);
+    expect(todoStatus.casefiles.map((item) => item.id)).toEqual([10, 12, 11]);
+    expect(component.kanbanData.statuses[2].casefiles).toEqual([]);
   });
 });

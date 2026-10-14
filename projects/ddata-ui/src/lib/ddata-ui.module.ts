@@ -1,26 +1,55 @@
-import { NgModule, ModuleWithProviders, Injector } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Injector, ModuleWithProviders, NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatMenuModule } from '@angular/material/menu';
+import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
-// services
-import { ProxyService } from '@netdjw/ddata-core';
+import { DdataUiCommonModule } from '@netdjw/ddata-ui-common';
+import { DdataUiDialogModule } from '@netdjw/ddata-ui-dialog';
 
 // module configuration
 import { ModuleConfigurationInterface } from './models/module-configuration/module-configuration.interface';
 
-// models
-import { FileModel } from 'projects/ddata-ui-file/src/lib/models/file/file.model';
-
 // components
-import { CommonModule } from '@angular/common';
-import { DdataUiFileListComponent } from 'projects/ddata-ui-file/src/lib/components/file-list/file-list.component';
-import { DdataUiFileUploadComponent } from 'projects/ddata-ui-file/src/lib/components/file-upload/file-upload.component';
-import { DdataUiNoDataComponent } from '@netdjw/ddata-ui-common';
+import { AutocompleteBoxComponent } from './components/input-extensions/autocomplete/autocomplete-box.component';
+import { CharacterCounterComponent } from './components/input-extensions/character-counter/character-counter.component';
+import { MultilanguageNameComponent } from './components/input-extensions/multilanguage-name/multilanguage-name.component';
+import { PasswordStrengthOMeterComponent } from './components/input-extensions/password-strength-o-meter/password-strength-o-meter.component';
+import { XlsButtonExportComponent } from './components/list-extensions/download-buttons/xls-button-export.component';
+import { ListButtonsComponent } from './components/list-extensions/list-buttons/list-buttons.component';
+import { ListDropdownDeleteConfirmComponent } from './components/list-extensions/list-dropdown/list-dropdown-delete-confirm/list-dropdown-delete-confirm.component';
+import { ListDropdownComponent } from './components/list-extensions/list-dropdown/list-dropdown.component';
+import { ShowSearchParametersComponent } from './components/other/show-search-parameters/show-search-parameters.component';
+import { TabButtonComponent } from './components/other/tab-button/tab-button.component';
+import { ViewDateSeparatedListComponent } from './components/views/view-date-separated-list/view-date-separated-list.component';
+import { ViewKanbanComponent } from './components/views/view-kanban/view-kanban.component';
+const components = [
+  AutocompleteBoxComponent,
+  CharacterCounterComponent,
+  MultilanguageNameComponent,
+  PasswordStrengthOMeterComponent,
+  XlsButtonExportComponent,
+  ListButtonsComponent,
+  ListDropdownDeleteConfirmComponent,
+  ListDropdownComponent,
+  ShowSearchParametersComponent,
+  TabButtonComponent,
+  ViewDateSeparatedListComponent,
+  ViewKanbanComponent
+];
 
 @NgModule({
-  declarations: [DdataUiFileListComponent, DdataUiFileUploadComponent, DdataUiNoDataComponent],
-  imports: [CommonModule, FontAwesomeModule],
-  exports: [DdataUiFileListComponent, DdataUiFileUploadComponent, DdataUiNoDataComponent],
-  providers: [ProxyService]
+  declarations: components,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    MatMenuModule,
+    FontAwesomeModule,
+    DdataUiCommonModule,
+    DdataUiDialogModule
+  ],
+  exports: components
 })
 export class DdataUiModule {
   static InjectorInstance: Injector;
@@ -32,7 +61,7 @@ export class DdataUiModule {
   static forRoot(config: ModuleConfigurationInterface): ModuleWithProviders<DdataUiModule> {
     return {
       ngModule: DdataUiModule,
-      providers: [FileModel, { provide: 'config', useValue: config }]
+      providers: [{ provide: 'config', useValue: config }]
     };
   }
 }

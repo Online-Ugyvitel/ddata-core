@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { BaseModel, BaseModelInterface } from '@netdjw/ddata-core';
+import { BaseModel, BaseModelInterface, FieldInterface } from '@netdjw/ddata-core';
 import { Global } from '../../../models/global.model';
 
 @Component({
@@ -13,9 +13,9 @@ import { Global } from '../../../models/global.model';
 })
 export class ListButtonsComponent {
   /**
-   * `BaseModelInterface<unknown>` - Need to specify a model to set the `api_endpoint`. Default is a `new BaseModel()`.
+   * `BaseModel` - Need to specify a model to set the `api_endpoint`. Default is a `new BaseModel()`.
    */
-  @Input() model: BaseModelInterface<unknown> = new BaseModel();
+  @Input() model: BaseModel = new BaseModel();
 
   /**
    * `boolean` - Define this is a list where the user can select elements. Default `false`.
@@ -78,6 +78,16 @@ export class ListButtonsComponent {
   icon = new Global().icon;
 
   constructor(private readonly router: Router) {}
+
+  /**
+   * The label of the model's `title` field, what the "Add new" button displays.
+   */
+  get modelTitle(): string {
+    const fields = this.model?.fields as Record<string, FieldInterface> | undefined;
+    const label = fields?.['title']?.label ?? '';
+
+    return this.transformToLowerCase ? label.toLowerCase() : label;
+  }
 
   select(): void {
     this.emitSelected.emit();

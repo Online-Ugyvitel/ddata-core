@@ -55,16 +55,15 @@
     <a href="{{ href }}" mat-menu-item class="btn btn-light" type="button">{{ hrefText }}</a>
   </ng-container>
 
-  <ng-container *ngFor="let type of certificationTypes">
+  <ng-container *ngFor="let item of dialogItems">
     <button
       mat-menu-item
       class="btn btn-light"
       type="button"
-      (click)="createCertificate(type.id)"
-      *ngIf="isShowElement(type.id)"
+      (click)="openDialog(item)"
+      *ngIf="isVisible(item)"
     >
-      <!-- <fa-icon *ngIf="!!type.icon" [icon]="icon[type.icon]"></fa-icon> -->
-      {{ type.name }}
+      {{ item.name }}
     </button>
   </ng-container>
 </mat-menu>
