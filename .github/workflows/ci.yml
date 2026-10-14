@@ -5,7 +5,10 @@ on:
     branches: [ master, main ]
 
 jobs:
-  test-and-lint:
+  # A separate job, so the build shows up as its own check on the pull request.
+  # It uses the same production configuration and dependency order as the publish workflow.
+  build:
+    name: Build packages
     runs-on: ubuntu-latest
 
     steps:
@@ -41,6 +44,46 @@ jobs:
     # Installs the packed packages into a scratch project and imports them, like a consumer would.
     - name: Verify consumer installation
       run: npm run verify:consumer
+
+    # Lint and the tests resolve the packages from dist/ (see the paths in tsconfig.json), so they reuse this build.
+    - name: Upload built packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+        if-no-files-found: error
+        retention-days: 1
+
+  test-and-lint:
+    name: Lint and test
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        # Disable npm cache to avoid authentication issues
+        # cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        rm -f .npmrc
+        rm -f package-lock.json
+        npm config set registry https://registry.npmjs.org/
+        npm config delete //registry.npmjs.org/:_authToken || true
+        npm whoami || echo "Not logged in to npm (this is expected)"
+        npm install --legacy-peer-deps --no-audit --no-fund --ignore-scripts
+
+    - name: Download built packages
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist/
 
     - name: Lint
       run: npm run lint
