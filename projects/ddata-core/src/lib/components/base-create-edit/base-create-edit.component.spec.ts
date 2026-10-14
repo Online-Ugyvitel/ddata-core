@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector } from '@angular/core';
+import { Component, EventEmitter, Injector, Type } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { of, Observable } from 'rxjs';
 
@@ -7,8 +7,32 @@ import { HelperServiceInterface } from '../../services/helper/helper-service.int
 import { HelperFactoryService } from '../../services/helper/helper-service.factory';
 import { DdataCoreModule } from '../../ddata-core.module';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
-import { TestModel, TestModelInterface } from './test.model.spec';
 import { ID } from '../../models/base/base-data.type';
+import { BaseModel, BaseModelInterface } from '../../models/base/base-model.model';
+
+interface TestModelInterface extends BaseModelInterface<TestModelInterface> {
+  name: string;
+}
+
+class TestModel extends BaseModel implements TestModelInterface {
+  readonly api_endpoint = '/test';
+  readonly model_name = 'TestModel';
+  id: ID = 0 as ID;
+  name = '';
+
+  init(data?: any): TestModelInterface {
+    const incoming = data ?? {};
+
+    this.id = (incoming.id ?? 0) as ID;
+    this.name = incoming.name ?? '';
+
+    return this;
+  }
+
+  prepareToSave(): any {
+    return { id: this.id, name: this.name };
+  }
+}
 // Mock PaginateInterface implementation
 const mockPaginate: PaginateInterface = {
   current_page: 1,
@@ -114,9 +138,6 @@ describe('BaseCreateEditComponent', () => {
   let mockHelperFactoryService: MockHelperFactoryService;
 
   beforeEach(() => {
-    // Don't call configureTestBed as it resets the test environment
-    // configureTestBed();
-
     mockHelperService = new MockHelperService();
     mockHelperFactoryService = new MockHelperFactoryService();
     // Mock DdataCoreModule.InjectorInstance completely
@@ -155,18 +176,24 @@ describe('BaseCreateEditComponent', () => {
   });
 
   it('should create the component', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeInstanceOf(TestCreateEditComponent);
+    expect(component).toBeInstanceOf(BaseCreateEditComponent);
   });
 
   it('should depend on the helperService', () => {
-    expect(component.helperService).toBeDefined();
     expect(component.helperService).toBeInstanceOf(MockHelperService);
   });
 
-  it('should have all required input parameters', () => {
-    expect(component.isModal).toBeDefined();
-    expect(component.saveToStorage).toBeDefined();
-    expect(component.model).toBeDefined();
+  it('should accept its inputs from the template', () => {
+    const model = new TestModel().init({ id: 3, name: 'Input' });
+
+    fixture.componentRef.setInput('isModal', true);
+    fixture.componentRef.setInput('saveToStorage', false);
+    fixture.componentRef.setInput('model', model);
+
+    expect(component.isModal).toBe(true);
+    expect(component.saveToStorage).toBe(false);
+    expect(component.model).toBe(model);
   });
 
   it('should set isModal input property to false by default', () => {
@@ -230,7 +257,6 @@ describe('BaseCreateEditComponent', () => {
   });
 
   it('should have saveModel output parameter', () => {
-    expect(component.saveModel).toBeDefined();
     expect(component.saveModel).toBeInstanceOf(EventEmitter);
   });
 
@@ -304,16 +330,10 @@ describe('BaseCreateEditComponent', () => {
     expect(component.saveModel.emit).toHaveBeenCalledWith(null);
   });
 
-  it('should handle null data input gracefully', () => {
-    component.data = null;
-    // Should not throw an error
-    expect(component).toBeTruthy();
-  });
-
-  it('should handle undefined data input gracefully', () => {
-    component.data = undefined;
-    // Should not throw an error
-    expect(component).toBeTruthy();
+  it.each([null, undefined])('should ignore a %s data input', (value) => {
+    expect(() => (component.data = value)).not.toThrow();
+    expect(component.isModal).toBe(false);
+    expect(component.saveToStorage).toBe(true);
   });
 
   it('should skip null or undefined values in data input', () => {
@@ -326,5 +346,39 @@ describe('BaseCreateEditComponent', () => {
 
     // Should not change isModal since the value was null
     expect(component.isModal).toBe(isOriginalModal);
+  });
+});
+
+describe('BaseCreateEditComponent created by the injector', () => {
+  @Component({
+    template: '',
+    standalone: false
+  })
+  class InjectedTypeCreateEditComponent extends BaseCreateEditComponent<TestModelInterface> {}
+
+  beforeEach(() => {
+    (DdataCoreModule as any).InjectorInstance = { get: vi.fn().mockReturnValue({}) };
+    vi.spyOn(HelperFactoryService.prototype, 'get').mockReturnValue(new MockHelperService());
+    TestBed.configureTestingModule({
+      declarations: [InjectedTypeCreateEditComponent, BaseCreateEditComponent],
+      providers: [{ provide: 'type', useValue: TestModel }]
+    });
+  });
+
+  it('should build the model of the injected type in a subclass without constructor', () => {
+    const created = TestBed.createComponent(InjectedTypeCreateEditComponent).componentInstance;
+
+    expect(created).toBeInstanceOf(InjectedTypeCreateEditComponent);
+    expect(created.model).toBeInstanceOf(TestModel);
+    expect(HelperFactoryService.prototype.get).toHaveBeenCalledWith(TestModel);
+  });
+
+  it('should build the model of the injected type in the base component itself', () => {
+    const created = TestBed.createComponent(
+      BaseCreateEditComponent as unknown as Type<BaseCreateEditComponent<TestModelInterface>>
+    ).componentInstance;
+
+    expect(created).toBeInstanceOf(BaseCreateEditComponent);
+    expect(created.model).toBeInstanceOf(TestModel);
   });
 });

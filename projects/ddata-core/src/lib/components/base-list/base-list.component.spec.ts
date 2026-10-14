@@ -1,8 +1,9 @@
 import type { Mock } from 'vitest';
-import { EventEmitter, Injector } from '@angular/core';
+import { Component, EventEmitter, Injector, Type } from '@angular/core';
 import { of } from 'rxjs';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
+import { Paginate } from '../../models/paginate/paginate.model';
 import { BaseListComponent } from './base-list.component';
 import { HelperFactoryService } from '../../services/helper/helper-service.factory';
 import { DdataCoreModule } from '../../ddata-core.module';
@@ -64,7 +65,8 @@ describe('BaseListComponent', () => {
 
   describe('Component Initialization', () => {
     it('should create the component', () => {
-      expect(component).toBeTruthy();
+      expect(component).toBeInstanceOf(TestListComponent);
+      expect(component).toBeInstanceOf(BaseListComponent);
     });
 
     it('should have default property values', () => {
@@ -79,7 +81,8 @@ describe('BaseListComponent', () => {
 
     it('should initialize model and paginate on construction', () => {
       expect(component.model).toBeInstanceOf(TestModel);
-      expect(component.paginate).toBeDefined();
+      expect(component.paginate).toBeInstanceOf(Paginate);
+      expect(component.paginate.data).toEqual([]);
       expect(component.helperService).toBeInstanceOf(MockHelperService);
       expect(component.activatedRoute).toBe(mockActivatedRoute as unknown as ActivatedRoute);
     });
@@ -553,5 +556,42 @@ describe('BaseListComponent', () => {
       expect((component as any).nested).toEqual(complexData.nested);
       expect((component as any).array).toEqual(complexData.array);
     });
+  });
+});
+
+describe('BaseListComponent created by the injector', () => {
+  @Component({
+    template: '',
+    standalone: false
+  })
+  class InjectedTypeListComponent extends BaseListComponent<TestModelInterface> {}
+
+  beforeEach(() => {
+    (DdataCoreModule as any).InjectorInstance = {
+      get: vi.fn().mockReturnValue(mockActivatedRoute)
+    };
+    vi.spyOn(HelperFactoryService.prototype, 'get').mockReturnValue(new MockHelperService());
+    TestBed.configureTestingModule({
+      declarations: [InjectedTypeListComponent],
+      providers: [{ provide: 'type', useValue: TestModel }]
+    });
+  });
+
+  it('should build the model of the injected type in a subclass without constructor', () => {
+    const created = TestBed.createComponent(InjectedTypeListComponent).componentInstance;
+
+    expect(created).toBeInstanceOf(InjectedTypeListComponent);
+    expect(created.model).toBeInstanceOf(TestModel);
+    expect(created.activatedRoute).toBe(mockActivatedRoute as unknown as ActivatedRoute);
+  });
+
+  it('should build the model of the injected type in the base component itself', () => {
+    const created = TestBed.createComponent(
+      BaseListComponent as unknown as Type<BaseListComponent<TestModelInterface>>
+    ).componentInstance;
+
+    expect(created).toBeInstanceOf(BaseListComponent);
+    expect(created.model).toBeInstanceOf(TestModel);
+    expect(HelperFactoryService.prototype.get).toHaveBeenCalledWith(TestModel);
   });
 });

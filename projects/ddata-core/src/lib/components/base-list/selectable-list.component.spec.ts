@@ -1,10 +1,11 @@
-import { Injector } from '@angular/core';
+import { Component, EventEmitter, Injector, Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 import { BehaviorSubject } from 'rxjs';
+import { BaseListComponent } from './base-list.component';
 import { SelectableListComponent } from './selectable-list.component';
 import { DdataCoreModule } from '../../ddata-core.module';
 import { HelperFactoryService } from '../../services/helper/helper-service.factory';
@@ -72,30 +73,30 @@ describe('SelectableListComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeInstanceOf(TestSelectableListComponent);
   });
 
   it('should extend BaseListComponent', () => {
-    expect(component instanceof SelectableListComponent).toBe(true);
+    expect(component).toBeInstanceOf(SelectableListComponent);
+    expect(component).toBeInstanceOf(BaseListComponent);
     // Should have inherited properties from BaseListComponent
-    expect(component.models).toBeDefined();
-    expect(component.filter).toBeDefined();
-    expect(component.editModel).toBeDefined();
-    expect(component.deleteModel).toBeDefined();
+    expect(component.models).toEqual([testModel1, testModel2, testModel3]);
+    expect(component.filter).toEqual({});
+    expect(component.editModel).toBeInstanceOf(EventEmitter);
+    expect(component.deleteModel).toBeInstanceOf(EventEmitter);
   });
 
   it('should implement SelectableListComponentInterface', () => {
-    // Verify all interface properties and methods exist
-    expect(component.isModal).toBeDefined();
-    expect(component.multipleSelectEnabled).toBeDefined();
-    expect(component.isSelectionList).toBeDefined();
-    expect(component.loadData).toBeDefined();
-    expect(component.selectedElements).toBeDefined();
-    expect(component.removeSelection).toBeDefined();
-    expect(component.setSelection).toBeDefined();
-    expect(component.emitSelected).toBeDefined();
-    expect(component.datasArrived).toBeDefined();
-    expect(component.select).toBeDefined();
+    expect(component.isModal).toBe(true);
+    expect(component.multipleSelectEnabled).toBe(true);
+    expect(component.isSelectionList).toBe(true);
+    expect(component.loadData).toBe(false);
+    expect(component.selectedElements).toEqual([]);
+    expect(component.removeSelection).toBeInstanceOf(EventEmitter);
+    expect(component.setSelection).toBeInstanceOf(EventEmitter);
+    expect(component.emitSelected).toBeInstanceOf(EventEmitter);
+    expect(component.datasArrived).toBeInstanceOf(BehaviorSubject);
+    expect(component.select).toBeInstanceOf(BehaviorSubject);
     expect(typeof component.toggleSelect).toBe('function');
     expect(typeof component.chooseSelect).toBe('function');
   });
@@ -118,9 +119,9 @@ describe('SelectableListComponent', () => {
     });
 
     it('should initialize EventEmitters', () => {
-      expect(component.removeSelection).toBeDefined();
-      expect(component.setSelection).toBeDefined();
-      expect(component.emitSelected).toBeDefined();
+      expect(component.removeSelection).toBeInstanceOf(EventEmitter);
+      expect(component.setSelection).toBeInstanceOf(EventEmitter);
+      expect(component.emitSelected).toBeInstanceOf(EventEmitter);
     });
   });
 
@@ -502,5 +503,42 @@ describe('SelectableListComponent', () => {
       // Final state should be empty
       expect(component['selectedElementsSet'].size).toBe(0);
     });
+  });
+});
+
+describe('SelectableListComponent created by the injector', () => {
+  @Component({
+    template: '',
+    standalone: false
+  })
+  class InjectedTypeSelectableListComponent extends SelectableListComponent<TestModel> {}
+
+  beforeEach(() => {
+    const activatedRoute = { snapshot: {} };
+
+    DdataCoreModule.InjectorInstance = { get: vi.fn().mockReturnValue(activatedRoute) };
+    vi.spyOn(HelperFactoryService.prototype, 'get').mockReturnValue(new MockHelperService());
+    TestBed.configureTestingModule({
+      declarations: [InjectedTypeSelectableListComponent, SelectableListComponent],
+      providers: [{ provide: 'type', useValue: TestModel }]
+    });
+  });
+
+  it('should build the model of the injected type in a subclass without constructor', () => {
+    const created = TestBed.createComponent(InjectedTypeSelectableListComponent).componentInstance;
+
+    expect(created).toBeInstanceOf(InjectedTypeSelectableListComponent);
+    expect(created.model).toBeInstanceOf(TestModel);
+    expect(created.isModal).toBe(true);
+  });
+
+  it('should build the model of the injected type in the base component itself', () => {
+    const created = TestBed.createComponent(
+      SelectableListComponent as unknown as Type<SelectableListComponent<TestModel>>
+    ).componentInstance;
+
+    expect(created).toBeInstanceOf(SelectableListComponent);
+    expect(created.model).toBeInstanceOf(TestModel);
+    expect(HelperFactoryService.prototype.get).toHaveBeenCalledWith(TestModel);
   });
 });

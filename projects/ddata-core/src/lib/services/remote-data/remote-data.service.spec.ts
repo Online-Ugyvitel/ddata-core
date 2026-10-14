@@ -99,7 +99,6 @@ describe('RemoteDataService', () => {
   });
 
   it('should be created with the API URL of the environment', () => {
-    expect(service).toBeTruthy();
     expect(service.url).toBe(apiUrl);
   });
 
@@ -373,5 +372,298 @@ describe('RemoteDataService', () => {
       ['first.txt', 'remote/first.txt'],
       ['second.txt', 'remote/second.txt']
     ]);
+  });
+
+  it('should fall back to a new EnvService when the injector has no get()', () => {
+    DdataInjectorModule.InjectorInstance = {} as Injector;
+    const created = new RemoteDataService<any>(new DummyData().init());
+
+    expect(created.url).toBe('');
+    expect((created as any).appEnv).toBeInstanceOf(EnvService);
+  });
+
+  it('should send "Bearer null" when no token is stored', () => {
+    localStorage.removeItem('token');
+
+    service.getOne(1).subscribe();
+    const req = httpMock.expectOne(`${apiUrl}/dummy-uri/1`);
+
+    expect(req.request.headers.get('Authorization')).toBe('Bearer null');
+
+    req.flush(fakePlainObject);
+  });
+
+  it('should read the token again for every request', () => {
+    service.getOne(1).subscribe();
+    httpMock.expectOne(`${apiUrl}/dummy-uri/1`).flush(fakePlainObject);
+
+    localStorage.setItem('token', 'new-token');
+    service.getOne(1).subscribe();
+    const req = httpMock.expectOne(`${apiUrl}/dummy-uri/1`);
+
+    expect(req.request.headers.get('Authorization')).toBe('Bearer new-token');
+
+    req.flush(fakePlainObject);
+  });
+
+  it('getAll() should request a large page number as it is', () => {
+    service.getAll(99999).subscribe();
+
+    httpMock.expectOne(`${apiUrl}/dummy-uri?page=99999`).flush({ data: [] });
+  });
+
+  it.each([null, {}])('getAll() should return an empty page for a %o response', (body) => {
+    let result: PaginateInterface;
+
+    service.getAll().subscribe((response: PaginateInterface) => {
+      result = response;
+    });
+    httpMock.expectOne(`${apiUrl}/dummy-uri`).flush(body);
+
+    expect(result.data).toEqual([]);
+  });
+
+  it('getAllWithoutPaginate() should return an empty array for a null response', () => {
+    let result: Array<DummyDataInterface>;
+
+    service.getAllWithoutPaginate().subscribe((response: Array<DummyDataInterface>) => {
+      result = response;
+    });
+    httpMock.expectOne(`${apiUrl}/dummy-uri/list`).flush(null);
+
+    expect(result).toEqual([]);
+  });
+
+  it('getOne() should return an empty model for a null response', () => {
+    let result: DummyDataInterface;
+
+    service.getOne(1).subscribe((response: DummyDataInterface) => {
+      result = response;
+    });
+    httpMock.expectOne(`${apiUrl}/dummy-uri/1`).flush(null);
+
+    expect(result).toBeInstanceOf(DummyData);
+    expect(result.id).toBe(0);
+    expect(result.name).toBe('');
+  });
+
+  it.each([0, -1])('getOne() should put the id %s into the URL as it is', (id) => {
+    service.getOne(id).subscribe();
+
+    httpMock.expectOne(`${apiUrl}/dummy-uri/${id}`).flush(fakePlainObject);
+  });
+
+  it.each([
+    [404, 'Not Found'],
+    [500, 'Server error']
+  ])('getOne() should emit the HTTP error of status %s', (status, statusText) => {
+    let receivedError: HttpErrorResponse;
+
+    service.getOne(1).subscribe({
+      error: (error: HttpErrorResponse) => {
+        receivedError = error;
+      }
+    });
+    httpMock.expectOne(`${apiUrl}/dummy-uri/1`).flush('Failed', { status, statusText });
+
+    expect(receivedError).toBeInstanceOf(HttpErrorResponse);
+    expect(receivedError.status).toBe(status);
+  });
+
+  it('getAll() should emit a network error', () => {
+    let receivedError: HttpErrorResponse;
+
+    service.getAll().subscribe({
+      error: (error: HttpErrorResponse) => {
+        receivedError = error;
+      }
+    });
+    httpMock.expectOne(`${apiUrl}/dummy-uri`).error(new ProgressEvent('error'));
+
+    expect(receivedError.status).toBe(0);
+  });
+
+  it('should answer concurrent requests independently', () => {
+    const results: Array<string> = [];
+
+    service.getOne(1).subscribe((response: DummyDataInterface) => results.push(response.name));
+    service.getOne(2).subscribe((response: DummyDataInterface) => results.push(response.name));
+    const first = httpMock.expectOne(`${apiUrl}/dummy-uri/1`);
+    const second = httpMock.expectOne(`${apiUrl}/dummy-uri/2`);
+
+    second.flush({ id: 2, name: 'Second' });
+    first.flush({ id: 1, name: 'First' });
+
+    expect(results).toEqual(['Second', 'First']);
+  });
+
+  it('save() should update a model with a negative id', () => {
+    service.save(new DummyData().init({ id: -1, name: 'Negative' })).subscribe();
+    const req = httpMock.expectOne(`${apiUrl}/dummy-uri/-1`);
+
+    expect(req.request.method).toBe('PUT');
+
+    req.flush({ id: -1 });
+  });
+
+  it('save() should store the invalid fields of a backend validation error on update', () => {
+    const model = new DummyData().init({ id: 3, name: 'Invalid' });
+    let receivedError: HttpErrorResponse;
+
+    service.save(model).subscribe({
+      error: (error: HttpErrorResponse) => {
+        receivedError = error;
+      }
+    });
+    httpMock
+      .expectOne(`${apiUrl}/dummy-uri/3`)
+      .flush({ errors: { id: ['x'], name: ['required'] } }, { status: 480, statusText: 'Invalid' });
+
+    expect(receivedError.status).toBe(480);
+    expect(model.validationErrors).toEqual(['id', 'name']);
+  });
+
+  it.each([
+    [400, 'Bad Request'],
+    [422, 'Unprocessable Entity'],
+    [500, 'Server error']
+  ])(
+    'save() should rethrow a %s error without touching the validation errors',
+    (status, statusText) => {
+      const created = new DummyData().init({ name: 'New' });
+      const updated = new DummyData().init({ id: 4, name: 'Old' });
+      const errors: Array<number> = [];
+
+      created.validationErrors = ['kept'];
+      updated.validationErrors = ['kept'];
+      service
+        .save(created)
+        .subscribe({ error: (error: HttpErrorResponse) => errors.push(error.status) });
+      service
+        .save(updated)
+        .subscribe({ error: (error: HttpErrorResponse) => errors.push(error.status) });
+      httpMock
+        .expectOne({ method: 'POST', url: `${apiUrl}/dummy-uri` })
+        .flush({ errors: { name: ['x'] } }, { status, statusText });
+      httpMock
+        .expectOne({ method: 'PUT', url: `${apiUrl}/dummy-uri/4` })
+        .flush({ errors: { name: ['x'] } }, { status, statusText });
+
+      expect(errors).toEqual([status, status]);
+      expect(created.validationErrors).toEqual(['kept']);
+      expect(updated.validationErrors).toEqual(['kept']);
+    }
+  );
+
+  it('deleteMultiple() should post an empty id list for an empty array', () => {
+    service.deleteMultiple([]).subscribe();
+    const req = httpMock.expectOne(`${apiUrl}/dummy-uri/multiple/delete`);
+
+    expect(req.request.body).toBe(JSON.stringify({ data: [] }));
+
+    req.flush({});
+  });
+
+  it('sendFiles() should return no request for an empty file set', () => {
+    expect(service.sendFiles('/file', 1, new Set<File>())).toEqual([]);
+  });
+
+  it('sendFiles() should report null remote data for other events and an empty response body', () => {
+    const results: Array<string | null> = [];
+    const progress: Array<number> = [];
+    const [upload] = service.sendFiles('/file', 1, new Set([new File(['x'], 'x.txt')]), {});
+
+    upload.subscribe((result: FileUploadProcessInterface) => {
+      results.push(result.remoteFileDatas);
+      result.progress.subscribe((percent: number) => progress.push(percent));
+    });
+    const req = httpMock.expectOne(`${apiUrl}/dummy-uri/file`);
+
+    // the Sent event is emitted by the HttpClient itself, before any progress
+    req.event({ type: HttpEventType.UploadProgress, loaded: 10, total: 10 });
+    req.flush(null);
+
+    expect(results).toEqual([null, null, null]);
+    expect(progress).toEqual([100]);
+  });
+
+  describe('in debug mode', () => {
+    let log: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: EnvService, useValue: { environment: { apiUrl, debug: true } } }
+        ]
+      });
+      DdataInjectorModule.InjectorInstance = TestBed.inject(Injector);
+      httpMock = TestBed.inject(HttpTestingController);
+      service = new RemoteDataService<any>(new DummyData().init());
+      log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      log.mockRestore();
+    });
+
+    it('should log the URL of every request', () => {
+      const created = new DummyData().init({ name: 'New' });
+      const updated = new DummyData().init({ id: 1, name: 'Old' });
+      const file = new File(['x'], 'x.txt');
+
+      service.getAll().subscribe();
+      service.getPage(2).subscribe();
+      service.getAllWithoutPaginate().subscribe();
+      service.getOne(1).subscribe();
+      service.getUri('/custom').subscribe();
+      service.postUri({}, '/custom').subscribe();
+      service.putUri({}, '/custom').subscribe();
+      service.save(created).subscribe();
+      service.save(updated).subscribe();
+      service.delete(updated).subscribe();
+      service.deleteMultiple([updated]).subscribe();
+      service.sendFiles('/file', 1, new Set([file])).forEach((upload) => upload.subscribe());
+
+      expect(log.mock.calls.map((call: Array<unknown>) => call.slice(0, 2))).toEqual([
+        ['URL - getAll()', `${apiUrl}/dummy-uri`],
+        ['URL - getPaginatePage()', `${apiUrl}/dummy-uri?page=2`],
+        ['URL - getAllWithoutPaginate()', `${apiUrl}/dummy-uri/list`],
+        ['URL - getOne()', `${apiUrl}/dummy-uri/1`],
+        ['URL - getUri()', `${apiUrl}/custom`],
+        ['URL - uniquePost()', `${apiUrl}/dummy-uri/custom`],
+        ['URL - putUri()', `${apiUrl}/dummy-uri/custom`],
+        ['URL - create()', `${apiUrl}/dummy-uri`],
+        ['URL - update()', `${apiUrl}/dummy-uri/1`],
+        ['URL - delete()', `${apiUrl}/dummy-uri/1`],
+        ['URL - deleteMultiple()', `${apiUrl}/dummy-uri/multiple/delete`],
+        ['URL - sendFiles()', `${apiUrl}/dummy-uri/file`]
+      ]);
+      expect(log.mock.calls[7][2]).toEqual(created.prepareToSave());
+      expect(log.mock.calls[10][2]).toBe(JSON.stringify({ data: [1] }));
+      expect(log.mock.calls[11][2]).toBe(file);
+
+      httpMock
+        .match(() => true)
+        .forEach((req) => req.flush(req.request.url.endsWith('/list') ? [] : {}));
+    });
+
+    it('should log a save error before rethrowing it', () => {
+      let receivedError: HttpErrorResponse;
+
+      service.save(new DummyData().init({ name: 'New' })).subscribe({
+        error: (error: HttpErrorResponse) => {
+          receivedError = error;
+        }
+      });
+      httpMock
+        .expectOne(`${apiUrl}/dummy-uri`)
+        .flush('Failed', { status: 500, statusText: 'Server error' });
+
+      expect(log).toHaveBeenLastCalledWith(receivedError);
+      expect(receivedError.status).toBe(500);
+    });
   });
 });

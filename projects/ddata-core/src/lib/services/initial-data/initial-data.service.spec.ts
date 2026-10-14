@@ -75,7 +75,6 @@ describe('InitialDataService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
     expect(service).toBeInstanceOf(InitialDataService);
   });
 
@@ -83,7 +82,7 @@ describe('InitialDataService', () => {
     expect((service as any).initModel).toBeInstanceOf(InitialData);
     expect((service as any).initModel.api_endpoint).toBe('/init');
     expect((service as any).storageService).toBe(storageServiceSpy);
-    expect((service as any).spinner).toBeTruthy();
+    expect((service as any).spinner).toBe(spinnerServiceSpy);
   });
 
   describe('refresh()', () => {

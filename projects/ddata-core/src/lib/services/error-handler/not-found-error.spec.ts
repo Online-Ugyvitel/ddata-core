@@ -29,8 +29,7 @@ describe('NotFoundError', () => {
 
       notFoundError = new NotFoundError(originalError, notificationService);
 
-      expect(notFoundError).toBeTruthy();
-      expect(notFoundError instanceof NotFoundError).toBe(true);
+      expect(notFoundError).toBeInstanceOf(NotFoundError);
       expect(notFoundError instanceof DdataCoreError).toBe(true);
     });
 
@@ -205,8 +204,7 @@ describe('NotFoundError', () => {
       notFoundError = new NotFoundError(originalError, notificationService);
 
       // Check that inherited properties exist
-      expect(notFoundError.msg).toBeDefined();
-      expect(notFoundError.originalError).toBeDefined();
+      expect(notFoundError.originalError).toBe(originalError);
       expect(typeof notFoundError.msg).toBe('string');
     });
 
@@ -263,7 +261,6 @@ describe('NotFoundError', () => {
       notFoundError = new NotFoundError(originalError, notificationService);
 
       // Should not throw and should handle missing properties gracefully
-      expect(notFoundError).toBeTruthy();
       expect(notFoundError.msg).toBe('');
     });
   });
@@ -341,7 +338,7 @@ describe('NotFoundError', () => {
 
       // Verify every line was executed:
       // 1. Class instantiation
-      expect(notFoundError).toBeTruthy();
+      expect(notFoundError).toBeInstanceOf(NotFoundError);
 
       // 2. super(originalError) call - verified by checking inherited properties
       expect(notFoundError.originalError).toBe(originalError);

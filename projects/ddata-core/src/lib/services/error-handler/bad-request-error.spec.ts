@@ -20,7 +20,6 @@ describe('BadRequest', () => {
       const originalError = { error: { message: 'Test error' } };
       const badRequest = new BadRequest(originalError, mockNotificationService);
 
-      expect(badRequest).toBeTruthy();
       expect(badRequest).toBeInstanceOf(BadRequest);
     });
 
@@ -222,7 +221,6 @@ describe('BadRequest', () => {
       const originalError = { error: { message: 'Test error' } };
       const badRequest = new BadRequest(originalError, mockNotificationService);
 
-      expect(badRequest.msg).toBeDefined();
       expect(typeof badRequest.msg).toBe('string');
     });
 

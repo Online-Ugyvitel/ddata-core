@@ -10,31 +10,41 @@ describe('ValidationError', () => {
       };
       const error = new ValidationError(settings);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
+      expect(error.message).toBe('Test error message');
+      expect(error.invalids).toEqual(['field1', 'field2']);
+    });
+
+    it.each([null, undefined])('should create an instance without settings (%s)', (settings) => {
+      const error = new ValidationError(settings);
+
+      expect(error).toBeInstanceOf(ValidationError);
+      expect(error.message).toBe('');
+      expect(error.invalids).toEqual([]);
+      expect(error.originalError.error.invalids).toEqual([]);
     });
 
     it('should create an instance with empty settings object', () => {
       const settings: ValidationErrorSettingsInterface = {};
       const error = new ValidationError(settings);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
+      expect(error.message).toBe('');
+      expect(error.invalids).toEqual([]);
     });
 
     it('should handle settings object with undefined message', () => {
       const settings: ValidationErrorSettingsInterface = { message: undefined };
       const error = new ValidationError(settings);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
+      expect(error.message).toBe('');
     });
 
     it('should handle settings object with defined message', () => {
       const settings: ValidationErrorSettingsInterface = { message: 'Test message' };
       const error = new ValidationError(settings);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(ValidationError);
       expect(error.message).toBe('Test message');
     });
@@ -57,11 +67,11 @@ describe('ValidationError', () => {
 
     it('should implement ValidationErrorInterface', () => {
       // Verify it has all required interface properties
-      expect(error.name).toBeDefined();
-      expect(error.message).toBeDefined();
-      expect(error.invalids).toBeDefined();
-      expect(error.status).toBeDefined();
-      expect(error.originalError).toBeDefined();
+      expect(error.name).toBe('ValidationError');
+      expect(error.message).toBe('Test message');
+      expect(error.invalids).toEqual([]);
+      expect(error.status).toBe(480);
+      expect(error.originalError.status).toBe(480);
     });
 
     it('should have correct prototype chain', () => {
@@ -78,27 +88,27 @@ describe('ValidationError', () => {
 
     it('should have name property', () => {
       expect(error.hasOwnProperty('name') || 'name' in error).toBe(true);
-      expect(error.name).toBeDefined();
+      expect(error.name).toBe('ValidationError');
     });
 
     it('should have message property', () => {
       expect(error.hasOwnProperty('message') || 'message' in error).toBe(true);
-      expect(error.message).toBeDefined();
+      expect(error.message).toBe('Test message');
     });
 
     it('should have invalids property', () => {
       expect(error.hasOwnProperty('invalids') || 'invalids' in error).toBe(true);
-      expect(error.invalids).toBeDefined();
+      expect(error.invalids).toEqual([]);
     });
 
     it('should have status property', () => {
       expect(error.hasOwnProperty('status') || 'status' in error).toBe(true);
-      expect(error.status).toBeDefined();
+      expect(error.status).toBe(480);
     });
 
     it('should have originalError property', () => {
       expect(error.hasOwnProperty('originalError') || 'originalError' in error).toBe(true);
-      expect(error.originalError).toBeDefined();
+      expect(Object.keys(error.originalError)).toEqual(['status', 'error']);
     });
   });
 
@@ -273,12 +283,15 @@ describe('ValidationError', () => {
         invalids: ['field1']
       });
 
-      expect(error.originalError.status).toBeDefined();
-      expect(error.originalError.error).toBeDefined();
-      expect(error.originalError.error.name).toBeDefined();
-      expect(error.originalError.error.message).toBeDefined();
-      expect(error.originalError.error.invalids).toBeDefined();
-      expect(error.originalError.error.trace).toBeDefined();
+      expect(error.originalError).toEqual({
+        status: 480,
+        error: {
+          name: 'ValidationError',
+          message: 'Test message',
+          invalids: ['field1'],
+          trace: []
+        }
+      });
     });
 
     it('should have correct values in originalError', () => {
@@ -309,9 +322,9 @@ describe('ValidationError', () => {
     it('should inherit Error properties', () => {
       const error = new ValidationError({ message: 'Test' });
 
-      expect(error.name).toBeDefined();
-      expect(error.message).toBeDefined();
-      expect(error.stack).toBeDefined();
+      expect(error.name).toBe('ValidationError');
+      expect(error.message).toBe('Test');
+      expect(typeof error.stack).toBe('string');
     });
 
     it('should be throwable like a standard Error', () => {

@@ -18,7 +18,8 @@ export abstract class DataServiceAbstract<T> {
   protected getNewPaginateObject(type: any, returnedPaginateObject: any): PaginateInterface {
     const paginate = this.hydrate(new Paginate(type), returnedPaginateObject);
 
-    paginate.data = this.hydrateArray(returnedPaginateObject.data);
+    // an empty (`null`) response is an empty page
+    paginate.data = this.hydrateArray(returnedPaginateObject?.data);
 
     return paginate;
   }
@@ -26,12 +27,12 @@ export abstract class DataServiceAbstract<T> {
   /**
    * Create a living models from any JSON data.
    *
-   * @param data any JSON object
+   * @param data any JSON object, `null` or `undefined` is handled as an empty array
    */
   hydrateArray(data: Array<any>): Array<T> {
     const models: Array<T> = [];
 
-    data.forEach((item: any) => {
+    (data ?? []).forEach((item: any) => {
       // to deep clone we need to clear this.model's arrays
       for (const key of Object.keys(this.model)) {
         if (this.model[key] instanceof Array) {

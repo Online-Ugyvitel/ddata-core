@@ -22,7 +22,7 @@ describe('StorageService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(service).toBeInstanceOf(StorageService);
   });
 
   it('should be provided in root as a singleton', () => {

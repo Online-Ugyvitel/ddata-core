@@ -1,9 +1,17 @@
+import { TestBed } from '@angular/core/testing';
 import { ValidatorService } from './validator.service';
 import { ValidationError } from '../../models/error/validation-error.model';
 import { ValidationErrorSettingsInterface } from '../../models/error/validation-error-settings.model';
 const validator = new ValidatorService();
 
 describe('ValidatorService', () => {
+  it('should be provided in the root injector as a singleton', () => {
+    const injected = TestBed.inject(ValidatorService);
+
+    expect(injected).toBeInstanceOf(ValidatorService);
+    expect(TestBed.inject(ValidatorService)).toBe(injected);
+  });
+
   describe('isString', () => {
     it('Should be false if parameter is null', () => {
       const result = validator.isString(null);

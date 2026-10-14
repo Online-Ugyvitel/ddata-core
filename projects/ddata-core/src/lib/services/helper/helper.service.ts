@@ -3,8 +3,8 @@
 /* eslint-disable no-param-reassign */
 import { EventEmitter, Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { DataServiceAbstract } from '../data/data-service.abstract';
 import { ProxyServiceInterface } from '../proxy/proxy-service.interface';
 import { ProxyService } from '../proxy/proxy.service';
@@ -49,26 +49,25 @@ export class HelperService<T extends BaseModelInterface<T>> extends DataServiceA
     model[fieldName] = !model[fieldName];
 
     return this.proxy.save(model).pipe(
-      map(
-        (respose) => {
-          this.spinner.off(starterName);
+      map((response) => {
+        this.spinner.off(starterName);
 
-          // save wasn't success
-          if (!respose) {
-            model[fieldName] = !model[fieldName];
-
-            return false;
-          }
-
-          return true;
-        },
-        (error: any) => {
+        // save wasn't success
+        if (!response) {
           model[fieldName] = !model[fieldName];
-          this.spinner.on(starterName);
 
           return false;
         }
-      )
+
+        return true;
+      }),
+      catchError((error: unknown) => {
+        // revert the toggle, stop the spinner and let the error handler deal with the error
+        model[fieldName] = !model[fieldName];
+        this.spinner.off(starterName);
+
+        return throwError(() => error);
+      })
     );
   }
 
@@ -307,6 +306,8 @@ export class HelperService<T extends BaseModelInterface<T>> extends DataServiceA
         })
       );
     }
+
+    this.spinner.off(spinnerName);
 
     return of(new Paginate(this.instance));
   }

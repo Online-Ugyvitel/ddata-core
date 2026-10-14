@@ -5,7 +5,7 @@ describe('Selectable', () => {
   it('should be created', () => {
     const model = new Selectable();
 
-    expect(model).toBeTruthy();
+    expect(model.is_selected).toBe(false);
   });
 
   it('should be created as a correct type', () => {
@@ -20,7 +20,7 @@ describe('Selectable', () => {
     // Check that the model implements the interface by having all required properties
     const selectableInterface: SelectableInterface = model;
 
-    expect(selectableInterface).toBeDefined();
+    expect(selectableInterface.is_selected).toBe(false);
   });
 
   it('should have all required properties', () => {

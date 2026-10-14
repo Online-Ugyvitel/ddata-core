@@ -25,7 +25,7 @@ export class ValidationError extends Error implements ValidationErrorInterface {
   };
 
   constructor(incomingSettings: ValidationErrorSettingsInterface) {
-    super(incomingSettings.message);
+    super(incomingSettings?.message);
     const settings = !!incomingSettings
       ? incomingSettings
       : ({} as unknown as ValidationErrorSettingsInterface);

@@ -57,7 +57,6 @@ describe('HelperFactoryService', () => {
   describe('constructor', () => {
     it('should create an instance', () => {
       // This test covers line 7: constructor() { }
-      expect(factory).toBeTruthy();
       expect(factory).toBeInstanceOf(HelperFactoryService);
     });
 
@@ -65,7 +64,6 @@ describe('HelperFactoryService', () => {
       // This test ensures the empty constructor works properly
       const newFactory = new HelperFactoryService<MockModel>();
 
-      expect(newFactory).toBeTruthy();
       expect(newFactory).toBeInstanceOf(HelperFactoryService);
     });
   });
@@ -75,7 +73,6 @@ describe('HelperFactoryService', () => {
       // This test covers lines 10 and 12: instance creation and HelperService return
       const result = factory.get(MockModel);
 
-      expect(result).toBeTruthy();
       expect(result).toBeInstanceOf(HelperService);
     });
 
@@ -153,7 +150,6 @@ describe('HelperFactoryService', () => {
       // This test covers line 12: return new HelperService<T>(instance);
       const result: HelperServiceInterface<MockModel> = factory.get(MockModel);
 
-      expect(result).toBeTruthy();
       expect(typeof result.booleanChange).toBe('function');
       expect(typeof result.save).toBe('function');
       expect(typeof result.saveAsNew).toBe('function');

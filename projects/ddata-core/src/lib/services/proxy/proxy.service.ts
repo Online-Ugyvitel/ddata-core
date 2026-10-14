@@ -188,7 +188,7 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     const models = paginate.data;
 
     if (model.id === 0) {
-      models.splice(models.indexOf(model), 1);
+      this.removeFrom(models, model);
 
       return of(paginate);
     }
@@ -210,12 +210,23 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
       return this.remoteStorageService.delete(model).pipe(
         map((result: number) => {
           if (result) {
-            models.splice(models.indexOf(model), 1);
+            this.removeFrom(models, model);
           }
 
           return paginate;
         })
       );
+    }
+  }
+
+  /**
+   * Remove the model from the array if it is in it. `splice(-1, 1)` would remove the last item.
+   */
+  private removeFrom(models: Array<T>, model: T): void {
+    const index = models.indexOf(model);
+
+    if (index > -1) {
+      models.splice(index, 1);
     }
   }
 
@@ -230,13 +241,7 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
 
     models.forEach((model: T) => {
       if (model.id === 0) {
-        const index = modelsToShow.indexOf(model);
-
-        if (index > -1) {
-          modelsToShow.splice(index, 1);
-        }
-
-        return of(paginate);
+        this.removeFrom(modelsToShow, model);
       }
     });
 
@@ -259,13 +264,7 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
       return this.remoteStorageService.deleteMultiple(models).pipe(
         map((result: boolean) => {
           if (result) {
-            models.forEach((model: T) => {
-              const index = modelsToShow.indexOf(model);
-
-              if (index > -1) {
-                modelsToShow.splice(index, 1);
-              }
-            });
+            models.forEach((model: T) => this.removeFrom(modelsToShow, model));
           }
 
           return paginate;

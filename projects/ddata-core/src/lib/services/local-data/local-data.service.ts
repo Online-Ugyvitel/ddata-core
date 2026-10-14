@@ -133,7 +133,7 @@ export class LocalDataService<T extends BaseModelInterface<T>>
    * @param value the value what search in the given field.
    */
   filterByField(field: string, value: any): Array<T> {
-    return this.db.filter((obj) => obj[field] === value) || null;
+    return this.db.filter((obj) => obj[field] === value);
   }
 
   /**

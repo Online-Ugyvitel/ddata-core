@@ -20,17 +20,16 @@ describe('SpinnerService', () => {
 
   describe('constructor', () => {
     it('should be created', () => {
-      expect(service).toBeTruthy();
-      expect(service instanceof SpinnerService).toBe(true);
+      expect(service).toBeInstanceOf(SpinnerService);
     });
 
     it('should implement SpinnerServiceInterface', () => {
       const serviceInterface: SpinnerServiceInterface = service;
 
-      expect(serviceInterface.watch).toBeDefined();
-      expect(serviceInterface.on).toBeDefined();
-      expect(serviceInterface.off).toBeDefined();
-      expect(serviceInterface.getStatus).toBeDefined();
+      expect(typeof serviceInterface.watch).toBe('function');
+      expect(typeof serviceInterface.on).toBe('function');
+      expect(typeof serviceInterface.off).toBe('function');
+      expect(typeof serviceInterface.getStatus).toBe('function');
     });
 
     it('should initialize with correct default values', () => {
@@ -42,7 +41,6 @@ describe('SpinnerService', () => {
     it('should return an observable', () => {
       const observable = service.watch();
 
-      expect(observable).toBeDefined();
       expect(typeof observable.subscribe).toBe('function');
     });
 

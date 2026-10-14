@@ -155,8 +155,7 @@ describe('LocalDataService', () => {
 
   describe('Service Creation and Initialization', () => {
     it('should create an instance', () => {
-      expect(service).toBeTruthy();
-      expect(service instanceof LocalDataService).toBe(true);
+      expect(service).toBeInstanceOf(LocalDataService);
     });
 
     it('should be the correct type', () => {
@@ -222,7 +221,6 @@ describe('LocalDataService', () => {
     it('should return an Observable', () => {
       const result = service.watch();
 
-      expect(result).toBeDefined();
       expect(typeof result.subscribe).toBe('function');
     });
 
@@ -345,6 +343,16 @@ describe('LocalDataService', () => {
 
       expect(service['db'].length).toBe(originalLength - 1);
       expect(service['db'][service['db'].length - 1].id).toBe(2);
+    });
+
+    it('should keep every item when the model is not stored', () => {
+      const notStored = new MockModel().init({ id: 2, name: 'Test 2', value: 20 });
+      const result = service.delete(notStored);
+
+      // items are compared by reference, an equal but other instance is not deleted
+      expect(result).toBe(true);
+      expect(service['db'].map((m) => m.id)).toEqual([1, 2, 3]);
+      expect(JSON.parse(localStorage.getItem('mock_models')).length).toBe(3);
     });
   });
 
@@ -474,7 +482,6 @@ describe('LocalDataService', () => {
     it('should find existing model by id', () => {
       const result = service.findById(2);
 
-      expect(result).toBeDefined();
       expect(result.id).toBe(2);
       expect(result.name).toBe('Bob');
     });
@@ -536,7 +543,6 @@ describe('LocalDataService', () => {
     it('should find existing model by string field', () => {
       const result = service.findByField('name', 'Bob');
 
-      expect(result).toBeDefined();
       expect(result.id).toBe(2);
       expect(result.name).toBe('Bob');
     });
@@ -544,7 +550,6 @@ describe('LocalDataService', () => {
     it('should find existing model by number field', () => {
       const result = service.findByField('value', 20);
 
-      expect(result).toBeDefined();
       expect(result.id).toBe(2);
     });
 

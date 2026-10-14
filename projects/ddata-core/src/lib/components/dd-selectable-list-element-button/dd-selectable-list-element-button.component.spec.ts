@@ -32,7 +32,7 @@ describe('DdataSelectableListElementButtonComponent', () => {
   });
 
   it('should create the component', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeInstanceOf(DdataSelectableListElementButtonComponent);
   });
 
   it('should be an instance of DdataSelectableListElementButtonComponent', () => {
@@ -40,20 +40,18 @@ describe('DdataSelectableListElementButtonComponent', () => {
   });
 
   it('should have model input property with default Selectable instance', () => {
-    expect(component.model).toBeDefined();
     expect(component.model).toBeInstanceOf(Selectable);
     expect(component.model.is_selected).toBe(false);
   });
 
   it('should have choosed output property as EventEmitter', () => {
-    expect(component.choosed).toBeDefined();
     expect(component.choosed).toBeInstanceOf(EventEmitter);
   });
 
   it('should implement DdataSelectableListElementButtonComponentInterface', () => {
     // Verify the component has all interface properties and methods
-    expect(component.model).toBeDefined();
-    expect(component.choosed).toBeDefined();
+    expect(component.model).toBeInstanceOf(Selectable);
+    expect(component.choosed).toBeInstanceOf(EventEmitter);
     expect(typeof component.chooseSelect).toBe('function');
   });
 
@@ -109,7 +107,6 @@ describe('DdataSelectableListElementButtonComponent', () => {
   it('should render a button element', () => {
     const buttonElement = fixture.debugElement.query(By.css('button'));
 
-    expect(buttonElement).toBeTruthy();
     expect(buttonElement.nativeElement.tagName.toLowerCase()).toBe('button');
   });
 
@@ -189,7 +186,6 @@ describe('DdataSelectableListElementButtonComponent', () => {
     hostFixture.detectChanges();
     const projectedContent = hostFixture.debugElement.query(By.css('.test-content'));
 
-    expect(projectedContent).toBeTruthy();
     expect(projectedContent.nativeElement.textContent.trim()).toBe('Test Content');
   });
 
