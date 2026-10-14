@@ -76,7 +76,9 @@ jobs:
 
     - name: Nothing to publish
       if: steps.detect.outputs.packages == ''
-      run: echo "No package version changed, nothing to publish."
+      run: |
+        echo "No package version changed, nothing to publish."
+        echo "No package version changed, nothing to publish." >> "$GITHUB_STEP_SUMMARY"
 
     - name: Install dependencies
       if: steps.detect.outputs.packages != ''
@@ -105,9 +107,22 @@ jobs:
       if: steps.detect.outputs.packages != ''
       env:
         PACKAGES: ${{ steps.detect.outputs.packages }}
+      # A version that reached the registry since the detection (e.g. a manual publish) is skipped, not an error.
       run: |
-        set -e
+        echo "### Published packages" >> "$GITHUB_STEP_SUMMARY"
         for dir in $PACKAGES; do
-          echo "Publishing $dir"
-          (cd "dist/$dir" && npm publish --registry "$REGISTRY")
+          id=$(node -p "const p = require('./dist/$dir/package.json'); p.name + '@' + p.version")
+          echo "Publishing $id"
+          if output=$(cd "dist/$dir" && npm publish --registry "$REGISTRY" 2>&1); then
+            echo "$output"
+            echo "- $id published" >> "$GITHUB_STEP_SUMMARY"
+          elif grep -qiE 'E409|EPUBLISHCONFLICT|cannot publish over' <<< "$output"; then
+            echo "$output"
+            echo "::notice::$id already exists in the registry, skipping."
+            echo "- $id already existed, skipped" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "$output"
+            echo "::error::Publishing $id failed."
+            exit 1
+          fi
         done
