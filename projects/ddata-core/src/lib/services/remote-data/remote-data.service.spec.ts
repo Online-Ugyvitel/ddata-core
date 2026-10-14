@@ -382,13 +382,25 @@ describe('RemoteDataService', () => {
     expect((created as any).appEnv).toBeInstanceOf(EnvService);
   });
 
-  it('should send "Bearer null" when no token is stored', () => {
+  it('should send no Authorization header when no token is stored', () => {
     localStorage.removeItem('token');
 
     service.getOne(1).subscribe();
     const req = httpMock.expectOne(`${apiUrl}/dummy-uri/1`);
 
-    expect(req.request.headers.get('Authorization')).toBe('Bearer null');
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    expect(req.request.headers.get('Content-Type')).toBe('application/json');
+
+    req.flush(fakePlainObject);
+  });
+
+  it('should send no Authorization header when the stored token is empty', () => {
+    localStorage.setItem('token', '');
+
+    service.getOne(1).subscribe();
+    const req = httpMock.expectOne(`${apiUrl}/dummy-uri/1`);
+
+    expect(req.request.headers.has('Authorization')).toBe(false);
 
     req.flush(fakePlainObject);
   });
@@ -562,6 +574,20 @@ describe('RemoteDataService', () => {
     expect(req.request.body).toBe(JSON.stringify({ data: [] }));
 
     req.flush({});
+  });
+
+  it('sendFiles() should send no Authorization header when no token is stored', () => {
+    localStorage.removeItem('token');
+
+    service
+      .sendFiles('/file', 1, new Set<File>([new File(['first'], 'first.txt')]))
+      .forEach((upload) => upload.subscribe());
+    const req = httpMock.expectOne(`${apiUrl}/dummy-uri/file`);
+
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    expect(req.request.headers.get('Accepted-Encoding')).toBe('application/json');
+
+    req.flush('remote/first.txt');
   });
 
   it('sendFiles() should return no request for an empty file set', () => {
