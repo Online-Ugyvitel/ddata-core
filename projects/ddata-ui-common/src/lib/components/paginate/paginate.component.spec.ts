@@ -113,4 +113,120 @@ describe('DdataUiPaginateComponent', () => {
       expect(pages).toEqual([2]);
     });
   });
+
+  describe('edge cases', () => {
+    it('should not render anything and list no pages when paginate is not set', async () => {
+      fixture.detectChanges();
+
+      expect(component._paginate).toBeUndefined();
+      expect(await firstValueFrom(component.numbers)).toEqual([]);
+      expect(component.currentPage).toBe(0);
+      expect((fixture.nativeElement as HTMLElement).querySelector('nav')).toBeNull();
+    });
+
+    it('should fall back to page 0 and no pages when the fields are missing', async () => {
+      component.paginate = {} as PaginateInterface;
+
+      component.ngOnInit();
+
+      expect(await firstValueFrom(component.numbers)).toEqual([]);
+      expect(component.currentPage).toBe(0);
+    });
+
+    it('should not render the navigation for 0 results', () => {
+      const element = render({ ...paginateOf(1, 0), total: 0, from: 0, to: 0 });
+
+      expect(element.querySelector('nav')).toBeNull();
+      expect(element.querySelectorAll('li.page-item').length).toBe(0);
+    });
+
+    it('should disable both buttons when there is only a single page', () => {
+      const items = render(paginateOf(1, 1)).querySelectorAll('li.page-item');
+
+      expect(items.length).toBe(3);
+      expect(items[0].classList).toContain('disabled');
+      expect(items[1].classList).toContain('active');
+      expect(items[2].classList).toContain('disabled');
+    });
+
+    it('should disable the next button and enable the previous one on the last page', () => {
+      const items = render(paginateOf(3, 3)).querySelectorAll('li.page-item');
+
+      expect(items[0].classList).not.toContain('disabled');
+      expect(items[3].classList).toContain('active');
+      expect(items[4].classList).toContain('disabled');
+    });
+
+    it('should render every page when there are very many pages', () => {
+      const element = render(paginateOf(500, 1000));
+      const items = element.querySelectorAll('li.page-item');
+      const active = element.querySelectorAll('li.page-item.active');
+
+      expect(items.length).toBe(1002);
+      expect(items[1].textContent.trim()).toBe('1');
+      expect(items[1000].textContent.trim()).toBe('1000');
+      expect(active.length).toBe(1);
+      expect(active[0].textContent.trim()).toBe('500');
+      expect(element.querySelectorAll('li.page-item.disabled').length).toBe(0);
+    });
+
+    it('should not mark any page active when the current page is beyond the last page', () => {
+      const element = render(paginateOf(7, 3));
+      const items = element.querySelectorAll('li.page-item');
+
+      expect(element.querySelectorAll('li.page-item.active').length).toBe(0);
+      expect(items[0].classList).not.toContain('disabled');
+      expect(items[4].classList).toContain('disabled');
+    });
+
+    it('should not mark any page active and disable previous when the current page is negative', () => {
+      const element = render(paginateOf(-1, 3));
+      const items = element.querySelectorAll('li.page-item');
+
+      expect(element.querySelectorAll('li.page-item.active').length).toBe(0);
+      expect(items[0].classList).toContain('disabled');
+      expect(items[4].classList).not.toContain('disabled');
+    });
+
+    it('should use the custom texts', () => {
+      component.previousText = 'Előző';
+      component.nextText = 'Következő';
+      component.paginatorText = 'Lapozó';
+      const element = render(paginateOf(1, 2));
+      const links = element.querySelectorAll('a.page-link');
+
+      expect(element.querySelector('nav').getAttribute('aria-label')).toBe('Lapozó');
+      expect(links[0].textContent.trim()).toBe('Előző');
+      expect(links[3].textContent.trim()).toBe('Következő');
+    });
+
+    it('should emit the neighbour pages when the previous and next buttons are clicked', () => {
+      const pages: Array<number> = [];
+
+      component.changePage.subscribe((page: number) => pages.push(page));
+      const links = render(paginateOf(2, 3)).querySelectorAll<HTMLAnchorElement>('a.page-link');
+
+      links[0].click();
+      links[4].click();
+
+      expect(pages).toEqual([1, 3]);
+    });
+
+    it('should emit every click of fast consecutive paging relative to the current input page', () => {
+      const pages: Array<number> = [];
+
+      component.changePage.subscribe((page: number) => pages.push(page));
+      const links = render(paginateOf(2, 5)).querySelectorAll<HTMLAnchorElement>('a.page-link');
+
+      links[6].click();
+      links[6].click();
+      links[3].click();
+      links[4].click();
+      links[0].click();
+
+      // the component does not change page on its own: the parent decides by updating the input
+      expect(pages).toEqual([3, 3, 3, 4, 1]);
+      expect(component.currentPage).toBe(2);
+    });
+  });
 });
