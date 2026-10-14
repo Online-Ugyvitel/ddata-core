@@ -16,6 +16,8 @@ import {
   FieldContainerInterface
 } from '@netdjw/ddata-core';
 import { DdataInputComponent } from './input.component';
+import { CharacterCounterComponent } from '../character-counter/character-counter.component';
+import { WordCounterComponent } from '../word-counter/word-counter.component';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 class FakeModel
@@ -73,7 +75,7 @@ describe('InputBoxComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DdataInputComponent],
+      declarations: [DdataInputComponent, CharacterCounterComponent, WordCounterComponent],
       imports: [FormsModule],
       providers: [Injector, ValidatorService, BaseModel, InputHelperService]
     }).compileComponents();
@@ -489,5 +491,207 @@ describe('InputBoxComponent', () => {
     component.inputBox = undefined;
 
     expect(() => component.ngAfterViewInit()).not.toThrow();
+  });
+  describe('rendering', () => {
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+    const input = (): HTMLInputElement => element.querySelector('input');
+    const type = (value: string): void => {
+      input().value = value;
+      input().dispatchEvent(new Event('input'));
+      input().dispatchEvent(new KeyboardEvent('keyup'));
+      fixture.detectChanges();
+    };
+
+    it('should render the label with the required mark from the model', () => {
+      render({ field: 'name', model: new FakeModel() });
+      const label: HTMLLabelElement = element.querySelector('label');
+
+      expect(label.textContent).toContain('Címke neve:');
+      expect(label.querySelector('span').textContent).toBe(' *');
+      expect(label.getAttribute('for')).toBe(input().id);
+      expect(input().placeholder).toBe('Címke neve');
+      expect(input().title).toBe('Címke neve');
+    });
+
+    it('should not render the required mark for an optional field', () => {
+      render({ field: 'textField', model: new FakeModel() });
+
+      expect(element.querySelector('label span')).toBeNull();
+    });
+
+    it('should render nothing from the model for a field without description', () => {
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
+      render({ field: 'missing', model: new FakeModel() });
+
+      expect(element.querySelector('label').textContent.trim()).toBe(':');
+      expect(input().placeholder).toBe('');
+      expect(console.error).toHaveBeenCalledWith(
+        `The ${new FakeModel().model_name}'s missing field is `,
+        undefined
+      );
+    });
+
+    it('should render the prepend and the append texts and follow their changes', () => {
+      render({ field: 'name', model: new FakeModel(), prepend: 'Ft', append: '%' });
+
+      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('Ft');
+      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('%');
+
+      render({ prepend: 'EUR', append: 'db', labelText: 'Új címke' });
+
+      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('EUR');
+      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('db');
+      expect(element.querySelector('label').textContent).toContain('Új címke:');
+    });
+
+    it('should not render empty prepend, append and the hidden label', () => {
+      render({ field: 'name', model: new FakeModel(), showLabel: false });
+
+      expect(element.querySelector('label')).toBeNull();
+      expect(element.querySelector('.input-group-prepend')).toBeNull();
+      expect(element.querySelector('.input-group-append')).toBeNull();
+    });
+
+    it('should disable the input', async () => {
+      render({ field: 'name', model: new FakeModel(), disabled: true });
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(input().disabled).toBe(true);
+    });
+
+    it('should render the value as text in view only mode', () => {
+      const model = new FakeModel();
+
+      render({ field: 'name', model, isViewOnly: true });
+
+      expect(input()).toBeNull();
+      expect(element.querySelector('.bg-light').textContent.trim()).toBe('Test Name');
+      const updated = new FakeModel();
+
+      updated.name = 'Updated';
+      render({ model: updated });
+
+      expect(element.querySelector('.bg-light').textContent.trim()).toBe('Updated');
+    });
+
+    it('should show and hide the validation error while typing', async () => {
+      const model = new FakeModel();
+      const changed = vi.fn();
+
+      model.validationRules.name = ['required'];
+
+      component.changed.subscribe(changed);
+      render({ field: 'name', model });
+      await fixture.whenStable();
+
+      type('');
+
+      expect(model.validationErrors).toEqual(['name']);
+      expect(input().classList).toContain('invalid');
+      expect(changed).not.toHaveBeenCalled();
+
+      type('Valid name');
+
+      expect(model.name).toBe('Valid name');
+      expect(model.validationErrors).toEqual([]);
+      expect(input().classList).not.toContain('invalid');
+      expect(changed).toHaveBeenCalledExactlyOnceWith(model);
+    });
+
+    it('should focus the input when autoFocus is set', () => {
+      render({ field: 'name', model: new FakeModel(), autoFocus: true });
+
+      expect(document.activeElement).toBe(input());
+    });
+
+    it('should not focus the input without autoFocus', () => {
+      render({ field: 'name', model: new FakeModel() });
+
+      expect(document.activeElement).not.toBe(input());
+    });
+
+    it('should render the character counter', async () => {
+      render({
+        field: 'name',
+        model: new FakeModel(),
+        enableCharacterCounter: true,
+        maxLength: 20
+      });
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(element.querySelector('character-counter').textContent.trim()).toBe('9 / 20');
+    });
+
+    describe('word counter', () => {
+      const keywords = (value: string): FakeModel => {
+        const model = new FakeModel();
+
+        model.name = value;
+
+        return model;
+      };
+      const warning = (): HTMLElement => element.querySelector('.bg-warning.rounded');
+
+      it('should not warn at the limit', () => {
+        render({
+          field: 'name',
+          model: keywords('a,b,c'),
+          enableWordCounter: true,
+          maxWords: 3,
+          wordCounterWarningMessage: 'Too many keywords'
+        });
+
+        expect(component.isWordLimitExceeded).toBe(false);
+        expect(warning()).toBeNull();
+        expect(element.querySelector('dd-word-counter').textContent.trim()).toBe('3 / 3');
+      });
+
+      it('should warn over the limit and stop warning when it is fixed', () => {
+        render({
+          field: 'name',
+          model: keywords('a,b,c,d'),
+          enableWordCounter: true,
+          maxWords: 3,
+          wordCounterWarningMessage: 'Too many keywords'
+        });
+
+        expect(component.isWordLimitExceeded).toBe(true);
+        expect(component.displayWordCounterWarning).toBe(true);
+        expect(warning().textContent.trim()).toBe('Too many keywords');
+
+        render({ model: keywords('a,b') });
+
+        expect(component.isWordLimitExceeded).toBe(false);
+        expect(warning()).toBeNull();
+      });
+
+      it('should not warn without a message', () => {
+        render({ field: 'name', model: keywords('a,b,c,d'), enableWordCounter: true, maxWords: 3 });
+
+        expect(component.isWordLimitExceeded).toBe(true);
+        expect(warning()).toBeNull();
+      });
+
+      it('should never be exceeded without limit or when the counter is disabled', () => {
+        render({ field: 'name', model: keywords('a,b,c,d'), enableWordCounter: true, maxWords: 0 });
+
+        expect(component.isWordLimitExceeded).toBe(false);
+
+        render({ enableWordCounter: false, maxWords: 3 });
+
+        expect(component.isWordLimitExceeded).toBe(false);
+      });
+
+      it('should not be exceeded for an empty value', () => {
+        render({ field: 'name', model: keywords(''), enableWordCounter: true, maxWords: 3 });
+
+        expect(component.isWordLimitExceeded).toBe(false);
+      });
+    });
   });
 });

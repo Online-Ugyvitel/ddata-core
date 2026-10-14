@@ -496,6 +496,38 @@ describe('InputHelperService', () => {
     });
   });
 
+  describe('isRequired with non array rules', () => {
+    const withRules = (rules: unknown): MockModel =>
+      ({ validationRules: { field: rules } }) as unknown as MockModel;
+
+    it.each([
+      [{ required: true }, true],
+      [{ required: false }, false],
+      [{ required: 'yes' }, true],
+      [{}, false],
+      ['required', true],
+      ['maxLength:255', false],
+      [true, true],
+      [42, false]
+    ])('should return for rules %j: %s', (rules, expected) => {
+      expect(service.isRequired(withRules(rules), 'field')).toBe(expected);
+    });
+
+    it('should return false for an empty rule list', () => {
+      expect(service.isRequired(withRules([]), 'field')).toBe(false);
+    });
+
+    it('should return false when reading the rules throws', () => {
+      const model = {
+        get validationRules(): never {
+          throw new Error('broken');
+        }
+      } as unknown as MockModel;
+
+      expect(service.isRequired(model, 'field')).toBe(false);
+    });
+  });
+
   describe('randChars', () => {
     it('should return a string of 50 characters', () => {
       const result = service.randChars();

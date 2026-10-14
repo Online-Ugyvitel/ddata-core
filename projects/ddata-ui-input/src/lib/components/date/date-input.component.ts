@@ -150,7 +150,7 @@ export class DdataInputDateComponent implements OnInit {
   };
 
   random: string = this.helperService.randChars();
-  selectedValue = !!this.model[this._field] ? this.model[this._field] : '';
+  selectedValue: unknown = '';
 
   constructor(private readonly changeDetector: ChangeDetectorRef) {}
 

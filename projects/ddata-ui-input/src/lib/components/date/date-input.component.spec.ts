@@ -467,6 +467,80 @@ describe('DdataInputDateComponent', () => {
     });
   });
 
+  describe('date boundaries', () => {
+    let testModel: MockModel;
+
+    beforeEach(() => {
+      testModel = new MockModel().init({ date: '' });
+      component._model = testModel;
+      component._field = 'date';
+    });
+
+    it.each([
+      [2024, 2, 29, '2024-02-29'],
+      [2000, 2, 29, '2000-02-29'],
+      [2023, 12, 31, '2023-12-31'],
+      [2024, 1, 1, '2024-01-01'],
+      [2024, 1, 31, '2024-01-31'],
+      [2024, 3, 1, '2024-03-01'],
+      [1, 1, 1, '1-01-01'],
+      [9999, 12, 31, '9999-12-31']
+    ])('should store %i-%i-%i as %s', (year, month, day, expected) => {
+      component.change(new NgbDate(year, month, day));
+
+      expect(testModel.date).toBe(expected);
+      expect(component.selectedValue).toBe(expected);
+    });
+
+    it('should not shift the selected day by the time zone', () => {
+      const realDate = new NgbDate(2024, 3, 31);
+
+      vi.setSystemTime(new Date('2024-03-31T23:30:00Z'));
+      component.change(realDate);
+
+      expect(testModel.date).toBe('2024-03-31');
+    });
+
+    it('should store the selected date of the datepicker', () => {
+      const changed = vi.fn();
+
+      component.changed.subscribe(changed);
+      fixture.componentRef.setInput('field', 'date');
+      fixture.componentRef.setInput('model', testModel);
+      detectChangesOf(fixture);
+
+      fixture.debugElement
+        .query(By.css('input'))
+        .triggerEventHandler('dateSelect', new NgbDate(2024, 2, 29));
+
+      expect(testModel.date).toBe('2024-02-29');
+      expect(changed).toHaveBeenCalledExactlyOnceWith(testModel);
+    });
+
+    it('should keep an invalid typed date as it is and let the validator decide', () => {
+      const input = document.createElement('input');
+
+      input.value = '2023-02-30';
+      component.typeChange({ target: input } as unknown as Event);
+
+      expect(testModel.date).toBe('2023-02-30');
+
+      input.value = 'not a date';
+      component.typeChange({ target: input } as unknown as Event);
+
+      expect(testModel.date).toBe('not a date');
+    });
+
+    it('should render the stored date in the input', () => {
+      testModel.date = '2024-02-29';
+      fixture.componentRef.setInput('field', 'date');
+      fixture.componentRef.setInput('model', testModel);
+      detectChangesOf(fixture);
+
+      expect(fixture.nativeElement.querySelector('input').value).toBe('2024-02-29');
+    });
+  });
+
   describe('typeChange method', () => {
     let testModel: MockModel;
 

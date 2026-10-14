@@ -500,4 +500,130 @@ describe('DdataMultipleSelectComponent', () => {
       ).not.toThrow();
     });
   });
+  describe('selection edge cases', () => {
+    const select = (): HTMLElement => fixture.nativeElement.querySelector('.multiple-select');
+    const tags = (): Array<HTMLElement> =>
+      Array.from(fixture.nativeElement.querySelectorAll('dd-tag'));
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+
+    it('should show the unselected text for an empty selection', () => {
+      render({ mode: 'multiple', field: 'tags', model: { tags: [] }, items: [] });
+
+      expect(select().textContent.trim()).toBe('-- Válassz --');
+      expect(tags().length).toBe(0);
+    });
+
+    it('should show one selected item', () => {
+      render({ mode: 'multiple', field: 'tags', model: { tags: [mockTag1] }, items: [mockTag1] });
+
+      expect(select().textContent.trim()).toBe('1 elem kiválasztva');
+      expect(tags().length).toBe(1);
+    });
+
+    it('should show very many selected items', () => {
+      const many = Array.from({ length: 500 }, (_, i) => ({ id: i, name: `Tag ${i}` }));
+
+      render({ mode: 'multiple', field: 'tags', model: { tags: [...many] }, items: many });
+
+      expect(select().textContent.trim()).toBe('500 elem kiválasztva');
+      expect(tags().length).toBe(500);
+    });
+
+    it('should clear the multiple selection item by item', () => {
+      const model = { tags: [mockTag1, mockTag2] };
+      const settings: DialogContentWithOptionsInterface = {
+        listOptions: { selectedElements: [mockTag1, mockTag2] }
+      };
+
+      render({ mode: 'multiple', field: 'tags', model, dialogSettings: settings });
+
+      tags()[0].dispatchEvent(new CustomEvent('delete'));
+      fixture.detectChanges();
+      tags()[0].dispatchEvent(new CustomEvent('delete'));
+      fixture.componentRef.setInput('model', { ...model });
+      fixture.detectChanges();
+
+      expect(model.tags).toEqual([]);
+      expect(settings.listOptions.selectedElements).toEqual([]);
+      expect(select().textContent.trim()).toBe('-- Válassz --');
+      expect(tags().length).toBe(0);
+    });
+
+    it.each([null, undefined, 'not an array'])(
+      'should not fail to delete from a %j selection',
+      (value) => {
+        component.model = { tags: value } as unknown as MockModel;
+        component.field = 'tags';
+
+        expect(() =>
+          component.deleteFromMultipleSelectedList(mockTag1 as unknown as MockModel)
+        ).not.toThrow();
+        expect(component.model['tags']).toBe(value);
+      }
+    );
+
+    it('should show an empty name for a selected value that is not in the items', () => {
+      component.mode = 'single';
+      component.field = 'category';
+      component.items = [{ id: 1, name: 'First' }];
+      component.model = { category: 999 } as unknown as MockModel;
+
+      expect(component.selectedModelName).toBe('');
+    });
+
+    it('should show an empty name when there are no items', () => {
+      component.mode = 'single';
+      component.field = 'category';
+      component.items = null;
+      component.model = { category: 1 } as unknown as MockModel;
+
+      expect(component.selectedModelName).toBe('');
+    });
+
+    it('should render the name of the selected single item', () => {
+      render({
+        mode: 'single',
+        field: 'category',
+        items: [{ id: 2, name: 'Second' }],
+        model: { category: 2 }
+      });
+
+      expect(select().textContent.trim()).toBe('Second');
+    });
+
+    it('should fall back to the id when the value field is missing on single select', () => {
+      component.mode = 'single';
+      component.field = 'tag_id';
+      component.valueField = 'code';
+      component.model = { tag_id: 0, tag: null } as unknown as MockModel;
+
+      component.selectModelEmit({ id: 7, name: 'Seventh' });
+
+      expect(component.model['tag_id']).toBe(7);
+      expect(component.model['tag']).toEqual({ id: 7, name: 'Seventh', is_selected: true });
+    });
+
+    it('should use the value field on single select', () => {
+      component.mode = 'single';
+      component.field = 'tag_id';
+      component.valueField = 'code';
+      component.model = { tag_id: 0, tag: null } as unknown as MockModel;
+
+      component.selectModelEmit({ id: 7, code: 'SEVEN' });
+
+      expect(component.model['tag_id']).toBe('SEVEN');
+    });
+
+    it('should not open the dialog when disabled', () => {
+      render({ mode: 'multiple', field: 'tags', model: { tags: [] }, disabled: true });
+
+      select().click();
+
+      expect(component.isModalVisible).toBe(false);
+      expect(select().getAttribute('tabindex')).toBe('-1');
+    });
+  });
 });

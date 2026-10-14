@@ -130,6 +130,33 @@ describe('ComponentRendererService', () => {
       expect(instance['filter']).toEqual({});
     });
 
+    it('should not configure the list component without list options', () => {
+      service.setDialogHost(dialogHost).setSettings({ listComponent: DummyComponent });
+
+      expect(service.render()).toBe(instance as unknown as DialogContentInterface);
+      expect(instance['isModal']).toBe(true);
+      expect(instance['filter']).toBeUndefined();
+    });
+
+    it('should log an error and return nothing when the component has no instance', () => {
+      dialogHost.createComponent.mockReturnValue(createComponentRef(null));
+      service.setDialogHost(dialogHost).setSettings({
+        listComponent: DummyComponent,
+        listOptions: { loadData: false }
+      });
+
+      expect(service.render()).toBeUndefined();
+      expect(console.error).toHaveBeenCalledWith('Component instance is not set.');
+      expect(service.getSelectedModels()).toEqual([]);
+    });
+
+    it('should return an empty selection when the instance has no selected elements', () => {
+      service.setDialogHost(dialogHost).setSettings({ listComponent: DummyComponent });
+      service.render();
+
+      expect(service.getSelectedModels()).toEqual([]);
+    });
+
     it('should not configure the list component without settings', () => {
       service.setDialogHost(dialogHost);
 

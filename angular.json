@@ -261,9 +261,6 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ddata-ui-input/tsconfig.spec.json",
-            "exclude": [
-              "**/multiple-select-dialog.component.spec.ts"
-            ],
             "coverageInclude": [
               "projects/ddata-ui-input/src/**/*.ts"
             ],
@@ -281,10 +278,10 @@
               "json-summary"
             ],
             "coverageThresholds": {
-              "statements": 92,
-              "branches": 88,
-              "functions": 90,
-              "lines": 93
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
             }
           }
         },

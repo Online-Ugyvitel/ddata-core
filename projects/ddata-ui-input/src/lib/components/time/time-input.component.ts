@@ -86,15 +86,13 @@ export class DdataInputTimeComponent implements AfterViewInit {
       return;
     }
 
-    if (!!this._model && !!this._model.fields[this._field]) {
-      this._title = this.helperService.getTitle(this._model, this._field);
-      this._placeholder = this.helperService.getPlaceholder(this._model, this._field);
-      this._prepend = this.helperService.getPrepend(this._model, this._field);
-      this._append = this.helperService.getAppend(this._model, this._field);
-      this._label = this.helperService.getLabel(this._model, this._field);
-    }
+    this._title = this.helperService.getTitle(this._model, this._field);
+    this._placeholder = this.helperService.getPlaceholder(this._model, this._field);
+    this._prepend = this.helperService.getPrepend(this._model, this._field);
+    this._append = this.helperService.getAppend(this._model, this._field);
+    this._label = this.helperService.getLabel(this._model, this._field);
 
-    if (!!this._model && !!this._model.validationRules?.[this._field]) {
+    if (this._model.validationRules?.[this._field]) {
       this._isRequired = this.helperService.isRequired(this._model, this._field);
     }
 
@@ -174,11 +172,16 @@ export class DdataInputTimeComponent implements AfterViewInit {
       return null;
     }
     const [hours, minutes] = value.split(':').map(Number);
+
+    // reject out of range values (e.g. 24:00 or 12:60) instead of rolling them over
+    if (hours > 23 || minutes > 59) {
+      return null;
+    }
     const result = new Date();
 
     result.setHours(hours, minutes, 0, 0);
 
-    return Number.isNaN(result.getTime()) ? null : result;
+    return result;
   }
 
   private formatTime(value: Date): string {

@@ -327,4 +327,110 @@ describe('DdataInputCheckboxComponent', () => {
       expect(newComponent.iterable).toBe(0);
     });
   });
+  describe('edge cases', () => {
+    it('should keep the label when the model has no fields at all', () => {
+      const testModel = new BaseModel();
+
+      component._label = 'Previous';
+      testModel.fields = null;
+      component.model = testModel;
+
+      expect(component._model).toBe(testModel);
+      expect(component._label).toBe('Previous');
+    });
+
+    it('should set an empty label when the new field has no label', () => {
+      const testModel = new BaseModel();
+
+      testModel.fields = { is_active: { title: 'Active' } };
+      component.model = testModel;
+      component._label = 'Previous';
+      component.field = 'is_active';
+
+      expect(component._label).toBe('');
+    });
+  });
+
+  describe('rendering', () => {
+    const createModel = (): BaseModel => {
+      const model = new BaseModel();
+
+      model.fields = { is_active: { label: 'Aktív', title: 'Aktív' } };
+      model['is_active'] = false;
+
+      return model;
+    };
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+    const element = (): HTMLElement => fixture.nativeElement;
+    const labels = (): NodeListOf<HTMLLabelElement> => element().querySelectorAll('label');
+
+    it('should render the label after the button by default and follow its changes', () => {
+      render({ field: 'is_active', model: createModel() });
+
+      expect(labels().length).toBe(1);
+      expect(element().firstElementChild.lastElementChild.tagName).toBe('LABEL');
+      expect(labels()[0].textContent.trim()).toBe('Aktív');
+      const model = createModel();
+
+      model.fields['is_active'].label = 'Engedélyezve';
+      render({ model });
+
+      expect(labels()[0].textContent.trim()).toBe('Engedélyezve');
+    });
+
+    it('should render the label before the button and follow its changes', () => {
+      render({ field: 'is_active', model: createModel(), showLabelAfter: false });
+
+      expect(labels().length).toBe(1);
+      expect(element().firstElementChild.firstElementChild.tagName).toBe('LABEL');
+      expect(labels()[0].textContent.trim()).toBe('Aktív:');
+
+      render({ disabled: true });
+
+      expect(labels()[0].classList).toContain('disabled');
+    });
+
+    it('should not render any label when it is hidden', () => {
+      render({ field: 'is_active', model: createModel(), showLabel: false });
+
+      expect(labels().length).toBe(0);
+    });
+
+    it('should toggle the value and emit it when the button is clicked', () => {
+      const model = createModel();
+      const changed = vi.fn();
+
+      component.changed.subscribe(changed);
+      render({ field: 'is_active', model });
+
+      element().querySelector('button').click();
+
+      expect(model['is_active']).toBe(true);
+      expect(changed).toHaveBeenLastCalledWith(true);
+
+      element().querySelector('button').click();
+
+      expect(model['is_active']).toBe(false);
+      expect(changed).toHaveBeenLastCalledWith(false);
+    });
+
+    it('should disable the button and ignore clicks when disabled', () => {
+      const model = createModel();
+      const changed = vi.fn();
+
+      component.changed.subscribe(changed);
+      render({ field: 'is_active', model, disabled: true });
+      const button = element().querySelector('button');
+
+      expect(button.disabled).toBe(true);
+
+      component.clicked();
+
+      expect(model['is_active']).toBe(false);
+      expect(changed).not.toHaveBeenCalled();
+    });
+  });
 });
