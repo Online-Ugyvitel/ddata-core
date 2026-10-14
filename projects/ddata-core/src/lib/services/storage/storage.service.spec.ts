@@ -1,61 +1,55 @@
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Injector } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StorageService } from './storage.service';
 
-describe.skip('StorageService', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [],
-      providers: [
-        Injector,
-        StorageService,
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting()
-      ]
-    });
-  });
+describe('StorageService', () => {
+  let service: StorageService;
+  let changes: number;
 
   beforeEach(() => {
-    TestBed.inject(StorageService);
+    localStorage.clear();
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(StorageService);
+    changes = 0;
+    service.watchStorage().subscribe(() => changes++);
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('should be created', () => {
-    const service: StorageService = TestBed.inject(StorageService);
-
     expect(service).toBeTruthy();
-    service.clear();
-
-    expect(localStorage.length).toBe(0);
   });
 
-  it('setItem should add 1 item to localStorage', () => {
-    const service: StorageService = TestBed.inject(StorageService);
-
+  it('setItem should add the item to localStorage and notify the watchers', () => {
     service.setItem('sample-key', 'sample text');
 
     expect(localStorage.length).toBe(1);
+    expect(localStorage.getItem('sample-key')).toBe('sample text');
+    expect(changes).toBe(1);
   });
 
-  it('removeItem should remove the item from local storage', () => {
-    const service: StorageService = TestBed.inject(StorageService);
+  it('removeItem should remove only the given item from localStorage and notify the watchers', () => {
+    service.setItem('sample-key', 'sample text');
+    service.setItem('other-key', 'other text');
 
     service.removeItem('sample-key');
 
-    expect(localStorage.length).toBe(0);
+    expect(localStorage.getItem('sample-key')).toBeNull();
+    expect(localStorage.getItem('other-key')).toBe('other text');
+    expect(changes).toBe(3);
   });
 
-  it('clear should remove everything from local storage', () => {
-    const service: StorageService = TestBed.inject(StorageService);
-
+  it('clear should remove everything from localStorage and notify the watchers', () => {
     service.setItem('sample-key1', 'sample text');
     service.setItem('sample-key2', 'sample text');
     service.setItem('sample-key3', 'sample text');
 
     expect(localStorage.length).toBe(3);
+
     service.clear();
 
     expect(localStorage.length).toBe(0);
+    expect(changes).toBe(4);
   });
 });
