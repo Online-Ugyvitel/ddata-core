@@ -44,7 +44,7 @@
             <div *ngIf="file.is_image">
               <img
                 src="/api/file/image/{{ file.id }}?token={{ token }}"
-                alt="{{ file.file_name }}"
+                alt="{{ file.name }}"
                 style="height: auto; max-height: 150px; width: 100%; max-width: 150px"
               />
             </div>
@@ -76,7 +76,7 @@
           </div>
 
           <!-- size -->
-          <div class="col-2 text-right">{{ file.size | filesize: 'kb' : '2' }} KB</div>
+          <div class="col-2 text-right">{{ file.size | filesize: 'kb' : 2 }} KB</div>
 
           <!-- buttons -->
           <div class="col-1">
@@ -97,7 +97,7 @@
   [title]="i18n.upload_dialog_title.label"
   [dialogContent]="fileUploadDialogContent"
   [showDialog]="showDialog"
-  (success)="fileuploadSuccess($event)"
+  (success)="fileuploadSuccess($any($event))"
   (fail)="closeDialog()"
 ></dd-modal-dialog>
 
@@ -105,6 +105,6 @@
   <dd-no-data
     *ngIf="model.files.length === 0"
     [text]="i18n.no_data_text.label"
-    [attr.class]="w - 100"
+    class="w-100"
   ></dd-no-data>
 </ng-container>

@@ -124,4 +124,51 @@ describe('filesize.pipe', () => {
       expect(pipe.transform(214748, 'mb', 3)).toBe(0.205);
     });
   });
+
+  describe('boundaries and invalid input', () => {
+    it('should keep 1023 bytes under 1 KB', () => {
+      expect(pipe.transform(1023, 'kb', 3)).toBe(0.999);
+      expect(pipe.transform(1023, 'kb', 0)).toBe(1);
+      expect(pipe.transform(1023, undefined, 0)).toBe(1023);
+    });
+
+    it('should convert exactly 1024 bytes to 1 KB', () => {
+      expect(pipe.transform(1024, 'kb', 2)).toBe(1);
+    });
+
+    it('should convert 1 byte less than 1 MB and 1 GB under the boundary', () => {
+      expect(pipe.transform(1048575, 'mb', 6)).toBe(0.999999);
+      expect(pipe.transform(1073741823, 'gb', 2)).toBe(1);
+    });
+
+    it('should convert very large sizes', () => {
+      expect(pipe.transform(1024 ** 4, 'gb', 0)).toBe(1024);
+      expect(pipe.transform(Number.MAX_SAFE_INTEGER, 'gb', 0)).toBe(8388608);
+    });
+
+    it('should return null for a negative size', () => {
+      expect(pipe.transform(-1, 'kb', 2)).toBe(null);
+      expect(pipe.transform(-1024, undefined, 0)).toBe(null);
+    });
+
+    it('should return null for an infinite size', () => {
+      expect(pipe.transform(Infinity, 'mb', 2)).toBe(null);
+      expect(pipe.transform(-Infinity, 'mb', 2)).toBe(null);
+    });
+
+    it('should convert a numeric string', () => {
+      expect(pipe.transform('2048' as unknown as number, 'kb', 0)).toBe(2);
+      expect(pipe.transform('2048' as unknown as number, undefined, 0)).toBe(2048);
+    });
+
+    it('should return null for a not numeric input', () => {
+      expect(pipe.transform('big' as unknown as number, 'kb', 0)).toBe(null);
+      expect(pipe.transform({} as unknown as number, 'kb', 0)).toBe(null);
+      expect(pipe.transform([1, 2] as unknown as number, 'kb', 0)).toBe(null);
+    });
+
+    it('should treat the unit case sensitively', () => {
+      expect(pipe.transform(2048, 'KB', 0)).toBe(2048);
+    });
+  });
 });
