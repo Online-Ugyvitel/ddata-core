@@ -133,6 +133,13 @@ describe('WordCounterComponent', () => {
       expect(counter().classList).not.toContain('bg-warning');
     });
 
+    it('should not highlight the counter without a max length', () => {
+      render('a,b,c', 0);
+
+      expect(text()).toBe('3 / 0');
+      expect(counter().classList).not.toContain('bg-warning');
+    });
+
     it('should never report the limit as reached without a max length', () => {
       render('a,b,c', 0);
 

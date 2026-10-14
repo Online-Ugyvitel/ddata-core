@@ -5,12 +5,14 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
-import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDate, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import {
   BaseModel,
   BaseModelInterface,
@@ -28,7 +30,7 @@ import { InputHelperService } from '../../services/input/helper/input-helper.ser
   standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DdataInputDateComponent implements OnInit {
+export class DdataInputDateComponent implements OnInit, OnChanges {
   @Input() disabled = false;
   @Input() inputClass = 'form-control';
   @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
@@ -49,11 +51,18 @@ export class DdataInputDateComponent implements OnInit {
   @Input() showIcon = true;
   @Input() autoApply = true;
   @Input() singleDatePicker = true;
+  // earliest / latest allowed date (inclusive), a Date or a string in `format`
+  @Input() min: Date | string | null = null;
+  @Input() max: Date | string | null = null;
 
   @Output() readonly changed: EventEmitter<BaseModelInterface<unknown> & FieldsInterface<unknown>> =
     new EventEmitter();
 
   @ViewChild('inputBox') inputBox: ElementRef;
+
+  private minMoment: moment.Moment | null = null;
+  private maxMoment: moment.Moment | null = null;
+  private isOutOfRange = false;
 
   helperService: InputHelperServiceInterface =
     DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
@@ -151,10 +160,20 @@ export class DdataInputDateComponent implements OnInit {
 
   random: string = this.helperService.randChars();
   selectedValue: unknown = '';
+  minDate: NgbDateStruct | null = null;
+  maxDate: NgbDateStruct | null = null;
 
   constructor(private readonly changeDetector: ChangeDetectorRef) {}
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['min'] || changes['max'] || changes['format'] || changes['moment']) {
+      this.updateRange();
+    }
+  }
+
   ngOnInit(): void {
+    this.updateRange();
+
     if (!!this.model[this._field]) {
       this.selectedValue = this.model[this._field];
     }
@@ -165,10 +184,15 @@ export class DdataInputDateComponent implements OnInit {
   }
 
   change(value: NgbDate): void {
-    this.selectedValue = `${value.year}-${value.month.toString().padStart(2, '0')}-${value.day
+    const selected = `${value.year}-${value.month.toString().padStart(2, '0')}-${value.day
       .toString()
       .padStart(2, '0')}`;
 
+    if (!this.acceptInRange(this.parseDate(selected, 'YYYY-MM-DD'))) {
+      return;
+    }
+
+    this.selectedValue = selected;
     this.model[this._field] = this.selectedValue;
     const isValid = this.helperService.validateField(this._model, this._field);
 
@@ -178,6 +202,77 @@ export class DdataInputDateComponent implements OnInit {
   }
 
   typeChange(event: Event): void {
-    this._model[this._field] = (event.target as HTMLInputElement).value;
+    const value = (event.target as HTMLInputElement).value;
+
+    if (!this.acceptInRange(this.parseDate(value, this.format))) {
+      return;
+    }
+
+    this._model[this._field] = value;
+  }
+
+  private updateRange(): void {
+    this.minMoment = this.toMoment(this.min, 'min');
+    this.maxMoment = this.toMoment(this.max, 'max');
+    this.minDate = this.toDateStruct(this.minMoment);
+    this.maxDate = this.toDateStruct(this.maxMoment);
+  }
+
+  private toMoment(value: Date | string | null | undefined, name: string): moment.Moment | null {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+    const result = this.parseDate(value, this.format);
+
+    if (!result.isValid()) {
+      console.warn(`Invalid ${name} date: "${String(value)}", the ${name} limit is ignored.`);
+
+      return null;
+    }
+
+    return result;
+  }
+
+  // a namespace import of moment is not callable, its factory is the default export then
+  private parseDate(value: Date | string, format: string): moment.Moment {
+    type MomentFactory = (input: Date | string, format?: string, strict?: boolean) => moment.Moment;
+    const source = this._moment as unknown as MomentFactory | { default: MomentFactory };
+    const factory = typeof source === 'function' ? source : source.default;
+
+    return value instanceof Date ? factory(value) : factory(value, format, true);
+  }
+
+  private toDateStruct(value: moment.Moment | null): NgbDateStruct | null {
+    return value ? { year: value.year(), month: value.month() + 1, day: value.date() } : null;
+  }
+
+  // out of range dates are not written to the model, the field is marked as invalid instead;
+  // values that can't be parsed are left to the validator, like before
+  private acceptInRange(value: moment.Moment): boolean {
+    const isOutside =
+      value.isValid() &&
+      ((!!this.minMoment && value.isBefore(this.minMoment, 'day')) ||
+        (!!this.maxMoment && value.isAfter(this.maxMoment, 'day')));
+    const errors = this._model.validationErrors;
+
+    if (isOutside) {
+      if (!errors.includes(this._field)) {
+        errors.push(this._field);
+      }
+
+      this.isOutOfRange = true;
+
+      return false;
+    }
+
+    if (this.isOutOfRange) {
+      this.isOutOfRange = false;
+
+      if (errors.includes(this._field)) {
+        errors.splice(errors.indexOf(this._field), 1);
+      }
+    }
+
+    return true;
   }
 }

@@ -35,6 +35,8 @@ A date input UI form element with date picker.
 | `buttonClass` | `string` | no | `input-group-prepend btn btn-light mb-0` | Class of the button with calendar icon. |
 | `wrapperClass` | `string` | no | `d-flex flex-wrap` | Class of the wrapper `div` element. It contains the `label` and the `div.input-group` elements. |
 | `format` | `string` | no | `YYYY-MM-DD` | Date format, [details here](https://github.com/fetrarij/ngx-daterangepicker-material) |
+| `min` | `Date \| string \| null` | no | `null` | Earliest allowed date (inclusive). A string is parsed in `format`. Earlier dates can't be picked; a typed earlier date is not written to the model and the field is marked invalid. An invalid value is ignored with a console warning. |
+| `max` | `Date \| string \| null` | no | `null` | Latest allowed date (inclusive), works the same way as `min`. |
 | `separator` | `string` | no | `-` | Data separator string. |
 | `labelApply` | `string` | no | `OK` | Label of "apply" button on datepicker. |
 | `labelCancel` | `string` | no | `Cancel` | Label of "cancel" button on datepicker. |

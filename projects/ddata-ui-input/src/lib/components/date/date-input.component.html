@@ -22,6 +22,8 @@
         (dateSelect)="change($event)"
         type="text"
         ngbDatepicker
+        [minDate]="minDate"
+        [maxDate]="maxDate"
         #d="ngbDatepicker"
         (click)="d.toggle()"
         (change)="typeChange($event)"
