@@ -12,10 +12,27 @@
             <div class="card-body p-4 bg-primary text-white text-center">
               <h5>{{ i18n.step_1.label }}</h5>
               <p>{{ i18n.choose_files.label }}</p>
-              <button type="button" class="btn btn-light" (click)="fileInput.click()">
-                <fa-icon [icon]="icon.files"></fa-icon>
-                {{ i18n.select_files.label }}
-              </button>
+              <!-- drop zone, it opens the file selector by click or by the Enter and Space keys too -->
+              <div
+                class="drop-zone p-3"
+                [class.drop-zone-active]="dragOver"
+                role="button"
+                tabindex="0"
+                [attr.aria-label]="i18n.drop_files.label"
+                (click)="fileInput.click()"
+                (keydown.enter)="$event.preventDefault(); fileInput.click()"
+                (keydown.space)="$event.preventDefault(); fileInput.click()"
+                (dragenter)="onDragEnter($event)"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+              >
+                <p class="mb-2 drop-zone-text">{{ i18n.drop_files.label }}</p>
+                <span class="btn btn-light">
+                  <fa-icon [icon]="icon.files"></fa-icon>
+                  {{ i18n.select_files.label }}
+                </span>
+              </div>
               <input
                 hidden
                 type="file"
@@ -47,6 +64,12 @@
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="rejectedFiles.length > 0">
+        <div class="col-12 py-2 text-danger rejected-files">
+          {{ i18n.not_accepted_files.label }}: {{ rejectedFileNames }}
         </div>
       </div>
 

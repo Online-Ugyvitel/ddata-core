@@ -55,6 +55,28 @@ describe('DdataUiFileUploadComponent', () => {
     element.querySelector<HTMLButtonElement>('.btn-secondary');
   const listedNames = (): Array<string> =>
     Array.from(element.querySelectorAll('h6')).map((title) => title.textContent?.trim() ?? '');
+  const dropZone = (): HTMLElement => element.querySelector<HTMLElement>('.drop-zone');
+  const rejectedText = (): string | undefined =>
+    element.querySelector('.rejected-files')?.textContent?.trim();
+  /** jsdom has no DataTransfer, so the drag events get a minimal one */
+  const drag = (
+    type: 'dragenter' | 'dragover' | 'dragleave' | 'drop',
+    files: Array<File> = [],
+    types: Array<string> = files.length > 0 ? ['Files'] : [],
+    target: Element = dropZone()
+  ): Event & { dataTransfer: { files: Array<File>; types: Array<string>; dropEffect: string } } => {
+    const event = new Event(type, { bubbles: true, cancelable: true }) as Event & {
+      dataTransfer: { files: Array<File>; types: Array<string>; dropEffect: string };
+    };
+
+    Object.defineProperty(event, 'dataTransfer', {
+      value: { files, types, dropEffect: 'none' }
+    });
+    target.dispatchEvent(event);
+    fixture.detectChanges();
+
+    return event;
+  };
   const deleteButtons = (): Array<HTMLButtonElement> =>
     Array.from(element.querySelectorAll<HTMLButtonElement>('button[title]'));
   /** select files like the browser does: set the files of the input and fire its change event */
@@ -125,12 +147,37 @@ describe('DdataUiFileUploadComponent', () => {
       expect(fileInput().accept).toBe('.pdf');
     });
 
-    it('should open the file selector of the browser with the select button', () => {
+    it('should open the file selector of the browser by clicking the drop zone', () => {
       const click = vi.spyOn(fileInput(), 'click').mockImplementation(() => undefined);
 
-      element.querySelector<HTMLButtonElement>('.btn-light')?.click();
+      dropZone().click();
 
       expect(click).toHaveBeenCalledTimes(1);
+    });
+
+    it.each(['Enter', ' '])(
+      'should open the file selector with the %j key on the focused drop zone',
+      (key) => {
+        const click = vi.spyOn(fileInput(), 'click').mockImplementation(() => undefined);
+        const keydown = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+
+        dropZone().dispatchEvent(keydown);
+
+        expect(click).toHaveBeenCalledTimes(1);
+        // the page must not scroll by the space key
+        expect(keydown.defaultPrevented).toBe(true);
+      }
+    );
+
+    it('should make the drop zone reachable and described for keyboard and screen reader users', () => {
+      expect(dropZone().getAttribute('role')).toBe('button');
+      expect(dropZone().getAttribute('tabindex')).toBe('0');
+      expect(dropZone().getAttribute('aria-label')).toBe('Drag files here or browse');
+      expect(dropZone().querySelector('.drop-zone-text')?.textContent?.trim()).toBe(
+        'Drag files here or browse'
+      );
+      // there is no other interactive element in the zone
+      expect(dropZone().querySelector('button, input, a')).toBeNull();
     });
 
     it('should disable the upload button until a file is selected', () => {
@@ -202,13 +249,15 @@ describe('DdataUiFileUploadComponent', () => {
     });
 
     it('should list an empty file without size', () => {
-      select([new File([], 'üres.txt', { type: 'text/plain' })]);
+      select([new File([], 'üres.pdf', { type: 'application/pdf' })]);
 
-      expect(listedNames()).toEqual(['üres.txt']);
+      expect(listedNames()).toEqual(['üres.pdf']);
       expect(element.querySelector('.col-sm-8 .text-muted')?.textContent?.trim()).toBe('Size:  MB');
     });
 
     it('should show the unknown file icon when the browser could not detect the type', () => {
+      // without accepted types every file is allowed
+      fixture.componentRef.setInput('accpetedTypes', '');
       select([new File(['?'], 'README')]);
 
       expect(component.fileIcons).toEqual([faFile]);
@@ -274,6 +323,211 @@ describe('DdataUiFileUploadComponent', () => {
     });
   });
 
+  describe('drag and drop', () => {
+    beforeEach(() => create());
+
+    it('should show the hungarian drop zone text with hungarian configuration', () => {
+      TestBed.resetTestingModule();
+      create({ lang: 'hu' });
+
+      expect(dropZone().getAttribute('aria-label')).toBe(
+        'Húzd ide a fájlokat vagy válaszd ki őket'
+      );
+    });
+
+    it('should activate the drop zone while files are dragged over it', () => {
+      const enter = drag('dragenter', [pdf()]);
+
+      expect(enter.defaultPrevented).toBe(true);
+      expect(component.dragOver).toBe(true);
+      expect(dropZone().classList).toContain('drop-zone-active');
+      const over = drag('dragover', [pdf()]);
+
+      expect(over.defaultPrevented).toBe(true);
+      expect(over.dataTransfer.dropEffect).toBe('copy');
+      expect(dropZone().classList).toContain('drop-zone-active');
+      const leave = drag('dragleave', [pdf()]);
+
+      expect(leave.defaultPrevented).toBe(true);
+      expect(component.dragOver).toBe(false);
+      expect(dropZone().classList).not.toContain('drop-zone-active');
+    });
+
+    it('should keep the drop zone active while the drag moves over its children', () => {
+      const child = dropZone().querySelector('.drop-zone-text');
+
+      drag('dragenter', [pdf()]);
+      // entering a child fires its enter before the leave of the zone
+      drag('dragenter', [pdf()], ['Files'], child);
+      drag('dragleave', [pdf()], ['Files']);
+
+      expect(dropZone().classList).toContain('drop-zone-active');
+
+      drag('dragleave', [pdf()], ['Files'], child);
+
+      expect(dropZone().classList).not.toContain('drop-zone-active');
+    });
+
+    it('should ignore a leave without an active drag', () => {
+      const leave = drag('dragleave', [pdf()]);
+
+      expect(leave.defaultPrevented).toBe(false);
+      expect(component.dragOver).toBe(false);
+    });
+
+    it('should activate the zone by dragover too when the enter was missed', () => {
+      drag('dragover', [pdf()]);
+
+      expect(dropZone().classList).toContain('drop-zone-active');
+
+      drag('dragleave', [pdf()]);
+
+      expect(dropZone().classList).not.toContain('drop-zone-active');
+    });
+
+    it('should not allow to drop a dragged text or link', () => {
+      const enter = drag('dragenter', [], ['text/plain', 'text/uri-list']);
+      const over = drag('dragover', [], ['text/plain']);
+
+      expect(enter.defaultPrevented).toBe(false);
+      expect(over.defaultPrevented).toBe(false);
+      expect(over.dataTransfer.dropEffect).toBe('none');
+      expect(component.dragOver).toBe(false);
+    });
+
+    it('should not allow a drag without data transfer', () => {
+      const event = new Event('dragenter', { bubbles: true, cancelable: true });
+
+      dropZone().dispatchEvent(event);
+      fixture.detectChanges();
+
+      expect(event.defaultPrevented).toBe(false);
+      expect(component.dragOver).toBe(false);
+    });
+
+    it('should add a dropped file to the list like a selected one', () => {
+      drag('dragenter', [pdf()]);
+      const drop = drag('drop', [pdf('dropped.pdf')]);
+
+      expect(drop.defaultPrevented).toBe(true);
+      expect(dropZone().classList).not.toContain('drop-zone-active');
+      expect(listedNames()).toEqual(['dropped.pdf']);
+      expect(component.filesSet.size).toBe(1);
+      expect(component.progress).toEqual({ 'dropped.pdf': { percent: 0 } });
+      expect(uploadButton().disabled).toBe(false);
+    });
+
+    it('should add several dropped files with image preview', async () => {
+      drag('drop', [pdf('a.pdf'), png('b.png'), pdf('c.pdf')]);
+      await vi.waitFor(() => expect(component.fileData.length).toBe(3));
+      fixture.detectChanges();
+
+      expect(listedNames().sort()).toEqual(['a.pdf', 'b.png', 'c.pdf']);
+      expect(element.querySelectorAll('img').length).toBe(1);
+    });
+
+    it('should reset the nested drag state after a drop', () => {
+      const child = dropZone().querySelector('.drop-zone-text');
+
+      drag('dragenter', [pdf()]);
+      drag('dragenter', [pdf()], ['Files'], child);
+      drag('drop', [pdf()], ['Files'], child);
+
+      expect(component.dragOver).toBe(false);
+
+      // a new drag starts from zero
+      drag('dragenter', [pdf()]);
+      drag('dragleave', [pdf()]);
+
+      expect(component.dragOver).toBe(false);
+    });
+
+    it('should ignore a drop without files', () => {
+      select([pdf('a.pdf')]);
+      const drop = drag('drop', [], ['text/plain']);
+
+      // the browser must not open the dropped content
+      expect(drop.defaultPrevented).toBe(true);
+      expect(listedNames()).toEqual(['a.pdf']);
+      expect(rejectedText()).toBeUndefined();
+    });
+
+    it('should ignore a drop with the files type but an empty file list', () => {
+      drag('drop', [], ['Files']);
+
+      expect(listedNames()).toEqual([]);
+      expect(component.filesSet.size).toBe(0);
+    });
+
+    it('should replace a listed file with a dropped file of the same name', () => {
+      const dropped = pdf('same.pdf', 'new content');
+
+      select([pdf('same.pdf', 'old content')]);
+      drag('drop', [dropped]);
+
+      expect(listedNames()).toEqual(['same.pdf']);
+      expect(Array.from(component.filesSet)).toEqual([dropped]);
+    });
+
+    it('should ignore the drag and drop while the files are uploading', () => {
+      select([pdf('a.pdf')]);
+      const [request] = startUpload();
+      const enter = drag('dragenter', [pdf('b.pdf')]);
+      const drop = drag('drop', [pdf('b.pdf')]);
+
+      expect(enter.defaultPrevented).toBe(false);
+      expect(component.dragOver).toBe(false);
+      expect(drop.defaultPrevented).toBe(true);
+      expect(listedNames()).toEqual(['a.pdf']);
+      expect(Array.from(component.filesSet).map((file) => file.name)).toEqual(['a.pdf']);
+      request.flush(remote(1, 'a.pdf'));
+    });
+
+    it('should not add the dropped files of a not accepted type', () => {
+      drag('drop', [pdf('a.pdf'), new File(['x'], 'run.exe'), new File(['t'], 'notes.txt')]);
+
+      expect(listedNames()).toEqual(['a.pdf']);
+      expect(component.rejectedFiles.map((file) => file.name)).toEqual(['run.exe', 'notes.txt']);
+      expect(rejectedText()).toBe('Not accepted file types: run.exe, notes.txt');
+
+      // the next accepted selection clears the message
+      drag('drop', [pdf('b.pdf')]);
+
+      expect(rejectedText()).toBeUndefined();
+      expect(listedNames()).toEqual(['a.pdf', 'b.pdf']);
+    });
+
+    it('should filter the selected files by the accepted types too', () => {
+      select([new File(['t'], 'notes.txt', { type: 'text/plain' }), pdf('a.pdf')]);
+
+      expect(listedNames()).toEqual(['a.pdf']);
+      expect(rejectedText()).toBe('Not accepted file types: notes.txt');
+    });
+
+    it.each([
+      ['.PDF', 'SZÁMLA.pdf', 'application/pdf', true],
+      ['.pdf', 'scan.PDF', 'application/pdf', true],
+      ['.pdf', 'pdf', 'application/pdf', false],
+      ['application/pdf', 'scan', 'application/pdf', true],
+      ['application/pdf', 'scan.pdf', 'application/x-pdf', false],
+      ['image/*', 'photo.heic', 'image/heic', true],
+      ['image/*', 'photo.heic', 'video/mp4', false],
+      [' .doc , image/png ', 'kép.png', 'image/png', true],
+      [' , ', 'anything.bin', '', true]
+    ])(
+      'should match the accepted types %j against %s (%s): %s',
+      (accepted, name, type, isAccepted) => {
+        fixture.componentRef.setInput('accpetedTypes', accepted);
+        drag('drop', [new File(['x'], name, { type })]);
+
+        // an image is listed only when it has been read, but it is in the upload set at once
+        expect(Array.from(component.filesSet).map((file) => file.name)).toEqual(
+          isAccepted ? [name] : []
+        );
+      }
+    );
+  });
+
   describe('upload', () => {
     beforeEach(() => create());
 
@@ -329,13 +583,13 @@ describe('DdataUiFileUploadComponent', () => {
     });
 
     it('should upload an empty file', () => {
-      select([new File([], 'empty.txt', { type: 'text/plain' })]);
+      select([new File([], 'empty.pdf', { type: 'application/pdf' })]);
       const [request] = startUpload();
 
       expect(((request.request.body as FormData).get('file') as File).size).toBe(0);
-      request.flush(remote(5, 'empty.txt'));
+      request.flush(remote(5, 'empty.pdf'));
 
-      expect(saved[0][0].name).toBe('empty.txt');
+      expect(saved[0][0].name).toBe('empty.pdf');
     });
 
     it('should upload a file with a very long and accented name', () => {

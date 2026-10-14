@@ -72,6 +72,7 @@ export class DdataUiFileUploadComponent implements OnDestroy {
   private readonly fileService = inject(FileService);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private uploadSubscription: Subscription | null = null;
+  private dragEnterCount = 0;
 
   config: ModuleConfigurationInterface;
 
@@ -88,8 +89,10 @@ export class DdataUiFileUploadComponent implements OnDestroy {
   isImage: Array<boolean> = [];
   fileTypes: Array<string> = [];
   fileIcons: Array<IconDefinition> = [];
+  rejectedFiles: Array<File> = [];
   uploadIsDone = false;
   hasUploadError = false;
+  dragOver = false;
   icon = {
     trash: faTrashAlt,
     files: faCopy,
@@ -205,19 +208,80 @@ export class DdataUiFileUploadComponent implements OnDestroy {
     }
   }
 
+  get rejectedFileNames(): string {
+    return this.rejectedFiles.map((file: File) => file.name).join(', ');
+  }
+
+  /**
+   * Add the selected or dropped files to the upload list. Both the file selector and the drop zone use it.
+   */
   onSelectFile(files: FileList | Array<File> | null): void {
     // the list can not be changed while its files are uploading
     if (this.isUploading) {
       return;
     }
+    const selectedFiles = Array.from(files ?? []);
 
-    Array.from(files ?? []).forEach((file: File) => {
-      // the progress is tracked by the file name, so a file with the same name replaces the previous one
-      this.removeFileByName(file.name);
-      this.filesSet.add(file);
-      this.progress[file.name] = { percent: 0 };
-      this.readAndSetup(file);
-    });
+    // the file selector filters by the accepted types, but a dropped file or the "all files" option does not
+    this.rejectedFiles = selectedFiles.filter((file: File) => !this.isAccepted(file));
+
+    selectedFiles
+      .filter((file: File) => this.isAccepted(file))
+      .forEach((file: File) => {
+        // the progress is tracked by the file name, so a file with the same name replaces the previous one
+        this.removeFileByName(file.name);
+        this.filesSet.add(file);
+        this.progress[file.name] = { percent: 0 };
+        this.readAndSetup(file);
+      });
+  }
+
+  onDragEnter(event: DragEvent): void {
+    if (!this.canDrop(event)) {
+      return;
+    }
+
+    event.preventDefault();
+    // the drag enters and leaves the children of the zone too, so the zone is active until every enter has its leave
+    this.dragEnterCount++;
+    this.dragOver = true;
+  }
+
+  onDragOver(event: DragEvent): void {
+    if (!this.canDrop(event)) {
+      return;
+    }
+
+    // without preventing the default the browser does not allow the drop
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    this.dragOver = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    if (!this.dragOver) {
+      return;
+    }
+
+    event.preventDefault();
+    this.dragEnterCount = Math.max(this.dragEnterCount - 1, 0);
+
+    if (this.dragEnterCount === 0) {
+      this.dragOver = false;
+    }
+  }
+
+  onDrop(event: DragEvent): void {
+    // the browser would open the dropped file instead of the application
+    event.preventDefault();
+    this.dragEnterCount = 0;
+    this.dragOver = false;
+
+    if (!this.canDrop(event)) {
+      return;
+    }
+
+    this.onSelectFile(event.dataTransfer.files);
   }
 
   deleteFile(index: number): void {
@@ -241,6 +305,42 @@ export class DdataUiFileUploadComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.cancelUpload();
+  }
+
+  /**
+   * Only files can be dropped (not a dragged text or link), and not while the files are uploading.
+   */
+  private canDrop(event: DragEvent): boolean {
+    return !this.isUploading && Array.from(event.dataTransfer?.types ?? []).includes('Files');
+  }
+
+  /**
+   * Check the file against the accepted types like the browser does: extensions (.pdf), MIME types
+   * (application/pdf) and MIME type groups (image/*).
+   */
+  private isAccepted(file: File): boolean {
+    const acceptedTypes = this.accpetedTypes
+      .split(',')
+      .map((type: string) => type.trim().toLowerCase())
+      .filter((type: string) => type !== '');
+    const name = file.name.toLowerCase();
+    const mimeType = file.type.toLowerCase();
+
+    if (acceptedTypes.length === 0) {
+      return true;
+    }
+
+    return acceptedTypes.some((type: string) => {
+      if (type.startsWith('.')) {
+        return name.endsWith(type);
+      }
+
+      if (type.endsWith('/*')) {
+        return mimeType.startsWith(type.slice(0, -1));
+      }
+
+      return mimeType === type;
+    });
   }
 
   private addToList(file: File, url: string, isImage: boolean): void {

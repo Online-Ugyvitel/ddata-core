@@ -133,3 +133,15 @@ export const upload_failed: FieldInterface = {
   title: 'The upload failed, please try again.',
   placeholder: 'The upload failed, please try again.'
 };
+
+export const drop_files: FieldInterface = {
+  label: 'Drag files here or browse',
+  title: 'Drag files here or browse',
+  placeholder: 'Drag files here or browse'
+};
+
+export const not_accepted_files: FieldInterface = {
+  label: 'Not accepted file types',
+  title: 'Not accepted file types',
+  placeholder: 'Not accepted file types'
+};
