@@ -14,6 +14,7 @@
     "@netdjw/ddata-core": "^0.3.17",
     "@netdjw/ddata-ui-common": "^0.1.20",
     "@netdjw/ddata-ui-dialog": "^0.1.22",
+    "@netdjw/ddata-ui-input": "^1.1.0",
     "rxjs": "~7.8.0"
   },
   "dependencies": {

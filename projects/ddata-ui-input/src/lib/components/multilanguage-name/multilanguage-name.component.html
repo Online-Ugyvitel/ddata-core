@@ -1,0 +1,76 @@
+@for (name of names; track name; let index = $index, first = $first) {
+  @if (first || show) {
+    <div class="input-group pb-1">
+      <label class="visually-hidden" [for]="getId('lang', index)">{{ langLabel }}</label>
+      <select
+        class="form-select col-12 col-sm-6 col-md-3 col-xl-2"
+        [id]="getId('lang', index)"
+        [name]="getId('lang', index)"
+        [attr.name]="getId('lang', index)"
+        [(ngModel)]="name.lang_id"
+      >
+        @for (lang of langs; track lang.id) {
+          <option [ngValue]="lang.id">{{ lang.name }}</option>
+        }
+      </select>
+
+      <label class="visually-hidden" [for]="getId('name', index)">{{ title }}</label>
+      <input
+        type="text"
+        class="form-control col-12 col-sm-6 col-md-9 col-xl-10"
+        [id]="getId('name', index)"
+        [name]="getId('name', index)"
+        [attr.name]="getId('name', index)"
+        [placeholder]="placeholder"
+        [title]="title"
+        autocomplete="off"
+        [(ngModel)]="name.name"
+      />
+
+      @if (!first) {
+        <button
+          type="button"
+          class="btn btn-light"
+          [title]="deleteButtonText"
+          [attr.aria-label]="deleteButtonText"
+          (click)="nameToDelete = name"
+        >
+          <fa-icon [icon]="icon.trash"></fa-icon>
+        </button>
+      }
+    </div>
+
+    @if (nameToDelete === name) {
+      <div class="multilanguage-name-confirm d-flex align-items-center gap-2 pb-1" role="alert">
+        <span>{{ confirmText }}</span>
+        <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete(true)">
+          {{ confirmButtonText }}
+        </button>
+        <button type="button" class="btn btn-light btn-sm" (click)="confirmDelete(false)">
+          {{ cancelButtonText }}
+        </button>
+      </div>
+    }
+  }
+}
+
+<button
+  type="button"
+  class="btn btn-light btn-sm"
+  [title]="addButtonText"
+  [disabled]="!model"
+  (click)="addName()"
+>
+  <fa-icon [icon]="icon.plus"></fa-icon>
+  {{ addButtonText }}
+</button>
+
+@if (names.length > 1) {
+  <button type="button" class="btn btn-light btn-sm" [attr.aria-expanded]="show" (click)="toggle()">
+    @if (show) {
+      {{ hideButtonText }}
+    } @else {
+      {{ showButtonText }}: {{ getTotal() }}
+    }
+  </button>
+}
