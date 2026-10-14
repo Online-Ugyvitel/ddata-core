@@ -27,6 +27,7 @@ const projects = [
   'ddata-ui-dialog',
   'ddata-ui-common',
   'ddata-a11y',
+  'ddata-ui-views',
 ];
 
 const scopes = [

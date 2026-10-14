@@ -49,7 +49,7 @@ jobs:
       id: detect
       run: |
         to_publish=""
-        for dir in ddata-core ddata-a11y ddata-ui-common ddata-ui-dialog ddata-ui-input ddata-ui-file; do
+        for dir in ddata-core ddata-a11y ddata-ui-common ddata-ui-dialog ddata-ui-input ddata-ui-file ddata-ui-views; do
           name=$(node -p "require('./projects/$dir/package.json').name")
           version=$(node -p "require('./projects/$dir/package.json').version")
           case "$name" in
@@ -97,6 +97,7 @@ jobs:
         npm run build:ui-dialog
         npm run build:ui-input
         npm run build:ui-file
+        npm run build:ui-views
 
     # A package that a consumer project cannot install and import is never published.
     - name: Verify consumer installation

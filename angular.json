@@ -409,6 +409,61 @@
           }
         }
       }
+    },
+    "ddata-ui-views": {
+      "projectType": "library",
+      "root": "projects/ddata-ui-views",
+      "sourceRoot": "projects/ddata-ui-views/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ddata-ui-views/tsconfig.lib.json",
+            "project": "projects/ddata-ui-views/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ddata-ui-views/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-ui-views/tsconfig.lib.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/ddata-ui-views/tsconfig.spec.json",
+            "setupFiles": [
+              "projects/ddata-ui-views/src/test-setup.ts"
+            ],
+            "coverage": true,
+            "coverageInclude": [
+              "projects/ddata-ui-views/src/lib/**/*.ts"
+            ],
+            "coverageReporters": [
+              "text",
+              "text-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-ui-views/**/*.ts",
+              "projects/ddata-ui-views/**/*.html"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {

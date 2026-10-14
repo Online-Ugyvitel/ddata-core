@@ -21,8 +21,6 @@ import { ListDropdownDeleteConfirmComponent } from './components/list-extensions
 import { ListDropdownComponent } from './components/list-extensions/list-dropdown/list-dropdown.component';
 import { ShowSearchParametersComponent } from './components/other/show-search-parameters/show-search-parameters.component';
 import { TabButtonComponent } from './components/other/tab-button/tab-button.component';
-import { ViewDateSeparatedListComponent } from './components/views/view-date-separated-list/view-date-separated-list.component';
-import { ViewKanbanComponent } from './components/views/view-kanban/view-kanban.component';
 const components = [
   AutocompleteBoxComponent,
   CharacterCounterComponent,
@@ -33,9 +31,7 @@ const components = [
   ListDropdownDeleteConfirmComponent,
   ListDropdownComponent,
   ShowSearchParametersComponent,
-  TabButtonComponent,
-  ViewDateSeparatedListComponent,
-  ViewKanbanComponent
+  TabButtonComponent
 ];
 
 @NgModule({

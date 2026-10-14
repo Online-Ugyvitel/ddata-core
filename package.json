@@ -17,13 +17,15 @@
     "build:ui-file": "ng build ddata-ui-file --configuration production",
     "build:ui": "ng build ddata-ui --configuration production",
     "build:ui-input": "ng build ddata-ui-input --configuration production",
+    "build:ui-views": "ng build ddata-ui-views --configuration production",
     "verify:consumer": "bash scripts/verify-consumer.sh",
     "publish:a11y": "cd dist/ddata-a11y && npm publish && cd ../..",
     "publish:core": "cd dist/ddata-core && npm publish && cd ../..",
     "publish:ui-common": "cd dist/ddata-ui-common && npm publish && cd ../..",
     "publish:ui-dialog": "cd dist/ddata-ui-dialog && npm publish && cd ../..",
     "publish:ui-file": "cd dist/ddata-ui-file && npm publish && cd ../..",
-    "publish:ui-input": "cd dist/ddata-ui-input && npm publish && cd ../.."
+    "publish:ui-input": "cd dist/ddata-ui-input && npm publish && cd ../..",
+    "publish:ui-views": "cd dist/ddata-ui-views && npm publish && cd ../.."
   },
   "private": true,
   "dependencies": {
@@ -64,6 +66,7 @@
     "@types/node": "^24.19.1",
     "@typescript-eslint/eslint-plugin": "^8.71.1",
     "@typescript-eslint/parser": "^8.71.1",
+    "@vitest/coverage-v8": "^5.0.3",
     "angular-eslint": "^22.5.0",
     "codelyzer": "^6.0.2",
     "eslint": "^9.39.5",

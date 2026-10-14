@@ -1,0 +1,136 @@
+<div class="container-fluid px-0 py-0">
+  <div class="view-title">
+    <h3>{{ title() }}</h3>
+  </div>
+
+  @if (lists().length > 0) {
+    <div
+      class="list-container"
+      role="region"
+      [attr.aria-label]="title()"
+      [style.height.px]="viewportHeight.height()"
+    >
+      @for (list of lists(); track list.date; let listIndex = $index) {
+        <section class="list mb-4" [attr.aria-labelledby]="'dd-date-list-' + listIndex">
+          <header class="container-fluid list-header py-2">
+            <div class="row border-bottom">
+              <h6 class="col px-2" [id]="'dd-date-list-' + listIndex">
+                {{ list.name }}
+                @if (list.date) {
+                  <small class="text-muted list-date">{{ formatDate(list.date) }}</small>
+                }
+              </h6>
+              <div class="col-2 small text-right">
+                {{ list.casefiles.length }} {{ i18n().casefileCount }}
+              </div>
+            </div>
+            <div class="row bg-light py-2" aria-hidden="true">
+              <div class="d-none d-sm-block col-sm-6 col-md-4 col-lg-3 col-xl-4 text-center px-0">
+                {{ i18n().partner }}
+              </div>
+              <div class="d-none d-sm-block col-sm-6 col-md-4 col-lg-3 col-xl-3 text-center pl-2">
+                {{ i18n().casefile }}
+              </div>
+              <div class="d-none d-sm-block col-sm-4 col-md-4 col-lg-2 col-xl-2 text-center px-0">
+                {{ i18n().status }}
+              </div>
+              <div
+                class="d-none d-sm-block col-sm-4 col-md-4 offset-md-8 col-lg-2 offset-lg-0 col-xl-2 text-center px-0"
+              >
+                {{ i18n().responsible }}
+              </div>
+            </div>
+          </header>
+
+          <ul class="list-items" role="list">
+            @for (casefile of list.casefiles; track casefile) {
+              <li
+                class="container-fluid list-item my-1 py-2 border-bottom"
+                [style.border-left-color]="casefile.priority?.color"
+              >
+                <div class="row">
+                  <div
+                    class="col-12 pb-2 col-sm-6 pb-sm-0 col-md-4 col-lg-3 col-xl-4 clickable list-company"
+                    (click)="open(casefile)"
+                  >
+                    {{ casefile.company?.name }}
+                  </div>
+
+                  <div
+                    class="col-12 pb-2 col-sm-6 pb-sm-0 col-md-4 col-lg-3 col-xl-3 clickable list-name"
+                    (click)="open(casefile)"
+                  >
+                    {{ casefile.name }}
+                  </div>
+
+                  <div class="col-6 col-sm-4 py-sm-2 col-md-4 py-md-0 col-lg-2 col-xl-2">
+                    @if (casefile.status) {
+                      <span
+                        class="d-inline-block px-2 list-status"
+                        [style.background-color]="casefile.status.color"
+                      >
+                        {{ casefile.status.name }}
+                      </span>
+                    }
+                  </div>
+
+                  <div
+                    class="col-6 col-sm-4 py-sm-2 col-md-3 offset-md-8 py-md-0 col-lg-2 offset-lg-0 col-xl-2"
+                  >
+                    {{ casefile.responsible_user?.name }}
+                  </div>
+
+                  <div class="col-12 col-sm-4 py-sm-2 col-md-1 p-md-0 col-lg-2 col-xl-1 text-right">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-light list-open"
+                      [attr.aria-label]="label(i18n().open, casefile)"
+                      [title]="label(i18n().open, casefile)"
+                      (click)="open(casefile)"
+                    >
+                      <fa-icon [icon]="icon.folder" aria-hidden="true"></fa-icon>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-light list-delete"
+                      [attr.aria-label]="label(i18n().delete, casefile)"
+                      [title]="label(i18n().delete, casefile)"
+                      (click)="delete(casefile)"
+                    >
+                      <fa-icon [icon]="icon.trash" aria-hidden="true"></fa-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 col-md-4 col-lg-3 col-xl-4 list-contacts">
+                    @if (casefile.company?.phone) {
+                      <a [href]="'tel:' + casefile.company.phone">{{ casefile.company.phone }}</a>
+                    }
+                    @if (casefile.company?.phone && casefile.company?.email) {
+                      ,
+                    }
+                    @if (casefile.company?.email) {
+                      <a [href]="'mailto:' + casefile.company.email">{{
+                        casefile.company.email
+                      }}</a>
+                    }
+                  </div>
+                  <div
+                    class="col-12 col-md-8 col-lg-5 card-description text-muted clickable"
+                    (click)="open(casefile)"
+                  >
+                    {{ casefile.description }}
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  } @else {
+    <dd-no-data [text]="i18n().noData"></dd-no-data>
+  }
+</div>
