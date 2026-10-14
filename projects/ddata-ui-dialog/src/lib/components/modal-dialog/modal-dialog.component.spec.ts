@@ -7,12 +7,15 @@ import {
   EventEmitter,
   NO_ERRORS_SCHEMA
 } from '@angular/core';
+import { NgFor } from '@angular/common';
+import { By } from '@angular/platform-browser';
 import { Observable, of } from 'rxjs';
 import { BaseModel } from '@netdjw/ddata-core';
 import { DdataUiNoDataComponent } from '@netdjw/ddata-ui-common';
 
 import { DdataUiModalDialogComponent } from './modal-dialog.component';
 import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';
+import { DdataUiDialogModule } from '../../ddata-ui-dialog.module';
 
 // Mock component for testing
 @Component({
@@ -605,6 +608,317 @@ describe('DdataUiModalDialogComponent', () => {
       expect(component.success.emit).toHaveBeenCalledTimes(1);
       expect(component.success.emit).toHaveBeenCalledWith(testModels);
       expect(component.close).toHaveBeenCalled();
+    });
+  });
+});
+
+// Content components rendered for real into the dialog host.
+@Component({
+  selector: 'dd-test-edit-content',
+  template: '<p class="edit-content">{{ model?.name }}</p>'
+})
+class TestEditContentComponent {
+  data: any;
+  model: any;
+  isModal = false;
+  readonly saveModel = new EventEmitter<any>();
+}
+
+@Component({
+  selector: 'dd-test-list-content',
+  template: '<ul class="list-content"><li *ngFor="let item of models">{{ item.name }}</li></ul>',
+  imports: [NgFor]
+})
+class TestListContentComponent {
+  data: any;
+  isModal = false;
+  multipleSelectEnabled: any;
+  isSelectionList: any;
+  loadData: any;
+  filter: any;
+  models: Array<any> = [];
+  selectedElements: Array<any> = [];
+  readonly select = new EventEmitter<any>();
+}
+
+@Component({
+  selector: 'dd-test-host',
+  imports: [DdataUiDialogModule],
+  template: `<dd-modal-dialog
+    [title]="title"
+    [dialogContent]="content"
+    [showDialog]="show"
+    [overlayClickCloseDialog]="overlayClose"
+    (success)="successes.push($event)"
+    (fail)="fails.push($event)"
+  ></dd-modal-dialog>`
+})
+class TestHostComponent {
+  title = 'Edit item';
+  content: DialogContentItem = new DialogContentItem(TestEditContentComponent, {
+    model: { name: 'Initial' }
+  });
+
+  show = false;
+  overlayClose = true;
+  successes: Array<any> = [];
+  fails: Array<string> = [];
+}
+
+describe('DdataUiModalDialogComponent rendered in a host', () => {
+  let hostFixture: ComponentFixture<TestHostComponent>;
+  let host: TestHostComponent;
+  let element: HTMLElement;
+  let dialog: DdataUiModalDialogComponent;
+  const render = (changes: Partial<TestHostComponent> = {}): void => {
+    Object.assign(host, changes);
+    // the host is OnPush (the default): mark it dirty like an event handler or signal would
+    hostFixture.debugElement.injector.get(ChangeDetectorRef).markForCheck();
+    hostFixture.detectChanges();
+  };
+  const query = (selector: string): HTMLElement | null => element.querySelector(selector);
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [TestHostComponent]
+    });
+
+    hostFixture = TestBed.createComponent(TestHostComponent);
+    host = hostFixture.componentInstance;
+    element = hostFixture.nativeElement;
+    hostFixture.detectChanges();
+    dialog = hostFixture.debugElement.query(
+      By.directive(DdataUiModalDialogComponent)
+    ).componentInstance;
+  });
+
+  it('should emit fail("close") once for the initial hidden binding (current behaviour)', () => {
+    expect(host.fails).toEqual(['close']);
+    expect(host.successes).toEqual([]);
+  });
+
+  describe('after the initial render', () => {
+    beforeEach(() => {
+      host.fails = [];
+    });
+
+    it('should render nothing while hidden', () => {
+      expect(query('.modal')).toBeNull();
+      expect(query('.modal-overlay').classList.contains('active')).toBe(false);
+    });
+
+    it('should render the dialog content component when shown', () => {
+      render({ show: true });
+
+      expect(query('.modal-title').textContent.trim()).toBe('Edit item');
+      expect(query('.modal-overlay').classList.contains('active')).toBe(true);
+      expect(query('.modal-body .edit-content').textContent.trim()).toBe('Initial');
+    });
+
+    it('should render the content when the dialog is open from the first render', () => {
+      hostFixture = TestBed.createComponent(TestHostComponent);
+      hostFixture.componentInstance.show = true;
+      hostFixture.detectChanges();
+
+      expect(
+        hostFixture.nativeElement.querySelector('.modal-body .edit-content').textContent.trim()
+      ).toBe('Initial');
+    });
+
+    it('should pass data, model and modal flag to the content component', () => {
+      const model = { name: 'Passed model' };
+      const data = { model, extra: 42 };
+
+      render({ content: new DialogContentItem(TestEditContentComponent, data), show: true });
+      const instance = dialog.componentRef.instance as TestEditContentComponent;
+
+      expect(instance).toBeInstanceOf(TestEditContentComponent);
+      expect(instance.data).toBe(data);
+      expect(instance.model).toBe(model);
+      expect(instance.isModal).toBe(true);
+    });
+
+    it('should pass list settings, preloaded models and a copy of selected elements', () => {
+      const selected = [{ id: 1, name: 'First' }];
+      const models = [
+        { id: 1, name: 'First' },
+        { id: 2, name: 'Second' }
+      ];
+
+      render({
+        content: new DialogContentItem(TestListContentComponent, {
+          multipleSelectEnabled: true,
+          isSelectionList: true,
+          loadData: false,
+          filter: { active: true },
+          models,
+          selectedElements: selected
+        }),
+        show: true
+      });
+      const instance = dialog.componentRef.instance as TestListContentComponent;
+
+      hostFixture.detectChanges();
+
+      expect(instance.multipleSelectEnabled).toBe(true);
+      expect(instance.isSelectionList).toBe(true);
+      expect(instance.loadData).toBe(false);
+      expect(instance.filter).toEqual({ active: true });
+      expect(instance.models).toBe(models);
+      expect(instance.selectedElements).toEqual(selected);
+      expect(instance.selectedElements).not.toBe(selected);
+      expect(
+        Array.from(element.querySelectorAll('.list-content li')).map((li) => li.textContent)
+      ).toEqual(['First', 'Second']);
+    });
+
+    it('should not pass preloaded models when the content loads its own data', () => {
+      render({
+        content: new DialogContentItem(TestListContentComponent, {
+          loadData: true,
+          models: [{ id: 1 }]
+        }),
+        show: true
+      });
+      const instance = dialog.componentRef.instance as TestListContentComponent;
+
+      expect(instance.models).toEqual([]);
+      expect(instance.filter).toEqual({});
+    });
+
+    it('should open an empty dialog when there is no dialog content', () => {
+      render({ content: null, show: true });
+
+      expect(query('.modal')).not.toBeNull();
+      expect(query('.modal-body').children.length).toBe(0);
+    });
+
+    it('should fail loudly for a content item without a component', () => {
+      render({ content: new DialogContentItem(undefined, {}) });
+
+      expect(() => render({ show: true })).toThrow();
+    });
+
+    it('should emit success and close without fail when the content saves a model', () => {
+      render({ show: true });
+      const saved = { id: 7 };
+
+      (dialog.componentRef.instance as TestEditContentComponent).saveModel.emit(saved);
+      hostFixture.detectChanges();
+
+      expect(host.successes).toEqual([saved]);
+      expect(host.fails).toEqual([]);
+      expect(query('.modal')).toBeNull();
+    });
+
+    it('should emit success and fail("close") when the content selects a model', () => {
+      render({ content: new DialogContentItem(TestListContentComponent, {}), show: true });
+      const selected = { id: 3 };
+
+      (dialog.componentRef.instance as TestListContentComponent).select.emit(selected);
+      hostFixture.detectChanges();
+
+      expect(host.successes).toEqual([selected]);
+      expect(host.fails).toEqual(['close']);
+      expect(query('.modal')).toBeNull();
+    });
+
+    it('should emit fail("close") and remove the content on the close button', () => {
+      render({ show: true });
+
+      (query('.modal-header button') as HTMLButtonElement).click();
+      hostFixture.detectChanges();
+
+      expect(host.fails).toEqual(['close']);
+      expect(query('.modal')).toBeNull();
+      expect(query('.edit-content')).toBeNull();
+    });
+
+    it('should close silently on overlay click when overlayClickCloseDialog is on', () => {
+      render({ show: true });
+
+      query('.modal-overlay').click();
+      hostFixture.detectChanges();
+
+      expect(query('.modal')).toBeNull();
+      expect(host.fails).toEqual([]);
+    });
+
+    it('should stay open on overlay click when overlayClickCloseDialog is off', () => {
+      render({ show: true, overlayClose: false });
+
+      query('.modal-overlay').click();
+      hostFixture.detectChanges();
+
+      expect(query('.modal')).not.toBeNull();
+      expect(host.fails).toEqual([]);
+    });
+
+    it('should render a fresh content instance after close and reopen', () => {
+      render({ show: true });
+      const first = dialog.componentRef.instance;
+
+      render({ show: false });
+      expect(query('.edit-content')).toBeNull();
+
+      render({ show: true });
+
+      expect(dialog.componentRef.instance).not.toBe(first);
+      expect(element.querySelectorAll('.edit-content').length).toBe(1);
+    });
+
+    it('should stop forwarding events of a closed content component', () => {
+      render({ show: true });
+      const first = dialog.componentRef.instance as TestEditContentComponent;
+
+      render({ show: false });
+      first.saveModel.emit({ id: 1 });
+
+      expect(host.successes).toEqual([]);
+    });
+
+    it('should show several different dialogs in a row', () => {
+      render({ show: true });
+      render({ show: false });
+
+      render({
+        title: 'Pick one',
+        content: new DialogContentItem(TestListContentComponent, {
+          loadData: false,
+          models: [{ name: 'Only' }]
+        }),
+        show: true
+      });
+      hostFixture.detectChanges();
+
+      expect(query('.modal-title').textContent.trim()).toBe('Pick one');
+      expect(query('.edit-content')).toBeNull();
+      expect(query('.list-content li').textContent).toBe('Only');
+
+      (dialog.componentRef.instance as TestListContentComponent).select.emit({ name: 'Only' });
+      render({ show: false });
+      render({ title: 'Edit again', content: host.content, show: true });
+
+      expect(host.successes).toEqual([{ name: 'Only' }]);
+      expect(query('.modal-title').textContent.trim()).toBe('Edit again');
+    });
+  });
+
+  describe('accessibility', () => {
+    it('should expose the dialog as a modal labelled by its title', () => {
+      render({ show: true });
+      const dialogElement = query('[role="dialog"]');
+      const labelId = dialogElement.getAttribute('aria-labelledby');
+
+      expect(dialogElement.getAttribute('aria-modal')).toBe('true');
+      expect(labelId).toBe(dialog.titleId);
+      expect(element.querySelector(`#${labelId}`).textContent.trim()).toBe('Edit item');
+    });
+
+    it('should label the icon-only close button', () => {
+      render({ show: true });
+
+      expect(query('.modal-header button').getAttribute('aria-label')).toBe('Close');
     });
   });
 });

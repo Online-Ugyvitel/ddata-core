@@ -23,6 +23,7 @@ import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogContentItem } from '../../models/dialog/content/dialog-content-item';
 import { DialogContentInterface } from '../../models/dialog/content/dialog-content.interface';
+let nextModalDialogId = 0;
 
 @Component({
   selector: 'dd-modal-dialog',
@@ -58,6 +59,8 @@ export class DdataUiModalDialogComponent {
   componentSubscription!: Subscription;
 
   componentRef!: ComponentRef<any>;
+
+  readonly titleId = `dd-modal-dialog-title-${nextModalDialogId++}`;
   icon = {
     close: faTimes
   };

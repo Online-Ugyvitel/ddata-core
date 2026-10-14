@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { faExclamationTriangle, faInfoCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { DialogType } from '../../models/dialog/dialog.interface';
+let nextConfirmDialogId = 0;
 
 @Component({
   selector: 'dd-confirm-dialog',
@@ -24,6 +25,8 @@ export class DdataUiConfirmDialogComponent {
 
   confirmed = false;
 
+  readonly titleId = `dd-confirm-dialog-title-${nextConfirmDialogId++}`;
+
   icon = {
     close: faTimes,
     info: faInfoCircle,
@@ -36,6 +39,12 @@ export class DdataUiConfirmDialogComponent {
   }
 
   confirmModal(): void {
+    // A closed dialog cannot be confirmed: this ignores the second click of a fast double click,
+    // which arrives before change detection has removed the button.
+    if (!this.showDialog) {
+      return;
+    }
+
     this.pressed.emit(true);
     this.showDialog = false;
     this.confirm.emit();

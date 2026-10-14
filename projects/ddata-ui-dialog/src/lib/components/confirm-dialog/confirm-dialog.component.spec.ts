@@ -153,6 +153,7 @@ describe('DdataUiConfirmDialogComponent', () => {
 
   describe('confirmModal method', () => {
     it('should emit pressed event with true', () => {
+      component.showDialog = true;
       vi.spyOn(component.pressed, 'emit').mockReturnValue(undefined);
       component.confirmModal();
 
@@ -167,6 +168,7 @@ describe('DdataUiConfirmDialogComponent', () => {
     });
 
     it('should emit confirm event', () => {
+      component.showDialog = true;
       vi.spyOn(component.confirm, 'emit').mockReturnValue(undefined);
       component.confirmModal();
 
@@ -299,6 +301,217 @@ describe('DdataUiConfirmDialogComponent', () => {
 
       expect(component.showDialog).toBe(true);
       expect(component.pressed.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('rendered dialog', () => {
+    const open = (inputs: Record<string, unknown> = {}): void => {
+      Object.entries({ showDialog: true, ...inputs }).forEach(([key, value]) =>
+        fixture.componentRef.setInput(key, value)
+      );
+      fixture.detectChanges();
+    };
+    const query = (selector: string): HTMLElement | null => element.querySelector(selector);
+    const footerButtons = (): Array<HTMLButtonElement> =>
+      Array.from(element.querySelectorAll('.modal-footer button'));
+    const overlay = (): HTMLElement => query('.modal-overlay');
+
+    it('should not render the dialog and keep the overlay inactive while hidden', () => {
+      expect(query('.modal')).toBeNull();
+      expect(overlay().classList.contains('active')).toBe(false);
+    });
+
+    it('should render title, content and activate the overlay when shown', () => {
+      open({ title: 'Delete item', content: 'Are you sure?' });
+
+      expect(query('.modal-title').textContent.trim()).toBe('Delete item');
+      expect(query('.content-container p').textContent.trim()).toBe('Are you sure?');
+      expect(overlay().classList.contains('active')).toBe(true);
+    });
+
+    it('should render custom button labels', () => {
+      open({ successButtonText: 'Yes', cancelButtonText: 'No', closeButtonText: 'Dismiss' });
+      const [confirmButton, cancelButton] = footerButtons();
+
+      expect(confirmButton.textContent.trim()).toBe('Yes');
+      expect(cancelButton.textContent.trim()).toBe('No');
+      expect(query('.modal-header button').getAttribute('aria-label')).toBe('Dismiss');
+    });
+
+    describe('type', () => {
+      it.each([
+        ['message', 'text-primary', 'btn-primary', true],
+        ['warning', 'text-primary', 'btn-primary', false],
+        ['delete', 'text-danger', 'btn-danger', true]
+      ])(
+        'should style a "%s" dialog with %s / %s and show the icon: %s',
+        (type, iconClass, buttonClass, hasIcon) => {
+          open({ type });
+          const iconContainer = query('.icon-container');
+          const [confirmButton, cancelButton] = footerButtons();
+
+          expect(iconContainer.classList.contains(iconClass)).toBe(true);
+          expect(confirmButton.classList.contains(buttonClass)).toBe(true);
+          expect(!!iconContainer.querySelector('fa-icon')).toBe(hasIcon);
+          expect(cancelButton.textContent.trim()).toBe('Cancel');
+        }
+      );
+
+      it('should render only the confirm button without styling for an unknown type', () => {
+        open({ type: 'custom' });
+        const buttons = footerButtons();
+        const iconContainer = query('.icon-container');
+
+        expect(buttons.length).toBe(1);
+        expect(buttons[0].className.trim()).toBe('btn');
+        expect(iconContainer.classList.contains('text-primary')).toBe(false);
+        expect(iconContainer.classList.contains('text-danger')).toBe(false);
+        expect(iconContainer.querySelector('fa-icon')).toBeNull();
+      });
+
+      it.each([
+        ['delete', 'alert'],
+        ['message', 'info']
+      ])('should render the %s dialog with the %s icon', (type, icon) => {
+        open({ type });
+        const svg = query('.icon-container fa-icon svg');
+
+        expect(svg.getAttribute('data-icon')).toBe(component.icon[icon].iconName);
+      });
+    });
+
+    it('should emit confirm once and close when the confirm button is clicked', () => {
+      const confirmSpy = vi.fn();
+      const pressedSpy = vi.fn();
+
+      component.confirm.subscribe(confirmSpy);
+      component.pressed.subscribe(pressedSpy);
+      open();
+
+      footerButtons()[0].click();
+      fixture.detectChanges();
+
+      expect(confirmSpy).toHaveBeenCalledTimes(1);
+      expect(pressedSpy).toHaveBeenCalledExactlyOnceWith(true);
+      expect(query('.modal')).toBeNull();
+    });
+
+    it('should emit confirm only once on a fast double click', () => {
+      const confirmSpy = vi.fn();
+      const pressedSpy = vi.fn();
+
+      component.confirm.subscribe(confirmSpy);
+      component.pressed.subscribe(pressedSpy);
+      open();
+      const confirmButton = footerButtons()[0];
+
+      // both clicks land before change detection removes the button
+      confirmButton.click();
+      confirmButton.click();
+      fixture.detectChanges();
+
+      expect(confirmSpy).toHaveBeenCalledTimes(1);
+      expect(pressedSpy).toHaveBeenCalledExactlyOnceWith(true);
+    });
+
+    it('should not emit confirm when confirmModal is called on a closed dialog', () => {
+      const confirmSpy = vi.fn();
+      const pressedSpy = vi.fn();
+
+      component.confirm.subscribe(confirmSpy);
+      component.pressed.subscribe(pressedSpy);
+
+      component.confirmModal();
+
+      expect(confirmSpy).not.toHaveBeenCalled();
+      expect(pressedSpy).not.toHaveBeenCalled();
+    });
+
+    it('should confirm again after the dialog is reopened', () => {
+      const confirmSpy = vi.fn();
+
+      component.confirm.subscribe(confirmSpy);
+      open();
+      footerButtons()[0].click();
+      fixture.detectChanges();
+
+      // the parent resets its one-way binding (e.g. on `pressed`) and opens the dialog again
+      fixture.componentRef.setInput('showDialog', false);
+      open();
+      footerButtons()[0].click();
+      fixture.detectChanges();
+
+      expect(confirmSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it.each([
+      ['cancel button', '.modal-footer .btn-secondary'],
+      ['header close button', '.modal-header button']
+    ])('should emit pressed(false) without confirm and close on the %s', (_name, selector) => {
+      const confirmSpy = vi.fn();
+      const pressedSpy = vi.fn();
+
+      component.confirm.subscribe(confirmSpy);
+      component.pressed.subscribe(pressedSpy);
+      open();
+
+      query(selector).click();
+      fixture.detectChanges();
+
+      expect(pressedSpy).toHaveBeenCalledExactlyOnceWith(false);
+      expect(confirmSpy).not.toHaveBeenCalled();
+      expect(query('.modal')).toBeNull();
+      expect(overlay().classList.contains('active')).toBe(false);
+    });
+
+    it('should close on overlay click when overlayClickCloseDialog is on', () => {
+      const pressedSpy = vi.fn();
+
+      component.pressed.subscribe(pressedSpy);
+      open({ overlayClickCloseDialog: true });
+
+      overlay().click();
+      fixture.detectChanges();
+
+      expect(pressedSpy).toHaveBeenCalledExactlyOnceWith(false);
+      expect(query('.modal')).toBeNull();
+    });
+
+    it('should stay open on overlay click when overlayClickCloseDialog is off', () => {
+      const pressedSpy = vi.fn();
+
+      component.pressed.subscribe(pressedSpy);
+      open({ overlayClickCloseDialog: false });
+
+      overlay().click();
+      fixture.detectChanges();
+
+      expect(pressedSpy).not.toHaveBeenCalled();
+      expect(query('.modal')).not.toBeNull();
+    });
+
+    describe('accessibility', () => {
+      it('should expose the dialog as a modal labelled by its title', () => {
+        open({ title: 'Confirm action' });
+        const dialog = query('[role="dialog"]');
+        const labelId = dialog.getAttribute('aria-labelledby');
+
+        expect(dialog.getAttribute('aria-modal')).toBe('true');
+        expect(labelId).toBe(component.titleId);
+        expect(element.querySelector(`#${labelId}`).textContent.trim()).toBe('Confirm action');
+      });
+
+      it('should give every dialog instance a unique title id', () => {
+        const other = TestBed.createComponent(DdataUiConfirmDialogComponent).componentInstance;
+
+        expect(other.titleId).not.toBe(component.titleId);
+      });
+
+      it('should label the icon-only close button', () => {
+        open();
+
+        expect(query('.modal-header button').getAttribute('aria-label')).toBe('Close');
+      });
     });
   });
 });
