@@ -85,6 +85,22 @@ and time picker if you need.
 - [Textarea Component](src/doc/textarea-component)
 - [Time Component](src/doc/time-component)
 
+## Password strength-o-meter with the Pwned Passwords check
+
+`dd-password-strength-o-meter` checks the password online in the
+[Have I Been Pwned – Pwned Passwords](https://haveibeenpwned.com/API/v3#PwnedPasswords) database
+by default. Only the first 5 characters of the locally calculated SHA-1 hash are sent, the password
+never leaves the browser, and no backend, proxy or API key is needed. A pwned password is rated
+0% / weak with a warning (`pwnedText`); when the check is unavailable, the local rating stays and
+`pwnedUnavailableText` is shown. Turn it off with `[checkPwnedPasswords]="false"`:
+
+```html
+<dd-password-strength-o-meter [password]="password" />
+<dd-password-strength-o-meter [password]="password" [checkPwnedPasswords]="false" />
+```
+
+See the [component documentation](src/doc/password-strength-o-meter-component.md) for the details.
+
 ## Custom rendering of selected items
 
 In `mode="multiple"` the selected items are shown as tags by default. Pass an
