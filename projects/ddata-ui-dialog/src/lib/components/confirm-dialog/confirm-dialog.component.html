@@ -2,14 +2,23 @@
 <div class="modal-overlay" [class.active]="showDialog" (click)="clickOnOverlay()"></div>
 
 <!-- dialog -->
-<div *ngIf="showDialog" class="modal" tabindex="-1" role="dialog">
+<div
+  *ngIf="showDialog"
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-labelledby]="titleId"
+  (click)="clickOnBackdrop($event)"
+  #dialogElement
+>
   <div class="modal-dialog modal-dialog-centered modal-md" role="document">
     <div class="modal-content">
       <!-- header -->
       <div class="modal-header">
         <!-- title -->
         <div class="col-10 text-start">
-          <h5 class="modal-title">{{ title }}</h5>
+          <h5 class="modal-title" [id]="titleId">{{ title }}</h5>
         </div>
 
         <!-- close button -->
