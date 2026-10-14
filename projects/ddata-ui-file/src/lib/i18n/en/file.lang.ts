@@ -79,3 +79,57 @@ export const no_data_text: FieldInterface = {
   title: 'file',
   placeholder: 'file'
 };
+
+export const choose_files: FieldInterface = {
+  label: 'Choose the files!',
+  title: 'Choose the files!',
+  placeholder: 'Choose the files!'
+};
+
+export const select_files: FieldInterface = {
+  label: 'Select files',
+  title: 'Select files',
+  placeholder: 'Select files'
+};
+
+export const step_1: FieldInterface = {
+  label: 'Step 1',
+  title: 'Step 1',
+  placeholder: 'Step 1'
+};
+
+export const step_2: FieldInterface = {
+  label: 'Step 2',
+  title: 'Step 2',
+  placeholder: 'Step 2'
+};
+
+export const start_upload: FieldInterface = {
+  label: 'Start the upload!',
+  title: 'Start the upload!',
+  placeholder: 'Start the upload!'
+};
+
+export const upload: FieldInterface = {
+  label: 'Upload',
+  title: 'Upload',
+  placeholder: 'Upload'
+};
+
+export const file_size: FieldInterface = {
+  label: 'Size',
+  title: 'Size',
+  placeholder: 'Size'
+};
+
+export const delete_from_list: FieldInterface = {
+  label: 'Remove from the list',
+  title: 'Remove from the list',
+  placeholder: 'Remove from the list'
+};
+
+export const upload_failed: FieldInterface = {
+  label: 'The upload failed, please try again.',
+  title: 'The upload failed, please try again.',
+  placeholder: 'The upload failed, please try again.'
+};

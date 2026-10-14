@@ -344,10 +344,10 @@
               "json-summary"
             ],
             "coverageThresholds": {
-              "statements": 59,
-              "branches": 62,
-              "functions": 60,
-              "lines": 57
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
             }
           }
         },

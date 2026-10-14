@@ -23,9 +23,8 @@
                 name="fileselector"
                 id="files"
                 [accept]="accpetedTypes"
-                [(ngModel)]="files"
                 #fileInput
-                (change)="onSelectFile($event.target.files)"
+                (change)="onSelectFile(fileInput.files); fileInput.value = ''"
                 class="form-control"
               />
             </div>
@@ -36,12 +35,12 @@
         <div class="col-12 col-sm-6 p-1">
           <div class="card">
             <div class="card-body p-4 bg-light text-body text-center">
-              <h5>{{ i18n.step_1.label }}</h5>
+              <h5>{{ i18n.step_2.label }}</h5>
               <p>{{ i18n.start_upload.label }}</p>
               <button
                 class="btn btn-secondary"
                 (click)="startUploadAll()"
-                [disabled]="urls.length === 0"
+                [disabled]="fileData.length === 0 || isUploading"
               >
                 <fa-icon [icon]="icon.upload"></fa-icon>
                 {{ i18n.upload.label }}
@@ -51,10 +50,13 @@
         </div>
       </div>
 
+      <div class="row" *ngIf="hasUploadError">
+        <div class="col-12 py-2 text-danger upload-error">{{ i18n.upload_failed.label }}</div>
+      </div>
+
       <!-- selected image container -->
       <div class="row">
         <div class="col-12 py-2 border-bottom" *ngFor="let dat of fileData; let i = index">
-          <!-- <div class="col-12 py-2 border-bottom" *ngFor="let url of urls; let i = index"> -->
           <div class="row">
             <div class="col-12 col-sm-2" *ngIf="isImage[i]">
               <img
@@ -67,7 +69,7 @@
               class="col-12 col-sm-2 text-muted d-flex justify-content-center align-items-center"
               *ngIf="!isImage[i]"
             >
-              <fa-icon [icon]="fileTypes[i]" size="3x"></fa-icon>
+              <fa-icon [icon]="fileIcons[i]" size="3x"></fa-icon>
             </div>
 
             <div class="col-12 col-sm-8">
@@ -75,11 +77,16 @@
                 <h6>{{ fileData[i].name }}</h6>
               </div>
               <div class="col-12 text-muted">
-                {{ i18n.file_size.label }}: {{ fileData[i].size | filesize: 'mb' : '2' }} MB
+                {{ i18n.file_size.label }}: {{ fileData[i].size | filesize: 'mb' : 2 }} MB
               </div>
-              <!-- <div class="col-12" style="max-width: 300px;" *ngIf="progress[fileData[i].name].percent !== 100">
-                <app-progressbar [max]="100" [current]="progress[fileData[i].name].percent"></app-progressbar>
-              </div> -->
+              <div
+                class="col-12 text-muted upload-percent"
+                *ngIf="
+                  progress[fileData[i].name].percent > 0 && progress[fileData[i].name].percent < 100
+                "
+              >
+                {{ progress[fileData[i].name].percent }}%
+              </div>
               <div class="col-12 text-success" *ngIf="progress[fileData[i].name].percent === 100">
                 <fa-icon [icon]="icon.check"></fa-icon>
               </div>

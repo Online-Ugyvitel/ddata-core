@@ -17,7 +17,7 @@ import { FileModelInterface, FileModelUIFieldsInterface } from './file-model.int
 
 export class FileModel extends BaseModel implements FileModelInterface {
   @Inject('config') private readonly config: unknown;
-  readonly api_endpoint = '/file/';
+  readonly api_endpoint = '/file';
   readonly model_name = 'FileModel';
   order: number; // only UI field
   id: ID;
@@ -55,31 +55,13 @@ export class FileModel extends BaseModel implements FileModelInterface {
     // Allow raw primitives in tests and coerce to branded types
     this.id = d.id ?? (0 as ID);
 
-    if (this.id === (undefined as unknown as ID) || this.id === (null as unknown as ID)) {
-      this.id = 0 as ID;
-    }
-
     this.folder_id = d.folder_id ?? (0 as ID);
-
-    if (
-      this.folder_id === (undefined as unknown as ID) ||
-      this.folder_id === (null as unknown as ID)
-    ) {
-      this.folder_id = 0 as ID;
-    }
 
     this.name = d.name ?? ('' as FileName);
 
     this.file_name_and_path = d.file_name_and_path ?? ('' as FileNameWithPath);
     this.file_name_slug = d.file_name_slug ?? ('' as FileNameSlug);
     this.size = d.size ?? (0 as FileSizeInByte);
-
-    if (
-      (this.size as unknown as number) === undefined ||
-      (this.size as unknown as number) === null
-    ) {
-      this.size = 0 as FileSizeInByte;
-    }
 
     this.mimetype = d.mimetype ?? ('' as MimeType);
 

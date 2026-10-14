@@ -7,7 +7,9 @@
   "peerDependencies": {
     "@angular/common": ">=22.1.1 <23",
     "@angular/core": ">=22.1.1 <23",
-    "@netdjw/ddata-core": "^0.3.17"
+    "@netdjw/ddata-core": "^0.3.17",
+    "@netdjw/ddata-ui-common": "^0.1.20",
+    "@netdjw/ddata-ui-dialog": "^0.1.22"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.14.0",

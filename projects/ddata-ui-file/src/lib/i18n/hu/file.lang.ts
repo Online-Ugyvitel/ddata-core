@@ -133,3 +133,9 @@ export const delete_from_list: FieldInterface = {
   title: 'Törlés a listából',
   placeholder: 'Törlés a listából'
 };
+
+export const upload_failed: FieldInterface = {
+  label: 'A feltöltés nem sikerült, kérjük, próbálja újra.',
+  title: 'A feltöltés nem sikerült, kérjük, próbálja újra.',
+  placeholder: 'A feltöltés nem sikerült, kérjük, próbálja újra.'
+};

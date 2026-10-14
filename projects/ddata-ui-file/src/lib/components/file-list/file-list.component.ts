@@ -1,6 +1,6 @@
-import { Component, Inject, Input, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, Input, Optional } from '@angular/core';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { DialogContentItem } from '@netdjw/ddata-ui-input';
+import { DialogContentItem } from '@netdjw/ddata-ui-dialog';
 import { fileText } from '../../i18n/file.lang';
 import { FileModelInterface } from '../../models/file/file-model.interface';
 import { Global } from '../../models/global.model';
@@ -21,15 +21,15 @@ interface HasFileModelInterface {
   standalone: false
 })
 export class DdataUiFileListComponent {
-  @Inject('config') private readonly config: ModuleConfigurationInterface = { lang: 'en' };
-
   @Input() model: HasFileModelInterface = { files: [] };
   @Input() showNoData = true;
 
   private readonly helper: FileAndFolderHelperServiceInterface = new FileAndFolderHelperService();
 
+  private readonly config: ModuleConfigurationInterface;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  i18n: Record<string, any> = fileText[this.config.lang];
+  i18n: Record<string, any>;
   fileUploadDialogContent: DialogContentItem = new DialogContentItem(
     DdataUiFileUploadComponent,
     {}
@@ -39,11 +39,18 @@ export class DdataUiFileListComponent {
   icon = new Global().icon;
   token = localStorage.getItem('token');
 
+  constructor(@Optional() @Inject('config') config?: ModuleConfigurationInterface | null) {
+    this.config = config ?? { lang: 'en' };
+    this.i18n = fileText[this.config.lang];
+  }
+
   delete(file: FileModelInterface): void {
-    this.model.files.splice(
-      this.model.files.findIndex((obj) => obj === file),
-      1
-    );
+    const index = this.model.files.indexOf(file);
+
+    // splice(-1, 1) would remove the last file
+    if (index > -1) {
+      this.model.files.splice(index, 1);
+    }
   }
 
   fileuploadSuccess(files: Array<FileModelInterface>): void {
