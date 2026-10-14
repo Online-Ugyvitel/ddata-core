@@ -16,7 +16,7 @@ HTML
   title="My awesome dialog title"
   [model]="model"
   [dialogContent]="dialogContent"
-  [showDialog]="showDialog"
+  [(showDialog)]="showDialog"
   [overlayClickCloseDialog]="false"
   closeButtonText="Close"
   (success)="save()"
@@ -67,14 +67,15 @@ export class AwesomeComponent implements OnInit {
 | `title`                   | `string`                                  | empty string                                        | Title of the dialog.                                                                       |
 | `model`                   | `BaseModelWithoutTypeDefinitionInterface` | `new BaseModel()`                                   | Model of the dialog.                                                                     |
 | `dialogContent`           | `DialogContentItem`                       | `new DialogContentItem(DdataUiNoDataComponent, {})` | Dialog type. Can be `message`, `delete`, `warning` or any other string.                    |
-| `showDialog`              | `false`                                   | `false`                                             | Dialog is visible or not.                                                                  |
+| `showDialog`              | `boolean`                                 | `false`                                             | Dialog is visible or not. Supports two-way binding: `[(showDialog)]`. Setting `false` on a dialog that is not open does nothing (no `fail` event). |
 | `overlayClickCloseDialog` | `boolean`                                 | `true`                                              | The ovrelay div is clickable or not. If clickable it cause a `pressed` event with `false`. |
 | `closeButtonText`         | `string`                                  | `Close`                                             | Title text of the close button.                                                            |
 
 | Output    | Type                    | Description                                                                                                                                      |
 |-----------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | `success` | `EventEmitter<BaseModelWithoutTypeDefinitionInterface>`     | Emit when user clicks on the success button (OK, Yes, Agree, Allow, etc.) in your component.                                                                       |
-| `fail` | `EventEmitter<string>` | Emit when user clicks on any button. The emitted value is depends on user clicked on success button (value is `true`) or not (value is `false`). |
+| `fail` | `EventEmitter<string>` | Emits `'close'` when an open dialog is closed with the close button, the Escape key, a `select` of the content or by the parent setting `showDialog` to `false`. |
+| `showDialogChange` | `EventEmitter<boolean>` | Emits `false` whenever an open dialog closes, so `[(showDialog)]` keeps the parent's value in sync and setting it to `true` again reopens the dialog. |
 
 
 
@@ -109,7 +110,7 @@ HTML
   successButtonText="Delete"
   cancelButtonText="Cancel"
   closeButtonText="Close"
-  [isModalVisible]="showDeleteDialog"
+  [(showDialog)]="showDeleteDialog"
   [overlayClickCloseDialog]="false"
   (confirm)="deleteIsConfirmed()"
   (pressed)="buttonPressedOnDialog($event)"
@@ -151,7 +152,7 @@ export class AwesomeComponent implements OnInit {
 | `title`                   | `string`     | empty string | Title of the dialog.                                                                       |
 | `content`                 | `string`     | empty string | Content of the dialog.                                                                     |
 | `type`                    | `DialogType` | `message`    | Dialog type. Can be `message`, `delete`, `warning` or any other string.                    |
-| `showDialog`              | `boolean`    | `false`      | Dialog is visible or not.                                                                  |
+| `showDialog`              | `boolean`    | `false`      | Dialog is visible or not. Supports two-way binding: `[(showDialog)]`.                      |
 | `overlayClickCloseDialog` | `boolean`    | `true`       | The ovrelay div is clickable or not. If clickable it cause a `pressed` event with `false`. |
 | `successButtonText`       | `string`     | `OK`         | Text on the success button.                                                                |
 | `cancelButtonText`        | `string`     | `Cancel`     | Text on the cancel button.                                                                 |
@@ -161,3 +162,13 @@ export class AwesomeComponent implements OnInit {
 |-----------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | `confirm` | `EventEmitter<any>`     | Emit when user clicks on the success button (OK, Yes, Agree, Allow, etc.)                                                                        |
 | `pressed` | `EventEmitter<boolean>` | Emit when user clicks on any button. The emitted value is depends on user clicked on success button (value is `true`) or not (value is `false`). |
+| `showDialogChange` | `EventEmitter<boolean>` | Emits `false` whenever the dialog closes itself (confirm, cancel, close button, Escape, overlay click). With a one-way `[showDialog]` binding the parent has to reset its own value (e.g. on `pressed`) before it can open the dialog again; `[(showDialog)]` does this automatically. |
+
+## Keyboard, focus and accessibility
+
+Both dialogs:
+
+- are rendered with `role="dialog"`, `aria-modal="true"` and `aria-labelledby` pointing at the title,
+- move the focus to their first focusable element (or the dialog itself) when they open, keep `Tab` / `Shift+Tab` inside the dialog while open, and give the focus back to the previously focused element when they close,
+- close on `Escape` (the confirm dialog like its cancel button, the modal dialog like its close button). Only the topmost open dialog reacts; closed dialogs ignore the key,
+- close on a click outside the dialog box when `overlayClickCloseDialog` is `true`.

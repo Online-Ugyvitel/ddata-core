@@ -84,4 +84,9 @@ describe('DescriptionPipe', () => {
       'Contact info <a href="tel:+36123456789" class="mr-3">+36123456789</a> <a href="mailto:user@domain.com" class="mr-3">user@domain.com</a> <a href="https://example.com" class="mr-3" target="_blank">https://example.com</a> <span class="description">Main office</span> '
     );
   });
+
+  it('should keep a colon that is not part of a known prefix', () => {
+    expect(pipe.transform('phone:123')).toBe('phone:123 ');
+    expect(pipe.transform(' tel:123')).toBe(' tel:123 ');
+  });
 });

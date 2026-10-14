@@ -33,7 +33,11 @@ export class DdataUiUserThumbnailComponent {
     }
 
     this.internalUser = userValue;
-    this.firstLetter = (userValue.name ?? '').charAt(0).toUpperCase();
+    // NFC merges a decomposed accent into its letter and Array.from splits by code point,
+    // so neither an accented letter nor an emoji is cut in half
+    const [firstCharacter = ''] = Array.from((userValue.name ?? '').normalize('NFC'));
+
+    this.firstLetter = firstCharacter.toUpperCase();
     this.imageSrc = !!userValue.image && !!userValue.image.src ? userValue.image.src : '';
   }
 

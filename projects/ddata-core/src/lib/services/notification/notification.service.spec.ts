@@ -29,7 +29,6 @@ describe('NotificationService', () => {
   });
 
   it('should be created and expose an observable', () => {
-    expect(service).toBeTruthy();
     expect(typeof service.watch().subscribe).toBe('function');
   });
 

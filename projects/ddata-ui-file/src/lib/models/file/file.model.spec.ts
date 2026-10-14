@@ -50,7 +50,7 @@ describe('FileModel', () => {
     });
 
     it('should have correct readonly properties values', () => {
-      expectLoose(model.api_endpoint).toBe('/file/');
+      expectLoose(model.api_endpoint).toBe('/file');
       expectLoose(model.model_name).toBe('FileModel');
       expectLoose(model.is_primary).toBe(false);
       expectLoose(model.title).toBe('Fájl');

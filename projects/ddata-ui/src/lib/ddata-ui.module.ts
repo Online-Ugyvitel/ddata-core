@@ -11,10 +11,7 @@ import { DdataUiDialogModule } from '@netdjw/ddata-ui-dialog';
 import { ModuleConfigurationInterface } from './models/module-configuration/module-configuration.interface';
 
 // components
-import { AutocompleteBoxComponent } from './components/input-extensions/autocomplete/autocomplete-box.component';
 import { CharacterCounterComponent } from './components/input-extensions/character-counter/character-counter.component';
-import { MultilanguageNameComponent } from './components/input-extensions/multilanguage-name/multilanguage-name.component';
-import { PasswordStrengthOMeterComponent } from './components/input-extensions/password-strength-o-meter/password-strength-o-meter.component';
 import { XlsButtonExportComponent } from './components/list-extensions/download-buttons/xls-button-export.component';
 import { ListButtonsComponent } from './components/list-extensions/list-buttons/list-buttons.component';
 import { ListDropdownDeleteConfirmComponent } from './components/list-extensions/list-dropdown/list-dropdown-delete-confirm/list-dropdown-delete-confirm.component';
@@ -22,10 +19,7 @@ import { ListDropdownComponent } from './components/list-extensions/list-dropdow
 import { ShowSearchParametersComponent } from './components/other/show-search-parameters/show-search-parameters.component';
 import { TabButtonComponent } from './components/other/tab-button/tab-button.component';
 const components = [
-  AutocompleteBoxComponent,
   CharacterCounterComponent,
-  MultilanguageNameComponent,
-  PasswordStrengthOMeterComponent,
   XlsButtonExportComponent,
   ListButtonsComponent,
   ListDropdownDeleteConfirmComponent,

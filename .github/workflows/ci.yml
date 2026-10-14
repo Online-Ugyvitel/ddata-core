@@ -93,27 +93,37 @@ jobs:
     - name: Test main app
       run: npm run test
 
+    # The package tests run with coverage; the thresholds in angular.json fail the step when coverage drops below them.
     - name: Test ddata-core
-      run: npx ng test ddata-core --no-watch
+      run: npx ng test ddata-core --no-watch --coverage
 
     - name: Test ddata-ui-input
-      run: npx ng test ddata-ui-input --no-watch
+      run: npx ng test ddata-ui-input --no-watch --coverage
 
     - name: Test ddata-ui-file
-      run: npx ng test ddata-ui-file --no-watch
+      run: npx ng test ddata-ui-file --no-watch --coverage
 
     - name: Test ddata-ui-dialog
-      run: npx ng test ddata-ui-dialog --no-watch
+      run: npx ng test ddata-ui-dialog --no-watch --coverage
 
     - name: Test ddata-ui-common
-      run: npx ng test ddata-ui-common --no-watch
+      run: npx ng test ddata-ui-common --no-watch --coverage
 
     - name: Test ddata-a11y
-      run: npx ng test ddata-a11y --no-watch
+      run: npx ng test ddata-a11y --no-watch --coverage
 
     - name: Test ddata-ui
       run: npx ng test ddata-ui --no-watch
 
-    # The coverage thresholds of the package are set in angular.json, the step fails below them.
-    - name: Test ddata-ui-views (with coverage)
-      run: npx ng test ddata-ui-views --no-watch
+    - name: Test ddata-ui-views
+      run: npx ng test ddata-ui-views --no-watch --coverage
+
+    # The coverage reports of every package (coverage/<package>/), also when a test step failed.
+    - name: Upload coverage reports
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: coverage/
+        if-no-files-found: warn
+        retention-days: 14

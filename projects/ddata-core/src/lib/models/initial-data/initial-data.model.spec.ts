@@ -10,7 +10,7 @@ describe('InitialData', () => {
 
   describe('Model Creation', () => {
     it('should be created', () => {
-      expect(model).toBeTruthy();
+      expect(model.loaded).toBe(true);
     });
 
     it('should be created as correct type', () => {
@@ -20,11 +20,11 @@ describe('InitialData', () => {
     it('should implement InitialDataInterface', () => {
       expect(model).toEqual(expect.any(Object));
       // Check if it has all required interface properties
-      expect(model.api_endpoint).toBeDefined();
-      expect(model.model_name).toBeDefined();
-      expect(model.loaded).toBeDefined();
+      expect(model.api_endpoint).toBe('/init');
+      expect(model.model_name).toBe('Init');
+      expect(model.loaded).toBe(true);
       expect(typeof model.data).toBe('undefined'); // data is declared but not initialized
-      expect(model.refreshTime).toBeDefined();
+      expect(model.refreshTime).toBe(5000);
     });
   });
 
@@ -50,7 +50,6 @@ describe('InitialData', () => {
       // Once we assign a value, it should work correctly
       model.data = {};
 
-      expect(model.data).toBeDefined();
       expect(typeof model.data).toBe('object');
     });
 

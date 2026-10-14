@@ -32,8 +32,7 @@ describe('BaseModel', () => {
 
   describe('Model Creation and Type', () => {
     it('should create an instance', () => {
-      expect(model).toBeTruthy();
-      expect(model instanceof BaseModel).toBe(true);
+      expect(model).toBeInstanceOf(BaseModel);
     });
 
     it('should be the correct type', () => {
@@ -774,6 +773,15 @@ describe('BaseModel', () => {
 
       expect(model['field1']).toBe('object string');
     });
+
+    it.each([null, undefined])(
+      'should use an empty string when the default is %s',
+      (defaultValue) => {
+        model.fieldAsString('field1', defaultValue, null);
+
+        expect(model['field1']).toBe('');
+      }
+    );
   });
 
   describe('initAsNumber method', () => {

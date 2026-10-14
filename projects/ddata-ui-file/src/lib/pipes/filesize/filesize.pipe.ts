@@ -6,7 +6,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FilesizePipe implements PipeTransform {
   transform(value: number, unit?: string, decimals?: number): number | null {
-    if (!value) {
+    // a template can pass the size as a string too, and a file size can not be negative or infinite
+    const numericValue = Number(value);
+
+    if (!value || !Number.isFinite(numericValue) || numericValue < 0) {
       return null;
     }
     let actualDecimals = decimals;
@@ -14,7 +17,7 @@ export class FilesizePipe implements PipeTransform {
     if (!actualDecimals || actualDecimals < 0) {
       actualDecimals = 0;
     }
-    let convertedValue = value;
+    let convertedValue = numericValue;
 
     if (unit === 'kb') {
       convertedValue = convertedValue / 1024;

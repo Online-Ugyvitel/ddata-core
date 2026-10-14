@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FieldContainerInterface } from '@netdjw/ddata-core';
-import { LangInterface, NameInterface } from '../../../models/lang/lang.interface';
+import { LangInterface, NameInterface } from '@netdjw/ddata-ui-input';
 
 interface HasFieldContainerInterface {
   fields: FieldContainerInterface<unknown>;

@@ -33,8 +33,7 @@ describe('ThirdPartyError', () => {
       const originalError = { error: 'Test error message' };
       const error = new ThirdPartyError(originalError, mockNotificationService);
 
-      expect(error).toBeTruthy();
-      expect(error instanceof ThirdPartyError).toBe(true);
+      expect(error).toBeInstanceOf(ThirdPartyError);
       expect(error instanceof DdataCoreError).toBe(true);
     });
 

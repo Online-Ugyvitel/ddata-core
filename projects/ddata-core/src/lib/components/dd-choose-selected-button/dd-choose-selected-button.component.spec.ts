@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { DebugElement, EventEmitter } from '@angular/core';
 import { DdataChooseSelectedButtonComponent } from './dd-choose-selected-button.component';
 
 describe('DdataChooseSelectedButtonComponent', () => {
@@ -32,7 +32,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeInstanceOf(DdataChooseSelectedButtonComponent);
   });
 
   describe('Input Properties', () => {
@@ -60,7 +60,6 @@ describe('DdataChooseSelectedButtonComponent', () => {
 
   describe('Output Properties', () => {
     it('should have choosed output property as EventEmitter', () => {
-      expect(component.choosed).toBeDefined();
       expect(typeof component.choosed.emit).toBe('function');
       expect(typeof component.choosed.subscribe).toBe('function');
     });
@@ -124,13 +123,12 @@ describe('DdataChooseSelectedButtonComponent', () => {
     it('should render a button element', () => {
       const buttonElement = compiled.querySelector('button');
 
-      expect(buttonElement).toBeTruthy();
+      expect(buttonElement).toBeInstanceOf(HTMLButtonElement);
     });
 
     it('should have correct CSS classes on button', () => {
       const buttonElement = compiled.querySelector('button');
 
-      expect(buttonElement).toBeTruthy();
       expect(buttonElement.classList.contains('mr-1')).toBe(true);
       expect(buttonElement.classList.contains('btn')).toBe(true);
       expect(buttonElement.classList.contains('btn-primary')).toBe(true);
@@ -139,7 +137,6 @@ describe('DdataChooseSelectedButtonComponent', () => {
     it('should have correct button type', () => {
       const buttonElement = compiled.querySelector('button');
 
-      expect(buttonElement).toBeTruthy();
       expect(buttonElement.getAttribute('type')).toBe('button');
     });
 
@@ -147,7 +144,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
       vi.spyOn(component, 'chooseSelect').mockReturnValue(undefined);
       const buttonElement = compiled.querySelector('button');
 
-      expect(buttonElement).toBeTruthy();
+      expect(buttonElement).toBeInstanceOf(HTMLButtonElement);
 
       buttonElement.click();
 
@@ -159,7 +156,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
       vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
       const buttonElement = compiled.querySelector('button');
 
-      expect(buttonElement).toBeTruthy();
+      expect(buttonElement).toBeInstanceOf(HTMLButtonElement);
 
       buttonElement.click();
 
@@ -170,7 +167,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
       vi.spyOn(component, 'chooseSelect').mockReturnValue(undefined);
       const buttonDebugElement = debugElement.query(By.css('button'));
 
-      expect(buttonDebugElement).toBeTruthy();
+      expect(buttonDebugElement.nativeElement).toBeInstanceOf(HTMLButtonElement);
 
       buttonDebugElement.triggerEventHandler('click', null);
 
@@ -181,7 +178,7 @@ describe('DdataChooseSelectedButtonComponent', () => {
       vi.spyOn(component.choosed, 'emit').mockReturnValue(undefined);
       const buttonElement = compiled.querySelector('button');
 
-      expect(buttonElement).toBeTruthy();
+      expect(buttonElement).toBeInstanceOf(HTMLButtonElement);
 
       buttonElement.click();
       buttonElement.click();
@@ -193,11 +190,12 @@ describe('DdataChooseSelectedButtonComponent', () => {
     it('should support ng-content projection', () => {
       const buttonElement = compiled.querySelector('button');
 
-      expect(buttonElement).toBeTruthy();
+      expect(buttonElement).toBeInstanceOf(HTMLButtonElement);
 
       // The button should contain ng-content element or placeholder for projected content
       // Check if the template is set up to support content projection
-      expect(buttonElement.innerHTML).toBeDefined();
+      expect(buttonElement.querySelector('*')).toBeNull();
+      expect(buttonElement.textContent.trim()).toBe('');
     });
   });
 
@@ -256,8 +254,8 @@ describe('DdataChooseSelectedButtonComponent', () => {
 
   describe('Interface Implementation', () => {
     it('should implement required interface properties', () => {
-      expect(component.multipleSelectEnabled).toBeDefined();
-      expect(component.choosed).toBeDefined();
+      expect(component.multipleSelectEnabled).toBe(true);
+      expect(component.choosed).toBeInstanceOf(EventEmitter);
     });
 
     it('should implement required interface methods', () => {

@@ -91,15 +91,13 @@ export class DdataTextareaComponent implements AfterViewInit {
       return;
     }
 
-    if (!!this._model && !!this._model.fields[this._field]) {
-      this._title = this.helperService.getTitle(this._model, this._field);
-      this._placeholder = this.helperService.getPlaceholder(this._model, this._field);
-      this._prepend = this.helperService.getPrepend(this._model, this._field);
-      this._append = this.helperService.getAppend(this._model, this._field);
-      this._label = this.helperService.getLabel(this._model, this._field);
-    }
+    this._title = this.helperService.getTitle(this._model, this._field);
+    this._placeholder = this.helperService.getPlaceholder(this._model, this._field);
+    this._prepend = this.helperService.getPrepend(this._model, this._field);
+    this._append = this.helperService.getAppend(this._model, this._field);
+    this._label = this.helperService.getLabel(this._model, this._field);
 
-    if (!!this._model && !!this._model.validationRules?.[this._field]) {
+    if (this._model.validationRules?.[this._field]) {
       this._isRequired = this.helperService.isRequired(this._model, this._field);
     }
   }

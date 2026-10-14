@@ -8,6 +8,8 @@ export * from './lib/models/dialog/content/dialog-content.interface';
 
 export * from './lib/models/icon-set/icon-set.interface';
 
+export * from './lib/models/lang/lang.interface';
+
 export * from './lib/models/search/search.interface';
 export * from './lib/models/search/search.model';
 export * from './lib/models/search/result/search-result.interface';
@@ -17,12 +19,16 @@ export * from './lib/pipes/description/description.pipe';
 
 export * from './lib/services/input/helper/input-helper-service.interface';
 export * from './lib/services/input/helper/input-helper.service';
+export * from './lib/services/password-strength/password-strength';
 
+export * from './lib/components/autocomplete-box/autocomplete-box.component';
 export * from './lib/components/checkbox/checkbox.component';
 export * from './lib/components/character-counter/character-counter.component';
 export * from './lib/components/color/color-input.component';
 export * from './lib/components/date/date-input.component';
 export * from './lib/components/input/input.component';
+export * from './lib/components/multilanguage-name/multilanguage-name.component';
+export * from './lib/components/password-strength-o-meter/password-strength-o-meter.component';
 export * from './lib/components/search/search.component';
 export * from './lib/components/select/select.component';
 export * from './lib/components/select/select.type';

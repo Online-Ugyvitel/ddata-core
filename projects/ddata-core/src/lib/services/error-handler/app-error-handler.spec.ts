@@ -110,7 +110,6 @@ describe('DdataCoreErrorHandler', () => {
 
   describe('Constructor', () => {
     it('should create the error handler', () => {
-      expect(errorHandler).toBeTruthy();
       expect(errorHandler).toBeInstanceOf(DdataCoreErrorHandler);
     });
 

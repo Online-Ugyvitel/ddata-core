@@ -28,7 +28,6 @@ describe('DdataCoreError', () => {
       };
       const error = new DdataCoreError(originalError);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(DdataCoreError);
     });
   });

@@ -19,8 +19,7 @@ describe('DataServiceAbstract', () => {
 
   describe('Constructor', () => {
     it('should create an instance', () => {
-      expect(service).toBeTruthy();
-      expect(service instanceof DataServiceAbstract).toBe(true);
+      expect(service).toBeInstanceOf(DataServiceAbstract);
     });
 
     it('should set the model property', () => {
@@ -64,7 +63,6 @@ describe('DataServiceAbstract', () => {
       const data = {};
       const result = service.hydrate(source, data);
 
-      expect(result).toBeDefined();
       expect(typeof result).toBe('object');
     });
 
@@ -254,7 +252,6 @@ describe('DataServiceAbstract', () => {
       vi.spyOn(service, 'hydrateArray').mockReturnValue([]);
       const result = service['getNewPaginateObject'](MockModel, mockPaginateData);
 
-      expect(result).toBeDefined();
       expect(typeof result).toBe('object');
     });
 

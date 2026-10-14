@@ -133,3 +133,21 @@ export const delete_from_list: FieldInterface = {
   title: 'Törlés a listából',
   placeholder: 'Törlés a listából'
 };
+
+export const upload_failed: FieldInterface = {
+  label: 'A feltöltés nem sikerült, kérjük, próbálja újra.',
+  title: 'A feltöltés nem sikerült, kérjük, próbálja újra.',
+  placeholder: 'A feltöltés nem sikerült, kérjük, próbálja újra.'
+};
+
+export const drop_files: FieldInterface = {
+  label: 'Húzd ide a fájlokat vagy válaszd ki őket',
+  title: 'Húzd ide a fájlokat vagy válaszd ki őket',
+  placeholder: 'Húzd ide a fájlokat vagy válaszd ki őket'
+};
+
+export const not_accepted_files: FieldInterface = {
+  label: 'Nem engedélyezett fájltípus',
+  title: 'Nem engedélyezett fájltípus',
+  placeholder: 'Nem engedélyezett fájltípus'
+};

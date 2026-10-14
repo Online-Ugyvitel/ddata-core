@@ -83,6 +83,12 @@ export class ComponentRendererService {
 
     this.instance = this.componentRef.instance;
 
+    if (!this.instance) {
+      console.error('Component instance is not set.');
+
+      return;
+    }
+
     if (this.method === 'list') {
       this.configureListComponent(dialogContent);
     }
@@ -128,12 +134,6 @@ export class ComponentRendererService {
     }
 
     if (!dialogContent.data) {
-      return;
-    }
-
-    if (!this.instance) {
-      console.error('Component instance is not set.');
-
       return;
     }
 

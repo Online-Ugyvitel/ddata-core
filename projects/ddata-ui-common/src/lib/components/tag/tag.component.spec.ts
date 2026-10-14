@@ -136,4 +136,86 @@ describe('DdataUiTagComponent', () => {
     expect(component.delete).toBeDefined();
     expect(typeof component.delete.emit).toBe('function');
   });
+
+  describe('template', () => {
+    const render = (inputs: {
+      tag?: TagInterface;
+      showIcon?: boolean;
+      class?: string;
+    }): HTMLElement => {
+      Object.entries(inputs).forEach(([name, value]) => fixture.componentRef.setInput(name, value));
+      fixture.detectChanges();
+
+      return element as HTMLElement;
+    };
+
+    it('should render the tag name, the tag icon and the delete button by default', () => {
+      const host = render({ tag: { name: 'Angular' }, class: 'badge' });
+      const wrapper = host.querySelector<HTMLElement>(':scope > span');
+
+      expect(wrapper.className).toBe('badge tag');
+      expect(wrapper.querySelector(':scope > span').textContent.trim()).toBe('Angular');
+      // the tag icon + the times icon of the delete button
+      expect(host.querySelectorAll('fa-icon').length).toBe(2);
+      expect(host.querySelectorAll('button fa-icon').length).toBe(1);
+    });
+
+    it('should hide the tag icon when showIcon is false', () => {
+      const host = render({ tag: { name: 'No icon' }, showIcon: false });
+
+      expect(host.querySelectorAll('fa-icon').length).toBe(1);
+      expect(host.querySelector('button fa-icon')).not.toBeNull();
+    });
+
+    it('should toggle the tag icon when showIcon changes', () => {
+      render({ tag: { name: 'Toggle' }, showIcon: false });
+
+      expect(element.querySelectorAll('fa-icon').length).toBe(1);
+
+      render({ showIcon: true });
+
+      expect(element.querySelectorAll('fa-icon').length).toBe(2);
+    });
+
+    it.each([
+      ['null', null],
+      ['undefined', undefined]
+    ])('should render an empty name when the tag is %s', (_label, tag) => {
+      const host = render({ tag, showIcon: false });
+
+      expect(host.querySelector(':scope > span > span').textContent.trim()).toBe('');
+    });
+
+    it('should render an empty name when the tag has no name', () => {
+      const host = render({ tag: {} as TagInterface });
+
+      expect(host.querySelector(':scope > span > span').textContent.trim()).toBe('');
+    });
+
+    it('should not set a wrapper class when the class input was never set', () => {
+      const host = render({ tag: { name: 'Plain' } });
+
+      expect(host.querySelector(':scope > span').className).toBe('');
+    });
+
+    it('should emit the current tag when the delete button is clicked', () => {
+      const tag: TagInterface = { name: 'Remove me' };
+      const emitted: Array<TagInterface> = [];
+
+      component.delete.subscribe((value: TagInterface) => emitted.push(value));
+      render({ tag }).querySelector('button').click();
+
+      expect(emitted).toEqual([tag]);
+      expect(emitted[0]).toBe(tag);
+    });
+
+    it('should emit null when the delete button of a tag without value is clicked', () => {
+      const emitted: Array<TagInterface> = [];
+
+      component.delete.subscribe((value: TagInterface) => emitted.push(value));
+      render({ tag: null }).querySelector('button').click();
+
+      expect(emitted).toEqual([null]);
+    });
+  });
 });

@@ -98,6 +98,25 @@ for (const serviceType of [RemoteDataService, ProxyService]) {
           expect(response).toHaveBeenCalledWith({ updated: true });
         });
 
+        it('sends no Authorization header when no token is stored, unless one is given', () => {
+          localStorage.removeItem('token');
+
+          request.send().subscribe();
+          const withoutToken = httpMock.expectOne(request.url);
+
+          expect(withoutToken.request.headers.has('Authorization')).toBe(false);
+          expect(withoutToken.request.headers.get('Content-Type')).toBe('application/json');
+          withoutToken.flush({});
+
+          request.send({ Authorization: 'Bearer custom-token' }).subscribe();
+          const withCustom = httpMock.expectOne(request.url);
+
+          expect(withCustom.request.headers.getAll('Authorization')).toEqual([
+            'Bearer custom-token'
+          ]);
+          withCustom.flush({});
+        });
+
         it('merges header objects without changing their values or dropping defaults', () => {
           const headers = { 'X-Request-Id': 'custom-id', 'X-Tag': ['first', 'second'] };
 

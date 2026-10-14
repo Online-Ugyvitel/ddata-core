@@ -73,10 +73,13 @@ and time picker if you need.
 
 ## Documentation
 
+- [Autocomplete Box Component](src/doc/autocomplete-box-component.md)
 - [Checkbox Component](src/doc/checbox-component)
 - [Color Component](src/doc/color-component)
 - [Date Component](src/doc/date-component)
 - [Input Component](src/doc/input-component)
+- [Multilanguage Name Component](src/doc/multilanguage-name-component.md)
+- [Password Strength-o-meter Component](src/doc/password-strength-o-meter-component.md)
 - [Search Component](src/doc/search-component)
 - [Select Component](src/doc/select-component)
 - [Textarea Component](src/doc/textarea-component)

@@ -33,8 +33,7 @@ describe('ErrorMessageFromApi', () => {
       const originalError = { error: 'Test error message' };
       const errorInstance = new ErrorMessageFromApi(originalError, mockNotificationService);
 
-      expect(errorInstance).toBeTruthy();
-      expect(errorInstance instanceof ErrorMessageFromApi).toBe(true);
+      expect(errorInstance).toBeInstanceOf(ErrorMessageFromApi);
       expect(errorInstance instanceof DdataCoreError).toBe(true);
     });
 
@@ -185,7 +184,7 @@ describe('ErrorMessageFromApi', () => {
       };
       const errorInstance = new ErrorMessageFromApi(originalError, mockNotificationService);
 
-      expect(errorInstance.msg).toBeDefined();
+      expect(typeof errorInstance.msg).toBe('string');
       expect(errorInstance.originalError).toBe(originalError);
     });
 

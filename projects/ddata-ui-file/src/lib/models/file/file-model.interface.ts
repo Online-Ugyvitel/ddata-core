@@ -6,7 +6,7 @@ import {
   FileNameWithPath,
   FileSizeInByte,
   ID,
-  BaseModelWithoutTypeDefinitionInterface,
+  BaseModelInterface,
   FieldsInterface,
   MimeType
 } from '@netdjw/ddata-core';
@@ -24,7 +24,7 @@ export interface FileModelUIFieldsInterface {
 export interface FileModelInterface
   extends
     FileModelUIFieldsInterface,
-    BaseModelWithoutTypeDefinitionInterface,
+    BaseModelInterface<FileModelInterface>,
     FieldsInterface<FileModelUIFieldsInterface> {
   id: ID;
   is_image: boolean; // UI fields only

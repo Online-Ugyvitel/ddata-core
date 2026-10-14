@@ -4,21 +4,24 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DdataCoreModule } from '@netdjw/ddata-core';
 import { DdataUiCommonModule } from '@netdjw/ddata-ui-common';
-// import { DdataUiFileListComponent } from './c  omponents/file-list/file-list.component';
-// import { DdataUiFileUploadComponent } from './components/file-upload/file-upload.component';
+import { DdataUiDialogModule } from '@netdjw/ddata-ui-dialog';
+import { DdataUiFileListComponent } from './components/file-list/file-list.component';
+import { DdataUiFileUploadComponent } from './components/file-upload/file-upload.component';
 import { FileModel } from './models/file/file.model';
 import { ModuleConfigurationInterface } from './models/module-configuration/module-configuration.interface';
+import { FilesizePipe } from './pipes/filesize/filesize.pipe';
 
 @NgModule({
-  declarations: [
-    // DdataUiFileListComponent,
-    // DdataUiFileUploadComponent,
+  declarations: [DdataUiFileListComponent, DdataUiFileUploadComponent, FilesizePipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FontAwesomeModule,
+    DdataCoreModule,
+    DdataUiCommonModule,
+    DdataUiDialogModule
   ],
-  imports: [CommonModule, FormsModule, FontAwesomeModule, DdataCoreModule, DdataUiCommonModule],
-  exports: [
-    // DdataUiFileListComponent,
-    // DdataUiFileUploadComponent,
-  ]
+  exports: [DdataUiFileListComponent, DdataUiFileUploadComponent, FilesizePipe]
 })
 export class DdataUiFileModule {
   static InjectorInstance: Injector;

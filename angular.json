@@ -153,10 +153,31 @@
             "setupFiles": [
               "projects/ddata-core/src/test-setup.ts"
             ],
-            "exclude": [
-              "**/test.model.spec.ts",
-              "**/test-bed-configuration.spec.ts"
-            ]
+            "coverageInclude": [
+              "projects/ddata-core/src/**/*.ts"
+            ],
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts",
+              "projects/ddata-core/src/lib/components/base-list/testing/**",
+              "projects/ddata-core/src/lib/components/base-list/test-helpers/**",
+              "projects/ddata-core/src/lib/services/data/mock-model.ts"
+            ],
+            "coverageReporters": [
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
+            }
           }
         },
         "lint": {
@@ -236,9 +257,28 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ddata-ui-input/tsconfig.spec.json",
-            "exclude": [
-              "**/multiple-select-dialog.component.spec.ts"
-            ]
+            "coverageInclude": [
+              "projects/ddata-ui-input/src/**/*.ts"
+            ],
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts"
+            ],
+            "coverageReporters": [
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
+            }
           }
         },
         "lint": {
@@ -279,7 +319,29 @@
             "tsConfig": "projects/ddata-ui-file/tsconfig.spec.json",
             "setupFiles": [
               "projects/ddata-ui-file/src/test-setup.ts"
-            ]
+            ],
+            "coverageInclude": [
+              "projects/ddata-ui-file/src/**/*.ts"
+            ],
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts"
+            ],
+            "coverageReporters": [
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
+            }
           }
         },
         "lint": {
@@ -320,7 +382,29 @@
             "tsConfig": "projects/ddata-ui-dialog/tsconfig.spec.json",
             "setupFiles": [
               "projects/ddata-ui-dialog/src/test-setup.ts"
-            ]
+            ],
+            "coverageInclude": [
+              "projects/ddata-ui-dialog/src/**/*.ts"
+            ],
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts"
+            ],
+            "coverageReporters": [
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
+            }
           }
         },
         "lint": {
@@ -358,7 +442,29 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/ddata-ui-common/tsconfig.spec.json"
+            "tsConfig": "projects/ddata-ui-common/tsconfig.spec.json",
+            "coverageInclude": [
+              "projects/ddata-ui-common/src/**/*.ts"
+            ],
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts"
+            ],
+            "coverageReporters": [
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
+            }
           }
         },
         "lint": {
@@ -396,7 +502,29 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/ddata-a11y/tsconfig.spec.json"
+            "tsConfig": "projects/ddata-a11y/tsconfig.spec.json",
+            "coverageInclude": [
+              "projects/ddata-a11y/src/**/*.ts"
+            ],
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts"
+            ],
+            "coverageReporters": [
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 100,
+              "branches": 100,
+              "functions": 100,
+              "lines": 100
+            }
           }
         },
         "lint": {
@@ -438,20 +566,28 @@
             "setupFiles": [
               "projects/ddata-ui-views/src/test-setup.ts"
             ],
-            "coverage": true,
             "coverageInclude": [
-              "projects/ddata-ui-views/src/lib/**/*.ts"
+              "projects/ddata-ui-views/src/**/*.ts"
             ],
             "coverageReporters": [
-              "text",
-              "text-summary"
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
             ],
             "coverageThresholds": {
               "statements": 98,
               "branches": 98,
               "functions": 98,
               "lines": 98
-            }
+            },
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts"
+            ]
           }
         },
         "lint": {

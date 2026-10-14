@@ -5,7 +5,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDate, NgbInputDatepicker } from '@ng-bootstrap/ng-bootstrap';
 import {
   BaseModel,
   BaseModelInterface,
@@ -464,6 +464,80 @@ describe('DdataInputDateComponent', () => {
       component.change(mockNgbDate);
 
       expect(component.changed.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('date boundaries', () => {
+    let testModel: MockModel;
+
+    beforeEach(() => {
+      testModel = new MockModel().init({ date: '' });
+      component._model = testModel;
+      component._field = 'date';
+    });
+
+    it.each([
+      [2024, 2, 29, '2024-02-29'],
+      [2000, 2, 29, '2000-02-29'],
+      [2023, 12, 31, '2023-12-31'],
+      [2024, 1, 1, '2024-01-01'],
+      [2024, 1, 31, '2024-01-31'],
+      [2024, 3, 1, '2024-03-01'],
+      [1, 1, 1, '1-01-01'],
+      [9999, 12, 31, '9999-12-31']
+    ])('should store %i-%i-%i as %s', (year, month, day, expected) => {
+      component.change(new NgbDate(year, month, day));
+
+      expect(testModel.date).toBe(expected);
+      expect(component.selectedValue).toBe(expected);
+    });
+
+    it('should not shift the selected day by the time zone', () => {
+      const realDate = new NgbDate(2024, 3, 31);
+
+      vi.setSystemTime(new Date('2024-03-31T23:30:00Z'));
+      component.change(realDate);
+
+      expect(testModel.date).toBe('2024-03-31');
+    });
+
+    it('should store the selected date of the datepicker', () => {
+      const changed = vi.fn();
+
+      component.changed.subscribe(changed);
+      fixture.componentRef.setInput('field', 'date');
+      fixture.componentRef.setInput('model', testModel);
+      detectChangesOf(fixture);
+
+      fixture.debugElement
+        .query(By.css('input'))
+        .triggerEventHandler('dateSelect', new NgbDate(2024, 2, 29));
+
+      expect(testModel.date).toBe('2024-02-29');
+      expect(changed).toHaveBeenCalledExactlyOnceWith(testModel);
+    });
+
+    it('should keep an invalid typed date as it is and let the validator decide', () => {
+      const input = document.createElement('input');
+
+      input.value = '2023-02-30';
+      component.typeChange({ target: input } as unknown as Event);
+
+      expect(testModel.date).toBe('2023-02-30');
+
+      input.value = 'not a date';
+      component.typeChange({ target: input } as unknown as Event);
+
+      expect(testModel.date).toBe('not a date');
+    });
+
+    it('should render the stored date in the input', () => {
+      testModel.date = '2024-02-29';
+      fixture.componentRef.setInput('field', 'date');
+      fixture.componentRef.setInput('model', testModel);
+      detectChangesOf(fixture);
+
+      expect(fixture.nativeElement.querySelector('input').value).toBe('2024-02-29');
     });
   });
 
@@ -935,6 +1009,247 @@ describe('DdataInputDateComponent', () => {
       component.field = specialFieldName;
 
       expect(component._field).toBe(specialFieldName);
+    });
+  });
+  describe('min and max', () => {
+    let testModel: MockModel;
+    let changed: ReturnType<typeof vi.fn>;
+    const input = (): HTMLInputElement => fixture.nativeElement.querySelector('input');
+    const picker = (): NgbInputDatepicker =>
+      fixture.debugElement.query(By.css('input')).injector.get(NgbInputDatepicker);
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+    const type = (value: string): void => {
+      input().value = value;
+      input().dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+    };
+    const pick = (year: number, month: number, day: number): void => {
+      fixture.debugElement
+        .query(By.css('input'))
+        .triggerEventHandler('dateSelect', new NgbDate(year, month, day));
+      fixture.detectChanges();
+    };
+
+    beforeEach(() => {
+      testModel = new MockModel().init({ date: '2024-06-15' });
+      changed = vi.fn();
+      component.changed.subscribe(changed);
+      vi.spyOn(console, 'warn').mockReturnValue(undefined);
+      render({ field: 'date', model: testModel });
+    });
+
+    it('should not restrict anything without min and max', () => {
+      expect(component.minDate).toBeNull();
+      expect(component.maxDate).toBeNull();
+
+      type('1900-01-01');
+
+      expect(testModel.date).toBe('1900-01-01');
+
+      pick(2999, 12, 31);
+
+      expect(testModel.date).toBe('2999-12-31');
+      expect(testModel.validationErrors).toEqual([]);
+    });
+
+    it.each([null, undefined, ''])('should not restrict anything with %j limits', (limit) => {
+      render({ min: limit, max: limit });
+
+      expect(component.minDate).toBeNull();
+      expect(component.maxDate).toBeNull();
+
+      type('1900-01-01');
+
+      expect(testModel.date).toBe('1900-01-01');
+    });
+
+    it('should pass string limits to the datepicker in the given format', () => {
+      render({ format: 'DD.MM.YYYY', min: '01.02.2024', max: '29.02.2024' });
+
+      expect(component.minDate).toEqual({ year: 2024, month: 2, day: 1 });
+      expect(component.maxDate).toEqual({ year: 2024, month: 2, day: 29 });
+      expect(picker().minDate).toEqual({ year: 2024, month: 2, day: 1 });
+      expect(picker().maxDate).toEqual({ year: 2024, month: 2, day: 29 });
+    });
+
+    it('should accept Date limits', () => {
+      render({ min: new Date(2024, 0, 1), max: new Date(2024, 11, 31, 23, 59) });
+
+      expect(component.minDate).toEqual({ year: 2024, month: 1, day: 1 });
+      expect(component.maxDate).toEqual({ year: 2024, month: 12, day: 31 });
+    });
+
+    it('should work with a callable moment factory', () => {
+      render({
+        moment: (moment as unknown as { default: typeof moment }).default,
+        min: '2024-01-01'
+      });
+
+      expect(component.minDate).toEqual({ year: 2024, month: 1, day: 1 });
+    });
+
+    it('should ignore an invalid limit with a warning', () => {
+      render({ min: '2024-13-45', max: 'tomorrow' });
+
+      expect(component.minDate).toBeNull();
+      expect(component.maxDate).toBeNull();
+      expect(console.warn).toHaveBeenCalledWith(
+        'Invalid min date: "2024-13-45", the min limit is ignored.'
+      );
+      expect(console.warn).toHaveBeenCalledWith(
+        'Invalid max date: "tomorrow", the max limit is ignored.'
+      );
+
+      type('1900-01-01');
+
+      expect(testModel.date).toBe('1900-01-01');
+    });
+
+    describe('with both limits', () => {
+      beforeEach(() => {
+        render({ min: '2024-01-10', max: '2024-01-20' });
+      });
+
+      it.each(['2024-01-10', '2024-01-15', '2024-01-20'])(
+        'should accept the typed value %s',
+        (value) => {
+          type(value);
+
+          expect(testModel.date).toBe(value);
+          expect(input().classList).not.toContain('invalid');
+        }
+      );
+
+      it.each([
+        [2024, 1, 10, '2024-01-10'],
+        [2024, 1, 20, '2024-01-20']
+      ])('should accept the picked boundary %i-%i-%i', (year, month, day, expected) => {
+        pick(year, month, day);
+
+        expect(testModel.date).toBe(expected);
+        expect(changed).toHaveBeenCalledExactlyOnceWith(testModel);
+      });
+
+      it.each(['2024-01-09', '2024-01-21', '2023-12-31', '2025-01-15'])(
+        'should reject the typed value %s and mark the field invalid',
+        (value) => {
+          type(value);
+
+          expect(testModel.date).toBe('2024-06-15');
+          expect(testModel.validationErrors).toEqual(['date']);
+          expect(input().classList).toContain('invalid');
+        }
+      );
+
+      it('should reject a picked date outside of the range without emitting', () => {
+        pick(2024, 1, 9);
+
+        expect(testModel.date).toBe('2024-06-15');
+        expect(testModel.validationErrors).toEqual(['date']);
+        expect(changed).not.toHaveBeenCalled();
+
+        pick(2024, 1, 21);
+
+        expect(testModel.validationErrors).toEqual(['date']);
+      });
+
+      it('should clear the range error when a value in range follows', () => {
+        type('2024-01-01');
+
+        expect(input().classList).toContain('invalid');
+
+        type('2024-01-12');
+
+        expect(testModel.date).toBe('2024-01-12');
+        expect(testModel.validationErrors).toEqual([]);
+        expect(input().classList).not.toContain('invalid');
+      });
+
+      it('should not fail when the range error was already removed by the validator', () => {
+        type('2024-01-01');
+        testModel.validationErrors = [];
+
+        type('2024-01-12');
+
+        expect(testModel.date).toBe('2024-01-12');
+        expect(testModel.validationErrors).toEqual([]);
+      });
+
+      it('should keep the error of other validation untouched for a value in range', () => {
+        testModel.validationErrors = ['date'];
+
+        type('2024-01-12');
+
+        expect(testModel.validationErrors).toEqual(['date']);
+      });
+
+      it('should leave an unparsable value to the validator', () => {
+        type('not a date');
+
+        expect(testModel.date).toBe('not a date');
+        expect(testModel.validationErrors).toEqual([]);
+      });
+    });
+
+    it('should only restrict the past with only min', () => {
+      render({ min: '2024-01-10' });
+
+      expect(component.maxDate).toBeNull();
+
+      type('2024-01-09');
+
+      expect(testModel.date).toBe('2024-06-15');
+
+      type('2999-01-01');
+
+      expect(testModel.date).toBe('2999-01-01');
+    });
+
+    it('should only restrict the future with only max', () => {
+      render({ max: '2024-01-20' });
+
+      expect(component.minDate).toBeNull();
+
+      type('2024-01-21');
+
+      expect(testModel.date).toBe('2024-06-15');
+
+      type('1900-01-01');
+
+      expect(testModel.date).toBe('1900-01-01');
+    });
+
+    it('should follow min and max changes after init', () => {
+      render({ min: '2024-01-10', max: '2024-01-20' });
+      type('2024-02-01');
+
+      expect(testModel.date).toBe('2024-06-15');
+
+      render({ max: '2024-02-28' });
+
+      expect(picker().maxDate).toEqual({ year: 2024, month: 2, day: 28 });
+
+      type('2024-02-01');
+
+      expect(testModel.date).toBe('2024-02-01');
+
+      render({ min: null, max: null });
+      type('1999-01-01');
+
+      expect(testModel.date).toBe('1999-01-01');
+      expect(picker().minDate).toBeNull();
+    });
+
+    it('should not recalculate the range for other input changes', () => {
+      render({ min: '2024-01-10' });
+      const minDate = component.minDate;
+
+      render({ disabled: true });
+
+      expect(component.minDate).toBe(minDate);
     });
   });
 });

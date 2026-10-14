@@ -165,8 +165,7 @@ describe('ProxyFactoryService', () => {
 
   describe('Service Creation', () => {
     it('should be created', () => {
-      expect(service).toBeTruthy();
-      expect(service instanceof ProxyFactoryService).toBe(true);
+      expect(service).toBeInstanceOf(ProxyFactoryService);
     });
 
     it('should have a constructor', () => {
@@ -182,8 +181,7 @@ describe('ProxyFactoryService', () => {
     it('should create an instance of the provided class', () => {
       const result = service.get(MockModel);
 
-      expect(result).toBeTruthy();
-      expect(result instanceof ProxyService).toBe(true);
+      expect(result).toBeInstanceOf(ProxyService);
     });
 
     it('should return ProxyServiceInterface', () => {
@@ -214,22 +212,16 @@ describe('ProxyFactoryService', () => {
     it('should create ProxyService with correct instance', () => {
       const result = service.get(MockModel);
 
-      // Access the private instance through the proxy service to verify it was created correctly
-      // We can check this by calling a method that would use the instance
-      expect(result).toBeDefined();
-
-      // Since ProxyService constructor takes an instance, and we can't directly access it,
-      // we verify the service was created properly by checking it's not null/undefined
-      expect(result).not.toBeNull();
-      expect(result).not.toBeUndefined();
+      expect(result).toBeInstanceOf(ProxyService);
+      expect((result as any).instance).toBeInstanceOf(MockModel);
     });
 
     it('should work with different model classes', () => {
       const result1 = service.get(MockModel);
       const result2 = service.get(MockModel); // Use the same model type for simplicity
 
-      expect(result1).toBeTruthy();
-      expect(result2).toBeTruthy();
+      expect(result1).toBeInstanceOf(ProxyService);
+      expect(result2).toBeInstanceOf(ProxyService);
       expect(result1).not.toBe(result2); // Should be different instances
     });
 
@@ -237,8 +229,8 @@ describe('ProxyFactoryService', () => {
       const result1 = service.get(MockModel);
       const result2 = service.get(MockModel);
 
-      expect(result1).toBeTruthy();
-      expect(result2).toBeTruthy();
+      expect(result1).toBeInstanceOf(ProxyService);
+      expect(result2).toBeInstanceOf(ProxyService);
       expect(result1).not.toBe(result2); // Should be different ProxyService instances
     });
   });
@@ -247,7 +239,6 @@ describe('ProxyFactoryService', () => {
     it('should initialize without parameters', () => {
       const newService = new ProxyFactoryService<MockModel>();
 
-      expect(newService).toBeTruthy();
       expect(typeof newService.get).toBe('function');
     });
 
@@ -255,8 +246,7 @@ describe('ProxyFactoryService', () => {
       const directService = new ProxyFactoryService<MockModel>();
       const result = directService.get(MockModel);
 
-      expect(result).toBeTruthy();
-      expect(result instanceof ProxyService).toBe(true);
+      expect(result).toBeInstanceOf(ProxyService);
     });
   });
 
@@ -267,7 +257,6 @@ describe('ProxyFactoryService', () => {
       const typedService = new ProxyFactoryService<MockModel>();
       const result: ProxyServiceInterface<MockModel> = typedService.get(MockModel);
 
-      expect(result).toBeTruthy();
       expect(typeof result.getOne).toBe('function');
     });
 
@@ -275,8 +264,7 @@ describe('ProxyFactoryService', () => {
       const anyService = new ProxyFactoryService();
       const result = anyService.get(MockModel);
 
-      expect(result).toBeTruthy();
-      expect(result instanceof ProxyService).toBe(true);
+      expect(result).toBeInstanceOf(ProxyService);
     });
   });
 });

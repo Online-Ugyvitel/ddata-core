@@ -140,6 +140,6 @@ A csomag exportálja a csoportosítás függvényeit is: `relativeTime()`, `rela
 ```bash
 npm run build:core && npm run build:ui-common   # a függőségek
 npm run build:ui-views
-npx ng test ddata-ui-views --no-watch           # lefedettség-küszöb: 98%
+npx ng test ddata-ui-views --no-watch --coverage   # lefedettség-küszöb: 98%
 npx ng lint ddata-ui-views
 ```
