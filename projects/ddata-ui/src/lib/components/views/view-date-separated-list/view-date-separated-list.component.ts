@@ -9,12 +9,23 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { CasefileInterface } from 'src/app/models/casefile/casefile.interface';
-import { ViewDateSeparatedListInterface } from 'src/app/models/view/date/separated/list/view-date-separated-list.interface';
-import { ViewDateSeparatedList } from 'src/app/models/view/date/separated/list/view-date-spearated-list.interface';
-import * as moment from 'moment';
-import { Global } from '../../../models/global.model';
 import { BehaviorSubject } from 'rxjs';
+import { CasefileInterface } from '../../../models/casefile/casefile.interface';
+import { Global } from '../../../models/global.model';
+import {
+  ViewDateSeparatedList,
+  ViewDateSeparatedListInterface
+} from '../../../models/view/date-separated-list/view-date-separated-list.model';
+// the largest unit what fits into the time difference is displayed, in seconds
+const relativeTimeUnits: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+  ['year', 365 * 24 * 60 * 60],
+  ['month', 30 * 24 * 60 * 60],
+  ['week', 7 * 24 * 60 * 60],
+  ['day', 24 * 60 * 60],
+  ['hour', 60 * 60],
+  ['minute', 60],
+  ['second', 1]
+];
 
 @Component({
   selector: 'dd-view-date-separated-list',
@@ -33,20 +44,16 @@ export class ViewDateSeparatedListComponent implements AfterViewInit {
   }
 
   @Input() title = 'Dátum szerint csoportosított nézet';
+  @Input() locale = 'hu';
+  @Input() noDeadlineText = 'Határidő nélküli feladatok';
   @Output() readonly openCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
   @Output() readonly deleteCasefile: EventEmitter<CasefileInterface> = new EventEmitter();
   @ViewChild('listContainer') listContainer: ElementRef;
   dateSeparatedListData: Array<ViewDateSeparatedListInterface> = [];
   originalData: Array<CasefileInterface> = [];
-  moment = moment;
-  icon = this.global.icon;
+  icon = new Global().icon;
 
-  constructor(
-    private readonly renderer: Renderer2,
-    private readonly global: Global
-  ) {
-    this.moment.locale('hu');
-  }
+  constructor(private readonly renderer: Renderer2) {}
 
   ngAfterViewInit(): void {
     this.setHeight();
@@ -95,12 +102,22 @@ export class ViewDateSeparatedListComponent implements AfterViewInit {
     });
   }
 
-  setListItemName(deadline: string): string {
-    if (!deadline) {
-      return 'Határidő nélküli feladatok';
-    }
+  setListItemName(deadline: string, now: Date = new Date()): string {
+    const date = new Date(deadline ?? '');
 
-    return this.moment(deadline).fromNow();
+    if (!deadline || isNaN(date.getTime())) {
+      return this.noDeadlineText;
+    }
+    const seconds = (date.getTime() - now.getTime()) / 1000;
+    const [unit, unitSeconds] = relativeTimeUnits.find(([, size]) => Math.abs(seconds) >= size) ?? [
+      'second',
+      1
+    ];
+
+    return new Intl.RelativeTimeFormat(this.locale, { numeric: 'auto' }).format(
+      Math.round(seconds / unitSeconds),
+      unit
+    );
   }
 
   open(casefile: CasefileInterface): void {

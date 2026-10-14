@@ -1,8 +1,11 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { ID } from '@netdjw/ddata-core';
 import { Global } from '../../../models/global.model';
-import { LangInterface } from 'src/app/models/lang/lang.interface';
-import { MultilanguageNameInterface, Name } from 'src/app/models/name/name.model';
-import { LangService } from 'src/app/services/lang/lang.service';
+import {
+  LangInterface,
+  MultilanguageNameInterface,
+  NameInterface
+} from '../../../models/lang/lang.interface';
 
 @Component({
   selector: 'dd-multilanguage-name',
@@ -13,30 +16,33 @@ import { LangService } from 'src/app/services/lang/lang.service';
 })
 export class MultilanguageNameComponent {
   @Input() model: MultilanguageNameInterface;
+  @Input() langs: Array<LangInterface> = [];
+  @Input() defaultLangId: ID = 1 as ID;
   @Input() placeholder = 'Név';
   @Input() title = 'Név';
 
   show = true;
-  langs: Array<LangInterface> = [];
-  global: Global = new Global();
-  icon = this.global.icon;
-
-  constructor(langService: LangService) {
-    langService.getAllSortedBy('name').subscribe((result: Array<LangInterface>) => {
-      this.langs = result;
-    });
-  }
+  nameToDelete: NameInterface = null;
+  icon = new Global().icon;
 
   addName(): void {
-    this.model.names.push(new Name().init({ lang_id: 1 }));
+    this.model.names.push({ lang_id: this.defaultLangId, name: '' });
   }
 
-  deleteName(name: Name): void {
-    if (!name) {
-      return;
+  deleteName(name: NameInterface): void {
+    const index = this.model.names.indexOf(name);
+
+    if (index !== -1) {
+      this.model.names.splice(index, 1);
+    }
+  }
+
+  confirmDelete(confirmed: boolean): void {
+    if (confirmed) {
+      this.deleteName(this.nameToDelete);
     }
 
-    this.model.names.splice(this.model.names.indexOf(name), 1);
+    this.nameToDelete = null;
   }
 
   getTotal(): number {

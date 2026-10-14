@@ -1,6 +1,8 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { TabService } from 'src/app/services/tab/tab.service';
-import { TabsetComponent } from 'ngx-bootstrap/tabs';
+import {
+  TabNavigationServiceInterface,
+  TabsetInterface
+} from '../../../models/tab/tab-navigation.interface';
 
 @Component({
   selector: 'dd-tab-button',
@@ -10,14 +12,12 @@ import { TabsetComponent } from 'ngx-bootstrap/tabs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TabButtonComponent {
-  @Input() service: TabService;
+  @Input() service: TabNavigationServiceInterface;
+  @Input() tabSetComponent: TabsetInterface;
 
-  tabSetComponent: TabsetComponent;
   currentTab = 0;
   lastTab: boolean;
   tabLength: number;
-
-  constructor() {}
 
   previousTab(): void {
     this.service.moveInTabsLeft(this.tabSetComponent);
@@ -29,7 +29,7 @@ export class TabButtonComponent {
     this.switchButtonName(this.tabSetComponent);
   }
 
-  private switchButtonName(tabset: TabsetComponent): void {
+  private switchButtonName(tabset: TabsetInterface): void {
     if (!!tabset) {
       this.lastTab = false;
 

@@ -11,9 +11,7 @@
       <button *ngIf="showAddButton" class="btn btn-light" type="button" (click)="create()">
         <fa-icon [icon]="icon.plus"></fa-icon>
         Új
-        {{
-          transformToLowerCase ? model.fields.title.label.toLowerCase() : model.fields.title.label
-        }}
+        {{ modelTitle }}
       </button>
 
       <!-- additional buttons -->
@@ -21,7 +19,7 @@
 
       <!-- xls, csv downloads -->
       <ng-container *ngIf="showDownloadButtons">
-        <app-xls-button-export [model]="model"></app-xls-button-export>
+        <dd-xls-button-export [model]="model"></dd-xls-button-export>
       </ng-container>
 
       <!-- delete selected button -->

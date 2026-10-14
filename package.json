@@ -15,6 +15,7 @@
     "build:ui-common": "ng build ddata-ui-common --configuration production",
     "build:ui-dialog": "ng build ddata-ui-dialog --configuration production",
     "build:ui-file": "ng build ddata-ui-file --configuration production",
+    "build:ui": "ng build ddata-ui --configuration production",
     "build:ui-input": "ng build ddata-ui-input --configuration production",
     "verify:consumer": "bash scripts/verify-consumer.sh",
     "publish:a11y": "cd dist/ddata-a11y && npm publish && cd ../..",

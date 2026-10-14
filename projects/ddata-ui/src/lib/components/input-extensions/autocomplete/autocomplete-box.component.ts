@@ -7,13 +7,15 @@ import {
   Input,
   OnInit,
   ViewChild,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  inject
 } from '@angular/core';
-import { faSpinner } from '@fortawesome/pro-solid-svg-icons';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { BaseModel, ProxyServiceInterface, ValidatorService } from '@netdjw/ddata-core';
-import { AppModule } from 'src/app/app.module';
+
+type AutocompleteSuggestion = BaseModel & { name?: string };
 
 @Component({
   selector: 'dd-autocomplete-box',
@@ -33,7 +35,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   @Input() showLabel = true;
   @Input() autoFocus = false;
   @Input() autocomplete = false;
-  @Input() autocompleteService: ProxyServiceInterface<unknown> = null;
+  @Input() autocompleteService: ProxyServiceInterface<AutocompleteSuggestion> = null;
 
   @ViewChild('inputBox') inputBox: ElementRef;
 
@@ -48,14 +50,13 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   private internalModel: BaseModel = new BaseModel();
 
   // Public properties
-  autocompleteSuggestions: Array<unknown> = [];
+  autocompleteSuggestions: Array<AutocompleteSuggestion> = [];
   autocompleteCursor = -1;
   random: string = this.randChars();
   inputValue: Subject<string> = new Subject();
   spinner = faSpinner;
   autocompleteLoading = false;
-  validatorService: ValidatorService =
-    AppModule.InjectorInstance.get<ValidatorService>(ValidatorService);
+  validatorService: ValidatorService = inject(ValidatorService);
 
   constructor(private readonly elementRef: ElementRef) {}
 
@@ -153,7 +154,9 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
     }
   }
 
-  setContent(content: unknown = this.autocompleteSuggestions[this.autocompleteCursor]): void {
+  setContent(
+    content: AutocompleteSuggestion = this.autocompleteSuggestions[this.autocompleteCursor]
+  ): void {
     this.model = content;
     this.clearSuggestions();
     this.validateField();
@@ -161,7 +164,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
 
   setName(): void {
     if (this.autocompleteCursor > -1) {
-      const suggestion = this.autocompleteSuggestions[this.autocompleteCursor] as { name?: string };
+      const suggestion = this.autocompleteSuggestions[this.autocompleteCursor];
 
       this.model[this.internalField] = suggestion?.name || '';
     }
@@ -344,7 +347,7 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
           });
         })
       )
-      .subscribe((result: Array<unknown>) => {
+      .subscribe((result: Array<AutocompleteSuggestion>) => {
         this.autocompleteSuggestions = result;
         this.autocompleteLoading = false;
       });
