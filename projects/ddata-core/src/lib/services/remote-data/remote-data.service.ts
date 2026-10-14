@@ -86,8 +86,7 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
    */
   setupHeaders(): void {
     this.headers = new HttpHeaders({
-      // tslint:disable-next-line: object-literal-key-quotes
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      ...this.authorizationHeader(),
       'Content-Type': 'application/json',
       'Accepted-Encoding': 'application/json'
     });
@@ -326,6 +325,15 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
     return this.http.put(url, JSON.stringify(resource), options).pipe(map((result: any) => result));
   }
 
+  /**
+   * The Authorization header with the stored token, or no header at all when there is no token.
+   */
+  private authorizationHeader(): Record<string, string> {
+    const token = localStorage.getItem('token');
+
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
   private getUriOptions(headers?: RequestHeaders): { headers: HttpHeaders; responseType: 'json' } {
     this.setupHeaders();
     const customHeaders = headers instanceof HttpHeaders ? headers : new HttpHeaders(headers);
@@ -515,7 +523,7 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
   ): Array<Observable<FileUploadProcessInterface>> {
     // set up custom headers to post
     const customHeaders = new HttpHeaders({
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      ...this.authorizationHeader(),
       'Accepted-Encoding': 'application/json'
     });
     // set up options to report progress in file uploading

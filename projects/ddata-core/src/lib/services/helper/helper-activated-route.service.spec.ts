@@ -26,7 +26,20 @@ describe('HelperActivatedRouteService', () => {
   }
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(service).toBeInstanceOf(HelperActivatedRouteService);
+  });
+
+  it('should read the id from the URL of the browser', () => {
+    const originalUrl = window.location.href;
+
+    window.history.pushState({}, '', '/users/edit/42');
+
+    try {
+      expect(service.getId()).toBe(42);
+      expect(service.getUniqueListId()).toBe(0);
+    } finally {
+      window.history.pushState({}, '', originalUrl);
+    }
   });
 
   describe('params()', () => {
@@ -35,7 +48,6 @@ describe('HelperActivatedRouteService', () => {
       const result: Observable<Params> = service.params();
 
       result.subscribe((params) => {
-        expect(params).toBeDefined();
         expect(params.id).toBe(123);
       });
     });
@@ -45,7 +57,6 @@ describe('HelperActivatedRouteService', () => {
       const result: Observable<Params> = service.params();
 
       result.subscribe((params) => {
-        expect(params).toBeDefined();
         expect(params.id).toBe(0);
       });
     });

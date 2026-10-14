@@ -33,7 +33,6 @@ describe('MethodNotAllowedError', () => {
       };
       const error = new MethodNotAllowedError(originalError, mockNotificationService);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(MethodNotAllowedError);
     });
 

@@ -113,7 +113,7 @@ describe('ProxyService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    expect(service).toBeInstanceOf(ProxyService);
   });
 
   describe('getOne', () => {
@@ -549,22 +549,78 @@ describe('ProxyService', () => {
       });
     });
 
-    it('should remove model from data array when model id is 0', () => {
-      const modelWithZeroId = new TestModel().init({ id: 0 as ID, name: 'Test' });
+    it('should remove an unsaved model (id 0) only from the list without a request', () => {
       const paginate = new Paginate(TestModel, {
-        data: [{ id: 0 as ID, name: 'Test' }],
-        current_page: 1,
-        per_page: 10,
-        total: 1,
-        last_page: 1,
-        from: 1,
-        to: 1
+        data: [{ id: 2 as ID, name: 'Saved' }, { id: 0 as ID, name: 'Unsaved' }, { id: 3 as ID }]
       });
+      const unsaved = paginate.data[1];
+      let result: PaginateInterface;
 
-      service.delete(modelWithZeroId, paginate).subscribe((result) => {
-        expect(result).toBe(paginate);
-        expect(paginate.data.length).toBe(0);
-      });
+      service.delete(unsaved, paginate).subscribe((response) => (result = response));
+
+      expect(result).toBe(paginate);
+      expect(paginate.data.map((item: TestModel) => item.id)).toEqual([2, 3]);
+      expect(mockRemoteDataService.delete).not.toHaveBeenCalled();
+    });
+
+    it('should keep the list when an unsaved model is not in it', () => {
+      const paginate = new Paginate(TestModel, { data: [{ id: 2 as ID }, { id: 3 as ID }] });
+      let result: PaginateInterface;
+
+      service
+        .delete(new TestModel().init({ id: 0 as ID }), paginate)
+        .subscribe((response) => (result = response));
+
+      expect(result).toBe(paginate);
+      expect(paginate.data.map((item: TestModel) => item.id)).toEqual([2, 3]);
+    });
+
+    it('should remove the deleted model from the list', () => {
+      const paginate = new Paginate(TestModel, { data: [{ id: 1 as ID }, { id: 2 as ID }] });
+      const deleted = paginate.data[0];
+      let result: PaginateInterface;
+
+      mockRemoteDataService.delete.mockReturnValue(of(200));
+
+      service.delete(deleted, paginate).subscribe((response) => (result = response));
+
+      expect(result).toBe(paginate);
+      expect(paginate.data.map((item: TestModel) => item.id)).toEqual([2]);
+    });
+
+    it('should keep the list when the deleted model is not in it', () => {
+      const paginate = new Paginate(TestModel, { data: [{ id: 1 as ID }, { id: 2 as ID }] });
+
+      mockRemoteDataService.delete.mockReturnValue(of(200));
+
+      service.delete(new TestModel().init({ id: 5 as ID }), paginate).subscribe();
+
+      expect(paginate.data.map((item: TestModel) => item.id)).toEqual([1, 2]);
+    });
+
+    it('should not delete from local storage, but reload, when the remote delete fails', () => {
+      let result: PaginateInterface;
+
+      testModel.use_localstorage = true;
+      mockRemoteDataService.delete.mockReturnValue(of(0));
+      mockRemoteDataService.getAll.mockReturnValue(of(testPaginate));
+
+      service.delete(testModel, testPaginate).subscribe((response) => (result = response));
+
+      expect(result).toBe(testPaginate);
+      expect(mockLocalDataService.delete).not.toHaveBeenCalled();
+      expect(mockRemoteDataService.getAll).toHaveBeenCalledTimes(1);
+    });
+
+    it('should propagate a remote delete error', () => {
+      let received: unknown;
+
+      mockRemoteDataService.delete.mockReturnValue(throwError(() => ({ status: 404 })));
+
+      service.delete(testModel, testPaginate).subscribe({ error: (err) => (received = err) });
+
+      expect(received).toEqual({ status: 404 });
+      expect(testPaginate.data.length).toBe(1);
     });
 
     it('should delete from both remote and local, then fetch all when use_localstorage is true', () => {
@@ -633,12 +689,51 @@ describe('ProxyService', () => {
         to: 1
       });
 
+      mockRemoteDataService.deleteMultiple.mockReturnValue(of(false));
+      paginate.data.push(modelWithZeroId);
+      let result: unknown;
+
+      service.deleteMultiple(models, paginate).subscribe((response) => (result = response));
+
+      expect(result).toBe(paginate);
+      // the other instance with id 0 is kept, only the given one is removed
+      expect(paginate.data.length).toBe(1);
+      expect(paginate.data).not.toContain(modelWithZeroId);
+      expect(mockRemoteDataService.deleteMultiple).toHaveBeenCalledWith(models);
+    });
+
+    it('should remove the deleted models from the list', () => {
+      const paginate = new Paginate(TestModel, {
+        data: [{ id: 1 as ID }, { id: 2 as ID }, { id: 3 as ID }]
+      });
+      const toDelete = [paginate.data[0], paginate.data[2], new TestModel().init({ id: 9 as ID })];
+      let result: unknown;
+
       mockRemoteDataService.deleteMultiple.mockReturnValue(of(true));
 
-      // The method should process the models and remove ones with id 0
-      service.deleteMultiple(models, paginate).subscribe((result) => {
-        expect(result).toBeDefined();
-      });
+      service.deleteMultiple(toDelete, paginate).subscribe((response) => (result = response));
+
+      expect(result).toBe(paginate);
+      expect(paginate.data.map((item: TestModel) => item.id)).toEqual([2]);
+    });
+
+    it('should keep the list when the remote delete fails', () => {
+      const paginate = new Paginate(TestModel, { data: [{ id: 1 as ID }, { id: 2 as ID }] });
+
+      mockRemoteDataService.deleteMultiple.mockReturnValue(of(false));
+
+      service.deleteMultiple([paginate.data[0]], paginate).subscribe();
+
+      expect(paginate.data.map((item: TestModel) => item.id)).toEqual([1, 2]);
+    });
+
+    it('should send an empty array to the remote storage as it is', () => {
+      mockRemoteDataService.deleteMultiple.mockReturnValue(of(true));
+
+      service.deleteMultiple([], testPaginate).subscribe();
+
+      expect(mockRemoteDataService.deleteMultiple).toHaveBeenCalledWith([]);
+      expect(testPaginate.data.length).toBe(1);
     });
 
     it('should delete multiple from both remote and local, then fetch all when use_localstorage is true', () => {
@@ -696,36 +791,31 @@ describe('ProxyService', () => {
   });
 
   describe('registerObserver', () => {
-    it('should register observer with default sort field', () => {
-      const target = [];
-
+    it('should reload sorted by name on refresh by default', () => {
       vi.spyOn(service, 'watch').mockReturnValue(of(true));
       vi.spyOn(service, 'getAllSortedBy').mockReturnValue(of([testModel]));
 
-      service.registerObserver(target);
+      service.registerObserver([]);
 
-      expect(service.watch).toHaveBeenCalled();
-
-      // Test the subscription behavior
-      service.watch().subscribe(() => {
-        expect(service.getAllSortedBy).toHaveBeenCalledWith('name');
-      });
+      expect(service.getAllSortedBy).toHaveBeenCalledWith('name');
     });
 
-    it('should register observer with custom sort field', () => {
-      const target = [];
-
+    it('should reload sorted by the given field on refresh', () => {
       vi.spyOn(service, 'watch').mockReturnValue(of(true));
       vi.spyOn(service, 'getAllSortedBy').mockReturnValue(of([testModel]));
 
-      service.registerObserver(target, 'id');
+      service.registerObserver([], 'id');
 
-      expect(service.watch).toHaveBeenCalled();
+      expect(service.getAllSortedBy).toHaveBeenCalledWith('id');
+    });
 
-      // Test the subscription behavior
-      service.watch().subscribe(() => {
-        expect(service.getAllSortedBy).toHaveBeenCalledWith('id');
-      });
+    it('should not reload when the watch emits false', () => {
+      vi.spyOn(service, 'watch').mockReturnValue(of(false));
+      vi.spyOn(service, 'getAllSortedBy');
+
+      service.registerObserver([]);
+
+      expect(service.getAllSortedBy).not.toHaveBeenCalled();
     });
   });
 
@@ -775,7 +865,6 @@ describe('ProxyService', () => {
       const newTestModel = new TestModel().init();
       const newService = new ProxyService<TestModelInterface>(newTestModel);
 
-      expect(newService).toBeTruthy();
       expect((newService as any).notificationService).toBeInstanceOf(NotificationService);
       expect((newService as any).localStorageService).toBeInstanceOf(LocalDataService);
       expect((newService as any).remoteStorageService).toBeInstanceOf(RemoteDataService);

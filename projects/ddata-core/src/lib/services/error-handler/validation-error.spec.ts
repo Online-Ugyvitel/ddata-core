@@ -33,7 +33,6 @@ describe('AppValidationError', () => {
       };
       const error = new AppValidationError(originalError, mockNotificationService);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(AppValidationError);
       expect(error).toBeInstanceOf(DdataCoreError);
     });

@@ -12,7 +12,6 @@ describe('SorterService', () => {
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
     expect(service).toBeInstanceOf(SorterService);
   });
 
@@ -301,7 +300,6 @@ describe('SorterService', () => {
       // But we test it to ensure it doesn't crash
       const result = service.sortBy(objects, 'user');
 
-      expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
     });
   });

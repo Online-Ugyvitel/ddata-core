@@ -22,7 +22,7 @@ describe('EnvService', () => {
     });
 
     it('should be created', () => {
-      expect(service).toBeTruthy();
+      expect(service).toBeInstanceOf(EnvService);
     });
 
     it('should set environment from injected env', () => {
@@ -52,7 +52,7 @@ describe('EnvService', () => {
     });
 
     it('should be created', () => {
-      expect(service).toBeTruthy();
+      expect(service).toBeInstanceOf(EnvService);
     });
 
     it('should set environment to empty object when env is undefined', () => {
@@ -69,7 +69,7 @@ describe('EnvService', () => {
     });
 
     it('should be created', () => {
-      expect(service).toBeTruthy();
+      expect(service).toBeInstanceOf(EnvService);
     });
 
     it('should set environment to empty object when env is null', () => {
@@ -86,7 +86,7 @@ describe('EnvService', () => {
     });
 
     it('should be created', () => {
-      expect(service).toBeTruthy();
+      expect(service).toBeInstanceOf(EnvService);
     });
 
     it('should set environment to provided empty object', () => {

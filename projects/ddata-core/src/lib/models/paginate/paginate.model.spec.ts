@@ -27,7 +27,6 @@ describe('Paginate', () => {
     it('should be created with valid type parameter', () => {
       const paginate = new Paginate(mockType);
 
-      expect(paginate).toBeTruthy();
       expect(paginate).toBeInstanceOf(Paginate);
     });
 
@@ -90,37 +89,37 @@ describe('Paginate', () => {
 
     it('should have current_page property', () => {
       expect(paginate.hasOwnProperty('current_page')).toBe(true);
-      expect(paginate.current_page).toBeDefined();
+      expect(paginate.current_page).toBe(1);
     });
 
     it('should have per_page property', () => {
       expect(paginate.hasOwnProperty('per_page')).toBe(true);
-      expect(paginate.per_page).toBeDefined();
+      expect(paginate.per_page).toBe(1);
     });
 
     it('should have from property', () => {
       expect(paginate.hasOwnProperty('from')).toBe(true);
-      expect(paginate.from).toBeDefined();
+      expect(paginate.from).toBe(1);
     });
 
     it('should have to property', () => {
       expect(paginate.hasOwnProperty('to')).toBe(true);
-      expect(paginate.to).toBeDefined();
+      expect(paginate.to).toBe(1);
     });
 
     it('should have data property', () => {
       expect(paginate.hasOwnProperty('data')).toBe(true);
-      expect(paginate.data).toBeDefined();
+      expect(paginate.data).toEqual([]);
     });
 
     it('should have total property', () => {
       expect(paginate.hasOwnProperty('total')).toBe(true);
-      expect(paginate.total).toBeDefined();
+      expect(paginate.total).toBe(1);
     });
 
     it('should have last_page property', () => {
       expect(paginate.hasOwnProperty('last_page')).toBe(true);
-      expect(paginate.last_page).toBeDefined();
+      expect(paginate.last_page).toBe(1);
     });
   });
 

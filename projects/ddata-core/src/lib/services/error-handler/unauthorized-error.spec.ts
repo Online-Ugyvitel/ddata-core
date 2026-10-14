@@ -36,8 +36,6 @@ describe('UnauthorizedError', () => {
     it('should create the error instance', () => {
       const error = new UnauthorizedError(mockRouter, originalError, mockStorageService);
 
-      expect(error).toBeTruthy();
-      expect(error).toBeDefined();
       expect(error).toBeInstanceOf(UnauthorizedError);
     });
 

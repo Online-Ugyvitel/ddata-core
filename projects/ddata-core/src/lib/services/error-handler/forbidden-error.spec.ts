@@ -31,8 +31,7 @@ describe('ForbiddenError', () => {
       };
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
-      expect(forbiddenError).toBeTruthy();
-      expect(forbiddenError instanceof ForbiddenError).toBe(true);
+      expect(forbiddenError).toBeInstanceOf(ForbiddenError);
       expect(forbiddenError instanceof DdataCoreError).toBe(true);
     });
 
@@ -172,7 +171,6 @@ describe('ForbiddenError', () => {
       };
       const forbiddenError = new ForbiddenError(originalError, mockNotificationService);
 
-      expect(forbiddenError.msg).toBeDefined();
       expect(typeof forbiddenError.msg).toBe('string');
       expect(forbiddenError.msg).toContain('app/Http/Controllers/TestController.php:123');
     });

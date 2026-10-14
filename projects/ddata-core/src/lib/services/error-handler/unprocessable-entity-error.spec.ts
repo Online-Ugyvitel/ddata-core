@@ -31,8 +31,6 @@ describe('UnprocessableEntity', () => {
       const originalError = { error: { message: 'Test error' } };
       const instance = new UnprocessableEntity(originalError, notificationService);
 
-      expect(instance).toBeTruthy();
-      expect(instance).toBeDefined();
       expect(instance.originalError).toBe(originalError);
     });
 

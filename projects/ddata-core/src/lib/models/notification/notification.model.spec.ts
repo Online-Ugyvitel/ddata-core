@@ -13,15 +13,13 @@ describe('Notification', () => {
     it('should create an instance with default seconds parameter', () => {
       notification = new Notification(testText, testTitle, testType);
 
-      expect(notification).toBeTruthy();
-      expect(notification instanceof Notification).toBe(true);
+      expect(notification).toBeInstanceOf(Notification);
     });
 
     it('should create an instance with custom seconds parameter', () => {
       notification = new Notification(testText, testTitle, testType, testSeconds);
 
-      expect(notification).toBeTruthy();
-      expect(notification instanceof Notification).toBe(true);
+      expect(notification).toBeInstanceOf(Notification);
     });
   });
 
@@ -31,10 +29,10 @@ describe('Notification', () => {
     });
 
     it('should have all required properties', () => {
-      expect(notification.text).toBeDefined();
-      expect(notification.title).toBeDefined();
-      expect(notification.type).toBeDefined();
-      expect(notification.createdTime).toBeDefined();
+      expect(notification.text).toBe(testText);
+      expect(notification.title).toBe(testTitle);
+      expect(notification.type).toBe(testType);
+      expect(notification.createdTime).toBeInstanceOf(Date);
     });
 
     it('should set text property correctly', () => {
@@ -64,10 +62,10 @@ describe('Notification', () => {
       // Check that the instance has all properties required by the interface
       const notificationInterface: NotificationInterface = notification;
 
-      expect(notificationInterface.text).toBeDefined();
-      expect(notificationInterface.title).toBeDefined();
-      expect(notificationInterface.type).toBeDefined();
-      expect(notificationInterface.createdTime).toBeDefined();
+      expect(notificationInterface.text).toBe(testText);
+      expect(notificationInterface.title).toBe(testTitle);
+      expect(notificationInterface.type).toBe(testType);
+      expect(notificationInterface.createdTime).toBeInstanceOf(Date);
     });
 
     it('should have correct property types as defined in interface', () => {

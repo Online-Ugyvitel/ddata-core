@@ -153,10 +153,6 @@
             "setupFiles": [
               "projects/ddata-core/src/test-setup.ts"
             ],
-            "exclude": [
-              "**/test.model.spec.ts",
-              "**/test-bed-configuration.spec.ts"
-            ],
             "coverageInclude": [
               "projects/ddata-core/src/**/*.ts"
             ],
@@ -177,10 +173,10 @@
               "json-summary"
             ],
             "coverageThresholds": {
-              "statements": 91,
-              "branches": 86,
-              "functions": 94,
-              "lines": 91
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
             }
           }
         },

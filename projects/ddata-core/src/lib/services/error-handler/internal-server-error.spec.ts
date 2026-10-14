@@ -27,7 +27,6 @@ describe('InternalServerError', () => {
       };
       const error = new InternalServerError(originalError, mockNotificationService);
 
-      expect(error).toBeTruthy();
       expect(error).toBeInstanceOf(InternalServerError);
     });
 
@@ -103,7 +102,7 @@ describe('InternalServerError', () => {
       const error = new InternalServerError(originalError, mockNotificationService);
 
       // Check that inherited properties are available
-      expect(error.msg).toBeDefined();
+      expect(typeof error.msg).toBe('string');
       expect(error.originalError).toBe(originalError);
     });
 
