@@ -8,6 +8,7 @@ import { BehaviorSubject, of, Subscription } from 'rxjs';
 import { DdataUiLoadingOverlayComponent } from './loading-overlay.component';
 import { DdataCoreModule, SpinnerServiceInterface } from '@netdjw/ddata-core';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DdataUiCommonModule } from '../../ddata-ui-common.module';
 
 describe('DdataUiLoadingOverlayComponent', () => {
@@ -291,5 +292,103 @@ describe('DdataUiLoadingOverlayComponent', () => {
   it('should have the correct icon configuration', () => {
     expect(component.icon).toEqual({ spinner: faSpinner });
     expect(component.icon.spinner).toBe(faSpinner);
+  });
+});
+
+describe('DdataUiLoadingOverlayComponent rendering', () => {
+  let fixture: ComponentFixture<DdataUiLoadingOverlayComponent>;
+  let loading$: BehaviorSubject<boolean>;
+  let element: HTMLElement;
+  const overlay = (): HTMLElement => element.querySelector('.overlay');
+  const spinnerIcon = (): Element => element.querySelector('.spinner-container fa-icon');
+  const render = (inputs: { loadingInProgress?: unknown; spinner?: unknown } = {}): void => {
+    Object.entries(inputs).forEach(([name, value]) => fixture.componentRef.setInput(name, value));
+    fixture.detectChanges();
+  };
+
+  beforeEach(() => {
+    loading$ = new BehaviorSubject<boolean>(false);
+    TestBed.configureTestingModule({
+      declarations: [DdataUiLoadingOverlayComponent],
+      imports: [FontAwesomeModule]
+    });
+
+    fixture = TestBed.createComponent(DdataUiLoadingOverlayComponent);
+    fixture.componentRef.setInput('spinnerService', {
+      watch: () => loading$.asObservable()
+    });
+    element = fixture.nativeElement as HTMLElement;
+  });
+
+  it('should render an inactive overlay without spinner by default', () => {
+    render();
+
+    expect(overlay().classList).not.toContain('active');
+    expect(spinnerIcon()).toBeNull();
+  });
+
+  it.each([
+    [true, true, true, true],
+    [true, false, true, false],
+    [false, true, false, true],
+    [false, false, false, false]
+  ])(
+    'loadingInProgress=%s and spinner=%s should render active=%s and spinner=%s',
+    (loadingInProgress, spinner, active, hasSpinner) => {
+      // the service reports the same state, so the overlay is not reset by the subscription
+      loading$.next(loadingInProgress);
+      render({ loadingInProgress, spinner });
+
+      expect(overlay().classList.contains('active')).toBe(active);
+      expect(spinnerIcon() !== null).toBe(hasSpinner);
+    }
+  );
+
+  it.each([
+    ['null', null],
+    ['undefined', undefined]
+  ])('should treat %s inputs as off', (_label, value) => {
+    render({ loadingInProgress: value, spinner: value });
+
+    expect(overlay().classList).not.toContain('active');
+    expect(spinnerIcon()).toBeNull();
+    expect(fixture.componentInstance.loadingInProgress$.value).toBe(false);
+  });
+
+  it('should follow the spinner service state', () => {
+    render({ spinner: true });
+
+    expect(overlay().classList).not.toContain('active');
+
+    loading$.next(true);
+    fixture.detectChanges();
+
+    expect(overlay().classList).toContain('active');
+    expect(spinnerIcon()).not.toBeNull();
+
+    loading$.next(false);
+    fixture.detectChanges();
+
+    expect(overlay().classList).not.toContain('active');
+  });
+
+  it('should hide the spinner when the spinner input is switched off', () => {
+    render({ spinner: true });
+
+    expect(spinnerIcon()).not.toBeNull();
+
+    render({ spinner: false });
+
+    expect(spinnerIcon()).toBeNull();
+  });
+
+  it('should stop following the spinner service after it is destroyed', () => {
+    render();
+    const component = fixture.componentInstance;
+
+    fixture.destroy();
+    loading$.next(true);
+
+    expect(component.loadingInProgress$.value).toBe(false);
   });
 });

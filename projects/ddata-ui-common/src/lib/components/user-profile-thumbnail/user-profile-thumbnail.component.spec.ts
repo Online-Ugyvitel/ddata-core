@@ -245,4 +245,101 @@ describe('DdataUiUserThumbnailComponent', () => {
       expect(component.user.image.src).toBe('complete-test.jpg');
     });
   });
+
+  describe('initials edge cases', () => {
+    it.each([
+      ['undefined', undefined],
+      ['null', null]
+    ])('should use an empty initial when the name is %s', (_label, name) => {
+      component.user = { name };
+
+      expect(component.firstLetter).toBe('');
+    });
+
+    it.each([
+      ['Ádám', 'Á'],
+      ['éva', 'É'],
+      ['őrs', 'Ő'],
+      ['ürge', 'Ü'],
+      ['ßtraße', 'SS'],
+      ['A\u0301gnes', 'Á'],
+      ['😀 Smiley', '😀'],
+      ['𝒜lice', '𝒜']
+    ])('should take the whole first character of %s', (name: string, expected: string) => {
+      component.user = { name };
+
+      expect(component.firstLetter).toBe(expected);
+    });
+  });
+
+  describe('template', () => {
+    const render = (user: unknown): HTMLElement => {
+      fixture.componentRef.setInput('user', user);
+      fixture.detectChanges();
+
+      return element.querySelector('.user-profile-thumbnail');
+    };
+
+    it('should render the image with the user name as alt and title', () => {
+      const thumbnail = render({
+        name: 'Kovács Éva',
+        image: { src: 'https://example.com/eva.png' }
+      });
+      const image = thumbnail.querySelector('img');
+
+      expect(image.getAttribute('src')).toBe('https://example.com/eva.png');
+      expect(image.getAttribute('alt')).toBe('Kovács Éva');
+      expect(thumbnail.getAttribute('title')).toBe('Kovács Éva');
+      expect(thumbnail.textContent.trim()).toBe('');
+    });
+
+    it('should render the initial instead of an image when the image URL is missing', () => {
+      const thumbnail = render({ name: 'éva', image: { src: '' } });
+
+      expect(thumbnail.querySelector('img')).toBeNull();
+      expect(thumbnail.textContent.trim()).toBe('É');
+    });
+
+    it('should render the default initial when the user is missing', () => {
+      const thumbnail = render(null);
+
+      expect(thumbnail.querySelector('img')).toBeNull();
+      expect(thumbnail.textContent.trim()).toBe('X');
+      expect(thumbnail.getAttribute('title')).toBe('X');
+    });
+
+    it('should render no initial and no title when the name is empty', () => {
+      const thumbnail = render({ name: '' });
+
+      expect(thumbnail.querySelector('img')).toBeNull();
+      expect(thumbnail.textContent.trim()).toBe('');
+      expect(thumbnail.getAttribute('title')).toBe('');
+    });
+
+    it('should render an emoji initial', () => {
+      expect(render({ name: '🚀 Rocket' }).textContent.trim()).toBe('🚀');
+    });
+
+    it('should keep the image element for a broken image URL (the browser shows its fallback)', () => {
+      const thumbnail = render({ name: 'Broken', image: { src: 'not a valid url' } });
+      const image = thumbnail.querySelector('img');
+
+      image.dispatchEvent(new Event('error'));
+      fixture.detectChanges();
+
+      expect(thumbnail.querySelector('img')).toBe(image);
+      expect(image.getAttribute('src')).toBe('not a valid url');
+    });
+
+    it('should switch between image and initial when the user changes', () => {
+      const thumbnail = render({ name: 'Alice', image: { src: 'alice.png' } });
+
+      expect(thumbnail.querySelector('img')).not.toBeNull();
+
+      render({ name: 'bob' });
+
+      expect(thumbnail.querySelector('img')).toBeNull();
+      expect(thumbnail.textContent.trim()).toBe('B');
+    });
+  });
 });
