@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test ddata-lib --no-watch",
-    "test:coverage": "ng test ddata-core --no-watch --coverage && ng test ddata-a11y --no-watch --coverage && ng test ddata-ui-common --no-watch --coverage && ng test ddata-ui-dialog --no-watch --coverage && ng test ddata-ui-input --no-watch --coverage && ng test ddata-ui-file --no-watch --coverage",
+    "test:coverage": "ng test ddata-core --no-watch --coverage && ng test ddata-a11y --no-watch --coverage && ng test ddata-ui-common --no-watch --coverage && ng test ddata-ui-dialog --no-watch --coverage && ng test ddata-ui-input --no-watch --coverage && ng test ddata-ui-file --no-watch --coverage && ng test ddata-ui-views --no-watch --coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "publish:ddata-core:patch-version": "cd projects/ddata-core && npm version patch && cd ../.. && ng build ddata-core --configuration production && cd dist/ddata-core && npm publish && cd ../..",
@@ -18,13 +18,15 @@
     "build:ui-file": "ng build ddata-ui-file --configuration production",
     "build:ui": "ng build ddata-ui --configuration production",
     "build:ui-input": "ng build ddata-ui-input --configuration production",
+    "build:ui-views": "ng build ddata-ui-views --configuration production",
     "verify:consumer": "bash scripts/verify-consumer.sh",
     "publish:a11y": "cd dist/ddata-a11y && npm publish && cd ../..",
     "publish:core": "cd dist/ddata-core && npm publish && cd ../..",
     "publish:ui-common": "cd dist/ddata-ui-common && npm publish && cd ../..",
     "publish:ui-dialog": "cd dist/ddata-ui-dialog && npm publish && cd ../..",
     "publish:ui-file": "cd dist/ddata-ui-file && npm publish && cd ../..",
-    "publish:ui-input": "cd dist/ddata-ui-input && npm publish && cd ../.."
+    "publish:ui-input": "cd dist/ddata-ui-input && npm publish && cd ../..",
+    "publish:ui-views": "cd dist/ddata-ui-views && npm publish && cd ../.."
   },
   "private": true,
   "dependencies": {

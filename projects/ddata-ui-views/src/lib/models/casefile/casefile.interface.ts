@@ -24,8 +24,8 @@ export interface CasefileInterface {
   id: ID;
   name?: string;
   description?: string;
-  status_id?: ID;
-  status?: CasefileStatusInterface;
+  status_id?: ID | null;
+  status?: CasefileStatusInterface | null;
   priority?: { color: string };
   owner?: CasefileUserInterface;
   responsible_user?: CasefileUserInterface;
@@ -35,7 +35,7 @@ export interface CasefileInterface {
    */
   estimated_time?: string;
   /**
-   * ISO date string.
+   * ISO date (`2026-01-15`) or date-time (`2026-01-15T12:00:00Z`) string.
    */
-  deadline?: string;
+  deadline?: string | null;
 }

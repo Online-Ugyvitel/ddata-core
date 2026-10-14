@@ -42,6 +42,10 @@
         "dist/ddata-ui-common/ddata-ui-common",
         "dist/ddata-ui-common"
       ],
+      "@netdjw/ddata-ui-views": [
+        "dist/ddata-ui-views/ddata-ui-views",
+        "dist/ddata-ui-views"
+      ],
       "@netdjw/ddata-a11y": [
         "dist/ddata-a11y/ddata-a11y",
         "dist/ddata-a11y"

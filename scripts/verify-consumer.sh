@@ -5,7 +5,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-packages=(ddata-core ddata-a11y ddata-ui-common ddata-ui-dialog ddata-ui-input ddata-ui-file)
+packages=(ddata-core ddata-a11y ddata-ui-common ddata-ui-dialog ddata-ui-input ddata-ui-file ddata-ui-views)
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
@@ -33,7 +33,13 @@ const own = new Set();
 for (const dir of dirs) {
   const pkg = require(path.join(root, 'dist', dir, 'package.json'));
   own.add(pkg.name);
-  deps[pkg.name] = 'file:' + path.join(tarballs, fs.readdirSync(tarballs).find(f => f.startsWith(pkg.name.replace('@', '').replace('/', '-') + '-')));
+  // npm pack names the tarball <scope>-<name>-<version>.tgz; an exact match, because a name prefix
+  // (e.g. netdjw-ddata-ui-) would also match the other packages.
+  const tarball = pkg.name.replace('@', '').replace('/', '-') + '-' + pkg.version + '.tgz';
+  if (!fs.existsSync(path.join(tarballs, tarball))) {
+    throw new Error(`The tarball ${tarball} of ${pkg.name} is missing.`);
+  }
+  deps[pkg.name] = 'file:' + path.join(tarballs, tarball);
 }
 for (const dir of dirs) {
   const pkg = require(path.join(root, 'dist', dir, 'package.json'));

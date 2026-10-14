@@ -1,26 +1,29 @@
 import { ID } from '@netdjw/ddata-core';
-import { CasefileInterface, CasefileStatusInterface } from '../../casefile/casefile.interface';
+import { CasefileInterface } from '../../casefile/casefile.interface';
 
-export interface KanbanStatusInterface extends CasefileStatusInterface {
+/**
+ * A column of the kanban view. The column of the casefiles without status has `null` id.
+ */
+export interface KanbanStatusInterface {
+  id: ID | null;
+  name: string;
+  color: string;
   casefiles: Array<CasefileInterface>;
-  is_drag_over: boolean;
 
   init(data?: Partial<KanbanStatusInterface>): KanbanStatusInterface;
 }
 
 export class KanbanStatus implements KanbanStatusInterface {
-  id: ID = 0 as ID;
+  id: ID | null = null;
   name = '';
   color = '';
   casefiles: Array<CasefileInterface> = [];
-  is_drag_over = false;
 
   init(data: Partial<KanbanStatusInterface> = {}): KanbanStatusInterface {
-    this.id = data.id ?? (0 as ID);
+    this.id = data.id ?? null;
     this.name = data.name ?? '';
     this.color = data.color ?? '';
     this.casefiles = data.casefiles ?? [];
-    this.is_drag_over = data.is_drag_over ?? false;
 
     return this;
   }

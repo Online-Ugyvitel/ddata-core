@@ -537,6 +537,69 @@
           }
         }
       }
+    },
+    "ddata-ui-views": {
+      "projectType": "library",
+      "root": "projects/ddata-ui-views",
+      "sourceRoot": "projects/ddata-ui-views/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ddata-ui-views/tsconfig.lib.json",
+            "project": "projects/ddata-ui-views/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ddata-ui-views/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ddata-ui-views/tsconfig.lib.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/ddata-ui-views/tsconfig.spec.json",
+            "setupFiles": [
+              "projects/ddata-ui-views/src/test-setup.ts"
+            ],
+            "coverageInclude": [
+              "projects/ddata-ui-views/src/**/*.ts"
+            ],
+            "coverageReporters": [
+              "text-summary",
+              "html",
+              "lcov",
+              "json-summary"
+            ],
+            "coverageThresholds": {
+              "statements": 98,
+              "branches": 98,
+              "functions": 98,
+              "lines": 98
+            },
+            "coverageExclude": [
+              "**/*.spec.ts",
+              "**/test-setup.ts",
+              "**/public-api.ts",
+              "**/*.interface.ts",
+              "**/*.type.ts"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ddata-ui-views/**/*.ts",
+              "projects/ddata-ui-views/**/*.html"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {

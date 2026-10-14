@@ -1,0 +1,32 @@
+.list-container {
+  font-size: 0.9rem;
+  overflow-y: auto;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.list-date {
+  margin-left: 0.5rem;
+  font-weight: normal;
+}
+
+.list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-item {
+  border-left-width: 3px;
+  border-left-style: solid;
+
+  &:hover {
+    background-color: var(--light);
+  }
+}
+
+.card-description {
+  font-size: 0.8rem;
+}

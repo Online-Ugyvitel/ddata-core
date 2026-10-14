@@ -1,0 +1,91 @@
+<div class="kanban-container container-fluid px-0 py-0">
+  <div class="kanban-title">
+    <h3>{{ title() }}</h3>
+  </div>
+
+  @if (board().statuses.length > 0) {
+    <p class="visually-hidden sr-only" [id]="helpId">{{ i18n().keyboardHelp }}</p>
+    <div class="visually-hidden sr-only" aria-live="polite" aria-atomic="true">
+      {{ announcement() }}
+    </div>
+
+    <div
+      class="kanban-status-container"
+      role="region"
+      [attr.aria-label]="title()"
+      [style.height.px]="viewportHeight.height()"
+    >
+      @for (status of board().statuses; track status; let statusIndex = $index) {
+        <section
+          class="kanban-status"
+          [class.drag-active]="dragged() !== null"
+          [class.drag-over]="isDragOver(status)"
+          [attr.aria-labelledby]="helpId + '-status-' + statusIndex"
+          (dragover)="dragoverStatus($event, status)"
+          (drop)="drop($event)"
+        >
+          <header [style.background-color]="status.color">
+            <h6 [id]="helpId + '-status-' + statusIndex">{{ status.name }}</h6>
+            <div class="row small">
+              <div class="col">{{ status.casefiles.length }} {{ i18n().casefileCount }}</div>
+              <div class="col text-right">{{ getEstimatedTimes(status) }}</div>
+            </div>
+          </header>
+
+          <ul class="kanban-cards" role="list">
+            @for (casefile of status.casefiles; track casefile) {
+              <li
+                #card
+                class="card"
+                tabindex="0"
+                draggable="true"
+                [attr.data-casefile-id]="casefile.id"
+                [attr.aria-label]="casefile.name"
+                [attr.aria-describedby]="helpId"
+                [class.dragging]="dragged() === casefile"
+                [style.border-top-color]="casefile.priority?.color"
+                (dragstart)="dragstart($event, casefile)"
+                (dragend)="dragend()"
+                (dragover)="dragoverCasefile($event, status, casefile)"
+                (keydown)="keydown($event, casefile, status)"
+              >
+                <button
+                  type="button"
+                  class="card-title"
+                  tabindex="-1"
+                  [attr.aria-label]="openLabel(casefile)"
+                  (click)="open(casefile)"
+                >
+                  {{ casefile.name }}
+                </button>
+
+                <div class="card-body">
+                  <div class="card-description">{{ casefile.description }}</div>
+                </div>
+
+                <footer class="card-footer d-flex">
+                  @if (casefile.owner) {
+                    <div class="card-owner pr-2">
+                      <dd-user-profile-thumbnail
+                        [user]="casefile.owner"
+                      ></dd-user-profile-thumbnail>
+                    </div>
+                  }
+                  @if (casefile.responsible_user) {
+                    <div class="card-responsible-user pr-2">
+                      <dd-user-profile-thumbnail
+                        [user]="casefile.responsible_user"
+                      ></dd-user-profile-thumbnail>
+                    </div>
+                  }
+                </footer>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  } @else {
+    <dd-no-data [text]="i18n().noData"></dd-no-data>
+  }
+</div>

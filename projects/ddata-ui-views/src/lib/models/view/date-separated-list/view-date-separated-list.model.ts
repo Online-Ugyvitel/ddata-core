@@ -3,7 +3,7 @@ import { CasefileInterface } from '../../casefile/casefile.interface';
 export interface ViewDateSeparatedListInterface {
   name: string;
   /**
-   * ISO date string of the group.
+   * The calendar day of the group in `YYYY-MM-DD` format, empty for the casefiles without deadline.
    */
   date: string;
   casefiles: Array<CasefileInterface>;

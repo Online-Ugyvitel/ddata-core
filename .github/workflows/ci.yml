@@ -40,6 +40,7 @@ jobs:
         npm run build:ui-dialog
         npm run build:ui-input
         npm run build:ui-file
+        npm run build:ui-views
         npm run build:ui
 
     # Installs the packed packages into a scratch project and imports them, like a consumer would.
@@ -113,6 +114,9 @@ jobs:
 
     - name: Test ddata-ui
       run: npx ng test ddata-ui --no-watch
+
+    - name: Test ddata-ui-views
+      run: npx ng test ddata-ui-views --no-watch --coverage
 
     # The coverage reports of every package (coverage/<package>/), also when a test step failed.
     - name: Upload coverage reports
