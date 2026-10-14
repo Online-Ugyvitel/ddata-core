@@ -1,111 +1,13 @@
-import { Injectable, InjectionToken, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-
-/**
- * State of the online Pwned Passwords check:
- * - `idle`: no check (disabled or empty password)
- * - `checking`: the check is in progress, the password is not known to be safe yet
- * - `compromised`: the password is in the Pwned Passwords database
- * - `not-found`: the password is not in the database
- * - `unavailable`: the check failed (no Web Crypto, network / CORS / HTTP error, invalid response)
- */
-export type PwnedPasswordStatus = 'idle' | 'checking' | 'compromised' | 'not-found' | 'unavailable';
-
-export type PwnedPasswordCheckResult = Extract<
-  PwnedPasswordStatus,
-  'compromised' | 'not-found' | 'unavailable'
->;
-
-export interface PwnedPasswordsConfigInterface {
-  /** The range endpoint, the 5 character hash prefix is appended to it. */
-  apiUrl: string;
-  /** Sends the `Add-Padding: true` header, so the size of the response doesn't leak the prefix. */
-  addPadding: boolean;
-}
-
-export type PwnedPasswordsFetch = (input: string, init?: RequestInit) => Promise<Response>;
-
-/** Returns the uppercase hexadecimal SHA-1 hash of the UTF-8 encoded password. */
-export type PwnedPasswordsHasher = (password: string) => Promise<string>;
-
-export const defaultPwnedPasswordsConfig: PwnedPasswordsConfigInterface = {
-  apiUrl: 'https://api.pwnedpasswords.com/range/',
-  addPadding: true
-};
-
-// eslint-disable-next-line @typescript-eslint/naming-convention -- Angular injection token naming
-export const PWNED_PASSWORDS_CONFIG = new InjectionToken<PwnedPasswordsConfigInterface>(
-  'PWNED_PASSWORDS_CONFIG',
-  { providedIn: 'root', factory: (): PwnedPasswordsConfigInterface => defaultPwnedPasswordsConfig }
-);
-
-/** The `fetch` implementation of the check, replaceable in the tests. */
-// eslint-disable-next-line @typescript-eslint/naming-convention -- Angular injection token naming
-export const PWNED_PASSWORDS_FETCH = new InjectionToken<PwnedPasswordsFetch | null>(
-  'PWNED_PASSWORDS_FETCH',
-  {
-    providedIn: 'root',
-    factory: (): PwnedPasswordsFetch | null =>
-      typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null
-  }
-);
-
-/** The SHA-1 implementation of the check, replaceable in the tests. */
-// eslint-disable-next-line @typescript-eslint/naming-convention -- Angular injection token naming
-export const PWNED_PASSWORDS_HASHER = new InjectionToken<PwnedPasswordsHasher>(
-  'PWNED_PASSWORDS_HASHER',
-  { providedIn: 'root', factory: (): PwnedPasswordsHasher => sha1Hex }
-);
-const hashPattern = /^[\dA-F]{40}$/;
-const linePattern = /^([\dA-F]{35}):(\d+)$/i;
-const cacheSize = 20;
-
-/**
- * SHA-1 of the UTF-8 encoded password as uppercase hex with the Web Crypto API.
- * SHA-1 is required by the Pwned Passwords protocol only, it isn't a password storage method.
- * Rejects when the Web Crypto API isn't available (e.g. not a secure context).
- */
-export async function sha1Hex(password: string): Promise<string> {
-  const subtle = globalThis.crypto?.subtle;
-
-  if (!subtle) {
-    throw new Error('Web Crypto API is not available');
-  }
-  const digest = await subtle.digest('SHA-1', new TextEncoder().encode(password));
-
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
-    .toUpperCase();
-}
-
-/**
- * Finds the hash suffix in a `HASH_SUFFIX:COUNT` range response (LF or CRLF line endings) and
- * returns its count. The comparison is case insensitive. Padding lines have 0 count, so 0 means
- * not found. Throws on an invalid response.
- */
-export function findPwnedCount(body: string, suffix: string): number {
-  const wanted = suffix.toUpperCase();
-  let count = 0;
-
-  for (const line of body.split(/\r?\n/)) {
-    const trimmed = line.trim();
-
-    if (trimmed === '') {
-      continue;
-    }
-    const match = linePattern.exec(trimmed);
-
-    if (!match) {
-      throw new Error('Invalid Pwned Passwords response');
-    }
-
-    if (match[1].toUpperCase() === wanted) {
-      count = Math.max(count, Number(match[2]));
-    }
-  }
-
-  return count;
-}
+import { Sha1HashService } from '../hash/sha1-hash.service';
+import { PwnedPasswordCheckResult } from './pwned-password-status.type';
+import { PWNED_PASSWORDS_CONFIG, PWNED_PASSWORDS_FETCH } from './pwned-passwords.const';
+import {
+  pwnedPasswordsCacheSize,
+  pwnedPasswordsHashPattern,
+  pwnedPasswordsLinePattern
+} from './pwned-passwords-protocol.const';
 
 /**
  * Checks a password against the Have I Been Pwned Pwned Passwords API with k-anonymity: only the
@@ -117,21 +19,21 @@ export function findPwnedCount(body: string, suffix: string): number {
 export class PwnedPasswordsService {
   private readonly config = inject(PWNED_PASSWORDS_CONFIG);
   private readonly fetchFn = inject(PWNED_PASSWORDS_FETCH);
-  private readonly hasher = inject(PWNED_PASSWORDS_HASHER);
+  private readonly sha1 = inject(Sha1HashService);
   // range prefix -> response body, the prefix and the response aren't secret
   private readonly cache = new Map<string, string>();
 
   /** Never rejects: every failure gives `unavailable`. */
   async check(password: string, signal?: AbortSignal): Promise<PwnedPasswordCheckResult> {
     try {
-      const hash = (await this.hasher(password)).toUpperCase();
+      const hash = (await this.sha1.hash(password)).toUpperCase();
 
-      if (!hashPattern.test(hash)) {
+      if (!pwnedPasswordsHashPattern.test(hash)) {
         return 'unavailable';
       }
       const body = await this.fetchRange(hash.slice(0, 5), signal);
 
-      return findPwnedCount(body, hash.slice(5)) > 0 ? 'compromised' : 'not-found';
+      return this.findCount(body, hash.slice(5)) > 0 ? 'compromised' : 'not-found';
     } catch {
       return 'unavailable';
     }
@@ -149,6 +51,35 @@ export class PwnedPasswordsService {
 
       return (): void => controller.abort();
     });
+  }
+
+  /**
+   * Finds the hash suffix in a `HASH_SUFFIX:COUNT` range response (LF or CRLF line endings) and
+   * returns its count. The comparison is case insensitive. Padding lines have 0 count, so 0 means
+   * not found. Throws on an invalid response.
+   */
+  findCount(body: string, suffix: string): number {
+    const wanted = suffix.toUpperCase();
+    let count = 0;
+
+    for (const line of body.split(/\r?\n/)) {
+      const trimmed = line.trim();
+
+      if (trimmed === '') {
+        continue;
+      }
+      const match = pwnedPasswordsLinePattern.exec(trimmed);
+
+      if (!match) {
+        throw new Error('Invalid Pwned Passwords response');
+      }
+
+      if (match[1].toUpperCase() === wanted) {
+        count = Math.max(count, Number(match[2]));
+      }
+    }
+
+    return count;
   }
 
   private async fetchRange(prefix: string, signal?: AbortSignal): Promise<string> {
@@ -182,10 +113,10 @@ export class PwnedPasswordsService {
     const body = await response.text();
 
     // validates before caching
-    findPwnedCount(body, '');
+    this.findCount(body, '');
     this.cache.set(prefix, body);
 
-    if (this.cache.size > cacheSize) {
+    if (this.cache.size > pwnedPasswordsCacheSize) {
       this.cache.delete(this.cache.keys().next().value as string);
     }
 

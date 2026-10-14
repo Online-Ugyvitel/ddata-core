@@ -84,8 +84,8 @@ import { PwnedPasswordsService } from '@netdjw/ddata-ui-input';
 const status = await inject(PwnedPasswordsService).check('password'); // 'compromised'
 ```
 
-Its dependencies can be replaced with the `PWNED_PASSWORDS_CONFIG` (`apiUrl`, `addPadding`),
-`PWNED_PASSWORDS_FETCH` and `PWNED_PASSWORDS_HASHER` injection tokens, e.g. in the tests.
+Its dependencies can be replaced with the `PWNED_PASSWORDS_CONFIG` (`apiUrl`, `addPadding`) and
+`PWNED_PASSWORDS_FETCH` injection tokens and the `Sha1HashService` provider, e.g. in the tests.
 
 
 ## API

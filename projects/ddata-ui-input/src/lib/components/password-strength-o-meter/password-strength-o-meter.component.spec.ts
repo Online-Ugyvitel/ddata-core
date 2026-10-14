@@ -1,13 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NEVER, Observable, Subject } from 'rxjs';
 import { WEAK_PASSWORDS } from '../../services/password-strength/password-strength';
-import {
-  PWNED_PASSWORDS_FETCH,
-  PWNED_PASSWORDS_HASHER,
-  PwnedPasswordCheckResult,
-  PwnedPasswordsFetch,
-  PwnedPasswordsService
-} from '../../services/pwned-passwords/pwned-passwords.service';
+import { Sha1HashService } from '../../services/hash/sha1-hash.service';
+import { PwnedPasswordCheckResult } from '../../services/pwned-passwords/pwned-password-status.type';
+import { PWNED_PASSWORDS_FETCH } from '../../services/pwned-passwords/pwned-passwords.const';
+import { PwnedPasswordsFetch } from '../../services/pwned-passwords/pwned-passwords-fetch.type';
+import { PwnedPasswordsService } from '../../services/pwned-passwords/pwned-passwords.service';
 import { PasswordStrengthOMeterComponent } from './password-strength-o-meter.component';
 
 describe('PasswordStrengthOMeterComponent', () => {
@@ -536,9 +534,11 @@ describe('PasswordStrengthOMeterComponent', () => {
     it('should give unavailable without the Web Crypto API', async () => {
       await createWithApi([
         {
-          provide: PWNED_PASSWORDS_HASHER,
-          useValue: async (): Promise<string> => {
-            throw new Error('no crypto');
+          provide: Sha1HashService,
+          useValue: {
+            hash: async (): Promise<string> => {
+              throw new Error('no crypto');
+            }
           }
         }
       ]);

@@ -1,41 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
+import { Sha1HashService } from '../hash/sha1-hash.service';
 import {
   PWNED_PASSWORDS_CONFIG,
   PWNED_PASSWORDS_FETCH,
-  PWNED_PASSWORDS_HASHER,
-  PwnedPasswordsFetch,
-  PwnedPasswordsService,
-  defaultPwnedPasswordsConfig,
-  findPwnedCount,
-  sha1Hex
-} from './pwned-passwords.service';
+  defaultPwnedPasswordsConfig
+} from './pwned-passwords.const';
+import { PwnedPasswordsFetch } from './pwned-passwords-fetch.type';
+import { PwnedPasswordsService } from './pwned-passwords.service';
 // SHA-1('password') = 5BAA6 1E4C9B93F3F0682250B6CF8331B7EE68FD8
 const passwordSuffix = '1E4C9B93F3F0682250B6CF8331B7EE68FD8';
 const otherSuffix = '0018A45C4D1DEF81644B54AB7F969B88D65';
+// replaces the Sha1HashService
+const hasherOf = (hash: () => Promise<string>): Pick<Sha1HashService, 'hash'> => ({ hash });
 const response = (body: string, status = 200): Response => new Response(body, { status });
 
-describe('sha1Hex()', () => {
-  it.each([
-    ['password', '5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8'],
-    ['jelszó', '540D3FF8059AC7042C116EDAB90B6D1CD6BC324C'],
-    ['😀🔑', '0ED31FB6443F459E493FCB8EBC5F0E95FE6BFBC2']
-  ])('should hash %s as UTF-8 to uppercase hex', async (password, hash) => {
-    expect(await sha1Hex(password)).toBe(hash);
-  });
+describe('PwnedPasswordsService.findCount()', () => {
+  const findPwnedCount = (body: string, suffix: string): number =>
+    TestBed.inject(PwnedPasswordsService).findCount(body, suffix);
 
-  it('should reject without the Web Crypto API', async () => {
-    vi.stubGlobal('crypto', undefined);
-
-    try {
-      await expect(sha1Hex('password')).rejects.toThrow('Web Crypto API is not available');
-    } finally {
-      vi.unstubAllGlobals();
-    }
-  });
-});
-
-describe('findPwnedCount()', () => {
   it('should find the exact suffix case insensitively', () => {
     expect(
       findPwnedCount(`${otherSuffix}:3\n${passwordSuffix.toLowerCase()}:42`, passwordSuffix)
@@ -117,7 +100,7 @@ describe('PwnedPasswordsService', () => {
     // a new prefix for every call
     const hasher = async (): Promise<string> =>
       `${(index++).toString(16).toUpperCase().padStart(5, '0')}${passwordSuffix}`;
-    const service = setup([{ provide: PWNED_PASSWORDS_HASHER, useValue: hasher }]);
+    const service = setup([{ provide: Sha1HashService, useValue: hasherOf(hasher) }]);
 
     for (let i = 0; i < 22; i++) {
       await service.check('x');
@@ -202,15 +185,15 @@ describe('PwnedPasswordsService', () => {
   it('should give unavailable when hashing fails or gives an invalid hash', async () => {
     let service = setup([
       {
-        provide: PWNED_PASSWORDS_HASHER,
-        useValue: async () => Promise.reject(new Error('no crypto'))
+        provide: Sha1HashService,
+        useValue: hasherOf(async () => Promise.reject(new Error('no crypto')))
       }
     ]);
 
     expect(await service.check('password')).toBe('unavailable');
 
     TestBed.resetTestingModule();
-    service = setup([{ provide: PWNED_PASSWORDS_HASHER, useValue: async () => 'nothex' }]);
+    service = setup([{ provide: Sha1HashService, useValue: hasherOf(async () => 'nothex') }]);
 
     expect(await service.check('password')).toBe('unavailable');
     expect(fetchMock).not.toHaveBeenCalled();
@@ -220,8 +203,8 @@ describe('PwnedPasswordsService', () => {
     fetchMock.mockResolvedValue(response(`${passwordSuffix}:1`));
     const service = setup([
       {
-        provide: PWNED_PASSWORDS_HASHER,
-        useValue: async () => `5baa6${passwordSuffix.toLowerCase()}`
+        provide: Sha1HashService,
+        useValue: hasherOf(async () => `5baa6${passwordSuffix.toLowerCase()}`)
       }
     ]);
 
@@ -258,8 +241,7 @@ describe('PwnedPasswordsService', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('should use the global fetch and Web Crypto by default', () => {
-    expect(TestBed.inject(PWNED_PASSWORDS_HASHER)).toBe(sha1Hex);
+  it('should use the global fetch and the default config', () => {
     expect(typeof TestBed.inject(PWNED_PASSWORDS_FETCH)).toBe('function');
     expect(TestBed.inject(PWNED_PASSWORDS_CONFIG)).toBe(defaultPwnedPasswordsConfig);
   });

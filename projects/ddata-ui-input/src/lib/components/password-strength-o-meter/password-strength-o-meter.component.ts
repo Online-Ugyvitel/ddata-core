@@ -15,22 +15,12 @@ import {
   calculatePasswordStrength,
   getPasswordStrengthLevel
 } from '../../services/password-strength/password-strength';
-import {
-  PwnedPasswordStatus,
-  PwnedPasswordsService
-} from '../../services/pwned-passwords/pwned-passwords.service';
+import { PwnedPasswordStatus } from '../../services/pwned-passwords/pwned-password-status.type';
+import { PwnedPasswordsService } from '../../services/pwned-passwords/pwned-passwords.service';
+import { PwnedRequestInterface } from './pwned-request.interface';
+import { PwnedStateInterface } from './pwned-state.interface';
 
 export type PasswordStrengthTexts = Record<PasswordStrengthLevel, string>;
-
-interface PwnedStateInterface {
-  password: string;
-  status: PwnedPasswordStatus;
-}
-
-interface PwnedRequestInterface {
-  password: string;
-  enabled: boolean;
-}
 
 @Component({
   selector: 'dd-password-strength-o-meter',
