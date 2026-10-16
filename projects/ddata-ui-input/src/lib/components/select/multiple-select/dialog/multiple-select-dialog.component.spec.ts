@@ -294,34 +294,50 @@ describe('DdataMultipleSelectDialogComponent', () => {
   });
 
   describe('closing', () => {
-    it('should emit the current selection and reset it when the close button is clicked', () => {
-      setup({ settings: createSettings(), model: { tags: [tag1, tag2] } as never, field: 'tags' });
+    it('should cancel the selection without emitting models when the close button is clicked', () => {
+      const model = { tags: [tag1, tag2] };
+
+      setup({ settings: createSettings(), model: model as never, field: 'tags' });
       const selectModel = vi.fn();
       const selectionFinished = vi.fn();
 
       component.selectModel.subscribe(selectModel);
       component.selectionFinished.subscribe(selectionFinished);
+      listInstance().selectedElements = [tag1, tag2, tag3];
       const button: HTMLButtonElement = fixture.nativeElement.querySelector('button.close');
 
       expect(button.getAttribute('aria-label')).toBe('Bezárás');
 
       button.click();
 
-      expect(selectModel).toHaveBeenCalledTimes(2);
-      expect(selectModel).toHaveBeenNthCalledWith(1, tag1);
-      expect(selectModel).toHaveBeenNthCalledWith(2, tag2);
-      expect(selectionFinished).toHaveBeenCalledExactlyOnceWith([tag1, tag2]);
+      expect(selectModel).not.toHaveBeenCalled();
+      expect(selectionFinished).toHaveBeenCalledExactlyOnceWith(undefined);
       expect(listInstance().selectedElements).toEqual([]);
+      expect(model.tags).toEqual([tag1, tag2]);
     });
 
-    it('should finish with an empty selection when nothing is selected', () => {
+    it('should not duplicate the previously selected items when the close button is clicked', () => {
+      const model = { tags: [tag1, tag2] };
+
+      setup({ settings: createSettings(), model: model as never, field: 'tags' });
+      // the same push the parent dd-select does on every emitted model in multiple mode
+      component.selectModel.subscribe((selected: unknown) =>
+        model.tags.push(selected as TagInterface)
+      );
+
+      component.hideModal();
+
+      expect(model.tags).toEqual([tag1, tag2]);
+    });
+
+    it('should finish without a selection when nothing is selected', () => {
       setup({ settings: createSettings(), model: { tags: [] } as never, field: 'tags' });
       const selectionFinished = vi.fn();
 
       component.selectionFinished.subscribe(selectionFinished);
       component.hideModal();
 
-      expect(selectionFinished).toHaveBeenCalledExactlyOnceWith([]);
+      expect(selectionFinished).toHaveBeenCalledExactlyOnceWith(undefined);
     });
 
     it('should cancel the selection (without emitted models) on escape', () => {
@@ -332,10 +348,13 @@ describe('DdataMultipleSelectDialogComponent', () => {
       component.selectModel.subscribe(selectModel);
       component.selectionFinished.subscribe(selectionFinished);
 
+      listInstance().selectedElements = [tag1, tag2];
+
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 
       expect(selectionFinished).toHaveBeenCalledExactlyOnceWith(undefined);
       expect(selectModel).not.toHaveBeenCalled();
+      expect(listInstance().selectedElements).toEqual([]);
     });
 
     it('should not react to other keys', () => {

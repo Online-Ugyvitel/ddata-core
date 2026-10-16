@@ -67,7 +67,7 @@ export class DdataMultipleSelectDialogComponent implements OnInit, AfterViewInit
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     event: Event
   ): void {
-    this.selectionFinished.emit();
+    this.cancel();
   }
 
   ngOnInit(): void {
@@ -130,15 +130,15 @@ export class DdataMultipleSelectDialogComponent implements OnInit, AfterViewInit
     );
   }
 
+  // the close (×) button cancels like Escape, only the list's select applies the selection
   hideModal(): void {
-    // get dialog component instance
-    const selectedElements = this.componentRendererService.getSelectedModels();
+    this.cancel();
+  }
 
-    // emit selected elements
-    this.emitEvents(selectedElements);
-
-    // reset selected elements
+  private cancel(): void {
     this.componentRendererService.resetSelectedModels();
+
+    this.selectionFinished.emit();
   }
 
   private getSelectedItems(): void {
