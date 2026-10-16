@@ -20,6 +20,12 @@ export * from './lib/pipes/description/description.pipe';
 export * from './lib/services/input/helper/input-helper-service.interface';
 export * from './lib/services/input/helper/input-helper.service';
 export * from './lib/services/password-strength/password-strength';
+export * from './lib/services/hash/sha1-hash.service';
+export * from './lib/services/pwned-passwords/pwned-password-status.type';
+export * from './lib/services/pwned-passwords/pwned-passwords-config.interface';
+export * from './lib/services/pwned-passwords/pwned-passwords-fetch.type';
+export * from './lib/services/pwned-passwords/pwned-passwords.const';
+export * from './lib/services/pwned-passwords/pwned-passwords.service';
 
 export * from './lib/components/autocomplete-box/autocomplete-box.component';
 export * from './lib/components/checkbox/checkbox.component';

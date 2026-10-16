@@ -54,7 +54,9 @@ describe('DdataInputSearchComponent', () => {
     };
 
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([])],
+      // DdataCoreModule refreshes the static DdataInjectorModule.InjectorInstance used by RemoteDataService,
+      // otherwise a destroyed injector of a previous spec file can stay there
+      imports: [RouterTestingModule.withRoutes([]), DdataCoreModule.forRoot({})],
       declarations: [DdataInputSearchComponent, DescriptionPipe],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
