@@ -3,7 +3,12 @@
 
   <span> {{ tag?.name }} </span>
 
-  <button class="btn btn-xs btn-light" type="button" (click)="deleteTag()">
+  <button
+    class="btn btn-xs dd-btn-neutral"
+    type="button"
+    [attr.aria-label]="deleteButtonText + ': ' + (tag?.name ?? '')"
+    (click)="deleteTag()"
+  >
     <fa-icon [icon]="icon.times"></fa-icon>
   </button>
 </span>

@@ -1,4 +1,10 @@
+@use '../../styles/color-mode';
+
 :host {
   position: relative;
   flex: 1 1 auto;
+}
+
+.dd-btn-neutral {
+  @include color-mode.neutral-button;
 }

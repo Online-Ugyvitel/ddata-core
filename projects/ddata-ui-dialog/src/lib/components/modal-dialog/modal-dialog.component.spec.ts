@@ -104,6 +104,7 @@ describe('DdataUiModalDialogComponent', () => {
     expect(component.dialogContent).toEqual(new DialogContentItem(DdataUiNoDataComponent, {}));
     expect(component.overlayClickCloseDialog).toBe(true);
     expect(component.closeButtonText).toBe('Close');
+    expect(component.closeButtonClass).toBe('btn dd-btn-neutral close');
     expect(component.icon.close).toBeDefined();
   });
 
@@ -940,6 +941,25 @@ describe('DdataUiModalDialogComponent rendered in a host', () => {
     it('should label the icon-only close button', () => {
       render({ show: true });
 
+      expect(query('.modal-header button').getAttribute('aria-label')).toBe('Close');
+    });
+
+    it('should render the close button with the colour-mode-aware class', () => {
+      render({ show: true });
+      const close = query('.modal-header button');
+
+      expect(Array.from(close.classList).sort()).toEqual(['btn', 'close', 'dd-btn-neutral']);
+      expect(close.querySelector('fa-icon')).toBeTruthy();
+    });
+
+    it('should render the close button with the given closeButtonClass', () => {
+      dialog.closeButtonClass = 'btn btn-close';
+      render({ show: true });
+
+      expect(Array.from(query('.modal-header button').classList).sort()).toEqual([
+        'btn',
+        'btn-close'
+      ]);
       expect(query('.modal-header button').getAttribute('aria-label')).toBe('Close');
     });
   });

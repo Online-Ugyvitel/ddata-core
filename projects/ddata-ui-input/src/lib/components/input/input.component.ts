@@ -34,7 +34,7 @@ export class DdataInputComponent implements AfterViewInit {
   @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
   @Input() inputBlockClass = 'col-12 d-flex px-0';
   @Input() inputBlockExtraClass = 'col-md-9';
-  @Input() viewOnlyClass = 'form-control border-0 bg-light';
+  @Input() viewOnlyClass = 'form-control border-0 bg-body-tertiary';
   @Input() wrapperClass = 'd-flex flex-wrap';
   @Input() showLabel = true;
   @Input() autoFocus = false;

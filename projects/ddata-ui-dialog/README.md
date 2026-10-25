@@ -70,6 +70,7 @@ export class AwesomeComponent implements OnInit {
 | `showDialog`              | `boolean`                                 | `false`                                             | Dialog is visible or not. Supports two-way binding: `[(showDialog)]`. Setting `false` on a dialog that is not open does nothing (no `fail` event). |
 | `overlayClickCloseDialog` | `boolean`                                 | `true`                                              | The ovrelay div is clickable or not. If clickable it cause a `pressed` event with `false`. |
 | `closeButtonText`         | `string`                                  | `Close`                                             | Title text of the close button.                                                            |
+| `closeButtonClass`        | `string`                                  | `btn dd-btn-neutral close`                          | CSS classes of the close button. See [Colour mode](#colour-mode).                          |
 
 | Output    | Type                    | Description                                                                                                                                      |
 |-----------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -157,6 +158,7 @@ export class AwesomeComponent implements OnInit {
 | `successButtonText`       | `string`     | `OK`         | Text on the success button.                                                                |
 | `cancelButtonText`        | `string`     | `Cancel`     | Text on the cancel button.                                                                 |
 | `closeButtonText`         | `string`     | `Close`      | Title text of the close button.                                                            |
+| `closeButtonClass`        | `string`     | `btn dd-btn-neutral close` | CSS classes of the close button. See [Colour mode](#colour-mode).            |
 
 | Output    | Type                    | Description                                                                                                                                      |
 |-----------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -172,3 +174,12 @@ Both dialogs:
 - move the focus to their first focusable element (or the dialog itself) when they open, keep `Tab` / `Shift+Tab` inside the dialog while open, and give the focus back to the previously focused element when they close,
 - close on `Escape` (the confirm dialog like its cancel button, the modal dialog like its close button). Only the topmost open dialog reacts; closed dialogs ignore the key,
 - close on a click outside the dialog box when `overlayClickCloseDialog` is `true`.
+
+## Colour mode
+
+The dialogs follow the Bootstrap 5.3 colour mode (`data-bs-theme="light"` or `"dark"` on the
+document root) without any TypeScript logic: the close button's default `dd-btn-neutral` class is
+built from the Bootstrap colour variables, so switching the attribute restyles an open dialog
+immediately. Its keyboard focus is shown by a 2px outline in `--bs-primary-text-emphasis`; set
+`--dd-focus-ring-color` to use another colour. Pass your own classes in `closeButtonClass` to
+replace the default look (the icon and the `aria-label` stay).

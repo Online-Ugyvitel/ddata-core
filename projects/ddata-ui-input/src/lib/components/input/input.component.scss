@@ -1,3 +1,5 @@
+@use '../../styles/color-mode';
+
 .autocomplete-list-container {
   /*the container must be positioned relative:*/
   position: absolute;
@@ -12,7 +14,7 @@
 }
 .autocomplete-list {
   position: absolute;
-  border: 1px solid #d4d4d4;
+  border: 1px solid var(--bs-border-color, #d4d4d4);
   border-bottom: none;
   border-top: none;
   z-index: 99;
@@ -25,15 +27,15 @@
 .autocomplete-list-item {
   padding: 10px;
   cursor: pointer;
-  background-color: #fff;
-  border-bottom: 1px solid #d4d4d4;
+  color: var(--bs-body-color, #212529);
+  background-color: var(--bs-body-bg, #fff);
+  border-bottom: 1px solid var(--bs-border-color, #d4d4d4);
 }
 .autocomplete-list-item:hover {
   /*when hovering an item:*/
-  background-color: #e9e9e9;
+  background-color: var(--bs-secondary-bg, #e9e9e9);
 }
-.active {
+.autocomplete-list-item.active {
   /*when navigating through the items using the arrow keys:*/
-  background-color: DodgerBlue !important;
-  color: #ffffff;
+  @include color-mode.active-option;
 }

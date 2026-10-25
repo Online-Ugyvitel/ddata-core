@@ -358,7 +358,7 @@ describe('InputBoxComponent', () => {
     expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
     expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
     expect(component.inputBlockExtraClass).toBe('col-md-9');
-    expect(component.viewOnlyClass).toBe('form-control border-0 bg-light');
+    expect(component.viewOnlyClass).toBe('form-control border-0 bg-body-tertiary');
     expect(component.wrapperClass).toBe('d-flex flex-wrap');
     expect(component.showLabel).toBe(true);
     expect(component.autoFocus).toBe(false);
@@ -569,13 +569,13 @@ describe('InputBoxComponent', () => {
       render({ field: 'name', model, isViewOnly: true });
 
       expect(input()).toBeNull();
-      expect(element.querySelector('.bg-light').textContent.trim()).toBe('Test Name');
+      expect(element.querySelector('.bg-body-tertiary').textContent.trim()).toBe('Test Name');
       const updated = new FakeModel();
 
       updated.name = 'Updated';
       render({ model: updated });
 
-      expect(element.querySelector('.bg-light').textContent.trim()).toBe('Updated');
+      expect(element.querySelector('.bg-body-tertiary').textContent.trim()).toBe('Updated');
     });
 
     it('should show and hide the validation error while typing', async () => {

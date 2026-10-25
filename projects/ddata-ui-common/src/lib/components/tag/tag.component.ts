@@ -15,6 +15,7 @@ interface TagInterface {
 export class DdataUiTagComponent {
   @Input() tag: TagInterface;
   @Input() showIcon = true;
+  @Input() deleteButtonText = 'Remove tag';
   @Output() readonly delete: EventEmitter<TagInterface> = new EventEmitter();
 
   // tslint:disable-next-line: variable-name

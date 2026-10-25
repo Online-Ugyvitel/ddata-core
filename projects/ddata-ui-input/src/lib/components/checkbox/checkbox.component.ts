@@ -13,7 +13,7 @@ import { BaseModel, BaseModelInterface, FieldsInterface } from '@netdjw/ddata-co
 @Component({
   selector: 'dd-input-checkbox',
   templateUrl: './checkbox.component.html',
-  styleUrls: ['./checkbox.component.css'],
+  styleUrls: ['./checkbox.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false
 })

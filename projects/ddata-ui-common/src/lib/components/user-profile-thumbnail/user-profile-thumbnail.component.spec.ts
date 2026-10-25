@@ -300,6 +300,15 @@ describe('DdataUiUserThumbnailComponent', () => {
       expect(thumbnail.textContent.trim()).toBe('É');
     });
 
+    it('should render the initial in black on yellow, independent of the inherited colour', () => {
+      fixture.nativeElement.style.color = 'rgb(222, 226, 230)';
+      const thumbnail = render({ name: 'éva', image: { src: '' } });
+      const style = getComputedStyle(thumbnail);
+
+      expect(style.color).toBe('rgb(0, 0, 0)');
+      expect(style.backgroundColor).toBe('rgb(255, 187, 17)');
+    });
+
     it('should render the default initial when the user is missing', () => {
       const thumbnail = render(null);
 

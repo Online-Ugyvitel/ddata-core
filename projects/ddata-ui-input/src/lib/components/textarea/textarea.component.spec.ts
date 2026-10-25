@@ -108,6 +108,7 @@ describe('DdataTextareaComponent', () => {
       expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
       expect(component.inputBlockExtraClass).toBe('col-md-9');
       expect(component.wrapperClass).toBe('d-flex flex-wrap');
+      expect(component.viewOnlyClass).toBe('form-control border-0 bg-body-tertiary');
     });
 
     it('should generate random string for id', () => {

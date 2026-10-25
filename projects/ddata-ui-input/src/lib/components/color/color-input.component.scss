@@ -1,3 +1,43 @@
 .input-color-container {
   width: 40px;
 }
+
+// ngx-color-picker renders its panel next to the input (cpUseRootViewContainer is off) with
+// unencapsulated, fixed light colours; this override follows the Bootstrap colour mode instead.
+:host ::ng-deep .color-picker {
+  color: var(--bs-body-color, #000);
+  background-color: var(--bs-body-bg, #fff);
+  border-color: var(--bs-border-color, #777);
+
+  .arrow.arrow-bottom {
+    border-bottom-color: var(--bs-border-color, #777);
+  }
+
+  input {
+    color: var(--bs-body-color, #000);
+    background-color: var(--bs-body-bg, #fff);
+    border-color: var(--bs-border-color, #a9a9a9);
+  }
+
+  .preset-area .preset-label,
+  .hex-text .box div,
+  .cmyk-text .box div,
+  .hsla-text .box div,
+  .rgba-text .box div,
+  .value-text .box div {
+    color: var(--bs-body-color, #555);
+  }
+
+  .preset-area .preset-color,
+  .selected-color {
+    border-color: var(--bs-border-color, #a9a9a9);
+  }
+
+  .cp-add-color-button-class:disabled {
+    color: var(--bs-secondary-color, #999);
+  }
+
+  .cp-remove-color-button-class {
+    background: var(--bs-body-bg, #fff);
+  }
+}

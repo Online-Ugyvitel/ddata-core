@@ -1,3 +1,5 @@
+@use '../../styles/color-mode';
+
 .autocomplete-box {
   position: relative;
   flex: 1 1 auto;
@@ -16,6 +18,7 @@
 }
 
 .autocomplete-list {
+  color: var(--bs-body-color, #212529);
   background: var(--bs-body-bg, #fff);
   border: 1px solid var(--bs-border-color, #dee2e6);
   border-radius: 0.25rem;
@@ -27,8 +30,11 @@
   padding: 0.375rem 0.75rem;
   cursor: pointer;
 
-  &.active,
   &:hover {
     background: var(--bs-secondary-bg, #e9ecef);
+  }
+
+  &.active {
+    @include color-mode.active-option;
   }
 }

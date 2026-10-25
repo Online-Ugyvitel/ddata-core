@@ -39,8 +39,8 @@ export class DdataInputDateComponent implements OnInit, OnChanges {
   @Input() showLabel = true;
   @Input() autoFocus = false;
   @Input() isViewOnly = false;
-  @Input() viewOnlyClass = 'form-control border-0 bg-light';
-  @Input() buttonClass = 'input-group-prepend btn btn-light mb-0';
+  @Input() viewOnlyClass = 'form-control border-0 bg-body-tertiary';
+  @Input() buttonClass = 'input-group-prepend btn dd-btn-neutral mb-0';
   @Input() wrapperClass = 'd-flex flex-wrap';
   @Input() format = 'YYYY-MM-DD';
   @Input() separator = '-';

@@ -85,6 +85,26 @@ and time picker if you need.
 - [Textarea Component](src/doc/textarea-component)
 - [Time Component](src/doc/time-component)
 
+## Colour mode
+
+Every component follows the Bootstrap 5.3 colour mode (`data-bs-theme="light"` or `"dark"` on the
+document root). The colours come from the Bootstrap CSS variables, never from TypeScript, so a mode
+switch restyles open lists, dialogs and the colour picker without re-rendering.
+
+- View-only fields default to `form-control border-0 bg-body-tertiary` (`viewOnlyClass` of
+  `dd-input`, `dd-textarea`, `dd-input-date` and `dd-input-time`).
+- Buttons that used to be `btn-light` use the package's colour-mode-aware `dd-btn-neutral` style;
+  the date picker button is configurable through `buttonClass`
+  (default `input-group-prepend btn dd-btn-neutral mb-0`).
+- The keyboard-selected option of the autocomplete lists is shown with at least 7:1 text contrast,
+  bold text and an edge bar, not by colour alone.
+- Focus outlines use `--bs-primary-text-emphasis` because `--bs-focus-ring-color` is translucent;
+  set `--dd-focus-ring-color` to use another colour.
+- The `ngx-color-picker` panel opened by `dd-input-color` is restyled by the component itself, no
+  extra stylesheet is needed in the application.
+
+Every class input can still be overridden to restore or change the look.
+
 ## Password strength-o-meter with the Pwned Passwords check
 
 `dd-password-strength-o-meter` checks the password online in the
