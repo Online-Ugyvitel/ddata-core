@@ -113,6 +113,9 @@ describe('DdataMultipleSelectDialogComponent', () => {
       expect(list.isSelectionList).toBe(true);
       expect(list.isModal).toBe(true);
       expect(list.filter).toEqual({});
+      const close = element.querySelector('button[aria-label="Bezárás"]');
+
+      expect(Array.from(close.classList).sort()).toEqual(['btn', 'close', 'dd-btn-neutral']);
     });
 
     it('should render an empty list', () => {

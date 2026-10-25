@@ -117,6 +117,18 @@ describe('MultilanguageNameComponent', () => {
     expect(all('input').length).toBe(3);
   });
 
+  it('should render every button with the colour-mode-aware class instead of btn-light', async () => {
+    model.names.push({ lang_id: 2 as ID, name: 'Apple' });
+    await render();
+    all<HTMLButtonElement>('button[title="Név törlése"]')[0].click();
+    await render();
+    const neutralButtons = all('.dd-btn-neutral');
+
+    expect(neutralButtons.length).toBe(4);
+    expect(all('.btn-light').length).toBe(0);
+    expect(buttonByText('Törlés').classList.contains('btn-danger')).toBe(true);
+  });
+
   it('should not render a delete button for the first name', async () => {
     model.names.push({ lang_id: 2 as ID, name: 'Apple' });
     await render();

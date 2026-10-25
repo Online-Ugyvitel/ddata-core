@@ -50,6 +50,13 @@ describe('DdataInputCheckboxComponent', () => {
     expect(component._model).toBeInstanceOf(BaseModel);
   });
 
+  it('should render the toggle button with the colour-mode-aware class', () => {
+    fixture.detectChanges();
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+
+    expect(Array.from(button.classList).sort()).toEqual(['btn', 'dd-btn-neutral']);
+  });
+
   describe('ngOnInit', () => {
     it('should set iterable to a random number between 0 and 100', () => {
       component.ngOnInit();

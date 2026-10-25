@@ -1,3 +1,5 @@
+@use '../../../styles/color-mode';
+
 .autocomplete-combobox {
   position: relative;
   width: 100%;
@@ -9,8 +11,9 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: white;
-  border: 1px solid #ccc;
+  color: var(--bs-body-color, #212529);
+  background: var(--bs-body-bg, #fff);
+  border: 1px solid var(--bs-border-color, #ccc);
   border-top: none;
   border-radius: 0 0 4px 4px;
   max-height: 200px;
@@ -23,13 +26,16 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 
-  &:hover,
+  &:hover {
+    background-color: var(--bs-secondary-bg, #e9ecef);
+  }
+
   &.selected {
-    background-color: #e9ecef;
+    @include color-mode.active-option;
   }
 
   &.no-results {
-    color: #6c757d;
+    color: var(--bs-body-color, #212529);
     cursor: default;
     font-style: italic;
 
@@ -46,8 +52,7 @@
 
 // Focus management
 .autocomplete-option:focus {
-  outline: 2px solid #007bff;
-  outline-offset: -2px;
+  @include color-mode.focus-ring(-2px);
 }
 
 // Screen reader support

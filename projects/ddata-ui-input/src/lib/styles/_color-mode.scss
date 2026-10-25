@@ -1,0 +1,40 @@
+// Bootstrap 5.3 colour mode support: every colour comes from the variables that
+// [data-bs-theme="light|dark"] redefines, so a mode switch needs no re-render. The fallbacks are
+// the light values for consumers without Bootstrap 5.3.
+
+// --bs-focus-ring-color is translucent (25%) and fails the 3:1 non-text contrast, so the outline
+// uses the opaque primary emphasis colour. Consumers may override it with --dd-focus-ring-color.
+@mixin focus-ring($offset: 2px) {
+  outline: 2px solid var(--dd-focus-ring-color, var(--bs-primary-text-emphasis, #052c65));
+  outline-offset: $offset;
+}
+
+// Bootstrap 5.3 has no colour-mode-aware light button (btn-light stays white in dark mode), so
+// the neutral button is built from the .btn variables.
+@mixin neutral-button {
+  --bs-btn-color: var(--bs-body-color, #212529);
+  --bs-btn-bg: var(--bs-tertiary-bg, #f8f9fa);
+  --bs-btn-border-color: var(--bs-secondary-color, rgba(33, 37, 41, .75));
+  --bs-btn-hover-color: var(--bs-emphasis-color, #000);
+  --bs-btn-hover-bg: var(--bs-secondary-bg, #e9ecef);
+  --bs-btn-hover-border-color: var(--bs-emphasis-color, #000);
+  --bs-btn-active-color: var(--bs-emphasis-color, #000);
+  --bs-btn-active-bg: var(--bs-secondary-bg, #e9ecef);
+  --bs-btn-active-border-color: var(--bs-emphasis-color, #000);
+  --bs-btn-disabled-color: var(--bs-body-color, #212529);
+  --bs-btn-disabled-bg: var(--bs-tertiary-bg, #f8f9fa);
+  --bs-btn-disabled-border-color: var(--bs-border-color, #dee2e6);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// The keyboard-selected option: at least 7:1 text contrast in both modes, and marked by weight
+// and an edge bar too, not by colour alone.
+@mixin active-option {
+  color: var(--bs-primary-text-emphasis, #052c65);
+  background-color: var(--bs-primary-bg-subtle, #cfe2ff);
+  box-shadow: inset 4px 0 0 var(--bs-primary-text-emphasis, #052c65);
+  font-weight: 600;
+}

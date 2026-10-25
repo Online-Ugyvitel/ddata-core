@@ -512,7 +512,7 @@ describe('DdataInputTimeComponent', () => {
       expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
       expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
       expect(component.inputBlockExtraClass).toBe('col-md-9');
-      expect(component.viewOnlyClass).toBe('form-control border-0 bg-light');
+      expect(component.viewOnlyClass).toBe('form-control border-0 bg-body-tertiary');
       expect(component.wrapperClass).toBe('d-flex flex-wrap');
 
       // Test that changed event emitter is initialized
@@ -674,12 +674,12 @@ describe('DdataInputTimeComponent', () => {
       render({ field: 'start', model, isViewOnly: true });
 
       expect(element.querySelector('input')).toBeNull();
-      expect(element.querySelector('.bg-light').textContent.trim()).toBe('10:00');
+      expect(element.querySelector('.bg-body-tertiary').textContent.trim()).toBe('10:00');
 
       model['start'] = '11:00';
       render({ model: Object.assign(new BaseModel(), model) });
 
-      expect(element.querySelector('.bg-light').textContent.trim()).toBe('11:00');
+      expect(element.querySelector('.bg-body-tertiary').textContent.trim()).toBe('11:00');
     });
 
     it('should toggle the invalid class as the validation error appears and disappears', () => {

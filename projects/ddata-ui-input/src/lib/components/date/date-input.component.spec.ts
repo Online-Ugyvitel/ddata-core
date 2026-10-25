@@ -187,6 +187,8 @@ describe('DdataInputDateComponent', () => {
       expect(component.showIcon).toBe(true);
       expect(component.autoApply).toBe(true);
       expect(component.singleDatePicker).toBe(true);
+      expect(component.viewOnlyClass).toBe('form-control border-0 bg-body-tertiary');
+      expect(component.buttonClass).toBe('input-group-prepend btn dd-btn-neutral mb-0');
     });
 
     it('should initialize random string from helperService', () => {
@@ -762,9 +764,27 @@ describe('DdataInputDateComponent', () => {
       component._field = 'date';
 
       detectChangesOf(fixture);
-      const viewOnlyElement = fixture.debugElement.query(By.css('.form-control.border-0.bg-light'));
+      const viewOnlyElement = fixture.debugElement.query(
+        By.css('.form-control.border-0.bg-body-tertiary')
+      );
 
       expect(viewOnlyElement).toBeTruthy();
+    });
+
+    it('should render the calendar button with the colour-mode-aware class', () => {
+      component.showIcon = true;
+      component.disabled = false;
+
+      detectChangesOf(fixture);
+      const button = fixture.debugElement.query(By.css('label.btn')).nativeElement as HTMLElement;
+
+      expect(Array.from(button.classList).sort()).toEqual([
+        'btn',
+        'dd-btn-neutral',
+        'input-group-prepend',
+        'mb-0'
+      ]);
+      expect(button.classList.contains('btn-light')).toBe(false);
     });
 
     it('should show calendar icon when showIcon is true and not disabled', () => {
