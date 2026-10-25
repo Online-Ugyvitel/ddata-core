@@ -53,6 +53,28 @@ describe('DdataUiConfirmDialogComponent', () => {
       expect(component.successButtonText).toBe('OK');
       expect(component.cancelButtonText).toBe('Cancel');
       expect(component.closeButtonText).toBe('Close');
+      expect(component.closeButtonClass).toBe('btn dd-btn-neutral close');
+    });
+
+    it('should render the close button with the colour-mode-aware class and its aria-label', () => {
+      fixture.componentRef.setInput('closeButtonText', 'Bezárás');
+      fixture.componentRef.setInput('showDialog', true);
+      fixture.detectChanges();
+      const close: HTMLButtonElement = element.querySelector('.modal-header button');
+
+      expect(Array.from(close.classList).sort()).toEqual(['btn', 'close', 'dd-btn-neutral']);
+      expect(close.getAttribute('aria-label')).toBe('Bezárás');
+      expect(close.querySelector('fa-icon')).toBeTruthy();
+    });
+
+    it('should render the close button with the given closeButtonClass', () => {
+      fixture.componentRef.setInput('closeButtonClass', 'btn btn-close');
+      fixture.componentRef.setInput('showDialog', true);
+      fixture.detectChanges();
+      const close: HTMLButtonElement = element.querySelector('.modal-header button');
+
+      expect(Array.from(close.classList).sort()).toEqual(['btn', 'btn-close']);
+      expect(close.getAttribute('aria-label')).toBe('Close');
     });
 
     it('should have confirmed property set to false', () => {

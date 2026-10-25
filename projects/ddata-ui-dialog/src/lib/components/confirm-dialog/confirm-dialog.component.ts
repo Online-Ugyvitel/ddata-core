@@ -32,6 +32,7 @@ export class DdataUiConfirmDialogComponent implements OnDestroy {
   @Input() successButtonText = 'OK';
   @Input() cancelButtonText = 'Cancel';
   @Input() closeButtonText = 'Close';
+  @Input() closeButtonClass = 'btn dd-btn-neutral close';
 
   /**
    * Opens (true) or closes (false) the dialog. The dialog emits `showDialogChange` with false

@@ -19,7 +19,7 @@
         <div class="col-2 text-end">
           <button
             type="button"
-            class="btn btn-light close"
+            [class]="closeButtonClass"
             (click)="close()"
             [attr.aria-label]="closeButtonText"
           >

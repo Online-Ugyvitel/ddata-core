@@ -44,6 +44,7 @@ export class DdataUiModalDialogComponent implements OnDestroy {
   @Input() dialogContent: DialogContentItem = new DialogContentItem(DdataUiNoDataComponent, {});
   @Input() overlayClickCloseDialog = true;
   @Input() closeButtonText = 'Close';
+  @Input() closeButtonClass = 'btn dd-btn-neutral close';
 
   /**
    * Opens (true) or closes (false) the dialog. Setting false closes only an open dialog, so a

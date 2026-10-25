@@ -1,3 +1,4 @@
+@use '../../styles/color-mode';
 
 .modal {
   display: block;
@@ -24,4 +25,8 @@
     align-items: center;
     opacity: 1;
   }
+}
+
+.dd-btn-neutral {
+  @include color-mode.neutral-button;
 }
