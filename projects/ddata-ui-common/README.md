@@ -2,6 +2,16 @@
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.2.
 
+## Colour mode
+
+`dd-tag` and `dd-user-profile-thumbnail` follow the Bootstrap 5.3 colour mode
+(`data-bs-theme="light"` or `"dark"` on the document root) through CSS variables only:
+
+- the tag's delete button uses the colour-mode-aware `dd-btn-neutral` style; its accessible name
+  is `deleteButtonText` (default `Remove tag`) followed by the tag name, e.g. `Remove tag: News`.
+  The focus outline is `--bs-primary-text-emphasis`, overridable with `--dd-focus-ring-color`,
+- the thumbnail's initial letter is black on its yellow background in both modes.
+
 ## Code scaffolding
 
 Run `ng generate component component-name --project ddata-ui-common` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ddata-ui-common`.

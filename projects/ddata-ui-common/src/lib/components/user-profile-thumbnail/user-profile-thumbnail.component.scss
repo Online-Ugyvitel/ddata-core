@@ -1,6 +1,8 @@
 .user-profile-thumbnail {
   display: inline-block;
   border-radius: 50%;
+  // An explicit text colour: the inherited one is light in dark mode and unreadable on yellow.
+  color: #000;
   background-color: #fb1;
   width: 25px;
   height: 25px;

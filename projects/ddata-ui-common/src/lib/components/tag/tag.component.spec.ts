@@ -40,6 +40,7 @@ describe('DdataUiTagComponent', () => {
 
   it('should initialize with default values', () => {
     expect(component.showIcon).toBe(true);
+    expect(component.deleteButtonText).toBe('Remove tag');
     expect(component.icon.tag).toBeDefined();
     expect(component.icon.times).toBeDefined();
   });
@@ -216,6 +217,38 @@ describe('DdataUiTagComponent', () => {
       render({ tag: null }).querySelector('button').click();
 
       expect(emitted).toEqual([null]);
+    });
+  });
+
+  describe('delete button', () => {
+    const button = (): HTMLButtonElement => element.querySelector('button');
+
+    it('should use the colour-mode-aware class instead of btn-light', () => {
+      fixture.componentRef.setInput('tag', { name: 'News' });
+      fixture.detectChanges();
+
+      expect(Array.from(button().classList).sort()).toEqual(['btn', 'btn-xs', 'dd-btn-neutral']);
+    });
+
+    it('should be named after the tag', () => {
+      fixture.componentRef.setInput('tag', { name: 'News' });
+      fixture.detectChanges();
+
+      expect(button().getAttribute('aria-label')).toBe('Remove tag: News');
+    });
+
+    it('should use the given deleteButtonText in its name', () => {
+      fixture.componentRef.setInput('tag', { name: 'Hírek' });
+      fixture.componentRef.setInput('deleteButtonText', 'Címke törlése');
+      fixture.detectChanges();
+
+      expect(button().getAttribute('aria-label')).toBe('Címke törlése: Hírek');
+    });
+
+    it('should keep a name without a tag', () => {
+      fixture.detectChanges();
+
+      expect(button().getAttribute('aria-label')).toBe('Remove tag: ');
     });
   });
 });
