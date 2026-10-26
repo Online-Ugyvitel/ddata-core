@@ -15,7 +15,7 @@ import {
 import { BaseModelInterface, FieldsInterface } from '@netdjw/ddata-core';
 import { ComponentRendererService } from '../../../../services/select/component-renderer.service';
 import { Subscription } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { filter, map, tap } from 'rxjs/operators';
 import { DialogContentWithOptionsInterface } from '../../../../models/dialog/content/dialog-content.interface';
 import { SelectType } from '../../select.type';
 
@@ -109,6 +109,10 @@ export class DdataMultipleSelectDialogComponent implements OnInit, AfterViewInit
     this.subscription.add(
       instance.select
         .pipe(
+          // the list's select is a BehaviorSubject that replays null on subscription; only a real
+          // selection may replace the field, otherwise opening the dialog empties it
+          filter((models: Array<unknown> | null) => models !== null),
+
           tap(() => {
             if (this.mode === 'multiple') {
               this.model[this.field] = [];
@@ -117,10 +121,6 @@ export class DdataMultipleSelectDialogComponent implements OnInit, AfterViewInit
           }),
 
           map((models: Array<unknown>) => {
-            if (models === null) {
-              return models;
-            }
-
             this.emitEvents(models);
 
             return models;

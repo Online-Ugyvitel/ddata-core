@@ -28,6 +28,25 @@ class TestListComponent {
 }
 
 @Component({
+  selector: 'dd-test-replay-list',
+  template: '<div class="test-list">{{ models.length }} items</div>',
+  standalone: false
+})
+class TestReplayListComponent {
+  readonly saveModel = new EventEmitter<unknown>();
+  // like SelectableListComponent.select, it replays null to every new subscriber
+  readonly select = new BehaviorSubject<Array<unknown> | null>(null);
+  selectedElements: Array<unknown> = [];
+  models: Array<unknown> = [];
+  multipleSelectEnabled: boolean;
+  isSelectionList: boolean;
+  loadData: boolean;
+  filter: unknown;
+  isModal = false;
+  datasArrived = new BehaviorSubject<number>(0);
+}
+
+@Component({
   selector: 'dd-test-edit',
   template: '<div class="test-edit">edit</div>',
   standalone: false
@@ -63,6 +82,9 @@ describe('DdataMultipleSelectDialogComponent', () => {
   const listInstance = (): TestListComponent =>
     fixture.debugElement.query((el) => el.componentInstance instanceof TestListComponent)
       ?.componentInstance as TestListComponent;
+  const replayListInstance = (): TestReplayListComponent =>
+    fixture.debugElement.query((el) => el.componentInstance instanceof TestReplayListComponent)
+      ?.componentInstance as TestReplayListComponent;
   const setup = (inputs: Partial<DdataMultipleSelectDialogComponent>): void => {
     fixture = TestBed.createComponent(DdataMultipleSelectDialogComponent);
     component = fixture.componentInstance;
@@ -72,7 +94,12 @@ describe('DdataMultipleSelectDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DdataMultipleSelectDialogComponent, TestListComponent, TestEditComponent]
+      declarations: [
+        DdataMultipleSelectDialogComponent,
+        TestListComponent,
+        TestReplayListComponent,
+        TestEditComponent
+      ]
     }).compileComponents();
   });
 
@@ -223,8 +250,11 @@ describe('DdataMultipleSelectDialogComponent', () => {
       expect(selectionFinished).toHaveBeenCalledExactlyOnceWith([]);
     });
 
-    it('should not emit anything when the selection is null', () => {
-      setup({ settings: createSettings(), model: { tags: [tag1] } as never, field: 'tags' });
+    it('should neither emit anything nor change the field when the selection is null', () => {
+      const model = { tags: [tag1] };
+      const settings = createSettings();
+
+      setup({ settings, model: model as never, field: 'tags' });
       const selectionFinished = vi.fn();
 
       component.selectionFinished.subscribe(selectionFinished);
@@ -232,6 +262,44 @@ describe('DdataMultipleSelectDialogComponent', () => {
       listInstance().select.emit(null);
 
       expect(selectionFinished).not.toHaveBeenCalled();
+      expect(model.tags).toEqual([tag1]);
+      expect(settings.listOptions.selectedElements).toEqual([tag1]);
+    });
+
+    it('should keep the field when the list replays its initial null selection on opening', () => {
+      const model = { tags: [tag1, tag2] };
+      const settings: DialogContentWithOptionsInterface = {
+        ...createSettings(),
+        listComponent: TestReplayListComponent
+      };
+
+      setup({ settings, model: model as never, field: 'tags' });
+
+      expect(replayListInstance().selectedElements).toEqual([tag1, tag2]);
+      expect(model.tags).toEqual([tag1, tag2]);
+      expect(settings.listOptions.selectedElements).toEqual([tag1]);
+
+      component.hideModal();
+
+      expect(model.tags).toEqual([tag1, tag2]);
+    });
+
+    it('should apply a selection the replaying list emits after its initial null', () => {
+      const model = { tags: [tag1] };
+      const settings: DialogContentWithOptionsInterface = {
+        ...createSettings(),
+        listComponent: TestReplayListComponent
+      };
+
+      setup({ settings, model: model as never, field: 'tags' });
+      const selectModel = vi.fn();
+
+      component.selectModel.subscribe(selectModel);
+
+      replayListInstance().select.next([tag3]);
+
+      expect(model.tags).toEqual([]);
+      expect(selectModel).toHaveBeenCalledExactlyOnceWith(tag3);
     });
 
     it('should ignore saved models of the edit component', () => {
