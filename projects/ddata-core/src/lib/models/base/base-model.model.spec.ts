@@ -1,6 +1,6 @@
 // tslint:disable: max-line-length
 import { TestBed } from '@angular/core/testing';
-import { BaseModel } from './base-model.model';
+import { BaseModel, BaseModelWithoutTypeDefinitionInterface } from './base-model.model';
 import { DdataCoreModule } from '../../ddata-core.module';
 import { ValidatorService } from '../../services/validator/validator.service';
 import { ValidationError } from '../error/validation-error.model';
@@ -871,6 +871,100 @@ describe('BaseModel', () => {
       expect(hours).toBeLessThanOrEqual(23);
       expect(minutes).toBeGreaterThanOrEqual(0);
       expect(minutes).toBeLessThanOrEqual(59);
+    });
+  });
+
+  describe('getFieldErrorMessage method', () => {
+    let validator: ValidatorService;
+
+    beforeEach(() => {
+      validator = new ValidatorService();
+      mockValidatorService.firstFailedRule = (data: any, rules: any) =>
+        validator.firstFailedRule(data, rules);
+      model.fields = {
+        name: {
+          label: 'Név',
+          title: 'Név',
+          errorMessages: { required: 'A kategória neve kötelező.' }
+        },
+        code: { label: 'Kód', title: 'Kód' }
+      };
+      model.validationRules = {
+        name: ['required'],
+        code: ['string', 'min:3' as any],
+        amount: ['number', 'max:5' as any],
+        other: ['valami' as any]
+      };
+    });
+
+    it('should be an optional member of BaseModelWithoutTypeDefinitionInterface', () => {
+      const mock: Partial<BaseModelWithoutTypeDefinitionInterface> = {};
+
+      expect(mock.getFieldErrorMessage).toBeUndefined();
+    });
+
+    it('should return an empty string if the field is not in validationErrors', () => {
+      model.validationErrors = [];
+      (model as any).name = '';
+
+      expect(model.getFieldErrorMessage('name')).toBe('');
+    });
+
+    it('should return an empty string if the field has no validation rules', () => {
+      model.validationErrors = ['unruled'];
+
+      expect(model.getFieldErrorMessage('unruled')).toBe('');
+    });
+
+    it('should return an empty string if the value satisfies every rule', () => {
+      model.validationErrors = ['name'];
+      (model as any).name = 'Ruha';
+
+      expect(model.getFieldErrorMessage('name')).toBe('');
+    });
+
+    it('should use the errorMessages override of the field', () => {
+      model.validationErrors = ['name'];
+      (model as any).name = '';
+
+      expect(model.getFieldErrorMessage('name')).toBe('A kategória neve kötelező.');
+    });
+
+    it('should use the default message without an override', () => {
+      delete model.fields['name'].errorMessages;
+      model.validationErrors = ['name'];
+      (model as any).name = '';
+
+      expect(model.getFieldErrorMessage('name')).toBe('A mező kitöltése kötelező.');
+    });
+
+    it('should put the min parameter into the message', () => {
+      model.validationErrors = ['code'];
+      (model as any).code = 'ab';
+
+      expect(model.getFieldErrorMessage('code')).toBe('Kisebb, mint a minimum (3).');
+    });
+
+    it('should put the max parameter into the message even without a fields entry', () => {
+      model.validationErrors = ['amount'];
+      (model as any).amount = 9;
+
+      expect(model.getFieldErrorMessage('amount')).toBe('Nagyobb, mint a maximum (5).');
+    });
+
+    it('should fall back to the invalid message for an unknown rule', () => {
+      model.validationErrors = ['other'];
+      (model as any).other = 'x';
+
+      expect(model.getFieldErrorMessage('other')).toBe('Az érték formátuma nem megfelelő.');
+    });
+
+    it('should use an override only for the failed rule key', () => {
+      model.fields['code'].errorMessages = { required: 'Más szabály.' };
+      model.validationErrors = ['code'];
+      (model as any).code = 'ab';
+
+      expect(model.getFieldErrorMessage('code')).toBe('Kisebb, mint a minimum (3).');
     });
   });
 });

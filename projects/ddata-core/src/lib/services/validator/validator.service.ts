@@ -99,124 +99,110 @@ export class ValidatorService {
 
   validate(data: any, rules: string | Array<string>): boolean {
     const ruleList: Array<string> = typeof rules === 'string' ? [rules] : rules;
-    const results: Array<boolean> = [];
 
-    if (ruleList.includes('nullable') && data == null) {
-      return true;
-    }
-
-    // if nullable rule enabled
-    if (
-      (ruleList.includes('nullable') && data === undefined) ||
-      (ruleList.includes('nullable') && data.length === 0)
-    ) {
+    if (this.isNullableAndEmpty(data, ruleList)) {
       return true;
     }
 
     // TODO megcsinálni, hogy kitalálja a függvény a szabályt a típus alapján. Pl. BankAccountNumber - bankaacount
 
-    // eslint-disable-next-line complexity
-    ruleList.forEach((rule: string) => {
-      const [ruleType, ruleValue] = rule.split(':');
+    return ruleList.map((rule: string) => this.checkRule(data, rule)).every(this.isTrue);
+  }
 
-      switch (ruleType) {
-        case 'string':
-          results.push(this.isString(data));
-          break;
-        case 'number':
-          results.push(this.isNumber(data));
-          break;
-        case 'boolean':
-          results.push(this.isBoolean(data));
-          break;
-        case 'integer':
-          results.push(this.isInteger(data));
-          break;
-        case 'required':
-          results.push(this.isRequired(data));
-          break;
-        case 'name':
-          results.push(this.isName(data));
-          break;
-        case 'email':
-          results.push(this.isEmail(data));
-          break;
-        case 'domain':
-          results.push(this.isDomain(data));
-          break;
-        case 'url':
-          results.push(this.isUrl(data));
-          break;
-        case 'iso_date':
-          results.push(this.isIsoDate(data));
-          break;
-        case 'driving_licence':
-          results.push(this.isDrivingLicence(data));
-          break;
-        case 'id_card_number':
-          results.push(this.isIdCardNumber(data));
-          break;
-        case 'address_card_number':
-          results.push(this.isAddressCardNumber(data));
-          break;
-        case 'phonenumber':
-          results.push(this.isPhoneNumber(data));
-          break;
-        case 'bankaccount':
-          results.push(this.isBankAccount(data));
-          break;
-        case 'taxnumber':
-          results.push(this.isTaxNumber(data));
-          break;
-        case 'social_insurance_number':
-          results.push(this.isSocialInsuranceNumber(data));
-          break;
-        case 'not_zero':
-          results.push(this.isNotZero(data));
-          break;
-        case 'lang':
-          results.push(this.isLang(data));
-          break;
-        case 'register_number':
-          results.push(this.isregisterNumber(data));
-          break;
-        case 'array':
-          results.push(this.isArray(data));
-          break;
-        case 'not_empty':
-          results.push(this.isNotEmpty(data));
-          break;
-        case 'empty':
-          results.push(this.isEmpty(data));
-          break;
-        case 'person_taxnumber':
-          results.push(this.isPersonTaxNumber(data));
-          break;
-        case 'color_code':
-          results.push(this.isColorCode(data));
-          break;
-        case 'nullable':
-          // results.push(true);
-          break;
-        case 'iban_code':
-          results.push(this.isIbanCode(data));
-          break;
-        case 'swift_code':
-          results.push(this.isSwiftCode(data));
-          break;
-        case 'min':
-          results.push(this.min(data, Number(ruleValue)));
-          break;
-        case 'max':
-          results.push(this.max(data, Number(ruleValue)));
-          break;
+  /**
+   * Return the complete rule string (e.g. `min:3`) of the first rule the data does not satisfy,
+   * or `null` if the data satisfies every rule. It follows the same conditions as `validate()`.
+   *
+   * @param data the value to check
+   * @param rules one rule or a list of rules
+   */
+  firstFailedRule(data: any, rules: string | Array<string>): string | null {
+    const ruleList: Array<string> = typeof rules === 'string' ? [rules] : rules;
 
-        default:
-          results.push(false);
-      }
-    });
+    if (this.isNullableAndEmpty(data, ruleList)) {
+      return null;
+    }
 
-    return results.every(this.isTrue);
+    return ruleList.find((rule: string) => !this.checkRule(data, rule)) ?? null;
+  }
+
+  private isNullableAndEmpty(data: any, ruleList: Array<string>): boolean {
+    if (!ruleList.includes('nullable')) {
+      return false;
+    }
+
+    return data == null || data.length === 0;
+  }
+
+  // eslint-disable-next-line complexity
+  private checkRule(data: any, rule: string): boolean {
+    const [ruleType, ruleValue] = rule.split(':');
+
+    switch (ruleType) {
+      case 'string':
+        return this.isString(data);
+      case 'number':
+        return this.isNumber(data);
+      case 'boolean':
+        return this.isBoolean(data);
+      case 'integer':
+        return this.isInteger(data);
+      case 'required':
+        return this.isRequired(data);
+      case 'name':
+        return this.isName(data);
+      case 'email':
+        return this.isEmail(data);
+      case 'domain':
+        return this.isDomain(data);
+      case 'url':
+        return this.isUrl(data);
+      case 'iso_date':
+        return this.isIsoDate(data);
+      case 'driving_licence':
+        return this.isDrivingLicence(data);
+      case 'id_card_number':
+        return this.isIdCardNumber(data);
+      case 'address_card_number':
+        return this.isAddressCardNumber(data);
+      case 'phonenumber':
+        return this.isPhoneNumber(data);
+      case 'bankaccount':
+        return this.isBankAccount(data);
+      case 'taxnumber':
+        return this.isTaxNumber(data);
+      case 'social_insurance_number':
+        return this.isSocialInsuranceNumber(data);
+      case 'not_zero':
+        return this.isNotZero(data);
+      case 'lang':
+        return this.isLang(data);
+      case 'register_number':
+        return this.isregisterNumber(data);
+      case 'array':
+        return this.isArray(data);
+      case 'not_empty':
+        return this.isNotEmpty(data);
+      case 'empty':
+        return this.isEmpty(data);
+      case 'person_taxnumber':
+        return this.isPersonTaxNumber(data);
+      case 'color_code':
+        return this.isColorCode(data);
+      case 'nullable':
+        return true;
+      case 'iban_code':
+        return this.isIbanCode(data);
+      case 'swift_code':
+        return this.isSwiftCode(data);
+      case 'min':
+        return this.min(data, Number(ruleValue));
+      case 'max':
+        return this.max(data, Number(ruleValue));
+
+      default:
+        return false;
+    }
   }
 
   private isTrue(value: boolean): boolean {

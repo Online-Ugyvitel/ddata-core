@@ -11,6 +11,8 @@ export interface ValidatorServiceInterface {
 
   validate(data: any, rules: string | Array<string>): boolean;
 
+  firstFailedRule(data: any, rules: string | Array<string>): string | null;
+
   // rule functions
   min(data: any, minimum: number): boolean;
 
