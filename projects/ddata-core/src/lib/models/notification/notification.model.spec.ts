@@ -56,6 +56,40 @@ describe('Notification', () => {
     });
   });
 
+  describe('id, action and autoDeleteMs', () => {
+    it('should give every instance a unique, increasing id', () => {
+      const first = new Notification(testText, testTitle, testType);
+      const second = new Notification(testText, testTitle, testType);
+
+      expect(Number.isInteger(first.id)).toBe(true);
+      expect(first.id).toBeGreaterThan(0);
+      expect(second.id).toBe(first.id + 1);
+    });
+
+    it('should leave the optional action and autoDeleteMs unset', () => {
+      notification = new Notification(testText, testTitle, testType);
+
+      expect(notification.action).toBeUndefined();
+      expect(notification.autoDeleteMs).toBeUndefined();
+    });
+
+    it('should accept an action and autoDeleteMs through NotificationInterface', () => {
+      const handler = vi.fn();
+      const notificationInterface: NotificationInterface = new Notification(
+        testText,
+        testTitle,
+        testType
+      );
+
+      notificationInterface.action = { label: 'Visszavonás', handler };
+      notificationInterface.autoDeleteMs = null;
+
+      expect(notificationInterface.action.label).toBe('Visszavonás');
+      expect(notificationInterface.action.handler).toBe(handler);
+      expect(notificationInterface.autoDeleteMs).toBeNull();
+    });
+  });
+
   describe('type validation', () => {
     it('should implement NotificationInterface', () => {
       notification = new Notification(testText, testTitle, testType);
