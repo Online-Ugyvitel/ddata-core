@@ -1,4 +1,19 @@
+@use '../../../styles/form-field';
+@use '../../../styles/form-control';
 
 .multiple-select {
   cursor: pointer;
+  // the trigger is a div: it shows the value on one line and keeps the focus ring of the control
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  outline: 0;
+
+  &.dd-control-placeholder {
+    color: var(--bs-secondary-color);
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+  }
 }

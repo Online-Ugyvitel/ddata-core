@@ -1,80 +1,96 @@
-<div [class]="wrapperClass">
+<div [class]="wrapperClass" [class.dd-field-inline]="layout === 'inline'">
   <!-- label -->
   @if (showLabel) {
-    <label [class]="labelClass" [for]="id">
-      {{ labelText }}:
-      @if (isRequired) {
-        <span aria-hidden="true"> *</span>
-      }
-    </label>
+    <div class="dd-field-label-row">
+      <label [class]="labelClass" [for]="id"
+        >{{ labelText }}
+        @if (isRequired) {
+          <span class="dd-required" aria-hidden="true"> *</span>
+        }
+      </label>
+    </div>
   }
 
   <!-- combobox container -->
-  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <!-- prepend -->
-    @if (!!prepend) {
-      <div class="input-group-prepend">
-        <div class="input-group-text">{{ prepend }}</div>
+  <div [class]="inputBlockClass" class="dd-field-block">
+    <div
+      class="dd-control"
+      [class.dd-control-sm]="size === 'sm'"
+      [class.is-invalid]="isInvalid"
+      [class.is-disabled]="disabled"
+    >
+      <!-- prepend -->
+      @if (!!prepend) {
+        <span class="dd-control-affix">{{ prepend }}</span>
+      }
+
+      <!-- combobox input -->
+      <div class="autocomplete-combobox dd-control-select">
+        <input
+          #inputBox
+          type="text"
+          class="dd-control-input"
+          [id]="id"
+          [value]="inputValue"
+          [class.disable-appearance]="disabledAppearance"
+          [disabled]="disabled"
+          [placeholder]="unselectedText"
+          role="combobox"
+          [attr.aria-expanded]="isOpen"
+          [attr.aria-controls]="listboxId"
+          [attr.aria-activedescendant]="getActiveDescendant()"
+          aria-autocomplete="list"
+          [attr.aria-required]="isRequired || null"
+          [attr.aria-invalid]="isInvalid || null"
+          [attr.aria-describedby]="describedBy"
+          (focus)="onInputFocus()"
+          (input)="onInput($event)"
+          (keydown)="onKeydown($event)"
+        />
+        <fa-icon class="dd-control-chevron" [icon]="chevronIcon" aria-hidden="true"></fa-icon>
+
+        <!-- dropdown listbox -->
+        @if (isOpen) {
+          <div
+            class="autocomplete-dropdown"
+            [id]="listboxId"
+            role="listbox"
+            [attr.aria-label]="labelText + ' options'"
+          >
+            @if (filteredItems.length === 0) {
+              <div class="autocomplete-option no-results" role="option">Nincs találat</div>
+            }
+
+            @for (item of filteredItems; track item[valueField]; let i = $index) {
+              <div
+                class="autocomplete-option"
+                [class.selected]="selectedIndex === i"
+                [id]="getOptionId(i)"
+                role="option"
+                [attr.aria-selected]="selectedIndex === i"
+                (click)="selectItem(item, i)"
+                (mouseenter)="selectedIndex = i"
+              >
+                {{ item[text] }}
+              </div>
+            }
+          </div>
+        }
       </div>
-    }
 
-    <!-- combobox input -->
-    <div class="autocomplete-combobox">
-      <input
-        #inputBox
-        type="text"
-        class="form-control"
-        [id]="id"
-        [value]="inputValue"
-        [class.invalid]="model.validationErrors.includes(field)"
-        [class.disable-appearance]="disabledAppearance"
-        [disabled]="disabled"
-        [placeholder]="unselectedText"
-        role="combobox"
-        [attr.aria-expanded]="isOpen"
-        [attr.aria-controls]="listboxId"
-        [attr.aria-activedescendant]="getActiveDescendant()"
-        aria-autocomplete="list"
-        [attr.aria-required]="isRequired"
-        (focus)="onInputFocus()"
-        (input)="onInput($event)"
-        (keydown)="onKeydown($event)"
-      />
-
-      <!-- dropdown listbox -->
-      @if (isOpen) {
-        <div
-          class="autocomplete-dropdown"
-          [id]="listboxId"
-          role="listbox"
-          [attr.aria-label]="labelText + ' options'"
-        >
-          @if (filteredItems.length === 0) {
-            <div class="autocomplete-option no-results" role="option">Nincs találat</div>
-          }
-
-          @for (item of filteredItems; track item[valueField]; let i = $index) {
-            <div
-              class="autocomplete-option"
-              [class.selected]="selectedIndex === i"
-              [id]="getOptionId(i)"
-              role="option"
-              [attr.aria-selected]="selectedIndex === i"
-              (click)="selectItem(item, i)"
-              (mouseenter)="selectedIndex = i"
-            >
-              {{ item[text] }}
-            </div>
-          }
-        </div>
+      <!-- append -->
+      @if (!!append) {
+        <span class="dd-control-affix">{{ append }}</span>
       }
     </div>
-
-    <!-- append -->
-    @if (!!append) {
-      <div class="input-group-append">
-        <div class="input-group-text">{{ append }}</div>
-      </div>
-    }
   </div>
+  @if (helpMessage !== '') {
+    <div class="form-text" [id]="helpId">{{ helpMessage }}</div>
+  }
+  @if (showError) {
+    <div class="invalid-feedback d-flex" [id]="errorId" aria-live="polite">
+      <fa-icon [icon]="warningIcon" aria-hidden="true"></fa-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
 </div>

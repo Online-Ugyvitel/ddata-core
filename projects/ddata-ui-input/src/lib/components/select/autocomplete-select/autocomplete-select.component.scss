@@ -1,13 +1,21 @@
 @use '../../../styles/color-mode';
+@use '../../../styles/form-field';
+@use '../../../styles/form-control';
 
 .autocomplete-combobox {
   position: relative;
   width: 100%;
 }
 
+// the field is a combobox, not a plain select: the text is typed, so no pointer cursor
+.dd-control .autocomplete-combobox .dd-control-input {
+  cursor: text;
+}
+
 .autocomplete-dropdown {
   position: absolute;
-  top: 100%;
+  // below the border of the control box
+  top: calc(100% + 1px);
   left: 0;
   right: 0;
   z-index: 1000;
@@ -43,11 +51,6 @@
       background-color: transparent;
     }
   }
-}
-
-.autocomplete-combobox input[aria-expanded="true"] {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
 }
 
 // Focus management

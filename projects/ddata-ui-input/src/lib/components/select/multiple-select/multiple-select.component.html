@@ -1,63 +1,73 @@
 <!-- eslint-disable @angular-eslint/template/cyclomatic-complexity -->
-<div [class]="wrapperClass">
+<div [class]="wrapperClass" [class.dd-field-inline]="layout === 'inline'">
   <!-- label -->
   @if (showLabel) {
-    <label [class]="labelClass" [for]="id">
-      {{ labelText }}:
-      @if (isRequired) {
-        <span aria-hidden="true"> *</span>
-      }
-    </label>
+    <div class="dd-field-label-row">
+      <label [class]="labelClass" [for]="id"
+        >{{ labelText }}
+        @if (isRequired) {
+          <span class="dd-required" aria-hidden="true"> *</span>
+        }
+      </label>
+    </div>
   }
 
-  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <!-- prepend -->
-    @if (!!prepend) {
-      <div class="input-group-prepend">
-        <div class="input-group-text">{{ prepend }}</div>
-      </div>
-    }
-
-    <!-- select -->
+  <div [class]="inputBlockClass" class="dd-field-block">
     <div
-      class="form-control multiple-select text-muted"
-      [ngClass]="{ disabled: disabled }"
-      [attr.aria-required]="isRequired"
-      [attr.aria-expanded]="false"
-      [attr.aria-haspopup]="true"
-      role="combobox"
-      [attr.tabindex]="disabled ? -1 : 0"
-      (click)="!disabled && showModal()"
+      class="dd-control"
+      [class.dd-control-sm]="size === 'sm'"
+      [class.is-invalid]="isInvalid"
+      [class.is-disabled]="disabled"
     >
-      <!-- if there isn't any selected items -->
-      @if (!model[field] || model[field].length === 0) {
-        {{ '-- ' + unselectedText + ' --' }}
-      } @else {
-        <!-- multiple select mode -->
-        @if (mode === 'multiple') {
-          {{ model[field].length + ' elem kiválasztva' }}
-        }
+      <!-- prepend -->
+      @if (!!prepend) {
+        <span class="dd-control-affix">{{ prepend }}</span>
+      }
 
-        <!-- single select mode -->
-        @if (mode === 'single') {
-          {{ selectedModelName }}
-        }
+      <!-- select -->
+      <div class="dd-control-select">
+        <div
+          class="dd-control-input multiple-select"
+          [class.dd-control-placeholder]="!model[field] || model[field].length === 0"
+          [id]="id"
+          [ngClass]="{ disabled: disabled }"
+          [attr.aria-required]="isRequired || null"
+          [attr.aria-invalid]="isInvalid || null"
+          [attr.aria-describedby]="describedBy"
+          [attr.aria-expanded]="false"
+          [attr.aria-haspopup]="true"
+          role="combobox"
+          [attr.tabindex]="disabled ? -1 : 0"
+          (click)="!disabled && showModal()"
+        >
+          <!-- if there isn't any selected items -->
+          @if (!model[field] || model[field].length === 0) {
+            {{ '-- ' + unselectedText + ' --' }}
+          } @else {
+            <!-- multiple select mode -->
+            @if (mode === 'multiple') {
+              {{ model[field].length + ' elem kiválasztva' }}
+            }
+
+            <!-- single select mode -->
+            @if (mode === 'single') {
+              {{ selectedModelName }}
+            }
+          }
+        </div>
+        <fa-icon class="dd-control-chevron" [icon]="chevronIcon" aria-hidden="true"></fa-icon>
+      </div>
+
+      <!-- append -->
+      @if (!!append) {
+        <span class="dd-control-affix">{{ append }}</span>
       }
     </div>
-
-    <!-- append -->
-    @if (!!append) {
-      <div class="input-group-append">
-        <div class="input-group-text">{{ append }}</div>
-      </div>
-    }
   </div>
-</div>
 
-<!-- multiple select - selected items -->
-@if (mode === 'multiple' && !disableShowSelectedItems) {
-  @if (model[field]?.length > 0) {
-    <div class="d-flex justify-content-end">
+  <!-- multiple select - selected items -->
+  @if (mode === 'multiple' && !disableShowSelectedItems) {
+    @if (model[field]?.length > 0) {
       <div
         [class]="selectedElementsBlockClass"
         [ngClass]="showLabel ? selectedElementsBlockExtraClass : ''"
@@ -78,9 +88,18 @@
           }
         }
       </div>
+    }
+  }
+  @if (helpMessage !== '') {
+    <div class="form-text" [id]="helpId">{{ helpMessage }}</div>
+  }
+  @if (showError) {
+    <div class="invalid-feedback d-flex" [id]="errorId" aria-live="polite">
+      <fa-icon [icon]="warningIcon" aria-hidden="true"></fa-icon>
+      <span>{{ errorMessage }}</span>
     </div>
   }
-}
+</div>
 
 @if (isModalVisible) {
   <dd-multiple-select-dialog
