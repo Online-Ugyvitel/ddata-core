@@ -14,8 +14,15 @@ import {
   signal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { BaseModel, ProxyServiceInterface, ValidatorService } from '@netdjw/ddata-core';
+import { faSpinner, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import {
+  BaseModel,
+  DdataCoreModule,
+  ProxyServiceInterface,
+  ValidatorService
+} from '@netdjw/ddata-core';
+import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
+import { InputHelperService } from '../../services/input/helper/input-helper.service';
 import { Observable, Subject, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 
@@ -41,14 +48,27 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   @Input() disabled = false;
   @Input() type = 'text';
   @Input() inputClass = 'form-control';
-  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
-  @Input() inputBlockClass = 'col-12 d-flex px-0';
-  @Input() inputBlockExtraClass = 'col-md-9';
+  @Input() wrapperClass = 'dd-field';
+  @Input() labelClass = 'form-label';
+  @Input() inputBlockClass = 'dd-field-control';
+  /**
+   * @deprecated the input block has no extra class any more, it does nothing
+   */
+  @Input() inputBlockExtraClass = '';
   @Input() showLabel = true;
   @Input() autoFocus = false;
   @Input() autocomplete = false;
   @Input() autocompleteService: ProxyServiceInterface<AutocompleteSuggestion> | null = null;
   @Input() loadingText = 'Betöltés...';
+  @Input() helpText = '';
+  @Input() errorText = '';
+  @Input() errorSuggestion = '';
+  /**
+   * Accepted for the API of all fields; this field has no counter, so it does nothing.
+   */
+  @Input() counterPlacement: 'label' | 'control' = 'label';
+  @Input() size: 'md' | 'sm' = 'md';
+  @Input() layout: 'stacked' | 'inline' = 'stacked';
 
   @Output() readonly modelChange: EventEmitter<BaseModel> = new EventEmitter();
   @Output() readonly selected: EventEmitter<AutocompleteSuggestion> = new EventEmitter();
@@ -64,10 +84,12 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
   private internalField = '';
   private internalAppend: string | null = null;
   private internalPrepend: string | null = null;
+  private internalHelper: InputHelperServiceInterface | null = null;
 
   readonly id = `dd-autocomplete-box-${nextId++}`;
   readonly listboxId = `${this.id}_listbox`;
   readonly spinner = faSpinner;
+  readonly warningIcon = faTriangleExclamation;
   readonly autocompleteSuggestions = signal<Array<AutocompleteSuggestion>>([]);
   readonly autocompleteCursor = signal(-1);
   readonly autocompleteLoading = signal(false);
@@ -122,6 +144,46 @@ export class AutocompleteBoxComponent implements OnInit, AfterViewInit {
 
   get isInvalid(): boolean {
     return !!this.model?.validationErrors?.includes(this.internalField);
+  }
+
+  get helpId(): string {
+    return `${this.id}_help`;
+  }
+
+  get errorId(): string {
+    return `${this.id}_error`;
+  }
+
+  get helpMessage(): string {
+    return this.helpText || (this.model?.fields?.[this.internalField]?.help ?? '');
+  }
+
+  get errorMessage(): string {
+    return this.helperService.getErrorText(
+      this.model,
+      this.internalField,
+      this.errorText,
+      this.errorSuggestion
+    );
+  }
+
+  get showError(): boolean {
+    return this.errorMessage !== '';
+  }
+
+  get describedBy(): string | null {
+    return this.helperService.buildDescribedBy(
+      this.helpMessage !== '' ? this.helpId : null,
+      this.showError ? this.errorId : null,
+      null
+    );
+  }
+
+  private get helperService(): InputHelperServiceInterface {
+    this.internalHelper ??=
+      DdataCoreModule.InjectorInstance.get<InputHelperServiceInterface>(InputHelperService);
+
+    return this.internalHelper;
   }
 
   get isOpen(): boolean {

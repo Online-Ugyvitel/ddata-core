@@ -1,42 +1,63 @@
-<div [class]="wrapperClass">
-  <label [class]="labelClass" [for]="_field + '_' + random" *ngIf="showLabel">
-    {{ _label }}:
-    <span *ngIf="_isRequired"> *</span>
-  </label>
-
-  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div
-      class="input-color-container"
-      [style.background]="model[_field]"
-      (click)="toggle = !toggle"
-    ></div>
-
-    <div class="input-group-prepend" *ngIf="_prepend !== ''">
-      <div class="input-group-text">{{ _prepend }}</div>
+<div [class]="wrapperClass" [class.dd-field-inline]="layout === 'inline'">
+  @if (showLabel) {
+    <div class="dd-field-label-row">
+      <label [class]="labelClass" [for]="inputId"
+        >{{ _label }}
+        @if (_isRequired) {
+          <span class="dd-required" aria-hidden="true"> *</span>
+        }
+      </label>
     </div>
-
-    <input
-      [class.invalid]="model.validationErrors.includes(_field)"
-      [class]="inputClass"
-      [(ngModel)]="model[_field]"
-      [id]="_field + '_' + random"
-      [attr.name]="_field + '_' + random"
-      [placeholder]="_placeholder"
-      [title]="_title"
-      [disabled]="disabled"
-      [type]="type"
-      [(colorPicker)]="model[_field]"
-      [(cpToggle)]="toggle"
-      cpPosition="bottom"
-      cpOutputFormat="hex"
-      cpAlphaChannel="disabled"
-      cpFallbackColor="#c0c0c0"
-      (keyup)="validateField()"
-      #inputBox
-    />
-
-    <div class="input-group-append" *ngIf="_append !== ''">
-      <div class="input-group-text">{{ _append }}</div>
+  }
+  <div [class]="inputBlockClass" class="dd-field-block">
+    <div
+      class="dd-control"
+      [class.dd-control-sm]="size === 'sm'"
+      [class.is-invalid]="isInvalid"
+      [class.is-disabled]="disabled"
+    >
+      <div
+        class="input-color-container"
+        [style.background]="model[_field]"
+        (click)="toggle = !toggle"
+      ></div>
+      @if (_prepend !== '') {
+        <span class="dd-control-affix">{{ _prepend }}</span>
+      }
+      <input
+        class="dd-control-input"
+        [class]="inputClass"
+        [(ngModel)]="model[_field]"
+        [id]="inputId"
+        [attr.name]="inputId"
+        [placeholder]="_placeholder"
+        [title]="_title"
+        [disabled]="disabled"
+        [type]="type"
+        [(colorPicker)]="model[_field]"
+        [(cpToggle)]="toggle"
+        cpPosition="bottom"
+        cpOutputFormat="hex"
+        cpAlphaChannel="disabled"
+        cpFallbackColor="#c0c0c0"
+        [attr.aria-invalid]="isInvalid || null"
+        [attr.aria-required]="_isRequired || null"
+        [attr.aria-describedby]="describedBy"
+        (keyup)="validateField()"
+        #inputBox
+      />
+      @if (_append !== '') {
+        <span class="dd-control-affix">{{ _append }}</span>
+      }
     </div>
   </div>
+  @if (helpMessage !== '') {
+    <div class="form-text" [id]="helpId">{{ helpMessage }}</div>
+  }
+  @if (showError) {
+    <div class="invalid-feedback d-flex" [id]="errorId" aria-live="polite">
+      <fa-icon [icon]="icon.warning" aria-hidden="true"></fa-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
 </div>

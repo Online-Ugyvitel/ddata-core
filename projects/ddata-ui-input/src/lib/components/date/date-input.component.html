@@ -1,45 +1,74 @@
-<div [class]="wrapperClass">
-  <label [class]="labelClass" [for]="_field + '_' + random" *ngIf="showLabel">
-    {{ _label }}:
-    <span *ngIf="_isRequired"> *</span>
-  </label>
-
-  <div [class]="inputBlockClass" [ngClass]="showLabel ? inputBlockExtraClass : ''">
-    <div class="input-group-prepend" *ngIf="_prepend !== ''">
-      <div class="input-group-text">{{ _prepend }}</div>
+<div [class]="wrapperClass" [class.dd-field-inline]="layout === 'inline'">
+  @if (showLabel) {
+    <div class="dd-field-label-row">
+      <label [class]="labelClass" [for]="inputId"
+        >{{ _label }}
+        @if (_isRequired) {
+          <span class="dd-required" aria-hidden="true"> *</span>
+        }
+      </label>
     </div>
-
-    <ng-container *ngIf="!isViewOnly">
-      <input
-        [class.invalid]="model.validationErrors.includes(_field)"
-        [class]="inputClass"
-        [disabled]="disabled"
-        [id]="_field + '_' + random"
-        [name]="_field + '_' + random"
-        [placeholder]="_placeholder"
-        [title]="_title"
-        [value]="model[_field]"
-        (dateSelect)="change($event)"
-        type="text"
-        ngbDatepicker
-        [minDate]="minDate"
-        [maxDate]="maxDate"
-        #d="ngbDatepicker"
-        (click)="d.toggle()"
-        (change)="typeChange($event)"
-      />
-    </ng-container>
-
-    <ng-container *ngIf="isViewOnly">
-      <div [class]="viewOnlyClass">{{ model[_field] }}</div>
-    </ng-container>
-
-    <label [class]="buttonClass" *ngIf="!disabled && showIcon" [for]="_field + '_' + random">
-      <fa-icon [icon]="icon.calendar"></fa-icon>
-    </label>
-
-    <div class="input-group-append" *ngIf="_append !== ''">
-      <div class="input-group-text">{{ _append }}</div>
-    </div>
+  }
+  <div [class]="inputBlockClass" class="dd-field-block">
+    @if (isViewOnly) {
+      @if (_prepend !== '') {
+        <span class="dd-control-affix">{{ _prepend }}</span>
+      }
+      <div [id]="inputId" [class]="viewOnlyClass" [attr.name]="inputId" [title]="_title">
+        {{ model[_field] }}
+      </div>
+      @if (_append !== '') {
+        <span class="dd-control-affix">{{ _append }}</span>
+      }
+    } @else {
+      <div
+        class="dd-control"
+        [class.dd-control-sm]="size === 'sm'"
+        [class.is-invalid]="isInvalid"
+        [class.is-disabled]="disabled"
+      >
+        @if (_prepend !== '') {
+          <span class="dd-control-affix">{{ _prepend }}</span>
+        }
+        <input
+          class="dd-control-input"
+          [class]="inputClass"
+          [disabled]="disabled"
+          [id]="inputId"
+          [name]="inputId"
+          [placeholder]="_placeholder"
+          [title]="_title"
+          [value]="model[_field]"
+          (dateSelect)="change($event)"
+          type="text"
+          ngbDatepicker
+          [minDate]="minDate"
+          [maxDate]="maxDate"
+          #d="ngbDatepicker"
+          (click)="d.toggle()"
+          (change)="typeChange($event)"
+          [attr.aria-invalid]="isInvalid || null"
+          [attr.aria-required]="_isRequired || null"
+          [attr.aria-describedby]="describedBy"
+        />
+        @if (!disabled && showIcon) {
+          <span class="dd-control-affix dd-control-icon" aria-hidden="true" (click)="d.toggle()">
+            <fa-icon [icon]="icon.calendar"></fa-icon>
+          </span>
+        }
+        @if (_append !== '') {
+          <span class="dd-control-affix">{{ _append }}</span>
+        }
+      </div>
+    }
   </div>
+  @if (helpMessage !== '') {
+    <div class="form-text" [id]="helpId">{{ helpMessage }}</div>
+  }
+  @if (showError) {
+    <div class="invalid-feedback d-flex" [id]="errorId" aria-live="polite">
+      <fa-icon [icon]="icon.warning" aria-hidden="true"></fa-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
 </div>

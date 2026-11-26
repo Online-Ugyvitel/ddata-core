@@ -1,3 +1,4 @@
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -28,12 +29,24 @@ export class DdataInputColorComponent implements OnInit {
   @Input() disabled = false;
   @Input() type = 'text';
   @Input() inputClass = 'form-control';
-  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
-  @Input() inputBlockClass = 'col-12 d-flex px-0';
-  @Input() inputBlockExtraClass = 'col-md-9';
+  @Input() labelClass = 'form-label';
+  @Input() inputBlockClass = 'dd-field-control';
+  /**
+   * @deprecated the input block has no extra class any more, it does nothing
+   */
+  @Input() inputBlockExtraClass = '';
   @Input() showLabel = true;
   @Input() autoFocus = false;
-  @Input() wrapperClass = 'd-flex flex-wrap';
+  @Input() wrapperClass = 'dd-field';
+  @Input() helpText = '';
+  @Input() errorText = '';
+  @Input() errorSuggestion = '';
+  /**
+   * Accepted for the API of all fields; this field has no counter, so it does nothing.
+   */
+  @Input() counterPlacement: 'label' | 'control' = 'label';
+  @Input() size: 'md' | 'sm' = 'md';
+  @Input() layout: 'stacked' | 'inline' = 'stacked';
 
   @Output() readonly changed: EventEmitter<BaseModelInterface<unknown> & FieldsInterface<unknown>> =
     new EventEmitter();
@@ -47,6 +60,7 @@ export class DdataInputColorComponent implements OnInit {
   _placeholder = '';
   _prepend = '';
   _append = '';
+  _help = '';
   _isRequired = false;
   _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
 
@@ -65,6 +79,7 @@ export class DdataInputColorComponent implements OnInit {
       this._prepend = this.helperService.getPrepend(this._model, this._field);
       this._append = this.helperService.getAppend(this._model, this._field);
       this._label = this.helperService.getLabel(this._model, this._field);
+      this._help = this._model.fields[this._field].help ?? '';
     }
 
     if (!!this._model && !!this._model.validationRules?.[this._field]) {
@@ -117,9 +132,51 @@ export class DdataInputColorComponent implements OnInit {
   }
 
   random: string = this.helperService.randChars();
+  readonly icon = { warning: faTriangleExclamation };
   toggle = false;
   validatorService: ValidatorService =
     DdataCoreModule.InjectorInstance.get<ValidatorService>(ValidatorService);
+
+  get inputId(): string {
+    return `${this._field}_${this.random}`;
+  }
+
+  get helpId(): string {
+    return `${this.inputId}_help`;
+  }
+
+  get errorId(): string {
+    return `${this.inputId}_error`;
+  }
+
+  get isInvalid(): boolean {
+    return !!this._model.validationErrors?.includes(this._field);
+  }
+
+  get helpMessage(): string {
+    return this.helpText || this._help;
+  }
+
+  get errorMessage(): string {
+    return this.helperService.getErrorText(
+      this._model,
+      this._field,
+      this.errorText,
+      this.errorSuggestion
+    );
+  }
+
+  get showError(): boolean {
+    return this.errorMessage !== '';
+  }
+
+  get describedBy(): string | null {
+    return this.helperService.buildDescribedBy(
+      this.helpMessage !== '' ? this.helpId : null,
+      this.showError ? this.errorId : null,
+      null
+    );
+  }
 
   constructor(private readonly helperService: InputHelperService) {}
 

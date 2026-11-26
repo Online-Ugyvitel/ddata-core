@@ -1,4 +1,5 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Injector, ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -25,12 +26,16 @@ describe('DdataInputTimeComponent', () => {
       getPrepend: vi.fn().mockName('InputHelperService.getPrepend'),
       getAppend: vi.fn().mockName('InputHelperService.getAppend'),
       isRequired: vi.fn().mockName('InputHelperService.isRequired'),
+      // the pure helpers of the real service, they do not use `this`
+      getErrorText: InputHelperService.prototype.getErrorText,
+      buildDescribedBy: InputHelperService.prototype.buildDescribedBy,
       randChars: vi.fn().mockName('InputHelperService.randChars')
     };
 
     TestBed.configureTestingModule({
       declarations: [DdataInputTimeComponent],
       schemas: [NO_ERRORS_SCHEMA],
+      imports: [FontAwesomeModule],
       providers: [{ provide: InputHelperService, useValue: spy }]
     }).compileComponents();
 
@@ -509,11 +514,11 @@ describe('DdataInputTimeComponent', () => {
     it('should handle all class properties correctly', () => {
       // Test that all properties can be set and retrieved
       expect(component.inputClass).toBe('form-control');
-      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
-      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
-      expect(component.inputBlockExtraClass).toBe('col-md-9');
+      expect(component.labelClass).toBe('form-label');
+      expect(component.inputBlockClass).toBe('dd-field-control');
+      expect(component.inputBlockExtraClass).toBe('');
       expect(component.viewOnlyClass).toBe('form-control border-0 bg-body-tertiary');
-      expect(component.wrapperClass).toBe('d-flex flex-wrap');
+      expect(component.wrapperClass).toBe('dd-field');
 
       // Test that changed event emitter is initialized
       expect(component.changed).toBeDefined();
@@ -635,20 +640,24 @@ describe('DdataInputTimeComponent', () => {
       Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
       fixture.detectChanges();
     };
+    const affixes = (): Array<string> =>
+      Array.from(element.querySelectorAll('.dd-control-affix:not(.dd-control-icon)')).map(
+        (affix: HTMLElement) => affix.textContent.trim()
+      );
 
     it('should render label, required mark, prepend and append and follow their changes', () => {
       render({ field: 'start', model: createModel() });
 
-      expect(element.querySelector('label').textContent).toContain('Test Label:');
+      expect(element.querySelector('label').textContent).toContain('Test Label');
       expect(element.querySelector('label span').textContent).toBe(' *');
-      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('Prepend');
-      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('Append');
+      expect(affixes()[0]).toBe('Prepend');
+      expect(affixes()[1]).toBe('Append');
 
       render({ labelText: 'Kezdés', prepend: 'P2', append: 'A2' });
 
-      expect(element.querySelector('label').textContent).toContain('Kezdés:');
-      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('P2');
-      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('A2');
+      expect(element.querySelector('label').textContent).toContain('Kezdés');
+      expect(affixes()[0]).toBe('P2');
+      expect(affixes()[1]).toBe('A2');
     });
 
     it('should hide the optional parts', () => {
@@ -658,8 +667,7 @@ describe('DdataInputTimeComponent', () => {
       render({ field: 'start', model: createModel(), showLabel: false });
 
       expect(element.querySelector('label')).toBeNull();
-      expect(element.querySelector('.input-group-prepend')).toBeNull();
-      expect(element.querySelector('.input-group-append')).toBeNull();
+      expect(element.querySelector('.dd-control-affix:not(.dd-control-icon)')).toBeNull();
     });
 
     it('should disable the input', () => {
@@ -699,19 +707,133 @@ describe('DdataInputTimeComponent', () => {
       input().dispatchEvent(new KeyboardEvent('keyup'));
       fixture.detectChanges();
 
-      expect(input().classList).toContain('invalid');
+      expect(input().getAttribute('aria-invalid')).toBe('true');
 
       model['start'] = '12:00';
       input().dispatchEvent(new KeyboardEvent('keyup'));
       fixture.detectChanges();
 
-      expect(input().classList).not.toContain('invalid');
+      expect(input().hasAttribute('aria-invalid')).toBe(false);
     });
 
     it('should focus the input on init when autoFocus is set', () => {
       render({ field: 'start', model: createModel(), autoFocus: true });
 
       expect(document.activeElement).toBe(element.querySelector('input'));
+    });
+  });
+
+  describe('form field skeleton', () => {
+    const FIELD = 'start';
+    const buildModel = (options: {
+      errors: Array<string>;
+      help?: string;
+      message?: string;
+    }): BaseModel => {
+      const model = new BaseModel();
+
+      model.fields = { start: { title: 'Start', label: 'Start', help: options.help } };
+      model.validationRules = { start: ['required'] };
+      model['start'] = '10:00';
+
+      model.validationErrors = options.errors;
+      model.getFieldErrorMessage = options.message ? () => options.message : undefined;
+
+      return model;
+    };
+    const query = (selector: string): HTMLElement => fixture.nativeElement.querySelector(selector);
+    const render = (extra: Record<string, unknown> = {}): void => {
+      Object.entries({ field: FIELD, model: buildModel({ errors: [] }), ...extra }).forEach(
+        ([key, value]) => fixture.componentRef.setInput(key, value)
+      );
+      fixture.detectChanges();
+    };
+    const describedBy = (): Array<string> =>
+      (query('input').getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+
+    it('should render the label above the .dd-control without a colon', () => {
+      render({});
+
+      expect(query('.dd-field > .dd-field-label-row > label.form-label')).not.toBeNull();
+      expect(query('label').textContent).not.toContain(':');
+      expect(query('.dd-field-control .dd-control input')).not.toBeNull();
+      expect(query('.dd-required').getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('should render no label row without a label', () => {
+      render({ showLabel: false });
+
+      expect(query('label')).toBeNull();
+      expect(query('.dd-field-label-row')).toBeNull();
+    });
+
+    it('should render the help of the model and let helpText override it', () => {
+      render({ model: buildModel({ errors: [], help: 'Súgó a modellből' }) });
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a modellből');
+      expect(describedBy()).toEqual([query('.form-text').id]);
+
+      fixture.componentRef.setInput('helpText', 'Súgó a sablonból');
+      fixture.detectChanges();
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a sablonból');
+    });
+
+    it('should render the error message with the suggestion and the aria attributes', () => {
+      render({
+        model: buildModel({ errors: [FIELD], message: 'Hibás érték.' }),
+        errorSuggestion: 'Javítsd ki.'
+      });
+      const error = query('.invalid-feedback.d-flex');
+
+      expect(error.querySelector('span').textContent).toBe('Hibás érték. Javítsd ki.');
+      expect(error.querySelector('fa-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(query('.dd-control').classList).toContain('is-invalid');
+      expect(query('input').getAttribute('aria-invalid')).toBe('true');
+      expect(describedBy()).toEqual([error.id]);
+
+      fixture.componentRef.setInput('errorText', 'Saját üzenet');
+      fixture.detectChanges();
+
+      expect(query('.invalid-feedback span').textContent).toBe('Saját üzenet Javítsd ki.');
+    });
+
+    it('should only mark the border when the model has no message', () => {
+      render({ model: buildModel({ errors: [FIELD] }) });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.dd-control').classList).toContain('is-invalid');
+    });
+
+    it('should render nothing about errors and help for a valid field', () => {
+      render({ errorText: 'Nem látszhat' });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.form-text')).toBeNull();
+      expect(query('input').hasAttribute('aria-invalid')).toBe(false);
+      expect(query('input').hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('should render the size, the layout and the disabled state', () => {
+      render({ size: 'sm', layout: 'inline', disabled: true });
+
+      expect(query('.dd-control').classList).toContain('dd-control-sm');
+      expect(query('.dd-control').classList).toContain('is-disabled');
+      expect(query('.dd-field').classList).toContain('dd-field-inline');
+    });
+
+    it('should apply the overridden legacy classes', () => {
+      render({ wrapperClass: 'my-wrapper', labelClass: 'my-label', inputBlockClass: 'my-block' });
+
+      expect(query('.my-wrapper label.my-label')).not.toBeNull();
+      expect(query('.my-wrapper .my-block .dd-control')).not.toBeNull();
+    });
+
+    it('should render the clock icon as an aria-hidden suffix inside the control', () => {
+      render({});
+
+      expect(query('.dd-control > .dd-control-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(query('.dd-control > .dd-control-icon fa-icon')).not.toBeNull();
     });
   });
 });

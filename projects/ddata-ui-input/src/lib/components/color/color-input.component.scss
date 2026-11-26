@@ -1,5 +1,14 @@
+@use '../../styles/form-field';
+@use '../../styles/form-control';
+
+// the colour preview is a small swatch at the start of the control
 .input-color-container {
-  width: 40px;
+  flex: none;
+  width: var(--dcms-size-icon, 1rem);
+  height: var(--dcms-size-icon, 1rem);
+  cursor: pointer;
+  border: 1px solid var(--dcms-control-border, var(--bs-border-color));
+  border-radius: var(--bs-border-radius-sm);
 }
 
 // ngx-color-picker renders its panel next to the input (cpUseRootViewContainer is off) with
