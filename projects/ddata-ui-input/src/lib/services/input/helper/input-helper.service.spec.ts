@@ -552,4 +552,69 @@ describe('InputHelperService', () => {
       expect(result1).not.toBe(result2);
     });
   });
+
+  describe('getErrorText', () => {
+    let model: MockModel;
+
+    beforeEach(() => {
+      model = new MockModel();
+      model.validationErrors = ['testField'];
+      model.getFieldErrorMessage = vi.fn().mockReturnValue('Kötelező mező.');
+    });
+
+    it('should return the message of the model for an invalid field', () => {
+      expect(service.getErrorText(model, 'testField', '')).toBe('Kötelező mező.');
+      expect(model.getFieldErrorMessage).toHaveBeenCalledWith('testField');
+    });
+
+    it('should let the override win over the message of the model', () => {
+      expect(service.getErrorText(model, 'testField', 'Saját üzenet')).toBe('Saját üzenet');
+      expect(model.getFieldErrorMessage).not.toHaveBeenCalled();
+    });
+
+    it('should return an empty string for a field without validation error', () => {
+      expect(service.getErrorText(model, 'requiredField', 'Saját üzenet')).toBe('');
+    });
+
+    it('should return an empty string when the model has no validationErrors', () => {
+      model.validationErrors = undefined;
+
+      expect(service.getErrorText(model, 'testField', 'Saját üzenet')).toBe('');
+      expect(service.getErrorText(undefined, 'testField', '')).toBe('');
+    });
+
+    it('should return an empty string when the model has no getFieldErrorMessage', () => {
+      model.getFieldErrorMessage = undefined;
+
+      expect(service.getErrorText(model, 'testField', '')).toBe('');
+    });
+
+    it('should append the suggestion after a space', () => {
+      expect(service.getErrorText(model, 'testField', '', 'Javaslat: add meg.')).toBe(
+        'Kötelező mező. Javaslat: add meg.'
+      );
+      expect(service.getErrorText(model, 'testField', 'Saját', 'Javaslat.')).toBe(
+        'Saját Javaslat.'
+      );
+    });
+
+    it('should not show a suggestion without a message', () => {
+      model.getFieldErrorMessage = undefined;
+
+      expect(service.getErrorText(model, 'testField', '', 'Javaslat.')).toBe('');
+    });
+  });
+
+  describe('buildDescribedBy', () => {
+    it('should join the given ids in help, error, counter order', () => {
+      expect(service.buildDescribedBy('h', 'e', 'c')).toBe('h e c');
+      expect(service.buildDescribedBy('h', null, 'c')).toBe('h c');
+      expect(service.buildDescribedBy(null, 'e', null)).toBe('e');
+    });
+
+    it('should return null when no element is visible', () => {
+      expect(service.buildDescribedBy(null, null, null)).toBeNull();
+      expect(service.buildDescribedBy('', '', '')).toBeNull();
+    });
+  });
 });

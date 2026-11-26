@@ -1,3 +1,5 @@
-<div class="input-group-append" title="Karakterek száma">
-  <span class="input-group-text">{{ _currentLength.length }} / {{ maxLength }}</span>
-</div>
+<span
+  title="Karakterek száma"
+  [class.dd-counter-exceeded]="maxLength > 0 && _currentLength.length > maxLength"
+  >{{ _currentLength.length }} / {{ maxLength }}</span
+>

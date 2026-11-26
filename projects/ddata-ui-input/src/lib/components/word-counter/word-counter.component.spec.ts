@@ -7,7 +7,7 @@ describe('WordCounterComponent', () => {
   let fixture: ComponentFixture<WordCounterComponent>;
   let reached: Array<boolean>;
   const counter = (): HTMLElement =>
-    (fixture.nativeElement as HTMLElement).querySelector('.input-group-text');
+    (fixture.nativeElement as HTMLElement).querySelector('span');
   const text = (): string => counter().textContent.trim();
   const render = (currentLength: string | null | undefined, maxLength?: number): void => {
     if (maxLength !== undefined) {
@@ -39,7 +39,7 @@ describe('WordCounterComponent', () => {
   });
 
   it('should render the title of the counter', () => {
-    const wrapper = (fixture.nativeElement as HTMLElement).querySelector('.input-group-append');
+    const wrapper = (fixture.nativeElement as HTMLElement).querySelector('span');
 
     expect(wrapper.getAttribute('title')).toBe('Kulcsszavak száma');
   });
@@ -71,7 +71,7 @@ describe('WordCounterComponent', () => {
 
       expect(component._currentLength).toBe('');
       expect(text()).toBe('0 / 5');
-      expect(counter().classList).not.toContain('bg-warning');
+      expect(counter().classList).not.toContain('dd-counter-exceeded');
     });
 
     it('should reset the count when the value is cleared', () => {
@@ -97,7 +97,7 @@ describe('WordCounterComponent', () => {
       render('a,b', 3);
 
       expect(text()).toBe('2 / 3');
-      expect(counter().classList).not.toContain('bg-warning');
+      expect(counter().classList).not.toContain('dd-counter-exceeded');
       expect(reached[reached.length - 1]).toBe(false);
     });
 
@@ -105,7 +105,7 @@ describe('WordCounterComponent', () => {
       render('a,b,c', 3);
 
       expect(text()).toBe('3 / 3');
-      expect(counter().classList).not.toContain('bg-warning');
+      expect(counter().classList).not.toContain('dd-counter-exceeded');
       expect(reached[reached.length - 1]).toBe(false);
     });
 
@@ -113,7 +113,7 @@ describe('WordCounterComponent', () => {
       render('a,b,c,d', 3);
 
       expect(text()).toBe('4 / 3');
-      expect(counter().classList).toContain('bg-warning');
+      expect(counter().classList).toContain('dd-counter-exceeded');
       expect(reached[reached.length - 1]).toBe(true);
     });
 
@@ -130,14 +130,14 @@ describe('WordCounterComponent', () => {
       render('', 3);
 
       expect(reached[reached.length - 1]).toBe(false);
-      expect(counter().classList).not.toContain('bg-warning');
+      expect(counter().classList).not.toContain('dd-counter-exceeded');
     });
 
     it('should not highlight the counter without a max length', () => {
       render('a,b,c', 0);
 
       expect(text()).toBe('3 / 0');
-      expect(counter().classList).not.toContain('bg-warning');
+      expect(counter().classList).not.toContain('dd-counter-exceeded');
     });
 
     it('should never report the limit as reached without a max length', () => {

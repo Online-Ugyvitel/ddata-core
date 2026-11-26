@@ -6,6 +6,7 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { By } from '@angular/platform-browser';
 import {
   DdataCoreModule,
@@ -76,7 +77,7 @@ describe('InputBoxComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DdataInputComponent, CharacterCounterComponent, WordCounterComponent],
-      imports: [FormsModule],
+      imports: [FormsModule, FontAwesomeModule],
       providers: [Injector, ValidatorService, BaseModel, InputHelperService]
     }).compileComponents();
   });
@@ -355,11 +356,11 @@ describe('InputBoxComponent', () => {
     expect(component.isViewOnly).toBe(false);
     expect(component.type).toBe('text');
     expect(component.inputClass).toBe('form-control');
-    expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
-    expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
-    expect(component.inputBlockExtraClass).toBe('col-md-9');
+    expect(component.labelClass).toBe('form-label');
+    expect(component.inputBlockClass).toBe('dd-field-control');
+    expect(component.inputBlockExtraClass).toBe('');
     expect(component.viewOnlyClass).toBe('form-control border-0 bg-body-tertiary');
-    expect(component.wrapperClass).toBe('d-flex flex-wrap');
+    expect(component.wrapperClass).toBe('dd-field');
     expect(component.showLabel).toBe(true);
     expect(component.autoFocus).toBe(false);
     expect(component.enableCharacterCounter).toBe(false);
@@ -509,8 +510,10 @@ describe('InputBoxComponent', () => {
       render({ field: 'name', model: new FakeModel() });
       const label: HTMLLabelElement = element.querySelector('label');
 
-      expect(label.textContent).toContain('Címke neve:');
+      expect(label.textContent).toContain('Címke neve');
+      expect(label.textContent).not.toContain(':');
       expect(label.querySelector('span').textContent).toBe(' *');
+      expect(label.querySelector('span').getAttribute('aria-hidden')).toBe('true');
       expect(label.getAttribute('for')).toBe(input().id);
       expect(input().placeholder).toBe('Címke neve');
       expect(input().title).toBe('Címke neve');
@@ -526,7 +529,7 @@ describe('InputBoxComponent', () => {
       vi.spyOn(console, 'error').mockReturnValue(undefined);
       render({ field: 'missing', model: new FakeModel() });
 
-      expect(element.querySelector('label').textContent.trim()).toBe(':');
+      expect(element.querySelector('label').textContent.trim()).toBe('');
       expect(input().placeholder).toBe('');
       expect(console.error).toHaveBeenCalledWith(
         `The ${new FakeModel().model_name}'s missing field is `,
@@ -537,22 +540,25 @@ describe('InputBoxComponent', () => {
     it('should render the prepend and the append texts and follow their changes', () => {
       render({ field: 'name', model: new FakeModel(), prepend: 'Ft', append: '%' });
 
-      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('Ft');
-      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('%');
+      const affixes = (): Array<string> =>
+        Array.from(element.querySelectorAll('.dd-control > .dd-control-affix')).map((affix) =>
+          (affix as HTMLElement).textContent.trim()
+        );
+
+      expect(affixes()).toEqual(['Ft', '%']);
 
       render({ prepend: 'EUR', append: 'db', labelText: 'Új címke' });
 
-      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('EUR');
-      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('db');
-      expect(element.querySelector('label').textContent).toContain('Új címke:');
+      expect(affixes()).toEqual(['EUR', 'db']);
+      expect(element.querySelector('label').textContent).toContain('Új címke');
     });
 
     it('should not render empty prepend, append and the hidden label', () => {
       render({ field: 'name', model: new FakeModel(), showLabel: false });
 
       expect(element.querySelector('label')).toBeNull();
-      expect(element.querySelector('.input-group-prepend')).toBeNull();
-      expect(element.querySelector('.input-group-append')).toBeNull();
+      expect(element.querySelector('.dd-field-label-row')).toBeNull();
+      expect(element.querySelector('.dd-control-affix')).toBeNull();
     });
 
     it('should disable the input', async () => {
@@ -591,14 +597,15 @@ describe('InputBoxComponent', () => {
       type('');
 
       expect(model.validationErrors).toEqual(['name']);
-      expect(input().classList).toContain('invalid');
+      expect(input().classList).not.toContain('invalid');
+      expect(element.querySelector('.dd-control').classList).toContain('is-invalid');
       expect(changed).not.toHaveBeenCalled();
 
       type('Valid name');
 
       expect(model.name).toBe('Valid name');
       expect(model.validationErrors).toEqual([]);
-      expect(input().classList).not.toContain('invalid');
+      expect(element.querySelector('.dd-control').classList).not.toContain('is-invalid');
       expect(changed).toHaveBeenCalledExactlyOnceWith(model);
     });
 
@@ -635,7 +642,7 @@ describe('InputBoxComponent', () => {
 
         return model;
       };
-      const warning = (): HTMLElement => element.querySelector('.bg-warning.rounded');
+      const warning = (): HTMLElement => element.querySelector('.alert-warning');
 
       it('should not warn at the limit', () => {
         render({
@@ -692,6 +699,221 @@ describe('InputBoxComponent', () => {
 
         expect(component.isWordLimitExceeded).toBe(false);
       });
+    });
+  });
+
+  describe('form field skeleton', () => {
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries(inputs).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+    const input = (): HTMLInputElement => element.querySelector('input');
+    const describedBy = (): Array<string> =>
+      (input().getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+    const invalidModel = (): FakeModel => {
+      const model = new FakeModel();
+
+      model.fields.name.help = 'Ebből találja meg a vásárló.';
+      model.name = '';
+      model.validationErrors = ['name'];
+
+      return model;
+    };
+
+    it('should render the label above the control, without a colon, before the .dd-control', () => {
+      render({ field: 'name', model: new FakeModel() });
+      const wrapper: HTMLElement = element.firstElementChild;
+      const label: HTMLLabelElement = element.querySelector('label.form-label');
+
+      expect(wrapper.classList).toContain('dd-field');
+      expect(wrapper.firstElementChild.classList).toContain('dd-field-label-row');
+      expect(label.textContent.replace(/\s+/g, ' ').trim()).toBe('Címke neve *');
+      expect(label.compareDocumentPosition(element.querySelector('.dd-control'))).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING
+      );
+      expect(
+        element.querySelector('.dd-field-control .dd-control input.dd-control-input')
+      ).not.toBeNull();
+    });
+
+    it('should mark a required field with aria-required and keep the asterisk out of the name', () => {
+      render({ field: 'name', model: new FakeModel() });
+
+      expect(input().getAttribute('aria-required')).toBe('true');
+      expect(element.querySelector('.dd-required').getAttribute('aria-hidden')).toBe('true');
+
+      render({ field: 'textField', model: new FakeModel() });
+
+      expect(input().hasAttribute('aria-required')).toBe(false);
+    });
+
+    it('should render the help text of the input over the help of the model', () => {
+      const model = new FakeModel();
+
+      model.fields.name.help = 'Súgó a modellből';
+      render({ field: 'name', model });
+      const help: HTMLElement = element.querySelector('.form-text');
+
+      expect(help.textContent.trim()).toBe('Súgó a modellből');
+      expect(describedBy()).toEqual([help.id]);
+
+      render({ helpText: 'Súgó a sablonból' });
+
+      expect(element.querySelector('.form-text').textContent.trim()).toBe('Súgó a sablonból');
+    });
+
+    it('should not render an empty help text and should not reference it', () => {
+      render({ field: 'name', model: new FakeModel(), helpText: '' });
+
+      expect(element.querySelector('.form-text')).toBeNull();
+      expect(input().hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('should render the message of the model with an icon for an invalid field', () => {
+      const model = invalidModel();
+
+      render({ field: 'name', model });
+      const error: HTMLElement = element.querySelector('.invalid-feedback.d-flex');
+
+      expect(error.textContent.trim()).toBe(model.getFieldErrorMessage('name'));
+      expect(error.textContent.trim()).not.toBe('');
+      expect(error.querySelector('fa-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(input().getAttribute('aria-invalid')).toBe('true');
+      expect(element.querySelector('.dd-control').classList).toContain('is-invalid');
+      expect(describedBy()).toEqual([element.querySelector('.form-text').id, error.id]);
+    });
+
+    it('should let errorText override the message and append the suggestion after a space', () => {
+      render({
+        field: 'name',
+        model: invalidModel(),
+        errorText: 'Add meg a nevet.',
+        errorSuggestion: 'Javaslat: „Név – 2. résztvevő”.'
+      });
+
+      expect(element.querySelector('.invalid-feedback span').textContent).toBe(
+        'Add meg a nevet. Javaslat: „Név – 2. résztvevő”.'
+      );
+    });
+
+    it('should only mark the border when no message exists', () => {
+      const model = invalidModel();
+
+      model.getFieldErrorMessage = undefined;
+      render({ field: 'name', model });
+
+      expect(element.querySelector('.invalid-feedback')).toBeNull();
+      expect(input().getAttribute('aria-invalid')).toBe('true');
+      expect(element.querySelector('.dd-control').classList).toContain('is-invalid');
+    });
+
+    it('should not render an error for a valid field', () => {
+      render({ field: 'name', model: new FakeModel(), errorText: 'Nem látszhat' });
+
+      expect(element.querySelector('.invalid-feedback')).toBeNull();
+      expect(input().hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('should render the character counter in the label row by default as "N / M"', () => {
+      render({
+        field: 'name',
+        model: new FakeModel(),
+        enableCharacterCounter: true,
+        maxLength: 20
+      });
+      const counter: HTMLElement = element.querySelector('.dd-field-label-row character-counter');
+
+      expect(counter.classList).toContain('dd-field-counter');
+      expect(counter.textContent.trim()).toBe('9 / 20');
+      expect(describedBy()).toEqual([counter.id]);
+    });
+
+    it('should render the counter inside the control for counterPlacement="control"', () => {
+      render({
+        field: 'name',
+        model: new FakeModel(),
+        enableCharacterCounter: true,
+        enableWordCounter: true,
+        counterPlacement: 'control'
+      });
+
+      expect(element.querySelector('.dd-field-label-row character-counter')).toBeNull();
+      expect(element.querySelector('.dd-control character-counter')).not.toBeNull();
+      expect(element.querySelector('.dd-control dd-word-counter')).not.toBeNull();
+      expect(describedBy().length).toBe(2);
+    });
+
+    it('should render the counter inside the control without a label', () => {
+      render({
+        field: 'name',
+        model: new FakeModel(),
+        enableCharacterCounter: true,
+        showLabel: false
+      });
+
+      expect(element.querySelector('.dd-control character-counter')).not.toBeNull();
+    });
+
+    it('should mark the counter when the max length is exceeded', async () => {
+      const model = new FakeModel();
+
+      model.name = 'x'.repeat(262);
+      render({ field: 'name', model, enableCharacterCounter: true, maxLength: 255 });
+      await fixture.whenStable();
+      fixture.detectChanges();
+
+      expect(element.querySelector('.dd-counter-exceeded').textContent.trim()).toBe('262 / 255');
+    });
+
+    it('should render the small size and the inline layout', () => {
+      render({ field: 'name', model: new FakeModel(), size: 'sm', layout: 'inline' });
+
+      expect(element.querySelector('.dd-control').classList).toContain('dd-control-sm');
+      expect(element.firstElementChild.classList).toContain('dd-field-inline');
+
+      render({ size: 'md', layout: 'stacked' });
+
+      expect(element.querySelector('.dd-control').classList).not.toContain('dd-control-sm');
+      expect(element.firstElementChild.classList).not.toContain('dd-field-inline');
+    });
+
+    it('should mark the control as disabled', () => {
+      render({ field: 'name', model: new FakeModel(), disabled: true });
+
+      expect(element.querySelector('.dd-control').classList).toContain('is-disabled');
+    });
+
+    it('should render no .dd-control in view only mode', () => {
+      render({ field: 'name', model: new FakeModel(), isViewOnly: true, prepend: 'Ft' });
+
+      expect(element.querySelector('.dd-control')).toBeNull();
+      expect(element.querySelector('.dd-control-affix').textContent.trim()).toBe('Ft');
+    });
+
+    it('should apply the overridden legacy classes', () => {
+      render({
+        field: 'name',
+        model: new FakeModel(),
+        wrapperClass: 'my-wrapper',
+        labelClass: 'my-label',
+        inputBlockClass: 'my-block',
+        inputBlockExtraClass: 'ignored'
+      });
+
+      expect(element.firstElementChild.classList).toContain('my-wrapper');
+      expect(element.querySelector('label').classList).toContain('my-label');
+      expect(element.querySelector('.my-block')).not.toBeNull();
+      expect(element.querySelector('.ignored')).toBeNull();
+    });
+
+    it('should not throw without the field of the model', () => {
+      vi.spyOn(console, 'error').mockReturnValue(undefined);
+      const model = invalidModel();
+
+      model.validationErrors = ['missing'];
+
+      expect(() => render({ field: 'missing', model })).not.toThrow();
+      expect(element.querySelector('.form-text')).toBeNull();
     });
   });
 });
