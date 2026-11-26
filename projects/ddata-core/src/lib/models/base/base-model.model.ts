@@ -5,17 +5,20 @@ import { ValidatorServiceInterface } from '../../services/validator/validator-se
 import { ValidatorService } from '../../services/validator/validator.service';
 import { ValidationErrorSettingsInterface } from '../error/validation-error-settings.model';
 import { ValidationError } from '../error/validation-error.model';
+import { DEFAULT_VALIDATION_MESSAGES } from '../error/validation-messages.const';
 import { ID, ISODate } from './base-data.type';
 
 export interface FieldInterface {
   label: string;
   title: string;
+  help?: string;
+  errorMessages?: { [rule: string]: string };
   placeholder?: string;
   append?: string;
   prepend?: string;
   validateByType?: boolean;
-  validationRules?: Array<Rule>;
-  additionalValidationRules?: Array<Rule>;
+  validationRules?: Array<ValidationRuleName>;
+  additionalValidationRules?: Array<ValidationRuleName>;
 }
 
 export type FieldContainerInterface<T> = {
@@ -37,7 +40,7 @@ export interface TabInterface<T> {
   columns: Array<FieldColumnInterface<T>>;
 }
 
-type Rule =
+export type ValidationRuleName =
   | 'string'
   | 'boolean'
   | 'number'
@@ -67,6 +70,9 @@ type Rule =
   | 'iban_code'
   | 'swift_code';
 
+/** Kept for backward compatibility; use `ValidationRuleName`. */
+type Rule = ValidationRuleName;
+
 export interface ValidationRuleInterface {
   [key: string]: Array<Rule>;
 }
@@ -83,6 +89,7 @@ export interface BaseModelWithoutTypeDefinitionInterface {
   prepareToSave(): any;
   validate(): void;
   getValidatedErrorFields(): Array<string>;
+  getFieldErrorMessage?(field: string): string;
   setDate(date: Date, days: number): ISODate;
   getCurrentUserId(): ID;
   getCurrentISODate(): ISODate;
@@ -174,6 +181,32 @@ export class BaseModel implements BaseModelInterface<ModelWithId> {
     });
 
     return errorNames;
+  }
+
+  /**
+   * Return the validation message of a field: the `errorMessages` override of the field for the first failed
+   * rule, otherwise the default Hungarian message. Empty if the field is valid or has no rules.
+   */
+  getFieldErrorMessage(field: string): string {
+    const rules = this.validationRules[field];
+
+    if (!this.validationErrors.includes(field) || !rules) {
+      return '';
+    }
+    const validatorService: ValidatorServiceInterface =
+      DdataCoreModule.InjectorInstance.get<ValidatorServiceInterface>(ValidatorService);
+    const failedRule = validatorService.firstFailedRule(this[field], rules);
+
+    if (failedRule === null) {
+      return '';
+    }
+    const [ruleKey, ruleValue] = failedRule.split(':');
+    const message =
+      this.fields[field]?.errorMessages?.[ruleKey] ??
+      DEFAULT_VALIDATION_MESSAGES[ruleKey] ??
+      DEFAULT_VALIDATION_MESSAGES['invalid'];
+
+    return message.replace('{value}', () => ruleValue ?? '');
   }
 
   setDate(date: Date, days = 0): ISODate {

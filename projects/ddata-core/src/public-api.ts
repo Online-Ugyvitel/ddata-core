@@ -46,6 +46,7 @@ export * from './lib/services/validator/validator.service';
 export * from './lib/services/validator/validator-service.interface';
 export * from './lib/models/error/validation-error.model';
 export * from './lib/models/error/validation-error-settings.model';
+export * from './lib/models/error/validation-messages.const';
 
 // spinner service & interface
 export * from './lib/services/spinner/spinner.service';

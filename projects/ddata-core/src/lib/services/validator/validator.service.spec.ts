@@ -1743,4 +1743,54 @@ describe('ValidatorService', () => {
       expect(result).toBe(true); // NaN comparison should work
     });
   });
+
+  describe('firstFailedRule', () => {
+    it('should return null if every rule is satisfied', () => {
+      expect(validator.firstFailedRule('abc', ['string', 'required', 'min:3'])).toBeNull();
+    });
+
+    it('should return the complete rule string of the first failed rule', () => {
+      expect(validator.firstFailedRule('ab', ['string', 'min:3', 'required'])).toBe('min:3');
+      expect(validator.firstFailedRule(9, ['number', 'max:5'])).toBe('max:5');
+    });
+
+    it('should accept a single rule as a string', () => {
+      expect(validator.firstFailedRule('', 'required')).toBe('required');
+      expect(validator.firstFailedRule('x', 'required')).toBeNull();
+    });
+
+    it('should return null for nullable rules and empty or missing values', () => {
+      expect(validator.firstFailedRule(null, ['email', 'nullable'])).toBeNull();
+      expect(validator.firstFailedRule(undefined, ['email', 'nullable'])).toBeNull();
+      expect(validator.firstFailedRule('', ['email', 'nullable'])).toBeNull();
+      expect(validator.firstFailedRule([], ['required', 'nullable'])).toBeNull();
+    });
+
+    it('should still check a non-empty value of a nullable field', () => {
+      expect(validator.firstFailedRule('nem-email', ['email', 'nullable'])).toBe('email');
+    });
+
+    it('should return the unknown rule string for an unknown rule', () => {
+      expect(validator.firstFailedRule('x', ['valami'])).toBe('valami');
+    });
+
+    it('should mirror validate for every rule', () => {
+      const samples: Array<[unknown, Array<string>]> = [
+        ['abc', ['string', 'min:2']],
+        ['a', ['string', 'min:2']],
+        [5, ['integer', 'max:3']],
+        ['', ['required']],
+        ['a@b.hu', ['email']],
+        ['a@', ['email']],
+        [null, ['nullable', 'required']],
+        ['x', ['nullable', 'valami']]
+      ];
+
+      samples.forEach(([data, rules]) => {
+        expect(validator.firstFailedRule(data, rules) === null).toBe(
+          validator.validate(data, rules)
+        );
+      });
+    });
+  });
 });
