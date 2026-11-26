@@ -2,7 +2,15 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ID } from '../../models/base/base-data.type';
 import { FileUploadProcessInterface } from '../../models/file/file-upload-process.interface';
+import {
+  BulkUpdateValuesInterface,
+  ListFacetsInterface,
+  ListNeighborsInterface,
+  ListQueryInterface,
+  ListViewInterface
+} from '../../models/list/list-query.interface';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { DataServiceAbstractInterface } from '../data/data-service-abstract.interface';
 import { RequestHeaders } from './request-headers.type';
@@ -24,6 +32,13 @@ export interface RemoteDataServiceInterface<T> extends DataServiceAbstractInterf
 
   delete(model: T): Observable<number>;
   deleteMultiple(models: Array<T>): Observable<{}>;
+
+  views(query?: ListQueryInterface): Observable<Array<ListViewInterface>>;
+  facets(fields: Array<string>, query?: ListQueryInterface): Observable<ListFacetsInterface>;
+  neighbors(id: ID, query?: ListQueryInterface): Observable<ListNeighborsInterface>;
+  restore(model: T): Observable<boolean>;
+  restoreMultiple(ids: Array<ID>): Observable<boolean>;
+  updateMultiple(ids: Array<ID>, values: BulkUpdateValuesInterface): Observable<boolean>;
 
   //  deepcode ignore no-any: we can't predict what type of data will be send as 'data'
   sendFiles(

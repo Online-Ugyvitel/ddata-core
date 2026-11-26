@@ -11,18 +11,28 @@ import {
   HttpEvent,
   HttpEventType,
   HttpHeaders,
+  HttpParams,
   HttpRequest,
   HttpResponse
 } from '@angular/common/http';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { DdataInjectorModule } from '../../ddata-injector.module';
+import { ID } from '../../models/base/base-data.type';
 import { BaseModelInterface } from '../../models/base/base-model.model';
 import { FileUploadProcessInterface } from '../../models/file/file-upload-process.interface';
+import {
+  BulkUpdateValuesInterface,
+  ListFacetsInterface,
+  ListNeighborsInterface,
+  ListQueryInterface,
+  ListViewInterface
+} from '../../models/list/list-query.interface';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { DataServiceAbstract } from '../data/data-service.abstract';
 import { EnvService } from '../env/env.service';
 import { DdataCoreError } from '../error-handler/ddata-core-error';
+import { toQueryParams } from './list-query-params';
 import { RemoteDataServiceInterface } from './remote-data-service.interface';
 import { RequestHeaders } from './request-headers.type';
 
@@ -480,6 +490,139 @@ export class RemoteDataService<T extends BaseModelInterface<T>>
     }
 
     return this.http.post(url, preparedData, this.options).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Send HTTP GET request to `{model.api_endpoint}/views` to get the list views with their record counts.
+   *
+   * The counts follow the term and the filters of the optional list query.
+   *
+   * @param query optional list query, sent as query parameters
+   * @returns Observable, the views of the list (`all` first)
+   *
+   * @example
+   * // GET http://www.yourdomain.com/api/post/views?term=news
+   * this.myRemoteStorageService.views({ term: 'news' }).subscribe();
+   */
+  views(query?: ListQueryInterface): Observable<Array<ListViewInterface>> {
+    const url = `${this.url + this.model.api_endpoint}/views`;
+
+    return this.getList<Array<ListViewInterface>>(url, toQueryParams(query), 'views()');
+  }
+
+  /**
+   * Send HTTP GET request to `{model.api_endpoint}/facets` to get the most frequent values of the given columns.
+   *
+   * Every field is sent as a repeated `fields[]` parameter, the optional list query as further parameters.
+   *
+   * @param fields the facet columns
+   * @param query optional list query, sent as query parameters
+   * @returns Observable, the facet values keyed by column
+   *
+   * @example
+   * // GET http://www.yourdomain.com/api/post/facets?fields[]=lang_id&fields[]=category_id
+   * this.myRemoteStorageService.facets(['lang_id', 'category_id']).subscribe();
+   */
+  facets(fields: Array<string>, query?: ListQueryInterface): Observable<ListFacetsInterface> {
+    const url = `${this.url + this.model.api_endpoint}/facets`;
+    const params = fields.reduce(
+      (result: HttpParams, field: string) => result.append('fields[]', field),
+      new HttpParams()
+    );
+
+    return this.getList<ListFacetsInterface>(url, toQueryParams(query, params), 'facets()');
+  }
+
+  /**
+   * Send HTTP GET request to `{model.api_endpoint}/{id}/neighbors` to get the previous and next record of the list
+   * described by the list query.
+   *
+   * @param id the current record
+   * @param query the list query (term, view, sort, filters), sent as query parameters
+   * @returns Observable, the neighbor IDs, the position of the record and the record count
+   *
+   * @example
+   * // GET http://www.yourdomain.com/api/post/7/neighbors?view=active&sort[field]=name&sort[direction]=asc
+   * this.myRemoteStorageService
+   *   .neighbors(7 as ID, { view: 'active', sort: { field: 'name', direction: 'asc' } })
+   *   .subscribe();
+   */
+  neighbors(id: ID, query?: ListQueryInterface): Observable<ListNeighborsInterface> {
+    const url = `${this.url + this.model.api_endpoint}/${id}/neighbors`;
+
+    return this.getList<ListNeighborsInterface>(url, toQueryParams(query), 'neighbors()');
+  }
+
+  /**
+   * Send HTTP POST request to `{model.api_endpoint}/{model.id}/restore` with an empty body to restore a soft
+   * deleted record.
+   *
+   * @param model the deleted model
+   * @returns Observable, `true` after a successful response; an error response goes through `handleError`
+   *
+   * @example
+   * // POST http://www.yourdomain.com/api/post/42/restore
+   * this.myRemoteStorageService.restore(post).subscribe();
+   */
+  restore(model: T): Observable<boolean> {
+    const url = `${this.url + this.model.api_endpoint}/${model.id}/restore`;
+
+    return this.postList(url, null, 'restore()');
+  }
+
+  /**
+   * Send HTTP POST request to `{model.api_endpoint}/multiple/restore` to restore soft deleted records.
+   *
+   * The request body is `{data: [1, 2, 3]}`.
+   *
+   * @param ids the IDs of the deleted records
+   * @returns Observable, `true` after a successful response; an error response goes through `handleError`
+   */
+  restoreMultiple(ids: Array<ID>): Observable<boolean> {
+    const url = `${this.url + this.model.api_endpoint}/multiple/restore`;
+
+    return this.postList(url, { data: ids }, 'restoreMultiple()');
+  }
+
+  /**
+   * Send HTTP POST request to `{model.api_endpoint}/multiple/update` to set the same column values on several records.
+   *
+   * The request body is `{data: [1, 2, 3], values: {is_inactive: true}}`.
+   *
+   * @param ids the IDs of the records
+   * @param values the new values keyed by column
+   * @returns Observable, `true` after a successful response; an error response goes through `handleError`
+   */
+  updateMultiple(ids: Array<ID>, values: BulkUpdateValuesInterface): Observable<boolean> {
+    const url = `${this.url + this.model.api_endpoint}/multiple/update`;
+
+    return this.postList(url, { data: ids, values }, 'updateMultiple()');
+  }
+
+  private getList<R>(url: string, params: HttpParams, method: string): Observable<R> {
+    this.setupHeaders();
+
+    if (!!this.appEnv.environment.debug) {
+      console.log(`URL - ${method}`, url, params.toString());
+    }
+
+    return this.http
+      .get<R>(url, { ...this.options, params })
+      .pipe(catchError(this.handleError)) as Observable<R>;
+  }
+
+  private postList(url: string, body: object | null, method: string): Observable<boolean> {
+    this.setupHeaders();
+    const preparedData = body === null ? null : JSON.stringify(body);
+
+    if (!!this.appEnv.environment.debug) {
+      console.log(`URL - ${method}`, url, preparedData);
+    }
+
+    return this.http.post(url, preparedData, this.options).pipe(
+      map(() => true),
+      catchError(this.handleError)
+    );
   }
 
   /**
