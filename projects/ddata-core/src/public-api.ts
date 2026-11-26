@@ -58,6 +58,8 @@ export * from './lib/services/spinner/spinner-service.interface';
 // notification service & interface
 export * from './lib/services/notification/notification.service';
 export * from './lib/services/notification/notification-service.interface';
+export * from './lib/services/notification/notification-config.token';
+export * from './lib/services/notification/notification-options.interface';
 export * from './lib/models/notification/notification.interface';
 export * from './lib/models/notification/notification.model';
 

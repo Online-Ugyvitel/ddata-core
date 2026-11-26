@@ -1236,16 +1236,28 @@ export class MyService {
     this.notifications.showValidationError(model);
   }
 
-  // Watch notifications
-  watchNotifications() {
-    this.notifications.watch().subscribe(notifications => {
-      // Handle notification updates
+  // Every new notification exactly once (watch() is deprecated: it emits the whole list after every change)
+  showToasts() {
+    this.notifications.added().subscribe((notification: NotificationInterface) => {
+      // render it; call notification.action?.handler() on its button, then remove(notification)
+    });
+  }
+
+  offerUndo(post: Post) {
+    this.notifications.add('Törölve', 'A bejegyzés törölve.', 'success' as NotificationType, {
+      autoDeleteMs: null,
+      action: { label: 'Visszavonás', handler: () => this.restore(post) }
     });
   }
 }
 ```
 
 **Notification Types:** `success`, `info`, `warning`, `danger`
+
+**Automatic deletion:** a notification is deleted after 7000 ms by default. The delay is set application-wide
+with `{ provide: NOTIFICATION_CONFIG, useValue: { autoDeleteMs: 5000 } }` and per notification with the
+`autoDeleteMs` option (the option wins); `null` or `0` keeps the notification until `remove()` or `delete()`.
+Each notification has a unique `id` and its effective `autoDeleteMs`; the service never runs the action handler.
 
 ### Spinner Service
 
