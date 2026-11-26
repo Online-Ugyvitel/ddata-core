@@ -1,4 +1,5 @@
 // @ts-nocheck -- generated spec uses loosely typed mock models, events and private members
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Injector, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
@@ -52,7 +53,7 @@ describe('DdataInputColorComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DdataInputColorComponent],
-      imports: [FormsModule, ColorPickerDirective],
+      imports: [FormsModule, ColorPickerDirective, FontAwesomeModule],
       providers: [Injector, ValidatorService, BaseModel, InputHelperService]
     }).compileComponents();
   });
@@ -294,12 +295,12 @@ describe('DdataInputColorComponent', () => {
       expect(component.disabled).toBe(false);
       expect(component.type).toBe('text');
       expect(component.inputClass).toBe('form-control');
-      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
-      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
-      expect(component.inputBlockExtraClass).toBe('col-md-9');
+      expect(component.labelClass).toBe('form-label');
+      expect(component.inputBlockClass).toBe('dd-field-control');
+      expect(component.inputBlockExtraClass).toBe('');
       expect(component.showLabel).toBe(true);
       expect(component.autoFocus).toBe(false);
-      expect(component.wrapperClass).toBe('d-flex flex-wrap');
+      expect(component.wrapperClass).toBe('dd-field');
     });
 
     it('should allow setting input properties', () => {
@@ -527,25 +528,27 @@ describe('DdataInputColorComponent', () => {
       fixture.detectChanges();
     };
     const input = (): HTMLInputElement => element.querySelector('input');
+    const affixes = (): Array<string> =>
+      Array.from(element.querySelectorAll('.dd-control-affix')).map((affix: HTMLElement) =>
+        affix.textContent.trim()
+      );
 
     it('should render label, required mark, prepend, append and the color preview', () => {
       render({ field: 'color', model: new MockColorModel() });
 
-      expect(element.querySelector('label').textContent).toContain('Color Field Label:');
+      expect(element.querySelector('label').textContent).toContain('Color Field Label');
       expect(element.querySelector('label span').textContent).toBe(' *');
-      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe(
-        'Color Prepend'
-      );
-      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('Color Append');
+      expect(affixes()[0]).toBe('Color Prepend');
+      expect(affixes()[1]).toBe('Color Append');
       expect(element.querySelector('.input-color-container').style.background).toBe(
         'rgb(255, 0, 0)'
       );
 
       render({ prepend: '#', append: 'hex', labelText: 'Szín' });
 
-      expect(element.querySelector('label').textContent).toContain('Szín:');
-      expect(element.querySelector('.input-group-prepend').textContent.trim()).toBe('#');
-      expect(element.querySelector('.input-group-append').textContent.trim()).toBe('hex');
+      expect(element.querySelector('label').textContent).toContain('Szín');
+      expect(affixes()[0]).toBe('#');
+      expect(affixes()[1]).toBe('hex');
     });
 
     it('should hide the label and the empty prepend and append', () => {
@@ -556,8 +559,7 @@ describe('DdataInputColorComponent', () => {
       render({ field: 'color', model, showLabel: false });
 
       expect(element.querySelector('label')).toBeNull();
-      expect(element.querySelector('.input-group-prepend')).toBeNull();
-      expect(element.querySelector('.input-group-append')).toBeNull();
+      expect(element.querySelector('.dd-control-affix')).toBeNull();
     });
 
     it('should show and hide the validation error while typing', async () => {
@@ -573,7 +575,7 @@ describe('DdataInputColorComponent', () => {
       fixture.detectChanges();
 
       expect(model.validationErrors).toEqual(['color']);
-      expect(input().classList).toContain('invalid');
+      expect(input().getAttribute('aria-invalid')).toBe('true');
       expect(changed).not.toHaveBeenCalled();
 
       model.color = '#00ff00';
@@ -581,7 +583,7 @@ describe('DdataInputColorComponent', () => {
       fixture.detectChanges();
 
       expect(model.validationErrors).toEqual([]);
-      expect(input().classList).not.toContain('invalid');
+      expect(input().hasAttribute('aria-invalid')).toBe(false);
       expect(changed).toHaveBeenCalledExactlyOnceWith(model);
     });
 
@@ -602,6 +604,119 @@ describe('DdataInputColorComponent', () => {
       await fixture.whenStable();
 
       expect(input().disabled).toBe(true);
+    });
+  });
+
+  describe('form field skeleton', () => {
+    const FIELD = 'color';
+    const buildModel = (options: {
+      errors: Array<string>;
+      help?: string;
+      message?: string;
+    }): BaseModel => {
+      const model = new MockColorModel();
+
+      model.fields = {
+        color: { title: 'Color', label: 'Color', placeholder: '', help: options.help }
+      };
+
+      model.validationErrors = options.errors;
+      model.getFieldErrorMessage = options.message ? () => options.message : undefined;
+
+      return model;
+    };
+    const query = (selector: string): HTMLElement => fixture.nativeElement.querySelector(selector);
+    const render = (extra: Record<string, unknown> = {}): void => {
+      Object.entries({ field: FIELD, model: buildModel({ errors: [] }), ...extra }).forEach(
+        ([key, value]) => fixture.componentRef.setInput(key, value)
+      );
+      fixture.detectChanges();
+    };
+    const describedBy = (): Array<string> =>
+      (query('input').getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+
+    it('should render the label above the .dd-control without a colon', () => {
+      render({});
+
+      expect(query('.dd-field > .dd-field-label-row > label.form-label')).not.toBeNull();
+      expect(query('label').textContent).not.toContain(':');
+      expect(query('.dd-field-control .dd-control input')).not.toBeNull();
+      expect(query('.dd-required').getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('should render no label row without a label', () => {
+      render({ showLabel: false });
+
+      expect(query('label')).toBeNull();
+      expect(query('.dd-field-label-row')).toBeNull();
+    });
+
+    it('should render the help of the model and let helpText override it', () => {
+      render({ model: buildModel({ errors: [], help: 'Súgó a modellből' }) });
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a modellből');
+      expect(describedBy()).toEqual([query('.form-text').id]);
+
+      fixture.componentRef.setInput('helpText', 'Súgó a sablonból');
+      fixture.detectChanges();
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a sablonból');
+    });
+
+    it('should render the error message with the suggestion and the aria attributes', () => {
+      render({
+        model: buildModel({ errors: [FIELD], message: 'Hibás érték.' }),
+        errorSuggestion: 'Javítsd ki.'
+      });
+      const error = query('.invalid-feedback.d-flex');
+
+      expect(error.querySelector('span').textContent).toBe('Hibás érték. Javítsd ki.');
+      expect(error.querySelector('fa-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(query('.dd-control').classList).toContain('is-invalid');
+      expect(query('input').getAttribute('aria-invalid')).toBe('true');
+      expect(describedBy()).toEqual([error.id]);
+
+      fixture.componentRef.setInput('errorText', 'Saját üzenet');
+      fixture.detectChanges();
+
+      expect(query('.invalid-feedback span').textContent).toBe('Saját üzenet Javítsd ki.');
+    });
+
+    it('should only mark the border when the model has no message', () => {
+      render({ model: buildModel({ errors: [FIELD] }) });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.dd-control').classList).toContain('is-invalid');
+    });
+
+    it('should render nothing about errors and help for a valid field', () => {
+      render({ errorText: 'Nem látszhat' });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.form-text')).toBeNull();
+      expect(query('input').hasAttribute('aria-invalid')).toBe(false);
+      expect(query('input').hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('should render the size, the layout and the disabled state', () => {
+      render({ size: 'sm', layout: 'inline', disabled: true });
+
+      expect(query('.dd-control').classList).toContain('dd-control-sm');
+      expect(query('.dd-control').classList).toContain('is-disabled');
+      expect(query('.dd-field').classList).toContain('dd-field-inline');
+    });
+
+    it('should apply the overridden legacy classes', () => {
+      render({ wrapperClass: 'my-wrapper', labelClass: 'my-label', inputBlockClass: 'my-block' });
+
+      expect(query('.my-wrapper label.my-label')).not.toBeNull();
+      expect(query('.my-wrapper .my-block .dd-control')).not.toBeNull();
+    });
+
+    it('should keep the colour preview swatch at the start of the control', () => {
+      render({});
+
+      expect(query('.dd-control > .input-color-container')).not.toBeNull();
     });
   });
 });

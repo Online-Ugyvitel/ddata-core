@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { BaseModel, ProxyServiceInterface } from '@netdjw/ddata-core';
+import { BaseModel, DdataCoreModule, ProxyServiceInterface } from '@netdjw/ddata-core';
+import { InputHelperService } from '../../services/input/helper/input-helper.service';
 import { Subject, of, throwError } from 'rxjs';
 import { AutocompleteBoxComponent, AutocompleteSuggestion } from './autocomplete-box.component';
 
@@ -73,6 +74,16 @@ describe('AutocompleteBoxComponent', () => {
   };
 
   beforeEach(async () => {
+    // the pure helpers of the real service, they do not use `this`
+    const helperService = {
+      getErrorText: InputHelperService.prototype.getErrorText,
+      buildDescribedBy: InputHelperService.prototype.buildDescribedBy
+    };
+
+    DdataCoreModule.InjectorInstance = {
+      get: (token: unknown) =>
+        token === InputHelperService ? helperService : TestBed.inject(token as never)
+    } as never;
     await TestBed.configureTestingModule({
       declarations: [AutocompleteBoxComponent],
       imports: [FormsModule, FontAwesomeModule]
@@ -125,21 +136,21 @@ describe('AutocompleteBoxComponent', () => {
       createAutocomplete();
       const label = element().querySelector('label');
 
-      expect(label.textContent).toContain('Címke neve:');
+      expect(label.textContent).toContain('Címke neve');
       expect(label.textContent).toContain('*');
       expect(label.htmlFor).toBe(input().id);
       expect(input().placeholder).toBe('Címke...');
       expect(input().title).toBe('Címke címe');
       expect(input().getAttribute('autocomplete')).toBe('off');
       expect(input().getAttribute('aria-required')).toBe('true');
-      expect(element().querySelector('.input-group-append').textContent.trim()).toBe('db');
-      expect(element().querySelector('.input-group-prepend')).toBeNull();
+      expect(element().querySelectorAll('.dd-control-affix')[0].textContent.trim()).toBe('db');
+      expect(element().querySelectorAll('.dd-control-affix').length).toBe(1);
     });
 
     it('should render the prepend text', () => {
       createAutocomplete({ prepend: '#' });
 
-      expect(element().querySelector('.input-group-prepend').textContent.trim()).toBe('#');
+      expect(element().querySelectorAll('.dd-control-affix')[0].textContent.trim()).toBe('#');
     });
 
     it('should hide the label', () => {
@@ -220,7 +231,7 @@ describe('AutocompleteBoxComponent', () => {
       type('');
 
       expect(model.validationErrors).toEqual(['name']);
-      expect(input().classList).toContain('invalid');
+      expect(input().getAttribute('aria-invalid')).toBe('true');
       expect(input().getAttribute('aria-invalid')).toBe('true');
 
       type('');
@@ -231,7 +242,7 @@ describe('AutocompleteBoxComponent', () => {
 
       expect(model.name).toBe('Valid');
       expect(model.validationErrors).toEqual([]);
-      expect(input().classList).not.toContain('invalid');
+      expect(input().hasAttribute('aria-invalid')).toBe(false);
 
       type('Still valid');
 
@@ -540,6 +551,119 @@ describe('AutocompleteBoxComponent', () => {
       component.setContent();
 
       expect(component.model).toBe(model);
+    });
+  });
+
+  describe('form field skeleton', () => {
+    const FIELD = 'name';
+    const buildModel = (options: {
+      errors: Array<string>;
+      help?: string;
+      message?: string;
+    }): BaseModel => {
+      const model = new Tag();
+
+      model.fields = {
+        name: { label: 'Címke neve', title: 'Címke', placeholder: '', help: options.help }
+      };
+
+      model.validationErrors = options.errors;
+      model.getFieldErrorMessage = options.message ? () => options.message : undefined;
+
+      return model;
+    };
+    const query = (selector: string): HTMLElement => fixture.nativeElement.querySelector(selector);
+    const render = (extra: Record<string, unknown> = {}): void => {
+      Object.entries({ field: FIELD, model: buildModel({ errors: [] }), ...extra }).forEach(
+        ([key, value]) => fixture.componentRef.setInput(key, value)
+      );
+      fixture.detectChanges();
+    };
+    const describedBy = (): Array<string> =>
+      (query('input').getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+
+    it('should render the label above the .dd-control without a colon', () => {
+      render({});
+
+      expect(query('.dd-field > .dd-field-label-row > label.form-label')).not.toBeNull();
+      expect(query('label').textContent).not.toContain(':');
+      expect(query('.dd-field-control .dd-control input')).not.toBeNull();
+      expect(query('.dd-required').getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('should render no label row without a label', () => {
+      render({ showLabel: false });
+
+      expect(query('label')).toBeNull();
+      expect(query('.dd-field-label-row')).toBeNull();
+    });
+
+    it('should render the help of the model and let helpText override it', () => {
+      render({ model: buildModel({ errors: [], help: 'Súgó a modellből' }) });
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a modellből');
+      expect(describedBy()).toEqual([query('.form-text').id]);
+
+      fixture.componentRef.setInput('helpText', 'Súgó a sablonból');
+      fixture.detectChanges();
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a sablonból');
+    });
+
+    it('should render the error message with the suggestion and the aria attributes', () => {
+      render({
+        model: buildModel({ errors: [FIELD], message: 'Hibás érték.' }),
+        errorSuggestion: 'Javítsd ki.'
+      });
+      const error = query('.invalid-feedback.d-flex');
+
+      expect(error.querySelector('span').textContent).toBe('Hibás érték. Javítsd ki.');
+      expect(error.querySelector('fa-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(query('.dd-control').classList).toContain('is-invalid');
+      expect(query('input').getAttribute('aria-invalid')).toBe('true');
+      expect(describedBy()).toEqual([error.id]);
+
+      fixture.componentRef.setInput('errorText', 'Saját üzenet');
+      fixture.detectChanges();
+
+      expect(query('.invalid-feedback span').textContent).toBe('Saját üzenet Javítsd ki.');
+    });
+
+    it('should only mark the border when the model has no message', () => {
+      render({ model: buildModel({ errors: [FIELD] }) });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.dd-control').classList).toContain('is-invalid');
+    });
+
+    it('should render nothing about errors and help for a valid field', () => {
+      render({ errorText: 'Nem látszhat' });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.form-text')).toBeNull();
+      expect(query('input').hasAttribute('aria-invalid')).toBe(false);
+      expect(query('input').hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('should render the size, the layout and the disabled state', () => {
+      render({ size: 'sm', layout: 'inline', disabled: true });
+
+      expect(query('.dd-control').classList).toContain('dd-control-sm');
+      expect(query('.dd-control').classList).toContain('is-disabled');
+      expect(query('.dd-field').classList).toContain('dd-field-inline');
+    });
+
+    it('should apply the overridden legacy classes', () => {
+      render({ wrapperClass: 'my-wrapper', labelClass: 'my-label', inputBlockClass: 'my-block' });
+
+      expect(query('.my-wrapper label.my-label')).not.toBeNull();
+      expect(query('.my-wrapper .my-block .dd-control')).not.toBeNull();
+    });
+
+    it('should keep the suggestions below the control box', () => {
+      render({ autocomplete: true, autocompleteService: service });
+
+      expect(query('.dd-control .autocomplete-box')).not.toBeNull();
     });
   });
 });

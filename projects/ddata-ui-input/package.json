@@ -1,6 +1,6 @@
 {
   "name": "@netdjw/ddata-ui-input",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
@@ -32,7 +32,7 @@
     "@fortawesome/angular-fontawesome": ">=0.7.0",
     "@fortawesome/fontawesome-svg-core": ">=1.2.30",
     "@fortawesome/free-solid-svg-icons": ">=5.14.0",
-    "@netdjw/ddata-core": "^0.3.17",
+    "@netdjw/ddata-core": "^0.3.19",
     "@netdjw/ddata-ui-common": "^0.1.20",
     "moment": "^2.27.0",
     "ngx-color-picker": "^20.0.0",

@@ -89,6 +89,9 @@ describe('DdataInputDateComponent', () => {
       getAppend: vi.fn().mockName('InputHelperService.getAppend'),
       isRequired: vi.fn().mockName('InputHelperService.isRequired'),
       validateField: vi.fn().mockName('InputHelperService.validateField'),
+      // the pure helpers of the real service, they do not use `this`
+      getErrorText: InputHelperService.prototype.getErrorText,
+      buildDescribedBy: InputHelperService.prototype.buildDescribedBy,
       randChars: vi.fn().mockName('InputHelperService.randChars')
     };
 
@@ -120,7 +123,11 @@ describe('DdataInputDateComponent', () => {
         {
           provide: ValidatorService,
           useValue: {
-            validate: vi.fn().mockName('ValidatorService.validate')
+            validate: vi.fn().mockName('ValidatorService.validate'),
+            firstFailedRule: vi
+              .fn()
+              .mockName('ValidatorService.firstFailedRule')
+              .mockReturnValue(null)
           }
         },
         {
@@ -176,7 +183,7 @@ describe('DdataInputDateComponent', () => {
       expect(component._isRequired).toBe(false);
       expect(component.disabled).toBe(false);
       expect(component.inputClass).toBe('form-control');
-      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
+      expect(component.labelClass).toBe('form-label');
       expect(component.showLabel).toBe(true);
       expect(component.autoFocus).toBe(false);
       expect(component.isViewOnly).toBe(false);
@@ -706,7 +713,7 @@ describe('DdataInputDateComponent', () => {
       component.showLabel = false;
 
       detectChangesOf(fixture);
-      const labelElement = fixture.debugElement.query(By.css('label.col-form-label'));
+      const labelElement = fixture.debugElement.query(By.css('label.form-label'));
 
       expect(labelElement).toBeFalsy();
     });
@@ -715,7 +722,9 @@ describe('DdataInputDateComponent', () => {
       component._prepend = '$';
 
       detectChangesOf(fixture);
-      const prependElement = fixture.debugElement.query(By.css('.input-group-prepend'));
+      const prependElement = fixture.debugElement.query(
+        By.css('.dd-control > .dd-control-affix:not(.dd-control-icon)')
+      );
 
       expect(prependElement).toBeTruthy();
     });
@@ -724,7 +733,9 @@ describe('DdataInputDateComponent', () => {
       component._prepend = '';
 
       detectChangesOf(fixture);
-      const prependElement = fixture.debugElement.query(By.css('div.input-group-prepend'));
+      const prependElement = fixture.debugElement.query(
+        By.css('.dd-control > .dd-control-affix:not(.dd-control-icon)')
+      );
 
       expect(prependElement).toBeFalsy();
     });
@@ -733,7 +744,9 @@ describe('DdataInputDateComponent', () => {
       component._append = 'USD';
 
       detectChangesOf(fixture);
-      const appendElement = fixture.debugElement.query(By.css('.input-group-append'));
+      const appendElement = fixture.debugElement.query(
+        By.css('.dd-control > .dd-control-affix:not(.dd-control-icon)')
+      );
 
       expect(appendElement).toBeTruthy();
     });
@@ -742,7 +755,9 @@ describe('DdataInputDateComponent', () => {
       component._append = '';
 
       detectChangesOf(fixture);
-      const appendElement = fixture.debugElement.query(By.css('.input-group-append'));
+      const appendElement = fixture.debugElement.query(
+        By.css('.dd-control > .dd-control-affix:not(.dd-control-icon)')
+      );
 
       expect(appendElement).toBeFalsy();
     });
@@ -771,20 +786,17 @@ describe('DdataInputDateComponent', () => {
       expect(viewOnlyElement).toBeTruthy();
     });
 
-    it('should render the calendar button with the colour-mode-aware class', () => {
+    it('should render the calendar icon as a decorative suffix inside the control', () => {
       component.showIcon = true;
       component.disabled = false;
 
       detectChangesOf(fixture);
-      const button = fixture.debugElement.query(By.css('label.btn')).nativeElement as HTMLElement;
+      const icon = fixture.debugElement.query(By.css('.dd-control > .dd-control-icon'))
+        .nativeElement as HTMLElement;
 
-      expect(Array.from(button.classList).sort()).toEqual([
-        'btn',
-        'dd-btn-neutral',
-        'input-group-prepend',
-        'mb-0'
-      ]);
-      expect(button.classList.contains('btn-light')).toBe(false);
+      expect(icon.getAttribute('aria-hidden')).toBe('true');
+      expect(icon.querySelector('fa-icon')).not.toBeNull();
+      expect(fixture.debugElement.query(By.css('label.btn'))).toBeFalsy();
     });
 
     it('should show calendar icon when showIcon is true and not disabled', () => {
@@ -828,7 +840,10 @@ describe('DdataInputDateComponent', () => {
       detectChangesOf(fixture);
       const inputElement = fixture.debugElement.query(By.css('input'));
 
-      expect(inputElement.nativeElement.classList.contains('invalid')).toBeTruthy();
+      expect(inputElement.nativeElement.getAttribute('aria-invalid')).toBe('true');
+      expect(fixture.debugElement.query(By.css('.dd-control')).nativeElement.classList).toContain(
+        'is-invalid'
+      );
     });
 
     it('should not apply validation error class when field has no validation errors', () => {
@@ -842,7 +857,10 @@ describe('DdataInputDateComponent', () => {
       detectChangesOf(fixture);
       const inputElement = fixture.debugElement.query(By.css('input'));
 
-      expect(inputElement.nativeElement.classList.contains('invalid')).toBeFalsy();
+      expect(inputElement.nativeElement.hasAttribute('aria-invalid')).toBe(false);
+      expect(
+        fixture.debugElement.query(By.css('.dd-control')).nativeElement.classList
+      ).not.toContain('is-invalid');
     });
 
     it('should show required indicator when field is required', () => {
@@ -871,7 +889,7 @@ describe('DdataInputDateComponent', () => {
       component.showLabel = true;
 
       detectChangesOf(fixture);
-      const requiredSpan = fixture.debugElement.query(By.css('span'));
+      const requiredSpan = fixture.debugElement.query(By.css('.dd-required'));
 
       expect(requiredSpan).toBeFalsy();
     });
@@ -1139,7 +1157,7 @@ describe('DdataInputDateComponent', () => {
           type(value);
 
           expect(testModel.date).toBe(value);
-          expect(input().classList).not.toContain('invalid');
+          expect(input().hasAttribute('aria-invalid')).toBe(false);
         }
       );
 
@@ -1160,7 +1178,7 @@ describe('DdataInputDateComponent', () => {
 
           expect(testModel.date).toBe('2024-06-15');
           expect(testModel.validationErrors).toEqual(['date']);
-          expect(input().classList).toContain('invalid');
+          expect(input().getAttribute('aria-invalid')).toBe('true');
         }
       );
 
@@ -1179,13 +1197,13 @@ describe('DdataInputDateComponent', () => {
       it('should clear the range error when a value in range follows', () => {
         type('2024-01-01');
 
-        expect(input().classList).toContain('invalid');
+        expect(input().getAttribute('aria-invalid')).toBe('true');
 
         type('2024-01-12');
 
         expect(testModel.date).toBe('2024-01-12');
         expect(testModel.validationErrors).toEqual([]);
-        expect(input().classList).not.toContain('invalid');
+        expect(input().hasAttribute('aria-invalid')).toBe(false);
       });
 
       it('should not fail when the range error was already removed by the validator', () => {
@@ -1270,6 +1288,126 @@ describe('DdataInputDateComponent', () => {
       render({ disabled: true });
 
       expect(component.minDate).toBe(minDate);
+    });
+  });
+
+  describe('form field skeleton', () => {
+    const FIELD = 'date';
+    const buildModel = (options: {
+      errors: Array<string>;
+      help?: string;
+      message?: string;
+    }): BaseModel => {
+      const model = new MockModel().init({ date: '2024-01-01' });
+
+      model.fields = {
+        date: { title: 'Dátum', label: 'Dátum', placeholder: '', help: options.help }
+      };
+
+      model.validationErrors = options.errors;
+      model.getFieldErrorMessage = options.message ? () => options.message : undefined;
+
+      return model;
+    };
+    const query = (selector: string): HTMLElement => fixture.nativeElement.querySelector(selector);
+    const render = (extra: Record<string, unknown> = {}): void => {
+      Object.entries({ field: FIELD, model: buildModel({ errors: [] }), ...extra }).forEach(
+        ([key, value]) => fixture.componentRef.setInput(key, value)
+      );
+      fixture.detectChanges();
+    };
+    const describedBy = (): Array<string> =>
+      (query('input').getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+
+    it('should render the label above the .dd-control without a colon', () => {
+      mockHelperService.isRequired.mockReturnValue(true);
+      render({});
+
+      expect(query('.dd-field > .dd-field-label-row > label.form-label')).not.toBeNull();
+      expect(query('label').textContent).not.toContain(':');
+      expect(query('.dd-field-control .dd-control input')).not.toBeNull();
+      expect(query('.dd-required').getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('should render no label row without a label', () => {
+      render({ showLabel: false });
+
+      expect(query('label')).toBeNull();
+      expect(query('.dd-field-label-row')).toBeNull();
+    });
+
+    it('should render the help of the model and let helpText override it', () => {
+      render({ model: buildModel({ errors: [], help: 'Súgó a modellből' }) });
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a modellből');
+      expect(describedBy()).toEqual([query('.form-text').id]);
+
+      fixture.componentRef.setInput('helpText', 'Súgó a sablonból');
+      fixture.detectChanges();
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a sablonból');
+    });
+
+    it('should render the error message with the suggestion and the aria attributes', () => {
+      render({
+        model: buildModel({ errors: [FIELD], message: 'Hibás érték.' }),
+        errorSuggestion: 'Javítsd ki.'
+      });
+      const error = query('.invalid-feedback.d-flex');
+
+      expect(error.querySelector('span').textContent).toBe('Hibás érték. Javítsd ki.');
+      expect(error.querySelector('fa-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(query('.dd-control').classList).toContain('is-invalid');
+      expect(query('input').getAttribute('aria-invalid')).toBe('true');
+      expect(describedBy()).toEqual([error.id]);
+
+      fixture.componentRef.setInput('errorText', 'Saját üzenet');
+      fixture.detectChanges();
+
+      expect(query('.invalid-feedback span').textContent).toBe('Saját üzenet Javítsd ki.');
+    });
+
+    it('should only mark the border when the model has no message', () => {
+      render({ model: buildModel({ errors: [FIELD] }) });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.dd-control').classList).toContain('is-invalid');
+    });
+
+    it('should render nothing about errors and help for a valid field', () => {
+      render({ errorText: 'Nem látszhat' });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.form-text')).toBeNull();
+      expect(query('input').hasAttribute('aria-invalid')).toBe(false);
+      expect(query('input').hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('should render the size, the layout and the disabled state', () => {
+      render({ size: 'sm', layout: 'inline', disabled: true });
+
+      expect(query('.dd-control').classList).toContain('dd-control-sm');
+      expect(query('.dd-control').classList).toContain('is-disabled');
+      expect(query('.dd-field').classList).toContain('dd-field-inline');
+    });
+
+    it('should apply the overridden legacy classes', () => {
+      render({ wrapperClass: 'my-wrapper', labelClass: 'my-label', inputBlockClass: 'my-block' });
+
+      expect(query('.my-wrapper label.my-label')).not.toBeNull();
+      expect(query('.my-wrapper .my-block .dd-control')).not.toBeNull();
+    });
+
+    it('should render the calendar icon as an aria-hidden suffix inside the control', () => {
+      render({});
+
+      expect(query('.dd-control > .dd-control-icon').getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('should not render the calendar icon when showIcon is false', () => {
+      render({ showIcon: false });
+
+      expect(query('.dd-control-icon')).toBeNull();
     });
   });
 });
