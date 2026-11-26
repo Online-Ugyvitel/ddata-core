@@ -6,9 +6,7 @@ describe('CharacterCounterComponent', () => {
   let component: CharacterCounterComponent;
   let fixture: ComponentFixture<CharacterCounterComponent>;
   const text = (): string =>
-    (fixture.nativeElement as HTMLElement)
-      .querySelector('.input-group-text')
-      ?.textContent?.trim() ?? '';
+    (fixture.nativeElement as HTMLElement).querySelector('span')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -57,9 +55,32 @@ describe('CharacterCounterComponent', () => {
   });
 
   it('should render the title of the counter', () => {
-    const wrapper = (fixture.nativeElement as HTMLElement).querySelector('.input-group-append');
+    const counter = (fixture.nativeElement as HTMLElement).querySelector('span');
 
-    expect(wrapper?.getAttribute('title')).toBe('Karakterek száma');
+    expect(counter?.getAttribute('title')).toBe('Karakterek száma');
+  });
+
+  it('should render plain text without the Bootstrap input group markup', () => {
+    const host = fixture.nativeElement as HTMLElement;
+
+    expect(host.querySelector('.input-group-append')).toBeNull();
+    expect(host.querySelector('.input-group-text')).toBeNull();
+  });
+
+  it('should mark the counter when the max length is exceeded', () => {
+    const exceeded = (): boolean =>
+      !!(fixture.nativeElement as HTMLElement).querySelector('.dd-counter-exceeded');
+
+    fixture.componentRef.setInput('maxLength', 5);
+    fixture.componentRef.setInput('currentLength', 'abcde');
+    fixture.detectChanges();
+
+    expect(exceeded()).toBe(false);
+
+    fixture.componentRef.setInput('currentLength', 'abcdef');
+    fixture.detectChanges();
+
+    expect(exceeded()).toBe(true);
   });
 
   it('should follow the changes of the inputs', () => {

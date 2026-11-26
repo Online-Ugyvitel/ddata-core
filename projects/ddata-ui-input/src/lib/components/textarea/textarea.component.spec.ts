@@ -3,6 +3,7 @@ import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BaseModel, DdataCoreModule } from '@netdjw/ddata-core';
 import { DdataTextareaComponent } from './textarea.component';
 import { InputHelperService } from '../../services/input/helper/input-helper.service';
@@ -28,7 +29,10 @@ describe('DdataTextareaComponent', () => {
       getAppend: vi.fn().mockName('InputHelperService.getAppend'),
       isRequired: vi.fn().mockName('InputHelperService.isRequired'),
       randChars: vi.fn().mockName('InputHelperService.randChars'),
-      validateField: vi.fn().mockName('InputHelperService.validateField')
+      validateField: vi.fn().mockName('InputHelperService.validateField'),
+      // the pure helpers of the real service, they do not use `this`
+      getErrorText: InputHelperService.prototype.getErrorText,
+      buildDescribedBy: InputHelperService.prototype.buildDescribedBy
     };
 
     // Setup default return values
@@ -49,7 +53,7 @@ describe('DdataTextareaComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [DdataTextareaComponent],
       schemas: [NO_ERRORS_SCHEMA],
-      imports: [FormsModule]
+      imports: [FormsModule, FontAwesomeModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(DdataTextareaComponent);
@@ -104,10 +108,16 @@ describe('DdataTextareaComponent', () => {
       expect(component.maxLength).toBe(255);
       expect(component.maxWords).toBe(7);
       expect(component.displayWordCounterWarning).toBe(false);
-      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
-      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
-      expect(component.inputBlockExtraClass).toBe('col-md-9');
-      expect(component.wrapperClass).toBe('d-flex flex-wrap');
+      expect(component.labelClass).toBe('form-label');
+      expect(component.inputBlockClass).toBe('dd-field-control');
+      expect(component.inputBlockExtraClass).toBe('');
+      expect(component.wrapperClass).toBe('dd-field');
+      expect(component.helpText).toBe('');
+      expect(component.errorText).toBe('');
+      expect(component.errorSuggestion).toBe('');
+      expect(component.counterPlacement).toBe('label');
+      expect(component.size).toBe('md');
+      expect(component.layout).toBe('stacked');
       expect(component.viewOnlyClass).toBe('form-control border-0 bg-body-tertiary');
     });
 
@@ -368,7 +378,7 @@ describe('DdataTextareaComponent', () => {
     it('should render prepend when _prepend is not empty', () => {
       component._prepend = '$';
       detectChangesOf(fixture);
-      const prepend = fixture.debugElement.query(By.css('.input-group-prepend'));
+      const prepend = fixture.debugElement.query(By.css('.dd-control > .dd-control-affix'));
 
       expect(prepend).toBeTruthy();
       expect(prepend.nativeElement.textContent.trim()).toBe('$');
@@ -377,7 +387,7 @@ describe('DdataTextareaComponent', () => {
     it('should render append when _append is not empty', () => {
       component._append = '%';
       detectChangesOf(fixture);
-      const append = fixture.debugElement.query(By.css('.input-group-append'));
+      const append = fixture.debugElement.queryAll(By.css('.dd-control > .dd-control-affix')).pop();
 
       expect(append).toBeTruthy();
       expect(append.nativeElement.textContent.trim()).toBe('%');
@@ -389,7 +399,7 @@ describe('DdataTextareaComponent', () => {
       component._model[component._field] = 'one,two,three';
       component.wordCounterWarningMessage = 'Warning message';
       detectChangesOf(fixture);
-      const warning = fixture.debugElement.query(By.css('.bg-warning'));
+      const warning = fixture.debugElement.query(By.css('.alert-warning'));
 
       expect(warning).toBeTruthy();
       expect(warning.nativeElement.textContent.trim()).toBe('Warning message');
@@ -399,7 +409,7 @@ describe('DdataTextareaComponent', () => {
       component.displayWordCounterWarning = false;
       component.wordCounterWarningMessage = 'Warning message';
       detectChangesOf(fixture);
-      const warning = fixture.debugElement.query(By.css('.bg-warning'));
+      const warning = fixture.debugElement.query(By.css('.alert-warning'));
 
       expect(warning).toBeFalsy();
     });
@@ -408,7 +418,7 @@ describe('DdataTextareaComponent', () => {
       component.displayWordCounterWarning = true;
       component.wordCounterWarningMessage = '';
       detectChangesOf(fixture);
-      const warning = fixture.debugElement.query(By.css('.bg-warning'));
+      const warning = fixture.debugElement.query(By.css('.alert-warning'));
 
       expect(warning).toBeFalsy();
     });
@@ -565,7 +575,8 @@ describe('DdataTextareaComponent', () => {
       const inputBlock = fixture.debugElement.query(By.css('.custom-input-block'));
 
       expect(inputBlock).toBeTruthy();
-      expect(inputBlock.nativeElement.classList.contains('custom-extra')).toBeTruthy();
+      // the extra class is deprecated and does nothing any more
+      expect(inputBlock.nativeElement.classList.contains('custom-extra')).toBeFalsy();
     });
 
     it('should apply input block class without extra class when showLabel is false', () => {
@@ -585,7 +596,10 @@ describe('DdataTextareaComponent', () => {
       detectChangesOf(fixture);
       const textarea = fixture.debugElement.query(By.css('textarea'));
 
-      expect(textarea.nativeElement.classList.contains('invalid')).toBeTruthy();
+      expect(textarea.nativeElement.getAttribute('aria-invalid')).toBe('true');
+      expect(fixture.debugElement.query(By.css('.dd-control')).nativeElement.classList).toContain(
+        'is-invalid'
+      );
     });
   });
   describe('optional field without validation rules', () => {
@@ -638,7 +652,7 @@ describe('DdataTextareaComponent', () => {
       textarea().dispatchEvent(new KeyboardEvent('keyup'));
       fixture.detectChanges();
 
-      expect(textarea().classList).toContain('invalid');
+      expect(textarea().getAttribute('aria-invalid')).toBe('true');
       expect(changed).not.toHaveBeenCalled();
 
       textarea().value = 'első sor\nmásodik sor';
@@ -647,7 +661,7 @@ describe('DdataTextareaComponent', () => {
       fixture.detectChanges();
 
       expect(mockModel.testField).toBe('első sor\nmásodik sor');
-      expect(textarea().classList).not.toContain('invalid');
+      expect(textarea().hasAttribute('aria-invalid')).toBe(false);
       expect(changed).toHaveBeenCalledExactlyOnceWith(mockModel);
     });
 
@@ -658,6 +672,108 @@ describe('DdataTextareaComponent', () => {
       fixture.detectChanges();
 
       expect(document.activeElement).toBe(textarea());
+    });
+  });
+
+  describe('form field skeleton', () => {
+    const render = (inputs: Record<string, unknown>): void => {
+      Object.entries({ field: 'testField', model: mockModel, ...inputs }).forEach(([key, value]) =>
+        fixture.componentRef.setInput(key, value)
+      );
+      fixture.detectChanges();
+    };
+    const query = (selector: string): HTMLElement => fixture.nativeElement.querySelector(selector);
+    const describedBy = (): Array<string> =>
+      (query('textarea').getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+
+    it('should render the label above the .dd-control inside the dd-field wrapper', () => {
+      render({});
+
+      expect(query('.dd-field > .dd-field-label-row > label.form-label')).not.toBeNull();
+      expect(query('.dd-field-control .dd-control textarea.dd-control-input')).not.toBeNull();
+      expect(query('label').textContent).not.toContain(':');
+      expect(query('textarea').getAttribute('aria-required')).toBe('true');
+      expect(query('.dd-required').getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('should render the help of the model and let helpText override it', () => {
+      mockModel.fields.testField.help = 'Súgó a modellből';
+      render({});
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a modellből');
+      expect(describedBy()).toEqual([query('.form-text').id]);
+
+      render({ helpText: 'Súgó a sablonból' });
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a sablonból');
+    });
+
+    it('should render the error message with the suggestion and reference it', () => {
+      mockModel.validationErrors = ['testField'];
+      mockModel.getFieldErrorMessage = (): string => 'Kötelező mező.';
+      render({ errorSuggestion: 'Adj meg egy értéket.' });
+      const error = query('.invalid-feedback.d-flex');
+
+      expect(error.querySelector('span').textContent).toBe('Kötelező mező. Adj meg egy értéket.');
+      expect(error.querySelector('fa-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(describedBy()).toEqual([error.id]);
+
+      render({ errorText: 'Saját üzenet' });
+
+      expect(error.querySelector('span').textContent).toBe('Saját üzenet Adj meg egy értéket.');
+    });
+
+    it('should only mark the border without a message', () => {
+      mockModel.validationErrors = ['testField'];
+      render({});
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.dd-control').classList).toContain('is-invalid');
+      expect(query('textarea').getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('should keep the counter below the field on the right by default', () => {
+      render({ enableCharacterCounter: true, maxLength: 20 });
+      const counter = query('.dd-field-counter-below character-counter');
+
+      expect(counter.classList).toContain('dd-field-counter');
+      expect(query('.dd-control character-counter')).toBeNull();
+      expect(describedBy()).toEqual([counter.id]);
+    });
+
+    it('should render the counters inside the control for counterPlacement="control"', () => {
+      render({
+        enableCharacterCounter: true,
+        enableWordCounter: true,
+        counterPlacement: 'control'
+      });
+
+      expect(query('.dd-control character-counter')).not.toBeNull();
+      expect(query('.dd-control dd-word-counter')).not.toBeNull();
+      expect(query('.dd-field-counter-below')).toBeNull();
+      expect(describedBy().length).toBe(2);
+    });
+
+    it('should not render a counter row without a counter', () => {
+      render({});
+
+      expect(query('.dd-field-counter-below')).toBeNull();
+    });
+
+    it('should render the size and the layout', () => {
+      render({ size: 'sm', layout: 'inline', disabled: true });
+
+      expect(query('.dd-control').classList).toContain('dd-control-sm');
+      expect(query('.dd-control').classList).toContain('is-disabled');
+      expect(query('.dd-field').classList).toContain('dd-field-inline');
+    });
+
+    it('should render no .dd-control and no counter in view only mode', () => {
+      render({ isViewOnly: true, enableCharacterCounter: true });
+
+      expect(query('.dd-control')).toBeNull();
+      expect(query('character-counter')).toBeNull();
+      expect(query('.bg-body-tertiary').textContent.trim()).toBe('test value');
     });
   });
 });

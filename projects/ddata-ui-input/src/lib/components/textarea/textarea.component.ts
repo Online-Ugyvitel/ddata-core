@@ -8,6 +8,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import {
   BaseModel,
   BaseModelInterface,
@@ -30,19 +31,31 @@ export class DdataTextareaComponent implements AfterViewInit {
   @Input() inputClass = 'form-control';
   @Input() disabled = false;
   @Input() isViewOnly = false;
-  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
-  @Input() inputBlockClass = 'col-12 d-flex px-0';
-  @Input() inputBlockExtraClass = 'col-md-9';
+  @Input() labelClass = 'form-label';
+  @Input() inputBlockClass = 'dd-field-control';
+  /**
+   * @deprecated the input block has no extra class any more, it does nothing
+   */
+  @Input() inputBlockExtraClass = '';
   @Input() viewOnlyClass = 'form-control border-0 bg-body-tertiary';
   @Input() showLabel = true;
   @Input() autoFocus = false;
-  @Input() wrapperClass = 'd-flex flex-wrap';
+  @Input() wrapperClass = 'dd-field';
   @Input() rows = '5';
   @Input() enableCharacterCounter = false;
   @Input() enableWordCounter = false;
   @Input() maxLength = 255;
   @Input() maxWords = 7;
   @Input() wordCounterWarningMessage = '';
+  @Input() helpText = '';
+  @Input() errorText = '';
+  @Input() errorSuggestion = '';
+  /**
+   * `label`: the counter stays below the field on the right; `control`: inside the control box.
+   */
+  @Input() counterPlacement: 'label' | 'control' = 'label';
+  @Input() size: 'md' | 'sm' = 'md';
+  @Input() layout: 'stacked' | 'inline' = 'stacked';
 
   @Output() readonly changed: EventEmitter<unknown> = new EventEmitter();
 
@@ -60,10 +73,12 @@ export class DdataTextareaComponent implements AfterViewInit {
   _prepend = '';
   _append = '';
   _max = '';
+  _help = '';
   _isRequired = false;
   _model: BaseModelInterface<unknown> & FieldsInterface<unknown> = new BaseModel();
 
   random: string = this.helperService.randChars();
+  readonly icon = { warning: faTriangleExclamation };
   displayWordCounterWarning = false;
 
   @Input() set model(value: (BaseModelInterface<unknown> & FieldsInterface<unknown>) | null) {
@@ -96,6 +111,7 @@ export class DdataTextareaComponent implements AfterViewInit {
     this._prepend = this.helperService.getPrepend(this._model, this._field);
     this._append = this.helperService.getAppend(this._model, this._field);
     this._label = this.helperService.getLabel(this._model, this._field);
+    this._help = this._model.fields[this._field].help ?? '';
 
     if (this._model.validationRules?.[this._field]) {
       this._isRequired = this.helperService.isRequired(this._model, this._field);
@@ -147,6 +163,68 @@ export class DdataTextareaComponent implements AfterViewInit {
   }
 
   constructor() {}
+
+  get inputId(): string {
+    return `${this._field}_${this.random}`;
+  }
+
+  get helpId(): string {
+    return `${this.inputId}_help`;
+  }
+
+  get errorId(): string {
+    return `${this.inputId}_error`;
+  }
+
+  get counterId(): string {
+    return `${this.inputId}_counter`;
+  }
+
+  get isInvalid(): boolean {
+    return !!this._model.validationErrors?.includes(this._field);
+  }
+
+  get helpMessage(): string {
+    return this.helpText || this._help;
+  }
+
+  get errorMessage(): string {
+    return this.helperService.getErrorText(
+      this._model,
+      this._field,
+      this.errorText,
+      this.errorSuggestion
+    );
+  }
+
+  get showError(): boolean {
+    return this.errorMessage !== '';
+  }
+
+  get hasCounter(): boolean {
+    return !this.isViewOnly && (this.enableCharacterCounter || this.enableWordCounter);
+  }
+
+  get counterInControl(): boolean {
+    return this.counterPlacement === 'control';
+  }
+
+  get counterBelow(): boolean {
+    return this.hasCounter && !this.counterInControl;
+  }
+
+  get describedBy(): string | null {
+    const counters = [
+      this.enableCharacterCounter ? this.counterId : null,
+      this.enableWordCounter ? `${this.counterId}_words` : null
+    ].filter((id) => !!id);
+
+    return this.helperService.buildDescribedBy(
+      this.helpMessage !== '' ? this.helpId : null,
+      this.showError ? this.errorId : null,
+      counters.length > 0 ? counters.join(' ') : null
+    );
+  }
 
   ngAfterViewInit(): void {
     if (this.autoFocus) {

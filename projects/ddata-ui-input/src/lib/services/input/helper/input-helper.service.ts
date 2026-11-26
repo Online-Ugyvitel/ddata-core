@@ -100,6 +100,37 @@ export class InputHelperService implements InputHelperServiceInterface {
     return model.fields[field].append;
   }
 
+  /**
+   * The error message of a field: empty while the field has no validation error. The `override`
+   * (the `errorText` input) wins over the message of the model (`getFieldErrorMessage`, which is
+   * optional); without any message only the border marks the error. The `suggestion` is a second
+   * sentence in the same message, separated by a space.
+   */
+  getErrorText(
+    model: BaseModelInterface<unknown> & FieldsInterface<unknown>,
+    field: string,
+    override: string,
+    suggestion = ''
+  ): string {
+    if (!model?.validationErrors?.includes(field)) {
+      return '';
+    }
+    const message = override !== '' ? override : (model.getFieldErrorMessage?.(field) ?? '');
+
+    return message !== '' && suggestion !== '' ? `${message} ${suggestion}` : message;
+  }
+
+  /** The ids of the visible help, error and counter elements for aria-describedby; null if none. */
+  buildDescribedBy(
+    helpId: string | null,
+    errorId: string | null,
+    counterId: string | null
+  ): string | null {
+    const ids = [helpId, errorId, counterId].filter((id): id is string => !!id);
+
+    return ids.length > 0 ? ids.join(' ') : null;
+  }
+
   isRequired(
     model: BaseModelInterface<unknown> & FieldsInterface<unknown>,
     field: string

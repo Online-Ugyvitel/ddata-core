@@ -1,0 +1,6 @@
+// the counter text is plain, borderless text; the position and the base look come from the
+// .dd-field-counter class of the host (styles/form-field)
+.dd-counter-exceeded {
+  font-weight: 600;
+  color: var(--dcms-destructive-color, var(--bs-danger-text-emphasis));
+}

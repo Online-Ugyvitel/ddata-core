@@ -1,0 +1,16 @@
+@use '../../styles/form-field';
+@use '../../styles/form-control';
+
+// the textarea grows with its rows; the prefix, suffix and counter stay at the top / bottom edge
+.dd-control {
+  align-items: flex-start;
+  padding-block: var(--dcms-space-0-375, 0.375rem);
+
+  .dd-control-input {
+    resize: vertical;
+  }
+
+  .dd-field-counter {
+    align-self: flex-end;
+  }
+}
