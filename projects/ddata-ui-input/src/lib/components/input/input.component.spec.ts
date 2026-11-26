@@ -539,7 +539,6 @@ describe('InputBoxComponent', () => {
 
     it('should render the prepend and the append texts and follow their changes', () => {
       render({ field: 'name', model: new FakeModel(), prepend: 'Ft', append: '%' });
-
       const affixes = (): Array<string> =>
         Array.from(element.querySelectorAll('.dd-control > .dd-control-affix')).map((affix) =>
           (affix as HTMLElement).textContent.trim()

@@ -6,9 +6,7 @@ describe('CharacterCounterComponent', () => {
   let component: CharacterCounterComponent;
   let fixture: ComponentFixture<CharacterCounterComponent>;
   const text = (): string =>
-    (fixture.nativeElement as HTMLElement)
-      .querySelector('span')
-      ?.textContent?.trim() ?? '';
+    (fixture.nativeElement as HTMLElement).querySelector('span')?.textContent?.trim() ?? '';
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

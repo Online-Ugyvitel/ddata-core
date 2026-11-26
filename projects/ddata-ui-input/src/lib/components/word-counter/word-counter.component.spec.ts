@@ -6,8 +6,7 @@ describe('WordCounterComponent', () => {
   let component: WordCounterComponent;
   let fixture: ComponentFixture<WordCounterComponent>;
   let reached: Array<boolean>;
-  const counter = (): HTMLElement =>
-    (fixture.nativeElement as HTMLElement).querySelector('span');
+  const counter = (): HTMLElement => (fixture.nativeElement as HTMLElement).querySelector('span');
   const text = (): string => counter().textContent.trim();
   const render = (currentLength: string | null | undefined, maxLength?: number): void => {
     if (maxLength !== undefined) {
