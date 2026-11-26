@@ -9,6 +9,8 @@ import {
   OnInit,
   ChangeDetectionStrategy
 } from '@angular/core';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faChevronDown, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { BaseModelInterface, DdataCoreModule, FieldsInterface } from '@netdjw/ddata-core';
 import { InputHelperServiceInterface } from '../../../services/input/helper/input-helper-service.interface';
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
@@ -22,15 +24,18 @@ import { InputHelperService } from '../../../services/input/helper/input-helper.
 })
 export class DdataAutocompleteSelectComponent implements OnInit {
   // All @Input and @Output properties first
-  @Input() wrapperClass = 'd-flex flex-wrap';
-  @Input() inputBlockClass = 'col-12 d-flex px-0';
-  @Input() inputBlockExtraClass = 'col-md-9';
+  @Input() wrapperClass = 'dd-field';
+  @Input() inputBlockClass = 'dd-field-control';
+  /**
+   * @deprecated the input block has no extra class any more, it does nothing
+   */
+  @Input() inputBlockExtraClass = '';
   @Input() unselectedText = 'Válassz vagy írj...';
   @Input() isRequired = false;
   @Input() disabledAppearance = false;
   @Input() disabled = false;
   @Input() addEmptyOption = true;
-  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
+  @Input() labelClass = 'form-label';
   @Input() showLabel = true;
   @Input() labelText = '';
   @Input() prepend = '';
@@ -40,6 +45,16 @@ export class DdataAutocompleteSelectComponent implements OnInit {
   @Input() items: Array<unknown> = [];
   @Input() text = 'name';
   @Input() valueField = 'id';
+  @Input() helpText = '';
+  @Input() errorText = '';
+  @Input() errorSuggestion = '';
+  /**
+   * Accepted for the API of all fields; a select has no counter, so it does nothing.
+   */
+  @Input() counterPlacement: 'label' | 'control' = 'label';
+  @Input() size: 'md' | 'sm' = 'md';
+  @Input() layout: 'stacked' | 'inline' = 'stacked';
+  @Input() chevronIcon: IconDefinition = faChevronDown;
 
   @Output() readonly selected: EventEmitter<unknown> = new EventEmitter();
   @Output() readonly selectModel: EventEmitter<unknown> = new EventEmitter();
@@ -50,6 +65,8 @@ export class DdataAutocompleteSelectComponent implements OnInit {
   private helperService: InputHelperServiceInterface;
   private random: string;
   private selectedModel: unknown;
+
+  readonly warningIcon = faTriangleExclamation;
 
   // Internal state
   isOpen = false;
@@ -154,6 +171,43 @@ export class DdataAutocompleteSelectComponent implements OnInit {
     }
 
     return `${this.field}_${this.random}`;
+  }
+
+  get helpId(): string {
+    return `${this.id}_help`;
+  }
+
+  get errorId(): string {
+    return `${this.id}_error`;
+  }
+
+  get isInvalid(): boolean {
+    return !!this.model?.validationErrors?.includes(this.field);
+  }
+
+  get helpMessage(): string {
+    return this.helpText || (this.model?.fields?.[this.field]?.help ?? '');
+  }
+
+  get errorMessage(): string {
+    return this.getHelperService().getErrorText(
+      this.model,
+      this.field,
+      this.errorText,
+      this.errorSuggestion
+    );
+  }
+
+  get showError(): boolean {
+    return this.errorMessage !== '';
+  }
+
+  get describedBy(): string | null {
+    return this.getHelperService().buildDescribedBy(
+      this.helpMessage !== '' ? this.helpId : null,
+      this.showError ? this.errorId : null,
+      null
+    );
   }
 
   get listboxId(): string {

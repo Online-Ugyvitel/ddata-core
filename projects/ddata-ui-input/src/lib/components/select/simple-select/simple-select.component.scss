@@ -1,6 +1,5 @@
-select {
-  padding: 0.375rem 0.25rem;
-}
+@use '../../../styles/form-field';
+@use '../../../styles/form-control';
 
 .disable-appearance {
   appearance: none;

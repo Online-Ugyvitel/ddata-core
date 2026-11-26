@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faSort } from '@fortawesome/free-solid-svg-icons';
 import { DdataSimpleSelectComponent } from './simple-select.component';
 import { DdataCoreModule, BaseModelInterface, FieldsInterface } from '@netdjw/ddata-core';
 import { InputHelperService } from '../../../services/input/helper/input-helper.service';
@@ -27,6 +29,9 @@ describe('DdataSimpleSelectComponent', () => {
         .fn()
         .mockName('get')
         .mockReturnValue({
+          // the pure helpers of the real service, they do not use `this`
+          getErrorText: InputHelperService.prototype.getErrorText,
+          buildDescribedBy: InputHelperService.prototype.buildDescribedBy,
           randChars: vi
             .fn()
             .mockName('randChars')
@@ -49,7 +54,7 @@ describe('DdataSimpleSelectComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [DdataSimpleSelectComponent],
-      imports: [FormsModule],
+      imports: [FormsModule, FontAwesomeModule],
       providers: [{ provide: InputHelperService, useValue: mockInjector.get() }]
     }).compileComponents();
 
@@ -72,9 +77,9 @@ describe('DdataSimpleSelectComponent', () => {
 
   describe('Component Properties', () => {
     it('should have default values for inputs', () => {
-      expect(component.wrapperClass).toBe('d-flex flex-wrap');
-      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
-      expect(component.inputBlockExtraClass).toBe('col-md-9');
+      expect(component.wrapperClass).toBe('dd-field');
+      expect(component.inputBlockClass).toBe('dd-field-control');
+      expect(component.inputBlockExtraClass).toBe('');
       expect(component.unselectedText).toBe('Válassz');
       expect(component.isRequired).toBe(false);
       expect(component.disabledAppearance).toBe(false);
@@ -392,6 +397,125 @@ describe('DdataSimpleSelectComponent', () => {
       }
 
       expect(hasAsterisk).toBe(true);
+    });
+  });
+
+  describe('form field skeleton', () => {
+    const FIELD = 'country_id';
+    const withMessages = (options: {
+      errors: Array<string>;
+      help?: string;
+      message?: string;
+    }): MockModel => ({
+      ...mockModel,
+      validationErrors: options.errors,
+      fields: { country_id: { label: 'Ország', title: 'Ország', help: options.help } },
+      getFieldErrorMessage: options.message ? () => options.message : undefined
+    });
+    const query = (selector: string): HTMLElement => fixture.nativeElement.querySelector(selector);
+    const render = (extra: Record<string, unknown> = {}): void => {
+      const base = { ...mockModel, validationErrors: [] };
+
+      fixture.componentRef.setInput('model', base);
+      Object.entries(extra).forEach(([key, value]) => fixture.componentRef.setInput(key, value));
+      fixture.detectChanges();
+    };
+    const describedBy = (): Array<string> =>
+      (query('select').getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+
+    it('should render the label above the .dd-control without a colon', () => {
+      render({ showLabel: true, labelText: 'Címke', isRequired: true });
+
+      expect(query('.dd-field > .dd-field-label-row > label.form-label')).not.toBeNull();
+      expect(query('label').textContent.replace(/\s+/g, ' ').trim()).toBe('Címke *');
+      expect(query('.dd-required').getAttribute('aria-hidden')).toBe('true');
+      expect(query('.dd-field-control .dd-control select')).not.toBeNull();
+      expect(query('select').getAttribute('aria-required')).toBe('true');
+    });
+
+    it('should render the chevron as an aria-hidden icon', () => {
+      render({});
+
+      expect(query('.dd-control .dd-control-chevron').getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('should not render the label row without a label', () => {
+      render({ showLabel: false });
+
+      expect(query('label')).toBeNull();
+      expect(query('.dd-field-label-row')).toBeNull();
+    });
+
+    it('should render the help text and reference it', () => {
+      render({ helpText: 'Súgó' });
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó');
+      expect(describedBy()).toEqual([query('.form-text').id]);
+    });
+
+    it('should render the help of the model', () => {
+      render({ model: withMessages({ errors: [], help: 'Súgó a modellből' }) });
+
+      expect(query('.form-text').textContent.trim()).toBe('Súgó a modellből');
+    });
+
+    it('should render the error message with the suggestion, the icon and aria attributes', () => {
+      render({
+        model: withMessages({ errors: [FIELD], message: 'Kötelező mező.' }),
+        errorSuggestion: 'Válassz egyet.'
+      });
+      const error = query('.invalid-feedback.d-flex');
+
+      expect(error.querySelector('span').textContent).toBe('Kötelező mező. Válassz egyet.');
+      expect(error.querySelector('fa-icon').getAttribute('aria-hidden')).toBe('true');
+      expect(query('.dd-control').classList).toContain('is-invalid');
+      expect(query('select').getAttribute('aria-invalid')).toBe('true');
+      expect(describedBy()).toEqual([error.id]);
+
+      fixture.componentRef.setInput('errorText', 'Saját üzenet');
+      fixture.detectChanges();
+
+      expect(query('.invalid-feedback span').textContent).toBe('Saját üzenet Válassz egyet.');
+    });
+
+    it('should only mark the border when the model has no message', () => {
+      render({ model: withMessages({ errors: [FIELD] }) });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('.dd-control').classList).toContain('is-invalid');
+      expect(query('select').getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('should not render a message or aria-invalid for a valid field', () => {
+      render({ errorText: 'Nem látszhat' });
+
+      expect(query('.invalid-feedback')).toBeNull();
+      expect(query('select').hasAttribute('aria-invalid')).toBe(false);
+      expect(query('select').hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('should render the size, the layout and the disabled state', () => {
+      render({ size: 'sm', layout: 'inline', disabled: true });
+
+      expect(query('.dd-control').classList).toContain('dd-control-sm');
+      expect(query('.dd-control').classList).toContain('is-disabled');
+      expect(query('.dd-field').classList).toContain('dd-field-inline');
+    });
+
+    it('should render the prepend and the append inside the control', () => {
+      render({ prepend: 'Ft', append: 'db' });
+
+      expect(
+        Array.from(fixture.nativeElement.querySelectorAll('.dd-control > .dd-control-affix')).map(
+          (affix) => (affix as HTMLElement).textContent.trim()
+        )
+      ).toEqual(['Ft', 'db']);
+    });
+
+    it('should use a custom chevron icon', () => {
+      render({ chevronIcon: faSort });
+
+      expect(query('.dd-control-chevron svg').getAttribute('data-icon')).toBe('sort');
     });
   });
 });

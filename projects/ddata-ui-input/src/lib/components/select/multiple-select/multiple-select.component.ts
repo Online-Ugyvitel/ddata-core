@@ -7,6 +7,8 @@ import {
   Output,
   TemplateRef
 } from '@angular/core';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faChevronDown, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { BaseModelInterface, DdataCoreModule, FieldsInterface } from '@netdjw/ddata-core';
 import { DialogContentWithOptionsInterface } from '../../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../../services/input/helper/input-helper-service.interface';
@@ -27,9 +29,12 @@ export interface SelectedItemTemplateContextInterface {
 })
 export class DdataMultipleSelectComponent {
   // look & feel
-  @Input() wrapperClass = 'd-flex flex-wrap';
-  @Input() inputBlockClass = 'col-12 d-flex px-0';
-  @Input() inputBlockExtraClass = 'col-md-9';
+  @Input() wrapperClass = 'dd-field';
+  @Input() inputBlockClass = 'dd-field-control';
+  /**
+   * @deprecated the input block has no extra class any more, it does nothing
+   */
+  @Input() inputBlockExtraClass = '';
   @Input() unselectedText = 'Válassz';
 
   /**
@@ -55,7 +60,7 @@ export class DdataMultipleSelectComponent {
   @Input() addEmptyOption = true;
 
   // label
-  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
+  @Input() labelClass = 'form-label';
   @Input() showLabel = true;
   @Input() labelText = '';
 
@@ -69,6 +74,18 @@ export class DdataMultipleSelectComponent {
   @Input() items: Array<unknown> = [];
   @Input() text = 'name';
   @Input() valueField = 'id';
+
+  // messages and look
+  @Input() helpText = '';
+  @Input() errorText = '';
+  @Input() errorSuggestion = '';
+  /**
+   * Accepted for the API of all fields; a select has no counter, so it does nothing.
+   */
+  @Input() counterPlacement: 'label' | 'control' = 'label';
+  @Input() size: 'md' | 'sm' = 'md';
+  @Input() layout: 'stacked' | 'inline' = 'stacked';
+  @Input() chevronIcon: IconDefinition = faChevronDown;
 
   // selected items
   @Input() disableShowSelectedItems = false;
@@ -103,12 +120,50 @@ export class DdataMultipleSelectComponent {
   private _isRequired = false;
   private readonly random: string = this.helperService.randChars();
   private internalDialogSettings: DialogContentWithOptionsInterface;
+  readonly warningIcon = faTriangleExclamation;
   isModalVisible = false;
 
   constructor(private readonly changeDetector: ChangeDetectorRef) {}
 
   get id(): string {
     return `${this.field}_${this.random}`;
+  }
+
+  get helpId(): string {
+    return `${this.id}_help`;
+  }
+
+  get errorId(): string {
+    return `${this.id}_error`;
+  }
+
+  get isInvalid(): boolean {
+    return !!this.model?.validationErrors?.includes(this.field);
+  }
+
+  get helpMessage(): string {
+    return this.helpText || (this.model?.fields?.[this.field]?.help ?? '');
+  }
+
+  get errorMessage(): string {
+    return this.helperService.getErrorText(
+      this.model,
+      this.field,
+      this.errorText,
+      this.errorSuggestion
+    );
+  }
+
+  get showError(): boolean {
+    return this.errorMessage !== '';
+  }
+
+  get describedBy(): string | null {
+    return this.helperService.buildDescribedBy(
+      this.helpMessage !== '' ? this.helpId : null,
+      this.showError ? this.errorId : null,
+      null
+    );
   }
 
   get selectedModelName(): string {

@@ -8,6 +8,8 @@ import {
   signal,
   TemplateRef
 } from '@angular/core';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { BaseModelInterface, DdataCoreModule, FieldsInterface } from '@netdjw/ddata-core';
 import { DialogContentWithOptionsInterface } from '../../models/dialog/content/dialog-content.interface';
 import { InputHelperServiceInterface } from '../../services/input/helper/input-helper-service.interface';
@@ -193,10 +195,13 @@ export class DdataSelectComponent {
     return this.selectedModelName$();
   }
 
-  @Input() wrapperClass = 'd-flex flex-wrap';
-  @Input() labelClass = 'col-12 col-md-3 px-0 col-form-label';
-  @Input() inputBlockClass = 'col-12 d-flex px-0';
-  @Input() inputBlockExtraClass = 'col-md-9';
+  @Input() wrapperClass = 'dd-field';
+  @Input() labelClass = 'form-label';
+  @Input() inputBlockClass = 'dd-field-control';
+  /**
+   * @deprecated the input block has no extra class any more, it does nothing
+   */
+  @Input() inputBlockExtraClass = '';
   @Input() showLabel = true;
   @Input() disabledAppearance = false;
   @Input() disabled = false;
@@ -205,6 +210,16 @@ export class DdataSelectComponent {
   @Input() text = 'name';
   @Input() valueField = 'id';
   @Input() unselectedText = 'Válassz';
+  @Input() helpText = '';
+  @Input() errorText = '';
+  @Input() errorSuggestion = '';
+  /**
+   * Accepted for the API of all fields; a select has no counter, so it does nothing.
+   */
+  @Input() counterPlacement: 'label' | 'control' = 'label';
+  @Input() size: 'md' | 'sm' = 'md';
+  @Input() layout: 'stacked' | 'inline' = 'stacked';
+  @Input() chevronIcon: IconDefinition = faChevronDown;
 
   /**
    * Custom template for rendering the selected items in multiple mode (instead of tags).

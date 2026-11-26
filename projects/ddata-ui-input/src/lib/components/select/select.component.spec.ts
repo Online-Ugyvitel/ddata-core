@@ -1,8 +1,10 @@
+import { faChevronDown, faSort } from '@fortawesome/free-solid-svg-icons';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DdataSelectComponent } from './select.component';
 import { DdataCoreModule } from '@netdjw/ddata-core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SelectType } from './select.type';
+import { InputHelperService } from '../../services/input/helper/input-helper.service';
 
 describe('DdataSelectComponent', () => {
   let component: DdataSelectComponent;
@@ -37,6 +39,9 @@ describe('DdataSelectComponent', () => {
           .mockReturnValue({
             validateFieldValue: vi.fn().mockName('validateFieldValue'),
             createUniqueId: vi.fn().mockName('createUniqueId').mockReturnValue('unique-id-123'),
+            // the pure helpers of the real service, they do not use `this`
+            getErrorText: InputHelperService.prototype.getErrorText,
+            buildDescribedBy: InputHelperService.prototype.buildDescribedBy,
             randChars: vi.fn().mockName('randChars').mockReturnValue('random-123'),
             getTitle: vi
               .fn()
@@ -111,10 +116,10 @@ describe('DdataSelectComponent', () => {
 
   describe('Component Properties', () => {
     it('should have default values for inputs', () => {
-      expect(component.wrapperClass).toBe('d-flex flex-wrap');
-      expect(component.labelClass).toBe('col-12 col-md-3 px-0 col-form-label');
-      expect(component.inputBlockClass).toBe('col-12 d-flex px-0');
-      expect(component.inputBlockExtraClass).toBe('col-md-9');
+      expect(component.wrapperClass).toBe('dd-field');
+      expect(component.labelClass).toBe('form-label');
+      expect(component.inputBlockClass).toBe('dd-field-control');
+      expect(component.inputBlockExtraClass).toBe('');
       expect(component.showLabel).toBe(true);
       expect(component.disabledAppearance).toBe(false);
       expect(component.disabled).toBe(false);
@@ -694,6 +699,50 @@ describe('DdataSelectComponent', () => {
 
       expect((component.model as unknown as { country_id: number }).country_id).toBe(999);
       expect(component.items).toEqual(mockCountries);
+    });
+  });
+
+  describe('form field inputs', () => {
+    const forwarded = {
+      helpText: 'Súgó',
+      errorText: 'Hiba',
+      errorSuggestion: 'Javaslat',
+      size: 'sm',
+      layout: 'inline',
+      inputBlockClass: 'my-block'
+    };
+
+    it('should have the default values of the new inputs', () => {
+      expect(component.helpText).toBe('');
+      expect(component.errorText).toBe('');
+      expect(component.errorSuggestion).toBe('');
+      expect(component.counterPlacement).toBe('label');
+      expect(component.size).toBe('md');
+      expect(component.layout).toBe('stacked');
+      expect(component.chevronIcon).toBe(faChevronDown);
+    });
+
+    it.each([
+      ['simple', 'dd-simple-select'],
+      ['autocomplete', 'dd-autocomplete-select'],
+      ['multiple', 'dd-multiple-select'],
+      ['single', 'dd-multiple-select']
+    ])('should forward the new inputs to the %s mode', (mode, selector) => {
+      fixture.componentRef.setInput('mode', mode);
+      Object.entries(forwarded).forEach(([key, value]) =>
+        fixture.componentRef.setInput(key, value)
+      );
+      fixture.componentRef.setInput('chevronIcon', faSort);
+      fixture.detectChanges();
+      const element = fixture.nativeElement.querySelector(selector);
+
+      expect(element.helpText).toBe('Súgó');
+      expect(element.errorText).toBe('Hiba');
+      expect(element.errorSuggestion).toBe('Javaslat');
+      expect(element.size).toBe('sm');
+      expect(element.layout).toBe('inline');
+      expect(element.inputBlockClass).toBe('my-block');
+      expect(element.chevronIcon).toBe(faSort);
     });
   });
 });
