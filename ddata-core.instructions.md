@@ -1145,6 +1145,41 @@ proxy.searchWithoutPaginate(filterData).subscribe((results: Array<User>) => {
 });
 ```
 
+#### List endpoints
+
+`search()` and `searchWithoutPaginate()` take a `ListQueryInterface` (`term?`, `filters?`, `view?`,
+`sort?: { field, direction }`) as the `POST {r}/search` body. The other list endpoints exist only on the
+API (not for `use_localstorage` models); errors go through `handleError` (`DdataCoreError`).
+
+```typescript
+import { ID, ListQueryInterface } from '@netdjw/ddata-core';
+
+const query: ListQueryInterface = {
+  term: 'news',
+  view: 'active',
+  sort: { field: 'published_at', direction: 'desc' },
+  // a scalar, a list (IN) or a [from, to] range with null for an open end
+  filters: { lang_id: [1, 2], is_inactive: 0, published_at: ['2026-01-01 00:00', null] }
+};
+
+// POST {r}/search?page=1
+proxy.search(query, 1);
+// GET {r}/views?term=… -> Array<ListViewInterface>
+proxy.views(query);
+// GET {r}/facets?fields[]=lang_id&term=… -> ListFacetsInterface
+proxy.facets(['lang_id'], query);
+// GET {r}/7/neighbors?term=…&sort[field]=…&filters[lang_id][]=1 -> ListNeighborsInterface
+proxy.neighbors(7 as ID, query);
+// POST {r}/{id}/restore -> true
+proxy.restore(post);
+// POST {r}/multiple/restore {"data":[7,9]} -> true
+proxy.restoreMultiple([7, 9] as Array<ID>);
+// POST {r}/multiple/update {"data":[7,9],"values":{"is_inactive":1}} -> true
+proxy.updateMultiple([7, 9] as Array<ID>, { is_inactive: 1 });
+```
+
+In the GET parameters a boolean filter is sent as `1`/`0` and `null` as an empty value.
+
 ### Validator Service
 
 Comprehensive validation service with built-in rules.

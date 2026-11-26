@@ -4,8 +4,16 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { ID } from '../../models/base/base-data.type';
 import { BaseModelInterface } from '../../models/base/base-model.model';
 import { FileUploadProcessInterface } from '../../models/file/file-upload-process.interface';
+import {
+  BulkUpdateValuesInterface,
+  ListFacetsInterface,
+  ListNeighborsInterface,
+  ListQueryInterface,
+  ListViewInterface
+} from '../../models/list/list-query.interface';
 import { PaginateInterface } from '../../models/paginate/paginate.interface';
 import { Paginate } from '../../models/paginate/paginate.model';
 import { DataServiceAbstract } from '../data/data-service.abstract';
@@ -132,7 +140,10 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
     }
   }
 
-  search(data: any, pageNumber?: number): Observable<PaginateInterface> {
+  /**
+   * Send `POST {model.api_endpoint}/search[?page=N]` with the list query as the body. Remote only.
+   */
+  search(data: ListQueryInterface | any, pageNumber?: number): Observable<PaginateInterface> {
     const uri = !!pageNumber ? `/search?page=${pageNumber}` : '/search';
 
     return this.remoteStorageService
@@ -140,7 +151,10 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
       .pipe(map((result: PaginateInterface) => this.getNewPaginateObject(this.type, result)));
   }
 
-  searchWithoutPaginate(data: any): Observable<Array<T>> {
+  /**
+   * Send `POST {model.api_endpoint}/search?paginate=off` with the list query as the body. Remote only.
+   */
+  searchWithoutPaginate(data: ListQueryInterface | any): Observable<Array<T>> {
     const uri = '/search?paginate=off';
 
     return this.remoteStorageService.postUri(data, uri).pipe(
@@ -150,6 +164,50 @@ export class ProxyService<T extends BaseModelInterface<T>> extends DataServiceAb
         return result;
       })
     );
+  }
+
+  // The list endpoints exist only on the API: they are not defined for `use_localstorage` models, like `search`.
+
+  /**
+   * `GET {model.api_endpoint}/views`: the list views with their record counts for the optional query. Remote only.
+   */
+  views(query?: ListQueryInterface): Observable<Array<ListViewInterface>> {
+    return this.remoteStorageService.views(query);
+  }
+
+  /**
+   * `GET {model.api_endpoint}/facets?fields[]=…`: the most frequent values of the columns. Remote only.
+   */
+  facets(fields: Array<string>, query?: ListQueryInterface): Observable<ListFacetsInterface> {
+    return this.remoteStorageService.facets(fields, query);
+  }
+
+  /**
+   * `GET {model.api_endpoint}/{id}/neighbors`: the previous and next record of the queried list. Remote only.
+   */
+  neighbors(id: ID, query?: ListQueryInterface): Observable<ListNeighborsInterface> {
+    return this.remoteStorageService.neighbors(id, query);
+  }
+
+  /**
+   * `POST {model.api_endpoint}/{model.id}/restore`: restores a soft deleted record. Remote only.
+   */
+  restore(model: T): Observable<boolean> {
+    return this.remoteStorageService.restore(model);
+  }
+
+  /**
+   * `POST {model.api_endpoint}/multiple/restore` with `{data: ids}`. Remote only.
+   */
+  restoreMultiple(ids: Array<ID>): Observable<boolean> {
+    return this.remoteStorageService.restoreMultiple(ids);
+  }
+
+  /**
+   * `POST {model.api_endpoint}/multiple/update` with `{data: ids, values}`. Remote only.
+   */
+  updateMultiple(ids: Array<ID>, values: BulkUpdateValuesInterface): Observable<boolean> {
+    return this.remoteStorageService.updateMultiple(ids, values);
   }
 
   save(model: T): Observable<number> {

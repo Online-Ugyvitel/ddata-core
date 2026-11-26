@@ -13,6 +13,9 @@ export * from './lib/models/paginate/paginate.model';
 // file upload interface
 export * from './lib/models/file/file-upload-process.interface';
 
+// list query interfaces of the list endpoints
+export * from './lib/models/list/list-query.interface';
+
 // selectable interface
 export * from './lib/models/selectable/selectable.interface';
 
